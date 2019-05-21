@@ -4,12 +4,227 @@
 
 ## Shiny App as a Package
 
+In the next chapter you'll be introduced to the `{golem}` package, which is __an opinionated framework for building production-ready Shiny Applications__. This framework starts by creating a package skeleton waiting to be filled. 
+
+But, in a world where Shiny Applications are mostly created as a series of files, why bother with a package? 
+
+### What's in a Shiny App? 
+
+OK, so let's ask the question the other way round. Think about your last Shiny which was created as a single-file (`app.R`) or two files app (`ui.R` and `server.R`). You've got these two, and you put them into a folder. 
+
+So, let's have a review of __what you'll need next for a robust application__.
+
+First, __metadata.__ In other words, the name of the app, the version number (which is crucial to any serious, production-level project), what the application does, who to contact if something goes wrong. 
+
+Then, you need to find a way to __handle the dependencies__. Because you know, when you want to push your app into production, you can't have this conversation with IT: 
+
+
+>IT: Hey, I tried to 'source("app.R")' but I've got an error. 
+>
+>R-dev: What's the error?
+>
+>IT: It says "could not find package 'shiny'". 
+>
+>R-dev: Ah yes, you need to install {shiny}. Try to run 'install.packages("shiny")'. 
+>
+>IT: Ok nice. What else?
+>
+>R-dev: Let me think, try also 'install.packages("DT")'... good? Now try 'install.packages("ggplot2")', and ...
+>
+>[...]
+>
+>IT: Ok, now I source the 'app.R', right?
+>
+>R-dev: Sure!
+>
+>IT: Ok so it says 'could not find function runApp()'
+>
+>R-dev: Ah, you've got to do library(shiny) at the beginning of your script. And library(purrr), and library(jsonlite)*.
+
+`*` Which will lead to a Namespace conflict on the `flatten()` function that can cause you some debugging headache. So, hey, it would be cool if we could have a Shiny app that only imports specific functions from a package, right?
+
+__So yes, dependencies matter. You need to handle them, and handle them correctly. __
+
+Now, let's say you're building a big app. Something with thousands of lines of code. Handling a one-file or two-file shiny app with that much lines is just a nightmare. So, what to do? Let's split everything into smaller files that we can call! 
+
+And finally, we want our app to live long and prosper, which means we need to document it: __each small pieces of code should have a piece of comment__ to explain what these specific lines do. The other thing we need for our application to be successful on the long term is tests, so that we are sure we're not introducing any regression.
+
+Oh, and that would be nice if people can get a `tar.gz` and install it on their computer and have access to a local copy of the app!
+
+OK, so let's sum up: we want to build an app. This app needs to have __metadata__ and to handle __dependencies__ corrrecly, which is what you get from the `DESCRIPTION` + `NAMESPACE` files of the package. Even more practical is the fact that you can do "selective namespace extraction" inside a package, i.e you can say "I want this function from this package". Also, __this app needs to be split up in smaller `.R` files__, which is the way a package is organized. And I don't need to emphasize how __documentation__ is a vital part of any package, so we solved this question too here. So is the __testing toolkit__. And of course, the "install everywhere" wish comes to life when a Shiny App is in a package. 
+
+### The other plus side of Shiny as a Package 
+
+#### Testing 
+
+__Nothing should go to production without being tested. Nothing.__ Testing production apps is a wide question, and I'll just stick to tests inside a Package here. 
+
+Frameworks for package testing are robust and widely documented. So you don't have to put any extra-effort here: just use a canonical testing framework like [`{testthat}`](https://testthat.r-lib.org/). Learning how to use it is not the subject of this chapter, so feel free to refer to the documentation. See also Chapter 5 of ["Building a package that lasts"](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107). 
+
+What should you test? 
+
++ First of all, as we've said before, the app should be split between the UI part and the backend (or 'business logic') part. These backend functions are supposed to run without any interactive context, just as plain old functions. So for these ones, __you can do classical tests__. As they are backend functions (so specific to a project), `{golem}` can't provide any helpers for that. 
+
++ For the UI part, __remember that any UI function is designed to render an HTML element__. So you can save a file as HTML, and then compare it to a UI object with the `golem::expect_html_equal()`.
+
+```
+library(shiny)
+ui <- tagList(h1("Hello world!"))
+htmltools::save_html(ui, "ui.html")
+golem::expect_html_equal(ui, "ui.html")
+# Changes 
+ui <- tagList(h2("Hello world!"))
+golem::expect_html_equal(ui, "ui.html")
+```
+
+This can for example be useful if you need to test a module. A UI module function returns an HTML tag list, so once your modules are set you can save them and use them inside tests. 
+
+```
+my_mod_ui <- function(id){
+  ns <- NS("id")
+  tagList(
+    selectInput(ns("this"), "that", choices = LETTERS[1:4])
+  )
+}
+my_mod_ui_test <- tempfile(fileext = "html")
+htmltools::save_html(my_mod_ui("test"), my_mod_ui_test)
+# Some time later, and of course saved in the test folder, 
+# not as a temp file
+golem::expect_html_equal(my_mod_ui("test"), my_mod_ui_test)
+```
+
+`{golem}` also provides two functions, `expect_shinytag()` and `expect_shinytaglist()`, that test if an objet is of class `"shiny.tag"` or  `"shiny.tag.list"`.
+ 
++ Testing package launch: when launching `golem::use_recommended_tests()`, you'll find a test built on top of `{processx}` that allows to check if the application is launch-able. Here's a short description of what happens: 
+
+```
+# Standard testthat things
+context("launch")
+
+library(processx)
+
+testthat::test_that(
+  "app launches",{
+    # We're creating a new process that runs the app
+    x <- process$new(
+      "R", 
+      c(
+        "-e", 
+        # As we are in the tests/testthat dir, we're moving 
+        # two steps back before launching the whole package
+        # and we try to launch the app
+        "setwd('../../'); pkgload::load_all();run_app()"
+      )
+    )
+    # We leave some time for the app to launch
+    # Configure this according to your need
+    Sys.sleep(5)
+    # We check that the app is alive
+    expect_true(x$is_alive())
+    # We kill it
+    x$kill()
+  }
+)
+```
+
+_Note_: this specific configuration will possibly fail on Continuous integration platform as Gitlab CI or Travis. A workaround is to, inside your CI yml, first install the package with `remotes::install_local()`, and then replace the `setwd (...) run_app()` command with `myuberapp::run_app()`. 
+
+For example: 
+
+- in `.gitlab-ci.yml`: 
+
+```
+test:
+  stage: test
+  script: 
+  - echo "Running tests"
+  - R -e 'remotes::install_local()'
+  - R -e 'devtools::check()'
+```
+
+- in `test-golem.R`:
+
+``` r
+testthat::test_that(
+  "app launches",{
+    x <- process$new( 
+      "R", 
+      c(
+        "-e", 
+        "datuberapp::run_app()"
+      )
+    )
+    Sys.sleep(5)
+    expect_true(x$is_alive())
+    x$kill()
+  }
+)
+```
+
+#### Documenting
+
+Documenting packages is a natural thing for any R developer. Any exported function should have its own documentation, hence you are "forced" to document any user facing-function. 
+
+Also, building a Shiny App as a package allows you to write standard R documentation: 
+
+- A `README` at the root of your package
+- `Vignettes` that explain how to use your app 
+- A `{pkgdown}` that can be used as an external link for your application. 
+
+### Deploy
+
+#### Local deployment
+
+As your Shiny App is a standard package, it can be built as a `tar.gz`, sent to your colleagues, friends, and family, and even to the CRAN. It can also be installed in any R-package repository. Then, if you've built your app with `{golem}`, you'll just have to do: 
+
+```{r eval=FALSE}
+library(myuberapp)
+run_app()
+```
+
+to launch your app.
+
+#### RStudio Connect & Shiny Server
+
+Both these platforms expect a file app configuration, i.e an `app.R` file or `ui.R` / `server.R` files. So how can we integrate this "Shiny App as Package" into Connect or Shiny Server? 
+
++ Using an internal package manager like [RStudio Package Manager](https://www.rstudio.com/products/package-manager/), where the package app is installed, and then you simply have to create an `app.R` with the small piece of code from the section just before. 
+
++ Uploading the package package folder to the server. In that scenario, you use the package folder as the app package, and upload the whole thing. Then, write an `app.R` that does: 
+
+```{r eval = FALSE}
+pkgload::load_all()
+shiny::shinyApp(ui = app_ui(), server = app_server)
+```
+
+And of course, don't forget to add this file in the `.Rbuildignore`!
+
+This is the file you'll get if your run `golem::add_rconnect_file()`.
+
+#### Docker containers
+
+In order to dockerize your app, simply install the package as any other package, and use as a `CMD` `R -e 'options("shiny.port"=80,shiny.host="0.0.0.0");myuberapp::run_app()'`. Of course changing the port to the one you need. 
+
+You'll get the Dockerfile you need with `golem::add_dockerfile()`.
+
+### Resources 
+
++ [R packages](http://r-pkgs.had.co.nz/)
+
++ ["Building a package that lasts"](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop)
+
++ [Writing R Extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Creating-R-packages)
+
++ [R package primer - a minimal tutorial](https://kbroman.org/pkg_primer/)
+
+## Understanding `{golem}` package structure
+
 // TODO
 
 ## Using Shiny Modules
 
 // TODO 
 
-## Splitting your app in files
+## Splitting your app into files
 
 // TODO
