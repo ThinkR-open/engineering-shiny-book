@@ -4,21 +4,21 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 3 Structuring your Project | Building Big Shiny Apps - A Workflow</title>
-  <meta name="description" content="Chapter 3 Structuring your Project | Building Big Shiny Apps - A Workflow" />
+  <title>Chapter 12 Send your app to production | Building Big Shiny Apps - A Workflow</title>
+  <meta name="description" content="Chapter 12 Send your app to production | Building Big Shiny Apps - A Workflow" />
   <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 3 Structuring your Project | Building Big Shiny Apps - A Workflow" />
+  <meta property="og:title" content="Chapter 12 Send your app to production | Building Big Shiny Apps - A Workflow" />
   <meta property="og:type" content="book" />
   
   
-  <meta property="og:description" content="Chapter 3 Structuring your Project | Building Big Shiny Apps - A Workflow" />
+  <meta property="og:description" content="Chapter 12 Send your app to production | Building Big Shiny Apps - A Workflow" />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 3 Structuring your Project | Building Big Shiny Apps - A Workflow" />
+  <meta name="twitter:title" content="Chapter 12 Send your app to production | Building Big Shiny Apps - A Workflow" />
   
-  <meta name="twitter:description" content="Chapter 3 Structuring your Project | Building Big Shiny Apps - A Workflow" />
+  <meta name="twitter:description" content="Chapter 12 Send your app to production | Building Big Shiny Apps - A Workflow" />
   
 
 <meta name="author" content="Colin Fay" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="challenges.html">
-<link rel="next" href="golem.html">
+<link rel="prev" href="secure.html">
+<link rel="next" href="deploy-golem.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -279,193 +279,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="structure" class="section level1">
-<h1><span class="header-section-number">Chapter 3</span> Structuring your Project</h1>
-<div id="shiny-app-as-a-package" class="section level2">
-<h2><span class="header-section-number">3.1</span> Shiny App as a Package</h2>
-<p>In the next chapter you’ll be introduced to the <code>{golem}</code> package, which is <strong>an opinionated framework for building production-ready Shiny Applications</strong>. This framework starts by creating a package skeleton waiting to be filled.</p>
-<p>But, in a world where Shiny Applications are mostly created as a series of files, why bother with a package?</p>
-<div id="whats-in-a-shiny-app" class="section level3">
-<h3><span class="header-section-number">3.1.1</span> What’s in a Shiny App?</h3>
-<p>OK, so let’s ask the question the other way round. Think about your last Shiny which was created as a single-file (<code>app.R</code>) or two files app (<code>ui.R</code> and <code>server.R</code>). You’ve got these two, and you put them into a folder.</p>
-<p>So, let’s have a review of <strong>what you’ll need next for a robust application</strong>.</p>
-<p>First, <strong>metadata.</strong> In other words, the name of the app, the version number (which is crucial to any serious, production-level project), what the application does, who to contact if something goes wrong.</p>
-<p>Then, you need to find a way to <strong>handle the dependencies</strong>. Because you know, when you want to push your app into production, you can’t have this conversation with IT:</p>
-<blockquote>
-<p>IT: Hey, I tried to ‘source(“app.R”)’ but I’ve got an error.</p>
-<p>R-dev: What’s the error?</p>
-<p>IT: It says “could not find package ‘shiny’”.</p>
-<p>R-dev: Ah yes, you need to install {shiny}. Try to run ‘install.packages(“shiny”)’.</p>
-<p>IT: Ok nice. What else?</p>
-<p>R-dev: Let me think, try also ‘install.packages(“DT”)’… good? Now try ‘install.packages(“ggplot2”)’, and …</p>
-<p>[…]</p>
-<p>IT: Ok, now I source the ‘app.R’, right?</p>
-<p>R-dev: Sure!</p>
-<p>IT: Ok so it says ‘could not find function runApp()’</p>
-<p>R-dev: Ah, you’ve got to do library(shiny) at the beginning of your script. And library(purrr), and library(jsonlite)*.</p>
-</blockquote>
-<p><code>*</code> Which will lead to a Namespace conflict on the <code>flatten()</code> function that can cause you some debugging headache. So, hey, it would be cool if we could have a Shiny app that only imports specific functions from a package, right?</p>
-<p><strong>So yes, dependencies matter. You need to handle them, and handle them correctly. </strong></p>
-<p>Now, let’s say you’re building a big app. Something with thousands of lines of code. Handling a one-file or two-file shiny app with that much lines is just a nightmare. So, what to do? Let’s split everything into smaller files that we can call!</p>
-<p>And finally, we want our app to live long and prosper, which means we need to document it: <strong>each small pieces of code should have a piece of comment</strong> to explain what these specific lines do. The other thing we need for our application to be successful on the long term is tests, so that we are sure we’re not introducing any regression.</p>
-<p>Oh, and that would be nice if people can get a <code>tar.gz</code> and install it on their computer and have access to a local copy of the app!</p>
-<p>OK, so let’s sum up: we want to build an app. This app needs to have <strong>metadata</strong> and to handle <strong>dependencies</strong> corrrecly, which is what you get from the <code>DESCRIPTION</code> + <code>NAMESPACE</code> files of the package. Even more practical is the fact that you can do “selective namespace extraction” inside a package, i.e you can say “I want this function from this package”. Also, <strong>this app needs to be split up in smaller <code>.R</code> files</strong>, which is the way a package is organized. And I don’t need to emphasize how <strong>documentation</strong> is a vital part of any package, so we solved this question too here. So is the <strong>testing toolkit</strong>. And of course, the “install everywhere” wish comes to life when a Shiny App is in a package.</p>
-</div>
-<div id="the-other-plus-side-of-shiny-as-a-package" class="section level3">
-<h3><span class="header-section-number">3.1.2</span> The other plus side of Shiny as a Package</h3>
-<div id="testing" class="section level4">
-<h4><span class="header-section-number">3.1.2.1</span> Testing</h4>
-<p><strong>Nothing should go to production without being tested. Nothing.</strong> Testing production apps is a wide question, and I’ll just stick to tests inside a Package here.</p>
-<p>Frameworks for package testing are robust and widely documented. So you don’t have to put any extra-effort here: just use a canonical testing framework like <a href="https://testthat.r-lib.org/"><code>{testthat}</code></a>. Learning how to use it is not the subject of this chapter, so feel free to refer to the documentation. See also Chapter 5 of <a href="https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107">“Building a package that lasts”</a>.</p>
-<p>What should you test?</p>
-<ul>
-<li><p>First of all, as we’ve said before, the app should be split between the UI part and the backend (or ‘business logic’) part. These backend functions are supposed to run without any interactive context, just as plain old functions. So for these ones, <strong>you can do classical tests</strong>. As they are backend functions (so specific to a project), <code>{golem}</code> can’t provide any helpers for that.</p></li>
-<li><p>For the UI part, <strong>remember that any UI function is designed to render an HTML element</strong>. So you can save a file as HTML, and then compare it to a UI object with the <code>golem::expect_html_equal()</code>.</p></li>
-</ul>
-<pre><code>library(shiny)
-ui &lt;- tagList(h1(&quot;Hello world!&quot;))
-htmltools::save_html(ui, &quot;ui.html&quot;)
-golem::expect_html_equal(ui, &quot;ui.html&quot;)
-# Changes 
-ui &lt;- tagList(h2(&quot;Hello world!&quot;))
-golem::expect_html_equal(ui, &quot;ui.html&quot;)</code></pre>
-<p>This can for example be useful if you need to test a module. A UI module function returns an HTML tag list, so once your modules are set you can save them and use them inside tests.</p>
-<pre><code>my_mod_ui &lt;- function(id){
-  ns &lt;- NS(&quot;id&quot;)
-  tagList(
-    selectInput(ns(&quot;this&quot;), &quot;that&quot;, choices = LETTERS[1:4])
-  )
-}
-my_mod_ui_test &lt;- tempfile(fileext = &quot;html&quot;)
-htmltools::save_html(my_mod_ui(&quot;test&quot;), my_mod_ui_test)
-# Some time later, and of course saved in the test folder, 
-# not as a temp file
-golem::expect_html_equal(my_mod_ui(&quot;test&quot;), my_mod_ui_test)</code></pre>
-<p><code>{golem}</code> also provides two functions, <code>expect_shinytag()</code> and <code>expect_shinytaglist()</code>, that test if an objet is of class <code>&quot;shiny.tag&quot;</code> or <code>&quot;shiny.tag.list&quot;</code>.</p>
-<ul>
-<li>Testing package launch: when launching <code>golem::use_recommended_tests()</code>, you’ll find a test built on top of <code>{processx}</code> that allows to check if the application is launch-able. Here’s a short description of what happens:</li>
-</ul>
-<pre><code># Standard testthat things
-context(&quot;launch&quot;)
+<div id="stepdeploy" class="section level1">
+<h1><span class="header-section-number">Chapter 12</span> Send your app to production</h1>
+<p>Tools for deployment are not the subject of this blog post so I won’t talk about this in detail (remember, we are talking about building 😉 ), but our two tools of choice are Docker &amp; ShinyProxy, and RStudio Connect.</p>
+<p>// TODO: link to resources.</p>
 
-library(processx)
-
-testthat::test_that(
-  &quot;app launches&quot;,{
-    # We&#39;re creating a new process that runs the app
-    x &lt;- process$new(
-      &quot;R&quot;, 
-      c(
-        &quot;-e&quot;, 
-        # As we are in the tests/testthat dir, we&#39;re moving 
-        # two steps back before launching the whole package
-        # and we try to launch the app
-        &quot;setwd(&#39;../../&#39;); pkgload::load_all();run_app()&quot;
-      )
-    )
-    # We leave some time for the app to launch
-    # Configure this according to your need
-    Sys.sleep(5)
-    # We check that the app is alive
-    expect_true(x$is_alive())
-    # We kill it
-    x$kill()
-  }
-)</code></pre>
-<p><em>Note</em>: this specific configuration will possibly fail on Continuous integration platform as Gitlab CI or Travis. A workaround is to, inside your CI yml, first install the package with <code>remotes::install_local()</code>, and then replace the <code>setwd (...) run_app()</code> command with <code>myuberapp::run_app()</code>.</p>
-<p>For example:</p>
-<ul>
-<li>in <code>.gitlab-ci.yml</code>:</li>
-</ul>
-<pre><code>test:
-  stage: test
-  script: 
-  - echo &quot;Running tests&quot;
-  - R -e &#39;remotes::install_local()&#39;
-  - R -e &#39;devtools::check()&#39;</code></pre>
-<ul>
-<li>in <code>test-golem.R</code>:</li>
-</ul>
-<pre class="sourceCode r"><code class="sourceCode r">testthat<span class="op">::</span><span class="kw">test_that</span>(
-  <span class="st">&quot;app launches&quot;</span>,{
-    x &lt;-<span class="st"> </span>process<span class="op">$</span><span class="kw">new</span>( 
-      <span class="st">&quot;R&quot;</span>, 
-      <span class="kw">c</span>(
-        <span class="st">&quot;-e&quot;</span>, 
-        <span class="st">&quot;datuberapp::run_app()&quot;</span>
-      )
-    )
-    <span class="kw">Sys.sleep</span>(<span class="dv">5</span>)
-    <span class="kw">expect_true</span>(x<span class="op">$</span><span class="kw">is_alive</span>())
-    x<span class="op">$</span><span class="kw">kill</span>()
-  }
-)</code></pre>
-</div>
-<div id="documenting" class="section level4">
-<h4><span class="header-section-number">3.1.2.2</span> Documenting</h4>
-<p>Documenting packages is a natural thing for any R developer. Any exported function should have its own documentation, hence you are “forced” to document any user facing-function.</p>
-<p>Also, building a Shiny App as a package allows you to write standard R documentation:</p>
-<ul>
-<li>A <code>README</code> at the root of your package</li>
-<li><code>Vignettes</code> that explain how to use your app</li>
-<li>A <code>{pkgdown}</code> that can be used as an external link for your application.</li>
-</ul>
-</div>
-</div>
-<div id="deploy" class="section level3">
-<h3><span class="header-section-number">3.1.3</span> Deploy</h3>
-<div id="local-deployment" class="section level4">
-<h4><span class="header-section-number">3.1.3.1</span> Local deployment</h4>
-<p>As your Shiny App is a standard package, it can be built as a <code>tar.gz</code>, sent to your colleagues, friends, and family, and even to the CRAN. It can also be installed in any R-package repository. Then, if you’ve built your app with <code>{golem}</code>, you’ll just have to do:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(myuberapp)
-<span class="kw">run_app</span>()</code></pre>
-<p>to launch your app.</p>
-</div>
-<div id="rstudio-connect-shiny-server" class="section level4">
-<h4><span class="header-section-number">3.1.3.2</span> RStudio Connect &amp; Shiny Server</h4>
-<p>Both these platforms expect a file app configuration, i.e an <code>app.R</code> file or <code>ui.R</code> / <code>server.R</code> files. So how can we integrate this “Shiny App as Package” into Connect or Shiny Server?</p>
-<ul>
-<li><p>Using an internal package manager like <a href="https://www.rstudio.com/products/package-manager/">RStudio Package Manager</a>, where the package app is installed, and then you simply have to create an <code>app.R</code> with the small piece of code from the section just before.</p></li>
-<li><p>Uploading the package package folder to the server. In that scenario, you use the package folder as the app package, and upload the whole thing. Then, write an <code>app.R</code> that does:</p></li>
-</ul>
-<pre class="sourceCode r"><code class="sourceCode r">pkgload<span class="op">::</span><span class="kw">load_all</span>()
-shiny<span class="op">::</span><span class="kw">shinyApp</span>(<span class="dt">ui =</span> <span class="kw">app_ui</span>(), <span class="dt">server =</span> app_server)</code></pre>
-<p>And of course, don’t forget to add this file in the <code>.Rbuildignore</code>!</p>
-<p>This is the file you’ll get if your run <code>golem::add_rconnect_file()</code>.</p>
-</div>
-<div id="docker-containers" class="section level4">
-<h4><span class="header-section-number">3.1.3.3</span> Docker containers</h4>
-<p>In order to dockerize your app, simply install the package as any other package, and use as a <code>CMD</code> <code>R -e 'options(&quot;shiny.port&quot;=80,shiny.host=&quot;0.0.0.0&quot;);myuberapp::run_app()'</code>. Of course changing the port to the one you need.</p>
-<p>You’ll get the Dockerfile you need with <code>golem::add_dockerfile()</code>.</p>
-</div>
-</div>
-<div id="resources" class="section level3">
-<h3><span class="header-section-number">3.1.4</span> Resources</h3>
-<ul>
-<li><p><a href="http://r-pkgs.had.co.nz/">R packages</a></p></li>
-<li><p><a href="https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop">“Building a package that lasts”</a></p></li>
-<li><p><a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Creating-R-packages">Writing R Extensions</a></p></li>
-<li><p><a href="https://kbroman.org/pkg_primer/">R package primer - a minimal tutorial</a></p></li>
-</ul>
-</div>
-</div>
-<div id="using-shiny-modules" class="section level2">
-<h2><span class="header-section-number">3.2</span> Using Shiny Modules</h2>
-<p>// TODO</p>
-</div>
-<div id="splitting-your-app-into-files" class="section level2">
-<h2><span class="header-section-number">3.3</span> Splitting your app into files</h2>
-<p>// TODO</p>
-
-</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="challenges.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="golem.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="secure.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="deploy-golem.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
