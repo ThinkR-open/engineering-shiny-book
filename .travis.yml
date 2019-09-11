@@ -1,11 +1,22 @@
 language: r
 
 cache: packages
-
-before_install:
-  - Rscript -e 'install.packages("remotes")'
-  - Rscript -e 'remotes::install_cran(c("golem", "bookdown"))'
   
-script:
-  - Rscript -e 'bookdown::render_book("index.rmd")'
+matrix:
+  include:
+  - r: release
+    before_cache:
+    - Rscript -e 'install.packages("remotes")'
+    - Rscript -e 'remotes::install_cran(c("golem", "bookdown"))'
+    deploy:
+      provider: pages
+      skip-cleanup: true
+      github-token: $GITHUB_PAT
+      keep-history: true
+      local-dir: docs
+      on:
+        branch: master
+      skip_cleanup: true
   
+after_success:
+  - Rscript -e 'bookdown::render_book("index.Rmd")'
