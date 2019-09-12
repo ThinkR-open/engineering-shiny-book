@@ -4,35 +4,35 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 16 Optimizing Shiny Code | Building Big Shiny Apps - A Workflow</title>
-  <meta name="description" content="Chapter 16 Optimizing Shiny Code | Building Big Shiny Apps - A Workflow" />
+  <title>Chapter 17 Using JavaSript | Building Big Shiny Apps - A Workflow</title>
+  <meta name="description" content="Chapter 17 Using JavaSript | Building Big Shiny Apps - A Workflow" />
   <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 16 Optimizing Shiny Code | Building Big Shiny Apps - A Workflow" />
+  <meta property="og:title" content="Chapter 17 Using JavaSript | Building Big Shiny Apps - A Workflow" />
   <meta property="og:type" content="book" />
   
   
-  <meta property="og:description" content="Chapter 16 Optimizing Shiny Code | Building Big Shiny Apps - A Workflow" />
+  <meta property="og:description" content="Chapter 17 Using JavaSript | Building Big Shiny Apps - A Workflow" />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 16 Optimizing Shiny Code | Building Big Shiny Apps - A Workflow" />
+  <meta name="twitter:title" content="Chapter 17 Using JavaSript | Building Big Shiny Apps - A Workflow" />
   
-  <meta name="twitter:description" content="Chapter 16 Optimizing Shiny Code | Building Big Shiny Apps - A Workflow" />
+  <meta name="twitter:description" content="Chapter 17 Using JavaSript | Building Big Shiny Apps - A Workflow" />
   
 
 <meta name="author" content="Colin Fay, Vincent Guyader, Cervan Girard, Sébastien Rochette" />
 
 
-<meta name="date" content="2019-09-11" />
+<meta name="date" content="2019-09-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="optim-caveat.html">
-<link rel="next" href="optimjs.html">
+<link rel="prev" href="optimizing-shiny-code.html">
+
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -290,29 +290,76 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="optimizing-shiny-code" class="section level1">
-<h1><span class="header-section-number">Chapter 16</span> Optimizing Shiny Code</h1>
-<div id="reading-data-1" class="section level2">
-<h2><span class="header-section-number">16.1</span> Reading data</h2>
+<div id="optimjs" class="section level1">
+<h1><span class="header-section-number">Chapter 17</span> Using JavaSript</h1>
+<div id="client-side-optimization" class="section level2">
+<h2><span class="header-section-number">17.1</span> Client-side Optimization</h2>
 <p>// TODO</p>
 </div>
-<div id="caching-elements" class="section level2">
-<h2><span class="header-section-number">16.2</span> Caching elements</h2>
+<div id="javascript---shiny-communication" class="section level2">
+<h2><span class="header-section-number">17.2</span> JavaScript &lt;-&gt; Shiny communication</h2>
 <p>// TODO</p>
 </div>
-<div id="keeping-things-simple" class="section level2">
-<h2><span class="header-section-number">16.3</span> Keeping things simple</h2>
+<div id="common-javascript-patterns-for-shiny" class="section level2">
+<h2><span class="header-section-number">17.3</span> Common JavaScript patterns for Shiny</h2>
 <p>// TODO</p>
+</div>
+<div id="about-golem-js-functions" class="section level2">
+<h2><span class="header-section-number">17.4</span> About <code>{golem}</code> js functions</h2>
+<p><code>{golem}</code> comes with a series of JavaScript functions that you can call from the server.
+These functions are added by default with <code>golem::activate_js()</code> in <code>app_ui</code>.</p>
+<p>Then they are called with <code>golem::invoke_js(&quot;function&quot;, &quot;ui_element&quot;)</code>.</p>
+<p>This <code>ui_element</code> define the UI element to interact with.
+It can be a full jQuery selector, an id or a class.</p>
+<div id="golemactivate_js" class="section level3">
+<h3><span class="header-section-number">17.4.1</span> <code>golem::activate_js()</code></h3>
+<ul>
+<li><code>showid</code> &amp; <code>hideid</code>, <code>showclass</code> &amp; <code>hideclass</code> show and hide elements through their id or class.</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;showid&quot;</span>, <span class="kw">ns</span>(<span class="st">&quot;plot&quot;</span>))</code></pre>
+<ul>
+<li><code>showhref</code> &amp; <code>hidehref</code> hide and show a link by trying to match the <code>href</code> content.</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;showhref&quot;</span>, <span class="st">&quot;panel2&quot;</span>)</code></pre>
+<ul>
+<li><p><code>clickon</code> click on the element. You have to use the full jQuery selector.</p></li>
+<li><p><code>show</code> &amp; <code>hide</code> show and hide elements, using the full jQuery selector.</p></li>
+</ul>
+</div>
+<div id="about-jquery-selectors" class="section level3">
+<h3><span class="header-section-number">17.4.2</span> About jQuery selectors</h3>
+<ul>
+<li><p><code>#plop</code>: the element with the id <code>plop</code></p></li>
+<li><p><code>.pouet</code>: elements of class <code>pouet</code></p></li>
+<li><p><code>&quot;button:contains('this')&quot;</code>: buttons with a text containing <code>'this'</code></p></li>
+</ul>
+<p>Note that in html, tags contains attributes. For example:</p>
+<pre class="sourceCode html"><code class="sourceCode html"><span class="kw">&lt;a</span><span class="ot"> href</span> <span class="ot">=</span> <span class="st">&quot;https://thinkr.fr&quot;</span><span class="ot"> data-value</span> <span class="ot">=</span> <span class="st">&quot;panel2&quot;</span><span class="kw">&gt;</span>ThinkR<span class="kw">&lt;/a&gt;</span></code></pre>
+<p>contains <code>href</code> &amp; <code>data-value</code>.
+You can refer to these attributes with <code>[]</code> after the tag name.</p>
+<ul>
+<li><p><code>a[href = &quot;https://thinkr.fr&quot;]</code>: link with <code>href</code> being <code>https://thinkr.fr</code></p></li>
+<li><p><code>a[data-value=&quot;panel2&quot;]</code>: link with <code>data-value</code> being <code>&quot;panel2&quot;</code></p></li>
+</ul>
 
 </div>
 </div>
+</div>
+
+
+
+
+
+
+
+
             </section>
 
           </div>
         </div>
       </div>
-<a href="optim-caveat.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="optimjs.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="optimizing-shiny-code.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
