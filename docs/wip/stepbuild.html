@@ -4,35 +4,35 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 16 Optimizing Shiny Code | Building Big Shiny Apps - A Workflow</title>
-  <meta name="description" content="Chapter 16 Optimizing Shiny Code | Building Big Shiny Apps - A Workflow" />
+  <title>Chapter 10 Building app with {golem} | Building Big Shiny Apps - A Workflow</title>
+  <meta name="description" content="Chapter 10 Building app with {golem} | Building Big Shiny Apps - A Workflow" />
   <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 16 Optimizing Shiny Code | Building Big Shiny Apps - A Workflow" />
+  <meta property="og:title" content="Chapter 10 Building app with {golem} | Building Big Shiny Apps - A Workflow" />
   <meta property="og:type" content="book" />
   
   
-  <meta property="og:description" content="Chapter 16 Optimizing Shiny Code | Building Big Shiny Apps - A Workflow" />
+  <meta property="og:description" content="Chapter 10 Building app with {golem} | Building Big Shiny Apps - A Workflow" />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 16 Optimizing Shiny Code | Building Big Shiny Apps - A Workflow" />
+  <meta name="twitter:title" content="Chapter 10 Building app with {golem} | Building Big Shiny Apps - A Workflow" />
   
-  <meta name="twitter:description" content="Chapter 16 Optimizing Shiny Code | Building Big Shiny Apps - A Workflow" />
+  <meta name="twitter:description" content="Chapter 10 Building app with {golem} | Building Big Shiny Apps - A Workflow" />
   
 
 <meta name="author" content="Colin Fay, Vincent Guyader, Cervan Girard, Sébastien Rochette" />
 
 
-<meta name="date" content="2019-09-11" />
+<meta name="date" content="2019-09-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="optim-caveat.html">
-<link rel="next" href="optimjs.html">
+<link rel="prev" href="proto.html">
+<link rel="next" href="step-secure.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -290,29 +290,221 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="optimizing-shiny-code" class="section level1">
-<h1><span class="header-section-number">Chapter 16</span> Optimizing Shiny Code</h1>
-<div id="reading-data-1" class="section level2">
-<h2><span class="header-section-number">16.1</span> Reading data</h2>
-<p>// TODO</p>
+<div id="stepbuild" class="section level1">
+<h1><span class="header-section-number">Chapter 10</span> Building app with <code>{golem}</code></h1>
+<p>Now the UI and the features are set, time to work on the backend.</p>
+<p>This part is pretty standard — everybody can now work on the implementation of the functions that process the app inputs, in their own modules.
+As the UI, functionalities and modules have been defined in the previous steps, everyone (well, in theory) knows what they have to work on.</p>
+<p>And also, as said before, there should be no “surprise implementation”, as the app has been well defined before.</p>
+<div id="using-golem" class="section level2">
+<h2><span class="header-section-number">10.1</span> Using <code>{golem}</code></h2>
+<div id="create-a-package" class="section level3">
+<h3><span class="header-section-number">10.1.1</span> Create a package</h3>
+<p>Once the package is installed, you can got to File &gt; New Project… in RStudio, and choose “Package for Shiny App Using golem” input.</p>
+<p>If you want to do it through command line, you can use:</p>
+<pre class="sourceCode r"><code class="sourceCode r">golem<span class="op">::</span><span class="kw">create_shiny_template</span>(<span class="dt">path =</span> <span class="st">&quot;path/to/package&quot;</span>)</code></pre>
+<p>This command allows you to create “illegally-named” package (for example, <code>1234</code>) by passing the <code>check_name</code> argument to <code>FALSE</code>. Note that this is not recommended and <strong>should only be done if you know what you are doing</strong>.</p>
+<p>Once you’ve got that, a new RStudio project will be launched. Here is the structure of this project:</p>
+<pre><code>DESCRIPTION               
+¦--dev/          
+  ¦--01_start.R           
+  ¦--02_dev.R           
+  ¦--03_deploy.R           
+  ¦--run_dev.R
+¦--inst/ 
+  ¦--app                
+    ¦--server.R       
+    ¦--ui.R           
+    ¦--www/          
+      ¦--favicon.ico
+¦--man/ 
+    ¦--run_app.Rd      
+NAMESPACE
+myapp.Rproj
+¦--R/ 
+  ¦--app_server.R       
+  ¦--app_ui.R           
+  ¦--run_app.R      </code></pre>
+<p>If you’re already familiar with R packages, most of these files will appear very familiar to you.
+That’s because a <code>{golem}</code> app IS a package.</p>
+<ul>
+<li><p><code>DESCRIPTION</code> &amp; <code>NAMESPACE</code>: Package meta-data.</p></li>
+<li><p><code>dev/</code>: Scripts that will be used along the process of developing your app.</p></li>
+<li><p><code>inst/app</code>: You’ll add external dependencies in <code>www</code> (images, css, etc). Don’t touch <code>app_ui</code> and <code>app_server</code>.</p></li>
+<li><p><code>man</code>: Package doc, to be generated by R.</p></li>
+<li><p><code>myapp.Rproj</code>: RStudio project.</p></li>
+<li><p><code>R/app_server.R</code>, <code>R/app_ui.R</code>: Top level UI and server elements.</p></li>
+<li><p><code>R/run_app.R</code>: a function to configure and launch the application.</p></li>
+</ul>
 </div>
-<div id="caching-elements" class="section level2">
-<h2><span class="header-section-number">16.2</span> Caching elements</h2>
-<p>// TODO</p>
 </div>
-<div id="keeping-things-simple" class="section level2">
-<h2><span class="header-section-number">16.3</span> Keeping things simple</h2>
-<p>// TODO</p>
+<div id="dev01_start.r" class="section level2">
+<h2><span class="header-section-number">10.2</span> <code>dev/01_start.R</code></h2>
+<p>Once you’ve created your project, the first file that opens is <code>dev/01_start.R</code>. This file contains a series of commands to run once, at the start of the project.</p>
+<div id="fill-the-desc" class="section level3">
+<h3><span class="header-section-number">10.2.1</span> Fill the DESC</h3>
+<p>First, fill the DESCRIPTION by adding information about the package that will contain your app:</p>
+<pre class="sourceCode r"><code class="sourceCode r">golem<span class="op">::</span><span class="kw">fill_desc</span>(
+  <span class="dt">pkg_name =</span> <span class="st">&quot;shinyexample&quot;</span>, <span class="co"># The Name of the package containing the App </span>
+  <span class="dt">pkg_title =</span> , <span class="co"># The Title of the package containing the App </span>
+  <span class="dt">pkg_description =</span> , <span class="co"># The Description of the package containing the App </span>
+  <span class="dt">author_first_name =</span> , <span class="co"># Your First Name</span>
+  <span class="dt">author_last_name =</span> ,  <span class="co"># Your Last Name</span>
+  <span class="dt">author_email =</span> ,      <span class="co"># Your Email</span>
+  <span class="dt">repo_url =</span> <span class="ot">NULL</span>)      <span class="co"># The (optional) URL of the GitHub Repo</span></code></pre>
+</div>
+<div id="set-common-files" class="section level3">
+<h3><span class="header-section-number">10.2.2</span> Set common Files</h3>
+<p>If you want to use the MIT licence, README, code of conduct, lifecycle badge, and news</p>
+<pre class="sourceCode r"><code class="sourceCode r">usethis<span class="op">::</span><span class="kw">use_mit_license</span>(<span class="dt">name =</span> <span class="st">&quot;Your Name&quot;</span>)  <span class="co"># You can set another licence here</span>
+usethis<span class="op">::</span><span class="kw">use_readme_rmd</span>()
+usethis<span class="op">::</span><span class="kw">use_code_of_conduct</span>()
+usethis<span class="op">::</span><span class="kw">use_lifecycle_badge</span>(<span class="st">&quot;Experimental&quot;</span>)
+usethis<span class="op">::</span><span class="kw">use_news_md</span>()</code></pre>
+</div>
+<div id="add-a-data-raw-folder" class="section level3">
+<h3><span class="header-section-number">10.2.3</span> Add a data-raw folder</h3>
+<p>If you have data in your package</p>
+<pre class="sourceCode r"><code class="sourceCode r">usethis<span class="op">::</span><span class="kw">use_data_raw</span>()</code></pre>
+</div>
+<div id="init-tests" class="section level3">
+<h3><span class="header-section-number">10.2.4</span> Init Tests</h3>
+<p>Create a template for tests:</p>
+<pre class="sourceCode r"><code class="sourceCode r">golem<span class="op">::</span><span class="kw">use_recommended_tests</span>()</code></pre>
+</div>
+<div id="use-recommended-package" class="section level3">
+<h3><span class="header-section-number">10.2.5</span> Use Recommended Package</h3>
+<p>This will add “shiny”, “DT”, “attempt”, “glue”, “htmltools”, and “golem” as a dependecy to your package.</p>
+<pre class="sourceCode r"><code class="sourceCode r">golem<span class="op">::</span><span class="kw">use_recommended_dep</span>(<span class="st">&quot;&quot;</span>)</code></pre>
+</div>
+<div id="add-various-tools" class="section level3">
+<h3><span class="header-section-number">10.2.6</span> Add various tools</h3>
+<p>These two functions add a file with various functions that can be used along the process of building your app.</p>
+<p>See each file in details for a description of the functions.</p>
+<pre class="sourceCode r"><code class="sourceCode r">golem<span class="op">::</span><span class="kw">use_utils_ui</span>()
+golem<span class="op">::</span><span class="kw">use_utils_server</span>()</code></pre>
+</div>
+<div id="if-you-want-to-change-the-default-favicon" class="section level3">
+<h3><span class="header-section-number">10.2.7</span> If you want to change the default favicon</h3>
+<pre class="sourceCode r"><code class="sourceCode r">golem<span class="op">::</span><span class="kw">use_favicon</span>( <span class="dt">path =</span> <span class="st">&quot;path/to/favicon&quot;</span>)</code></pre>
+<p>You’re now set!
+You’ve successfully initiated the project and can go to dev/02_dev.R.</p>
+<pre class="sourceCode r"><code class="sourceCode r">rstudioapi<span class="op">::</span><span class="kw">navigateToFile</span>(<span class="st">&quot;dev/02_dev.R&quot;</span>)</code></pre>
+</div>
+</div>
+<div id="day-to-day-dev-with-golem" class="section level2">
+<h2><span class="header-section-number">10.3</span> Day to Day Dev with <code>{golem}</code></h2>
+<p>Now that you’re all set with your project init, time to move to development :)</p>
+<p>App development should happen through the <code>dev/02_dev.R</code> file, which contains common commands for developping.</p>
+</div>
+<div id="launching-the-app" class="section level2">
+<h2><span class="header-section-number">10.4</span> Launching the app</h2>
+<p>To run the app, go to the <code>dev/run_dev.R</code> file, and run the all thing.</p>
+</div>
+<div id="dev02_dev.r" class="section level2">
+<h2><span class="header-section-number">10.5</span> <code>dev/02_dev.R</code></h2>
+<div id="add-modules" class="section level3">
+<h3><span class="header-section-number">10.5.1</span> Add modules</h3>
+<p>The <code>golem::add_module()</code> functions creates a module in the <code>R</code> folder.
+The file and the modules will be named after the <code>name</code> parameter, by adding <code>mod_</code> to the R file, and <code>mod_*_ui</code> and <code>mod_*_server</code> to the UI and server functions.</p>
+<pre class="sourceCode r"><code class="sourceCode r">golem<span class="op">::</span><span class="kw">add_module</span>(<span class="dt">name =</span> <span class="st">&quot;my_first_module&quot;</span>) <span class="co"># Name of the module</span></code></pre>
+<p>The new file will contain:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># mod_UI</span>
+mod_my_first_module_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){
+  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)
+  <span class="kw">tagList</span>(
+  
+  )
+}
+
+mod_my_first_module_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){
+  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns
+}
+    
+<span class="co">## To be copied in the UI</span>
+<span class="co"># mod_my_first_module_ui(&quot;my_first_module_1&quot;)</span>
+    
+<span class="co">## To be copied in the server</span>
+<span class="co"># callModule(mod_my_first_module_server, &quot;my_first_module_1&quot;)</span></code></pre>
+<p>In order not to make errors when putting these into your app, the end of the file will contain code that has to be copied and pasted inside your UI and server functions.</p>
+</div>
+<div id="add-dependencies" class="section level3">
+<h3><span class="header-section-number">10.5.2</span> Add dependencies</h3>
+<p>To be called each time you need a new package as a dependency:</p>
+<pre class="sourceCode r"><code class="sourceCode r">usethis<span class="op">::</span><span class="kw">use_package</span>(<span class="st">&quot;pkg&quot;</span>)</code></pre>
+</div>
+<div id="add-tests" class="section level3">
+<h3><span class="header-section-number">10.5.3</span> Add tests</h3>
+<p>Add more tests to your application:</p>
+<pre class="sourceCode r"><code class="sourceCode r">usethis<span class="op">::</span><span class="kw">use_test</span>(<span class="st">&quot;app&quot;</span>)</code></pre>
+</div>
+<div id="add-a-browser-button" class="section level3">
+<h3><span class="header-section-number">10.5.4</span> Add a browser button</h3>
+<p>Learn more about this: <a href="https://rtask.thinkr.fr/blog/a-little-trick-for-debugging-shiny/" class="uri">https://rtask.thinkr.fr/blog/a-little-trick-for-debugging-shiny/</a></p>
+<pre class="sourceCode r"><code class="sourceCode r">golem<span class="op">::</span><span class="kw">browser_button</span>()</code></pre>
+</div>
+<div id="add-external-files" class="section level3">
+<h3><span class="header-section-number">10.5.5</span> Add external files</h3>
+<p>These functions create external dependencies (JavaScript and CSS). <code>add_js_file()</code> creates a simple JavaScript file, while <code>add_js_handler()</code> adds a file with a skeleton for shiny custom handlers.</p>
+<pre class="sourceCode r"><code class="sourceCode r">golem<span class="op">::</span><span class="kw">add_js_file</span>(<span class="st">&quot;script&quot;</span>)
+golem<span class="op">::</span><span class="kw">add_js_handler</span>(<span class="st">&quot;script&quot;</span>)
+golem<span class="op">::</span><span class="kw">add_css_file</span>(<span class="st">&quot;custom&quot;</span>)</code></pre>
+</div>
+</div>
+<div id="adding-these-external-resources-to-your-app" class="section level2">
+<h2><span class="header-section-number">10.6</span> Adding these external resources to your app</h2>
+<p>You can add any external resource (JS, css) into <code>inst/app/www</code>.</p>
+<p>Then, You’ll need to point to these external resources in <code>golem_add_external_resources()</code>.
+For example, if you’ve created a CSS file with <code>golem::add_css_file(&quot;custom&quot;)</code>, you can add the file with:</p>
+<pre class="sourceCode r"><code class="sourceCode r">tags<span class="op">$</span><span class="kw">link</span>(<span class="dt">rel=</span><span class="st">&quot;stylesheet&quot;</span>, <span class="dt">type=</span><span class="st">&quot;text/css&quot;</span>, <span class="dt">href=</span><span class="st">&quot;www/custom.css&quot;</span>)</code></pre>
+<p>Also, you can list here the use of other packages, for example <code>useShinyalert()</code> from the <code>{shinyalert}</code> package.</p>
+<p>Note: we’ve chosen to leave it “raw”, in the sense that there is a <code>addResourcePath</code> and a <code>tags$head</code>.
+If you’re comfortable with <code>{htmltools}</code>, you can build a <code>htmltools::htmlDependency</code>.</p>
+</div>
+<div id="documentation" class="section level2">
+<h2><span class="header-section-number">10.7</span> Documentation</h2>
+<div id="vignette" class="section level3">
+<h3><span class="header-section-number">10.7.1</span> Vignette</h3>
+<pre class="sourceCode r"><code class="sourceCode r">usethis<span class="op">::</span><span class="kw">use_vignette</span>(<span class="st">&quot;shinyexample&quot;</span>)
+devtools<span class="op">::</span><span class="kw">build_vignettes</span>()</code></pre>
+</div>
+<div id="code-coverage" class="section level3">
+<h3><span class="header-section-number">10.7.2</span> Code coverage</h3>
+<pre class="sourceCode r"><code class="sourceCode r">usethis<span class="op">::</span><span class="kw">use_travis</span>()
+usethis<span class="op">::</span><span class="kw">use_appveyor</span>()
+usethis<span class="op">::</span><span class="kw">use_coverage</span>()</code></pre>
+</div>
+</div>
+<div id="using-golem-dev-functions" class="section level2">
+<h2><span class="header-section-number">10.8</span> Using <code>{golem}</code> dev functions</h2>
+<p>There’s a series of tools to make your app behave differently whether it’s in dev or prod mode.
+Notably, the <code>app_prod()</code> and <code>app_dev()</code> function tests for <code>options( &quot;golem.app.prod&quot;)</code> (or return TRUE if this option doesn’t exist).</p>
+<p>Setting this options at the beginning of your dev process allows to make your app behave in a specific way when you are in dev mode.
+For example, printing message to the console with <code>cat_dev()</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">TRUE</span>)
+golem<span class="op">::</span><span class="kw">cat_dev</span>(<span class="st">&quot;hey</span><span class="ch">\n</span><span class="st">&quot;</span>)
+<span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">FALSE</span>)
+golem<span class="op">::</span><span class="kw">cat_dev</span>(<span class="st">&quot;hey</span><span class="ch">\n</span><span class="st">&quot;</span>)</code></pre>
+<pre><code>## hey</code></pre>
+<p>You can then make any function being “dev-dependant” with the <code>make_dev()</code> function:</p>
+<pre class="sourceCode r"><code class="sourceCode r">log_dev &lt;-<span class="st"> </span>golem<span class="op">::</span><span class="kw">make_dev</span>(log)
+<span class="kw">log_dev</span>(<span class="dv">10</span>)</code></pre>
+<pre><code>## [1] 2.302585</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">TRUE</span>)
+<span class="kw">log_dev</span>(<span class="dv">10</span>)</code></pre>
 
 </div>
 </div>
+
+
+
             </section>
 
           </div>
         </div>
       </div>
-<a href="optim-caveat.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="optimjs.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="proto.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="step-secure.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
