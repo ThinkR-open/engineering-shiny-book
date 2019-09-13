@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Vincent Guyader, Cervan Girard, Sébastien Rochette" />
 
 
-<meta name="date" content="2019-09-12" />
+<meta name="date" content="2019-09-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -317,9 +317,9 @@ With small and simple Shiny apps, no knowledge of HTML, CSS or JavaScript is req
 <blockquote>
 <p>Complex software is harder to think about, harder to test, harder to debug, and harder to maintain — and above all, harder to learn and use.</p>
 </blockquote>
-<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<!--SHINY.SINGLETON[f965fedaf8018f87d7b1b26ffc985f270e938821]-->
 <style>.right{ text-align: right;}</style>
-<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<!--/SHINY.SINGLETON[f965fedaf8018f87d7b1b26ffc985f270e938821]-->
 <div class="right">
 <a href="http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#id2878339">Basics of the Unix Philosophy</a>
 </div>
@@ -349,9 +349,27 @@ And conventions are crucial when it comes to building and maintaining complex sy
 <li>Customers and users, on the other hand, see complexity as <em>interface complexity</em>.
 Interface complexity can be driven by a lot of elements, with for example the probability of making an error while using the app, difficulty to understand the evolution of the app, unfamiliar behaviour or terms, uncommon forms, visual distraction…</li>
 </ul>
+<p>There is an inherent tension between these two source of complexity, as designing an app means finding a good balance between implementation ann interface complexity.
+Reducing implementation complexity means one has to make some decisions that will lower one while rising the other.
+For example, we can think of something very common in Shiny: the “too much reactivity” pattern.
+In some cases, coders try to make everything reactive: e.g., three sliders and a selectInput, all updating a plot.
+This behaviour lowers the interface complexity: users don’t have to think a lot about what they are doing, they just move things around and it updates.
+But this kind of pattern can make the app computing too much things: user rarely go to the slider value they need from the first shoot, and usually miss what they want to select in an input.
+So, way more computation for R.
+One solution can be to delay reactivity or to cache things so that R computes less things.
+But that comes with a cost: handling delayed reactivity and caching elements, which increases implementation complexity.
+One other solution is simply to add a button after the input, and only update the plot when the user clicks on it.
+This pattern makes it easier to control reactivity from an implementation side.
+But it can make the interface a little bit more complex for the user who have to perform another action.
+We’ll argue somewhere else in the book that on the other hand, not enough reactivity is better than too much reactivity, as the latter increases computation time, and relies on the assumption that the user makes the right action on the first try.
+Another good example is <code>{shiny}</code>’s <code>dateRangeInput()</code> function being able to take a start which is posterior to the end (which is the behaviour of the JavaScript plugin used in <code>{shiny}</code> to create this input).
+Handling this special case is doable: with a little bit of craft, you can watch what the user inputs and throw an error if the start is after the end
+<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>.
+That solution augments the implementation complexity, while leaving it as is requires the user to think about wether or not the starting date is before the ending date, thus increasing the interface complexity.</p>
+<p>-&gt; Insert here something of the like: “It’s up to you to think about what’s the best balance between these two sources.”</p>
 <p>Another measure that sometime comes in the discussion is the codebase size.
 It’s relatively hard to use this number of lines metric, as R is very permissive when it comes to identation and line break. It also depends on your coding style and the packages you’re using. For example, tidyverse packages encourage the use of the pipe (<code>%&gt;%</code>)
-<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>
+<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>
 with one function by line, producing more lines in the end code.</p>
 <p>Consider this piece of valid R code:</p>
 <pre class="sourceCode r"><code class="sourceCode r">iris[
@@ -367,8 +385,9 @@ with one function by line, producing more lines in the end code.</p>
 ## Levels: setosa versicolor virginica</code></pre>
 <p>9 lines of code for something that should also be written in one, three, five…</p>
 <p>Another drawback of this metric is that it focuses on numbers instead of readability, and on the long run yes, readability matters
-<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>.</p>
-<p>-&gt; Cyclomatic complexity</p>
+<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>.</p>
+<p>-&gt; <a href="https://github.com/hrbrmstr/cloc" class="uri">https://github.com/hrbrmstr/cloc</a></p>
+<p>-&gt; Cyclomatic complexity <a href="https://en.wikipedia.org/wiki/Cyclomatic_complexity" class="uri">https://en.wikipedia.org/wiki/Cyclomatic_complexity</a></p>
 <p>-&gt; <a href="https://github.com/MangoTheCat/cyclocomp" class="uri">https://github.com/MangoTheCat/cyclocomp</a></p>
 </div>
 <div id="with-great-complexity-comes-great-responsabilities" class="section level3">
@@ -385,7 +404,7 @@ But there are dozens of reason why an app can become complex: for example, the q
 So yes, there is a chance that if you’re reading this page, you’re working or are planning to work on a complex Shiny app.
 And this is not necessarily a bad thing.
 Shiny apps can definitely be used to implement a production-grade
-<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>
+<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>
 software, but production-grade software implies production-grade software engineering.
 And your goal to make this project a succes is be to prepared, to use tool that will reduce the complexity of your app, and ensure that your app has the quality to age well.</p>
 <p>In other words, production-grade Shiny apps require to work with a software engineering mindset.
@@ -436,7 +455,7 @@ And if these person can’t use the app because it’s too hard to use, too hard
 Once the app is out, it’s successful if it can exist on the long run, with all the hasards that it implies: new package versions that potentially break the code base, implementation of new features in the global interface, changing key features of the UI or the back-end, and not to mention passing the code base along to someone who has not worked on the first version, and who is now in charge of working on version 2.
 And this, again, is hard to do without effective planning and efficient tooling.
 Well, and this new person might simply be you, month from now.
-And <em>&quot;You’ll be there in the future too, maintaining code you may have half forgotten under the press of more recent projects. When you design for the future, the sanity you save may be your own.</em><a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a></p>
+And <em>&quot;You’ll be there in the future too, maintaining code you may have half forgotten under the press of more recent projects. When you design for the future, the sanity you save may be your own.</em><a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a></p>
 
 </div>
 </div>
@@ -447,9 +466,10 @@ And <em>&quot;You’ll be there in the future too, maintaining code you may have
 <li id="fn1"><p>We borrow this term from Charity Major, as heard in <em>Test in Production with Charity Majors</em>, <a href="https://corecursive.com/019-test-in-production-with-charity-majors/">CoRecursive</a><a href="successfulshinyapp.html#fnref1" class="footnote-back">↩</a></p></li>
 <li id="fn2"><p>Ironic right?<a href="successfulshinyapp.html#fnref2" class="footnote-back">↩</a></p></li>
 <li id="fn3"><p>from <em>The Art of Unix Programming</em>, “Chapter 13: Speaking of Complexity”<a href="successfulshinyapp.html#fnref3" class="footnote-back">↩</a></p></li>
-<li id="fn5"><p>“Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess.”, from <em>The Art of Unix Programming</em>, “Chapter 13: Speaking of Complexity”<a href="successfulshinyapp.html#fnref5" class="footnote-back">↩</a></p></li>
-<li id="fn6"><p>By production-grade, we mean a software that can be used in a context where people use it for doing their job, and where failures or bug have real-life consequences<a href="successfulshinyapp.html#fnref6" class="footnote-back">↩</a></p></li>
-<li id="fn7"><p><em>The Art of Unix Programming</em>, Eric Steven Raymond<a href="successfulshinyapp.html#fnref7" class="footnote-back">↩</a></p></li>
+<li id="fn4"><p>see <a href="https://github.com/rstudio/shiny/issues/2043#issuecomment-525640738">shiny/issues/2043#issuecomment-525640738</a> for an example<a href="successfulshinyapp.html#fnref4" class="footnote-back">↩</a></p></li>
+<li id="fn6"><p>“Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess.”, from <em>The Art of Unix Programming</em>, “Chapter 13: Speaking of Complexity”<a href="successfulshinyapp.html#fnref6" class="footnote-back">↩</a></p></li>
+<li id="fn7"><p>By production-grade, we mean a software that can be used in a context where people use it for doing their job, and where failures or bug have real-life consequences<a href="successfulshinyapp.html#fnref7" class="footnote-back">↩</a></p></li>
+<li id="fn8"><p><em>The Art of Unix Programming</em>, Eric Steven Raymond<a href="successfulshinyapp.html#fnref8" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
             </section>
