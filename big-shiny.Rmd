@@ -43,6 +43,26 @@ And conventions are crucial when it comes to building and maintaining complex sy
 + Customers and users, on the other hand, see complexity as _interface complexity_. 
 Interface complexity can be driven by a lot of elements, with for example the probability of making an error while using the app, difficulty to understand the evolution of the app, unfamiliar behaviour or terms, uncommon forms, visual distraction...
 
+There is an inherent tension between these two source of complexity, as designing an app means finding a good balance between implementation ann interface complexity. 
+Reducing implementation complexity means one has to make some decisions that will lower one while rising the other. 
+For example, we can think of something very common in Shiny: the "too much reactivity" pattern. 
+In some cases, coders try to make everything reactive: e.g., three sliders and a selectInput, all updating a plot.
+This behaviour lowers the interface complexity: users don't have to think a lot about what they are doing, they just move things around and it updates. 
+But this kind of pattern can make the app computing too much things: user rarely go to the slider value they need from the first shoot, and usually miss what they want to select in an input. 
+So, way more computation for R. 
+One solution can be to delay reactivity or to cache things so that R computes less things. 
+But that comes with a cost: handling delayed reactivity and caching elements, which increases implementation complexity. 
+One other solution is simply to add a button after the input, and only update the plot when the user clicks on it. 
+This pattern makes it easier to control reactivity from an implementation side. 
+But it can make the interface a little bit more complex for the user who have to perform another action. 
+We'll argue somewhere else in the book that on the other hand, not enough reactivity is better than too much reactivity, as the latter increases computation time, and relies on the assumption that the user makes the right action on the first try.
+Another good example is `{shiny}`'s `dateRangeInput()` function being able to take a start which is posterior to the end (which is the behaviour of the JavaScript plugin used in `{shiny}` to create this input). 
+Handling this special case is doable: with a little bit of craft, you can watch what the user inputs and throw an error if the start is after the end
+^[see [shiny/issues/2043#issuecomment-525640738](https://github.com/rstudio/shiny/issues/2043#issuecomment-525640738) for an example].
+That solution augments the implementation complexity, while leaving it as is requires the user to think about wether or not the starting date is before the ending date, thus increasing the interface complexity.
+
+-> Insert here something of the like: "It's up to you to think about what's the best balance between these two sources." 
+
 Another measure that sometime comes in the discussion is the codebase size. 
 It's relatively hard to use this number of lines metric, as R is very permissive when it comes to identation and line break. It also depends on your coding style and the packages you're using. For example, tidyverse packages encourage the use of the pipe (`%>%`)
 ^[] 
@@ -65,9 +85,11 @@ iris[
 9 lines of code for something that should also be written in one, three, five...
 
 Another drawback of this metric is that it focuses on numbers instead of readability, and on the long run yes, readability matters
-^["Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess.", from _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity"]. 
+^["Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess.", from _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity"].
 
--> Cyclomatic complexity
+-> https://github.com/hrbrmstr/cloc
+
+-> Cyclomatic complexity https://en.wikipedia.org/wiki/Cyclomatic_complexity
 
 -> https://github.com/MangoTheCat/cyclocomp 
 
