@@ -1,0 +1,1 @@
+golem::create_golem("golemexample", open = FALSE)
