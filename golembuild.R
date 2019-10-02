@@ -1,1 +1,1 @@
-golem::create_golem("golemexample", open = FALSE)
+golem::create_golem("golex", open = FALSE)
