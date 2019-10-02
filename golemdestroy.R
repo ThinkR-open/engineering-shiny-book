@@ -1,1 +1,1 @@
-unlink("golemexample", TRUE, TRUE)
+unlink("golex", TRUE, TRUE)
