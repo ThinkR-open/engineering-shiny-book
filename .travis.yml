@@ -1,22 +1,18 @@
 language: r
-
 cache: packages
+dist: trusty
+sudo: required
   
-matrix:
-  include:
-  - r: release
-    before_cache:
-    - Rscript -e 'install.packages("remotes")'
-    - Rscript -e 'remotes::install_cran(c("golem", "bookdown"))'
-    deploy:
-      provider: pages
-      skip-cleanup: true
-      github-token: $GITHUB_PAT
-      keep-history: true
-      local-dir: docs/wip
-      on:
-        branch: master
-      skip_cleanup: true
+env:
+  global:
+  - MAKEFLAGS="-j 2"
   
+install:
+  - Rscript -e 'install.packages("remotes")'
+  - Rscript -e 'remotes::install_cran(c("golem", "bookdown"))'
+  
+script:
+  - make html
+
 after_success:
-  - Rscript -e 'bookdown::render_book("index.Rmd")'
+  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && bash deploy.sh
