@@ -4,7 +4,7 @@ html:
 	cp -fvr css/thinkr.css docs/wip/
 	cp -fvr css/style_gitbook.css docs/wip/
 	# cp -fvr images _book/
-	cp -fvr _main.utf8.md docs/wip/main.md
+	# cp -fvr _main.utf8.md docs/wip/main.md
 
 build:
 	make html
