@@ -9,14 +9,14 @@ update_website() {
   git config user.email "sebastienrochettefr@gmail.com"
   git config --global push.default simple
   git remote add upstream "https://$GH_TOKEN@github.com/ThinkR-open/building-shiny-apps-workflow.git"
-  git fetch upstream 2>err.txt
+  git fetch upstream
   git checkout gh-pages
   
   cp -fvr $BASE_REPO/docs/* .
   git add *
   git commit -a -m "Updating book (${TRAVIS_BUILD_NUMBER})"
   git status
-  git push 2>err.txt
+  git push
   git status
   cd ..
 }
