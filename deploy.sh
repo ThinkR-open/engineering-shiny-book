@@ -12,8 +12,8 @@ update_website() {
   git fetch upstream 2>err.txt
   git checkout gh-pages
   
-  cp -fvr $BASE_REPO/_book/* .
-  git add *.html libs/ figures images/ *.json
+  cp -fvr $BASE_REPO/docs .
+  git add *.html libs/ css/ figures img/ *.json *.css wip/
   git commit -a -m "Updating book (${TRAVIS_BUILD_NUMBER})"
   git status
   git push 2>err.txt
