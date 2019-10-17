@@ -1,0 +1,1337 @@
+\documentclass[]{book}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Building Big Shiny Apps - A Workflow},
+            pdfauthor={Colin Fay},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{natbib}
+\bibliographystyle{apalike}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Building Big Shiny Apps - A Workflow}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Colin Fay}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{2019-08-09}
+
+\usepackage{booktabs}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{1}
+\tableofcontents
+}
+\hypertarget{introduction}{%
+\chapter*{Introduction}\label{introduction}}
+\addcontentsline{toc}{chapter}{Introduction}
+
+This book is still at a Work in Progress stage.
+
+\hypertarget{motivation}{%
+\section*{Motivation}\label{motivation}}
+\addcontentsline{toc}{section}{Motivation}
+
+This book will not \textbf{get you started with Shiny}, nor \textbf{talk about how to deploy into production and scale your app}. What we'll see is \textbf{the process of building the app}. Why? Lots of blog posts and books talk about starting to use shiny or putting apps in production. Very few (if any) talk about this grey area between getting started and pushing into production.
+
+So this is what this book is going to talk about: building Shiny application. We'll focus on the process, the workflow, and the tools we use at ThinkR when building big Shiny Apps.
+
+Hence, if you're starting to read this book, we assume you have a working knowledge of how to build a small application, and want to know how to go one step further.
+
+\hypertarget{book-structure}{%
+\section*{Book structure}\label{book-structure}}
+\addcontentsline{toc}{section}{Book structure}
+
+\begin{itemize}
+\item
+  Part 1 (Building big Shiny Apps) gives a general context about what is a big Shiny Apps and what challenges arise when you're dealing with a big application. It also introduces the \texttt{\{golem\}} package and more general concept about organising your workflow.
+\item
+  Part 2 to 6 describes a series of steps you can take when you want to build a big Shiny App, and the tooling associated with each.
+\item
+  Part 7 (Optimizing) tackles the question of optimization, first by presenting some common caveats of big Shiny Apps, and then showing how to optimize R code, and use JavaScript to lighten R work.
+\end{itemize}
+
+\hypertarget{about-the-authors}{%
+\section*{About the authors}\label{about-the-authors}}
+\addcontentsline{toc}{section}{About the authors}
+
+// TODO
+
+\hypertarget{want-to-help}{%
+\section*{Want to help?}\label{want-to-help}}
+\addcontentsline{toc}{section}{Want to help?}
+
+Any feedbacks on the book is very welcome. Feel free to \href{https://github.com/ThinkR-open/building-shiny-apps-workflow/issues}{open an issue}, or to make a PR if you spot a typo (I'm not a native english speaker, so there might be some waiting to be found ;) ).
+
+\hypertarget{other-resources}{%
+\section*{Other resources}\label{other-resources}}
+\addcontentsline{toc}{section}{Other resources}
+
+\hypertarget{getting-started-with-shiny}{%
+\subsection*{Getting started with Shiny}\label{getting-started-with-shiny}}
+\addcontentsline{toc}{subsection}{Getting started with Shiny}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://shiny.rstudio.com/tutorial/}{Learn Shiny with RStudio}
+\item
+  \href{https://ourcodingclub.github.io/2017/03/07/shiny.html}{Getting Started with Shiny}
+\item
+  \href{https://github.com/jcheng5/shiny-book}{(WIP) Mastering Shiny}
+\item
+  \href{https://laderast.github.io/gradual_shiny/}{A gRadual intRoduction to Shiny}
+\end{itemize}
+
+\hypertarget{shiny-into-production}{%
+\subsection*{Shiny into production}\label{shiny-into-production}}
+\addcontentsline{toc}{subsection}{Shiny into production}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://resources.rstudio.com/rstudio-conf-2019/shiny-in-production-principles-practices-and-tools-joe-cheng}{Shiny in production: Principles, practices, and tools}
+\item
+  \href{https://kellobri.github.io/shiny-prod-book/}{Shiny in Production}
+\end{itemize}
+
+\href{https://github.com/ThinkR-open/building-shiny-apps-workflow/issues}{Suggest a Resource!}
+
+\hypertarget{part-building-big-shiny-apps}{%
+\part{Building Big Shiny Apps}\label{part-building-big-shiny-apps}}
+
+\hypertarget{bigshinyapp}{%
+\chapter{About Big Shiny Apps}\label{bigshinyapp}}
+
+If you're reading this page, chances are you already know what a Shiny App is --- a web application that communicates with R, built in R, and working with R. Almost anybody can create a prototype for a small data product in a matter of hours. And no knowledge of HTML, CSS or JavaScript is required, making it really easy to use --- you can rapidly create a POC. But what to do now you want to build a big Shiny App?
+
+\hypertarget{a-very-short-introduction-to-shiny}{%
+\section{A (very) short introduction to Shiny}\label{a-very-short-introduction-to-shiny}}
+
+// TODO
+
+\hypertarget{whats-a-big-shiny-app}{%
+\section{What's a big Shiny App?}\label{whats-a-big-shiny-app}}
+
+\begin{itemize}
+\tightlist
+\item
+  Well, first, one that includes several thousand lines of code (R and others).
+\item
+  It's also one that is potentially developed by several coders, working on the same application at the same time.
+\item
+  It's an application where scaling matters.
+\item
+  Maintainability and ease of upgrading are important.
+\item
+  In many cases, Shiny Apps in production are not used by ``tech literate'' people.
+\item
+  People rely on this application for making real-world decisions, with real consequences.
+\end{itemize}
+
+\hypertarget{challenges}{%
+\chapter{Challenges}\label{challenges}}
+
+\hypertarget{designing-the-ui}{%
+\section{Designing the UI}\label{designing-the-ui}}
+
+Choosing a UI is hard --- we have a natural tendency, as coders, to be focused on the backend, i.e the algorithmic part of the application. But let's state the truth: no matter how complex and innovative your backend can be, your application is bad if your UI is bad. That's the hard truth. If people can't understand how to use your application, your application doesn't work. No matter how incredible the backend is.
+
+\hypertarget{thinking-about-accessibility}{%
+\subsection{Thinking about accessibility}\label{thinking-about-accessibility}}
+
+A user interface needs to be ``ready to be consumed'' by the broader audience possible. That means people with visual, mobility, or cognitive disabilities.
+
+Web Accessibility is pretty standard concept in the web development world, and you can learn about this straight from the first chapter of \href{https://learn.freecodecamp.org/}{learn.freecodecamp.org}.
+-\textgreater{} Screen to speech technology : html semantic tags
+-\textgreater{} Mobility impairment, people w/ parkinson for example. Exemple of the text input \& ENTER button. Making things keyboard friendly.
+-\textgreater{} ColorBlind, viridis
+
+\hypertarget{dont-make-me-think}{%
+\subsection{``Don't make me think''}\label{dont-make-me-think}}
+
+Two contexts for using a shiny app : professional context or for fun. In both : people want the app to be useable, and easily usable. Work : don't want to lose time figuring out how to use the app. Fun : if you don't understand in a matter of minutes how to use the app, you'll stop using it.
+
+-\textgreater{} KISS principle
+-\textgreater{} ``Don't make me think''
+
+Try to find a simple, and efficient UI. One that people can understand and use in a matter of seconds. Don't implement features or visual elements that are not actually needed, just ``in case''. And spend time working on that UI, really thinking about what visual elements you are implementing.
+
+-\textgreater{} ``Self explanatory''
+
+\begin{quote}
+All kinds of things on a Web page can make us stop and think unnecessarily. Take names, for example. Typical culprits are cute or clever names, marketing-induced names, company-specific names, and unfamiliar technical names
+\end{quote}
+
+-\textgreater{} If things are clickable, it has to look clickable
+
+\begin{quote}
+``As a user, I should never have to devote a millisecond of thought to whether
+things are clickable---or not''
+\end{quote}
+
+-\textgreater{} Restrain reactivity
+
+-\textgreater{} Not everything needs to be interactive plots
+
+// TODO: Find resources about simplicity in UI/UX design
+
+\hypertarget{working-as-a-team-tools-organisation}{%
+\section{Working as a team: tools \& organisation}\label{working-as-a-team-tools-organisation}}
+
+Big Shiny Apps usually mean that several people will work on the application. For example, at ThinkR, 3 to 4 people usually work on the application. So, how do we organize that?
+
+\hypertarget{from-the-tools-point-of-view}{%
+\subsection{From the tools point of view:}\label{from-the-tools-point-of-view}}
+
+\begin{itemize}
+\tightlist
+\item
+  Use version control (not sure I have to expand on that topic ;) )
+\item
+  Think of your shiny app as a tree, and divide it as much as possible into little pieces. Then, create one Shiny module by piece. This allows you to split the work, and also to have smaller files --- it's easier to work on 20 files of 200 lines than on one big app.R file.
+\end{itemize}
+
+\hypertarget{from-the-organisational-point-of-view}{%
+\subsection{From the organisational point of view}\label{from-the-organisational-point-of-view}}
+
+\begin{itemize}
+\tightlist
+\item
+  Define one person in charge of having the big picture of the app. This person will kick off the project, and write the skeleton of the app, with the good modules and files structure. This person will also be in charge of accepting new merge requests from other developers, and to orchestrate the master and dev branches.
+\item
+  List the tasks, and open one issue for each task on your version control system. Each issue will be solved in a separate branch.
+\item
+  Finally, assign one module to one developer --- if it seems that working on one module is a two-person job, divide again into two other submodules. This is a relatively complex task, as the output of one module influences the input of another, so be sure to assign them well.
+\end{itemize}
+
+\hypertarget{making-the-app-production-ready}{%
+\section{Making the app production ready}\label{making-the-app-production-ready}}
+
+\hypertarget{scaling}{%
+\subsection{Scaling}\label{scaling}}
+
+This includes two things: scaling and maintaining. As said in the disclaimer, I won't expand on the topic of scaling, as many have written about that, but here is one piece of advice: make the R process running the app do as little as possible, and in particular prevent it from doing what it's not supposed to do. Which includes: use JavaScript so that the client browser renders things (instead of making R do the work --- basic JS is easy to learn), use parallelization and async, and if possible, make the heavy lifting be done outside the R session running the app.
+
+// TODO: link to resources.
+
+\hypertarget{maintaining}{%
+\subsection{Maintaining}\label{maintaining}}
+
+Maintainance, on the other hand, is something to think about from the beginning. It includes being able to ensure that the application will work in the long run, and that new features can be easily implemented.
+
+\begin{itemize}
+\tightlist
+\item
+  Working in the long run: separate the code with ``business logic'' (aka the data manipulation and the algorithm, that can work outside the context of the app) from the code building the application. That way, you can write regression tests for these functions to ensure they are stable.
+\item
+  Implement new elements: as we are working with modules, it's easy to insert new elements inside the global application.
+\end{itemize}
+
+// TO DO: be more precise on the tooling.
+
+\hypertarget{structure}{%
+\chapter{Structuring your Project}\label{structure}}
+
+\hypertarget{shiny-app-as-a-package}{%
+\section{Shiny App as a Package}\label{shiny-app-as-a-package}}
+
+In the next chapter you'll be introduced to the \texttt{\{golem\}} package, which is \textbf{an opinionated framework for building production-ready Shiny Applications}. This framework starts by creating a package skeleton waiting to be filled.
+
+But, in a world where Shiny Applications are mostly created as a series of files, why bother with a package?
+
+\hypertarget{whats-in-a-shiny-app}{%
+\subsection{What's in a Shiny App?}\label{whats-in-a-shiny-app}}
+
+OK, so let's ask the question the other way round. Think about your last Shiny which was created as a single-file (\texttt{app.R}) or two files app (\texttt{ui.R} and \texttt{server.R}). You've got these two, and you put them into a folder.
+
+So, let's have a review of \textbf{what you'll need next for a robust application}.
+
+First, \textbf{metadata.} In other words, the name of the app, the version number (which is crucial to any serious, production-level project), what the application does, who to contact if something goes wrong.
+
+Then, you need to find a way to \textbf{handle the dependencies}. Because you know, when you want to push your app into production, you can't have this conversation with IT:
+
+\begin{quote}
+IT: Hey, I tried to `source(``app.R'')' but I've got an error.
+
+R-dev: What's the error?
+
+IT: It says ``could not find package `shiny'\,''.
+
+R-dev: Ah yes, you need to install \{shiny\}. Try to run `install.packages(``shiny'')'.
+
+IT: Ok nice. What else?
+
+R-dev: Let me think, try also `install.packages(``DT'')'\ldots{} good? Now try `install.packages(``ggplot2'')', and \ldots{}
+
+{[}\ldots{}{]}
+
+IT: Ok, now I source the `app.R', right?
+
+R-dev: Sure!
+
+IT: Ok so it says `could not find function runApp()'
+
+R-dev: Ah, you've got to do library(shiny) at the beginning of your script. And library(purrr), and library(jsonlite)*.
+\end{quote}
+
+\texttt{*} Which will lead to a Namespace conflict on the \texttt{flatten()} function that can cause you some debugging headache. So, hey, it would be cool if we could have a Shiny app that only imports specific functions from a package, right?
+
+\textbf{So yes, dependencies matter. You need to handle them, and handle them correctly. }
+
+Now, let's say you're building a big app. Something with thousands of lines of code. Handling a one-file or two-file shiny app with that much lines is just a nightmare. So, what to do? Let's split everything into smaller files that we can call!
+
+And finally, we want our app to live long and prosper, which means we need to document it: \textbf{each small pieces of code should have a piece of comment} to explain what these specific lines do. The other thing we need for our application to be successful on the long term is tests, so that we are sure we're not introducing any regression.
+
+Oh, and that would be nice if people can get a \texttt{tar.gz} and install it on their computer and have access to a local copy of the app!
+
+OK, so let's sum up: we want to build an app. This app needs to have \textbf{metadata} and to handle \textbf{dependencies} corrrecly, which is what you get from the \texttt{DESCRIPTION} + \texttt{NAMESPACE} files of the package. Even more practical is the fact that you can do ``selective namespace extraction'' inside a package, i.e you can say ``I want this function from this package''. Also, \textbf{this app needs to be split up in smaller \texttt{.R} files}, which is the way a package is organized. And I don't need to emphasize how \textbf{documentation} is a vital part of any package, so we solved this question too here. So is the \textbf{testing toolkit}. And of course, the ``install everywhere'' wish comes to life when a Shiny App is in a package.
+
+\hypertarget{the-other-plus-side-of-shiny-as-a-package}{%
+\subsection{The other plus side of Shiny as a Package}\label{the-other-plus-side-of-shiny-as-a-package}}
+
+\hypertarget{testing}{%
+\subsubsection{Testing}\label{testing}}
+
+\textbf{Nothing should go to production without being tested. Nothing.} Testing production apps is a wide question, and I'll just stick to tests inside a Package here.
+
+Frameworks for package testing are robust and widely documented. So you don't have to put any extra-effort here: just use a canonical testing framework like \href{https://testthat.r-lib.org/}{\texttt{\{testthat\}}}. Learning how to use it is not the subject of this chapter, so feel free to refer to the documentation. See also Chapter 5 of \href{https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107}{``Building a package that lasts''}.
+
+What should you test?
+
+\begin{itemize}
+\item
+  First of all, as we've said before, the app should be split between the UI part and the backend (or `business logic') part. These backend functions are supposed to run without any interactive context, just as plain old functions. So for these ones, \textbf{you can do classical tests}. As they are backend functions (so specific to a project), \texttt{\{golem\}} can't provide any helpers for that.
+\item
+  For the UI part, \textbf{remember that any UI function is designed to render an HTML element}. So you can save a file as HTML, and then compare it to a UI object with the \texttt{golem::expect\_html\_equal()}.
+\end{itemize}
+
+\begin{verbatim}
+library(shiny)
+ui <- tagList(h1("Hello world!"))
+htmltools::save_html(ui, "ui.html")
+golem::expect_html_equal(ui, "ui.html")
+# Changes 
+ui <- tagList(h2("Hello world!"))
+golem::expect_html_equal(ui, "ui.html")
+\end{verbatim}
+
+This can for example be useful if you need to test a module. A UI module function returns an HTML tag list, so once your modules are set you can save them and use them inside tests.
+
+\begin{verbatim}
+my_mod_ui <- function(id){
+  ns <- NS("id")
+  tagList(
+    selectInput(ns("this"), "that", choices = LETTERS[1:4])
+  )
+}
+my_mod_ui_test <- tempfile(fileext = "html")
+htmltools::save_html(my_mod_ui("test"), my_mod_ui_test)
+# Some time later, and of course saved in the test folder, 
+# not as a temp file
+golem::expect_html_equal(my_mod_ui("test"), my_mod_ui_test)
+\end{verbatim}
+
+\texttt{\{golem\}} also provides two functions, \texttt{expect\_shinytag()} and \texttt{expect\_shinytaglist()}, that test if an objet is of class \texttt{"shiny.tag"} or \texttt{"shiny.tag.list"}.
+
+\begin{itemize}
+\tightlist
+\item
+  Testing package launch: when launching \texttt{golem::use\_recommended\_tests()}, you'll find a test built on top of \texttt{\{processx\}} that allows to check if the application is launch-able. Here's a short description of what happens:
+\end{itemize}
+
+\begin{verbatim}
+# Standard testthat things
+context("launch")
+
+library(processx)
+
+testthat::test_that(
+  "app launches",{
+    # We're creating a new process that runs the app
+    x <- process$new(
+      "R", 
+      c(
+        "-e", 
+        # As we are in the tests/testthat dir, we're moving 
+        # two steps back before launching the whole package
+        # and we try to launch the app
+        "setwd('../../'); pkgload::load_all();run_app()"
+      )
+    )
+    # We leave some time for the app to launch
+    # Configure this according to your need
+    Sys.sleep(5)
+    # We check that the app is alive
+    expect_true(x$is_alive())
+    # We kill it
+    x$kill()
+  }
+)
+\end{verbatim}
+
+\emph{Note}: this specific configuration will possibly fail on Continuous integration platform as Gitlab CI or Travis. A workaround is to, inside your CI yml, first install the package with \texttt{remotes::install\_local()}, and then replace the \texttt{setwd\ (...)\ run\_app()} command with \texttt{myuberapp::run\_app()}.
+
+For example:
+
+\begin{itemize}
+\tightlist
+\item
+  in \texttt{.gitlab-ci.yml}:
+\end{itemize}
+
+\begin{verbatim}
+test:
+  stage: test
+  script: 
+  - echo "Running tests"
+  - R -e 'remotes::install_local()'
+  - R -e 'devtools::check()'
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  in \texttt{test-golem.R}:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{testthat}\OperatorTok{::}\KeywordTok{test_that}\NormalTok{(}
+  \StringTok{"app launches"}\NormalTok{,\{}
+\NormalTok{    x <-}\StringTok{ }\NormalTok{process}\OperatorTok{$}\KeywordTok{new}\NormalTok{( }
+      \StringTok{"R"}\NormalTok{, }
+      \KeywordTok{c}\NormalTok{(}
+        \StringTok{"-e"}\NormalTok{, }
+        \StringTok{"datuberapp::run_app()"}
+\NormalTok{      )}
+\NormalTok{    )}
+    \KeywordTok{Sys.sleep}\NormalTok{(}\DecValTok{5}\NormalTok{)}
+    \KeywordTok{expect_true}\NormalTok{(x}\OperatorTok{$}\KeywordTok{is_alive}\NormalTok{())}
+\NormalTok{    x}\OperatorTok{$}\KeywordTok{kill}\NormalTok{()}
+\NormalTok{  \}}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{documenting}{%
+\subsubsection{Documenting}\label{documenting}}
+
+Documenting packages is a natural thing for any R developer. Any exported function should have its own documentation, hence you are ``forced'' to document any user facing-function.
+
+Also, building a Shiny App as a package allows you to write standard R documentation:
+
+\begin{itemize}
+\tightlist
+\item
+  A \texttt{README} at the root of your package
+\item
+  \texttt{Vignettes} that explain how to use your app
+\item
+  A \texttt{\{pkgdown\}} that can be used as an external link for your application.
+\end{itemize}
+
+\hypertarget{deploy}{%
+\subsection{Deploy}\label{deploy}}
+
+\hypertarget{local-deployment}{%
+\subsubsection{Local deployment}\label{local-deployment}}
+
+As your Shiny App is a standard package, it can be built as a \texttt{tar.gz}, sent to your colleagues, friends, and family, and even to the CRAN. It can also be installed in any R-package repository. Then, if you've built your app with \texttt{\{golem\}}, you'll just have to do:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(myuberapp)}
+\KeywordTok{run_app}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+to launch your app.
+
+\hypertarget{rstudio-connect-shiny-server}{%
+\subsubsection{RStudio Connect \& Shiny Server}\label{rstudio-connect-shiny-server}}
+
+Both these platforms expect a file app configuration, i.e an \texttt{app.R} file or \texttt{ui.R} / \texttt{server.R} files. So how can we integrate this ``Shiny App as Package'' into Connect or Shiny Server?
+
+\begin{itemize}
+\item
+  Using an internal package manager like \href{https://www.rstudio.com/products/package-manager/}{RStudio Package Manager}, where the package app is installed, and then you simply have to create an \texttt{app.R} with the small piece of code from the section just before.
+\item
+  Uploading the package package folder to the server. In that scenario, you use the package folder as the app package, and upload the whole thing. Then, write an \texttt{app.R} that does:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pkgload}\OperatorTok{::}\KeywordTok{load_all}\NormalTok{()}
+\NormalTok{shiny}\OperatorTok{::}\KeywordTok{shinyApp}\NormalTok{(}\DataTypeTok{ui =} \KeywordTok{app_ui}\NormalTok{(), }\DataTypeTok{server =}\NormalTok{ app_server)}
+\end{Highlighting}
+\end{Shaded}
+
+And of course, don't forget to add this file in the \texttt{.Rbuildignore}!
+
+This is the file you'll get if your run \texttt{golem::add\_rconnect\_file()}.
+
+\hypertarget{docker-containers}{%
+\subsubsection{Docker containers}\label{docker-containers}}
+
+In order to dockerize your app, simply install the package as any other package, and use as a \texttt{CMD} \texttt{R\ -e\ \textquotesingle{}options("shiny.port"=80,shiny.host="0.0.0.0");myuberapp::run\_app()\textquotesingle{}}. Of course changing the port to the one you need.
+
+You'll get the Dockerfile you need with \texttt{golem::add\_dockerfile()}.
+
+\hypertarget{resources}{%
+\subsection{Resources}\label{resources}}
+
+\begin{itemize}
+\item
+  \href{http://r-pkgs.had.co.nz/}{R packages}
+\item
+  \href{https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop}{``Building a package that lasts''}
+\item
+  \href{https://cran.r-project.org/doc/manuals/r-release/R-exts.html\#Creating-R-packages}{Writing R Extensions}
+\item
+  \href{https://kbroman.org/pkg_primer/}{R package primer - a minimal tutorial}
+\end{itemize}
+
+\hypertarget{using-shiny-modules}{%
+\section{Using Shiny Modules}\label{using-shiny-modules}}
+
+// TODO
+
+\hypertarget{splitting-your-app-into-files}{%
+\section{Splitting your app into files}\label{splitting-your-app-into-files}}
+
+// TODO
+
+\hypertarget{golem}{%
+\chapter{\texorpdfstring{Introduction to \texttt{\{golem\}}}{Introduction to \{golem\}}}\label{golem}}
+
+Ok, that's a lot of things to process. Is there a tool that can help us simplify this workflow? Of course there is, and it's called \texttt{\{golem\}}.
+
+It can be found at \url{https://github.com/ThinkR-open/golem}
+
+The stable release can be found on CRAN, and installed with:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"golem"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{\{golem\}} can only be found on GitHub so you have to install it with:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{remotes}\OperatorTok{::}\KeywordTok{install_github}\NormalTok{(}\StringTok{"Thinkr-open/golem"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{\{golem\}} is an R package that implements an opinionated framework for building production-ready Shiny apps. It all starts with an RStudio project, which contains a predefined setup for building your app. The idea is that with \texttt{\{golem\}}, you don't have to focus on the foundation of your app, and can spend your time thinking about what you want to do, not about how to do it. It's built on top of the working process we've developed at ThinkR, and tries to gather in one place the functions and tools we've created for building applications designed for production.
+
+\hypertarget{getting-started-with-golem}{%
+\section{\texorpdfstring{Getting started with \texttt{\{golem\}}}{Getting started with \{golem\}}}\label{getting-started-with-golem}}
+
+Note before using \texttt{\{golem\}}:
+
+\begin{itemize}
+\item
+  A \texttt{\{golem\}} app is contained inside a package, so knowing how to build a package is highly recommended.
+\item
+  A \texttt{\{golem\}} app works better if you are working with \texttt{shiny\ modules}, so knowing how modules work is heavily recommended.
+\end{itemize}
+
+In the rest of the book, we'll assume you're working in RStudio.
+
+\hypertarget{understanding-golem-package-structure}{%
+\section{\texorpdfstring{Understanding \texttt{\{golem\}} package structure}{Understanding \{golem\} package structure}}\label{understanding-golem-package-structure}}
+
+// TODO
+
+\hypertarget{workflow}{%
+\chapter{The workflow}\label{workflow}}
+
+-\textgreater{} Overview of the workflow
+
+\hypertarget{part-1-design}{%
+\section{Part 1: Design}\label{part-1-design}}
+
+// TODO
+
+\hypertarget{part-2-prototype}{%
+\section{Part 2: Prototype}\label{part-2-prototype}}
+
+// TODO
+
+\hypertarget{part-3-build}{%
+\section{Part 3: Build}\label{part-3-build}}
+
+// TODO
+
+\hypertarget{part-4-secure}{%
+\section{Part 4: Secure}\label{part-4-secure}}
+
+// TODO
+
+\hypertarget{part-5-deploy}{%
+\section{Part 5: Deploy}\label{part-5-deploy}}
+
+// TODO
+
+\hypertarget{part-step-1-designing}{%
+\part{Step 1: Designing}\label{part-step-1-designing}}
+
+\hypertarget{step-design}{%
+\chapter{Don't rush into coding}\label{step-design}}
+
+\hypertarget{designing-before-coding}{%
+\section{Designing before coding}\label{designing-before-coding}}
+
+Don't rush into coding. I know you want to, because it's what we like to do and what we are good at. But before entering the coding marathon, take time to think about the application and the way it will be deployed and used.
+
+\hypertarget{ask-questions}{%
+\section{Ask questions}\label{ask-questions}}
+
+Take a pen and a piece of paper and draw the app. Talk about it with the people who will use the app, just to decipher what they actually need. Take a moment to talk with the IT. Here are some questions you can ask:
+
+\begin{itemize}
+\tightlist
+\item
+  ``Who are the end users of the app?'' --- This will help you know if the end users are tech literate or not, and what they aim to achieve with the app.
+\item
+  ``How frequently will they use the app?'' --- The small details of the design \& the UI of an app you use on a daily basis is more crucial than when the app is used once a month.
+\item
+  ``What level of complexity and personalization do the users really need?'' --- People writing app specifications sometimes want more functionalities than what is actually needed by the users.
+\item
+  ``What level of interactivity do you want, and to what extent is it central?'' --- People love interactive graphs and like when things automatically sync with each other. Yet these two can make the app slower, without any significant gain. For example, being reactive to a \texttt{selectInput()} or a \texttt{sliderInput()} can lead to too much computation: maybe the user will not succeed to choose the right input the first, second or third time\ldots{} So let them do their choice, and add a button so that they can validate when they are ready.
+\item
+  ``How important is it that the app is fast?'' --- Should you spend a lot of time optimizing the little things?
+\item
+  etc.
+\end{itemize}
+
+Asking questions, taking notes, and drawing the app help you have a good idea of what is expected and what you have to do now.
+
+So, next step!
+
+\hypertarget{part-step-2-prototype}{%
+\part{Step 2: Prototype}\label{part-step-2-prototype}}
+
+\hypertarget{stepprotopype}{%
+\chapter{Building an ``ipsum-app''}\label{stepprotopype}}
+
+\hypertarget{the-ui-first-approach}{%
+\section{The ``UI first'' approach}\label{the-ui-first-approach}}
+
+I like to go ``UI first''. For two main reasons:
+
+\begin{itemize}
+\tightlist
+\item
+  Once the UI is set, there is no ``surprise implementation''. Once we agree on what elements there are in the app, there is no sudden ``oh the app needs to do that now''.
+\item
+  A pre-defined UI allows every person involved in the coding to know which part of the app they are working on. In other words, when you start working on the backend, it's much easier to work on a piece you can visually identify and integrate in a complete app scenario.
+\end{itemize}
+
+So yes, spend time writing a front-end prototype in lorem ipsum. And good news, we've got a tool for you: it's called \texttt{\{shinipsum\}}. The main goal of this package is to create random Shiny elements that can be used to draw a UI, without actually doing any heavy lifting in the backend.
+
+Hence, once you've got a draft of your app on a piece of paper, you can then move to the ``ipsum-UI'' stage: building the front-end of the app, and filling it with random Shiny elements, with functions like \texttt{random\_ggplot()} or \texttt{random\_DT()}.
+
+Another package that can be used to do that is \texttt{\{fakir\}}. This package is designed to create fake data frames, primarily for teaching purposes, but it can also be used for inserting data into a shiny prototype.
+
+\hypertarget{proto}{%
+\chapter{Tools for prototyping}\label{proto}}
+
+These two tools allow you to prototype a Shiny App and to go ``UI first''. Learn more:
+
+\hypertarget{fast-prototyping-with-shinipsum}{%
+\section{\texorpdfstring{Fast prototyping with \texttt{\{shinipsum\}}}{Fast prototyping with \{shinipsum\}}}\label{fast-prototyping-with-shinipsum}}
+
+// TODO
+
+\begin{itemize}
+\tightlist
+\item
+  \url{https://github.com/ThinkR-open/shinipsum}
+\end{itemize}
+
+\hypertarget{using-fakir-for-fake-data-generation}{%
+\section{\texorpdfstring{Using \texttt{\{fakir\}} for fake data generation}{Using \{fakir\} for fake data generation}}\label{using-fakir-for-fake-data-generation}}
+
+// TODO
+
+\begin{itemize}
+\tightlist
+\item
+  \url{https://github.com/ThinkR-open/fakir}
+\end{itemize}
+
+\hypertarget{part-step-3-build}{%
+\part{Step 3: Build}\label{part-step-3-build}}
+
+\hypertarget{stepbuild}{%
+\chapter{\texorpdfstring{Building app with \texttt{\{golem\}}}{Building app with \{golem\}}}\label{stepbuild}}
+
+Now the UI and the features are set, time to work on the backend.
+
+This part is pretty standard --- everybody can now work on the implementation of the functions that process the app inputs, in their own modules. As the UI, functionalities and modules have been defined in the previous steps, everyone (well, in theory) knows what they have to work on.
+
+And also, as said before, there should be no ``surprise implementation'', as the app has been well defined before.
+
+\hypertarget{using-golem}{%
+\section{\texorpdfstring{Using \texttt{\{golem\}}}{Using \{golem\}}}\label{using-golem}}
+
+\hypertarget{create-a-package}{%
+\subsection{Create a package}\label{create-a-package}}
+
+Once the package is installed, you can got to File \textgreater{} New Project\ldots{} in RStudio, and choose ``Package for Shiny App Using golem'' input.
+
+If you want to do it through command line, you can use:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{create_shiny_template}\NormalTok{(}\DataTypeTok{path =} \StringTok{"path/to/package"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+This command allows you to create ``illegally-named'' package (for example, \texttt{1234}) by passing the \texttt{check\_name} argument to \texttt{FALSE}. Note that this is not recommended and \textbf{should only be done if you know what you are doing}.
+
+Once you've got that, a new RStudio project will be launched. Here is the structure of this project:
+
+\begin{verbatim}
+DESCRIPTION               
+¦--dev/          
+  ¦--01_start.R           
+  ¦--02_dev.R           
+  ¦--03_deploy.R           
+  ¦--run_dev.R
+¦--inst/ 
+  ¦--app                
+    ¦--server.R       
+    ¦--ui.R           
+    ¦--www/          
+      ¦--favicon.ico
+¦--man/ 
+    ¦--run_app.Rd      
+NAMESPACE
+myapp.Rproj
+¦--R/ 
+  ¦--app_server.R       
+  ¦--app_ui.R           
+  ¦--run_app.R      
+\end{verbatim}
+
+If you're already familiar with R packages, most of these files will appear very familiar to you. That's because a \texttt{\{golem\}} app IS a package.
+
+\begin{itemize}
+\item
+  \texttt{DESCRIPTION} \& \texttt{NAMESPACE}: Package meta-data.
+\item
+  \texttt{dev/}: Scripts that will be used along the process of developing your app.
+\item
+  \texttt{inst/app}: You'll add external dependencies in \texttt{www} (images, css, etc). Don't touch \texttt{app\_ui} and \texttt{app\_server}.
+\item
+  \texttt{man}: Package doc, to be generated by R.
+\item
+  \texttt{myapp.Rproj}: RStudio project.
+\item
+  \texttt{R/app\_server.R}, \texttt{R/app\_ui.R}: Top level UI and server elements.
+\item
+  \texttt{R/run\_app.R}: a function to configure and launch the application.
+\end{itemize}
+
+\hypertarget{dev01_start.r}{%
+\section{\texorpdfstring{\texttt{dev/01\_start.R}}{dev/01\_start.R}}\label{dev01_start.r}}
+
+Once you've created your project, the first file that opens is \texttt{dev/01\_start.R}. This file contains a series of commands to run once, at the start of the project.
+
+\hypertarget{fill-the-desc}{%
+\subsection{Fill the DESC}\label{fill-the-desc}}
+
+First, fill the DESCRIPTION by adding information about the package that will contain your app:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{fill_desc}\NormalTok{(}
+  \DataTypeTok{pkg_name =} \StringTok{"shinyexample"}\NormalTok{, }\CommentTok{# The Name of the package containing the App }
+  \DataTypeTok{pkg_title =}\NormalTok{ , }\CommentTok{# The Title of the package containing the App }
+  \DataTypeTok{pkg_description =}\NormalTok{ , }\CommentTok{# The Description of the package containing the App }
+  \DataTypeTok{author_first_name =}\NormalTok{ , }\CommentTok{# Your First Name}
+  \DataTypeTok{author_last_name =}\NormalTok{ ,  }\CommentTok{# Your Last Name}
+  \DataTypeTok{author_email =}\NormalTok{ ,      }\CommentTok{# Your Email}
+  \DataTypeTok{repo_url =} \OtherTok{NULL}\NormalTok{)      }\CommentTok{# The (optional) URL of the GitHub Repo}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{set-common-files}{%
+\subsection{Set common Files}\label{set-common-files}}
+
+If you want to use the MIT licence, README, code of conduct, lifecycle badge, and news
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use_mit_license}\NormalTok{(}\DataTypeTok{name =} \StringTok{"Your Name"}\NormalTok{)  }\CommentTok{# You can set another licence here}
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use_readme_rmd}\NormalTok{()}
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use_code_of_conduct}\NormalTok{()}
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use_lifecycle_badge}\NormalTok{(}\StringTok{"Experimental"}\NormalTok{)}
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use_news_md}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{add-a-data-raw-folder}{%
+\subsection{Add a data-raw folder}\label{add-a-data-raw-folder}}
+
+If you have data in your package
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use_data_raw}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{init-tests}{%
+\subsection{Init Tests}\label{init-tests}}
+
+Create a template for tests:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{use_recommended_tests}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{use-recommended-package}{%
+\subsection{Use Recommended Package}\label{use-recommended-package}}
+
+This will add ``shiny'', ``DT'', ``attempt'', ``glue'', ``htmltools'', and ``golem'' as a dependecy to your package.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{use_recommended_dep}\NormalTok{(}\StringTok{""}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{add-various-tools}{%
+\subsection{Add various tools}\label{add-various-tools}}
+
+These two functions add a file with various functions that can be used along the process of building your app.
+
+See each file in details for a description of the functions.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{use_utils_ui}\NormalTok{()}
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{use_utils_server}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{if-you-want-to-change-the-default-favicon}{%
+\subsection{If you want to change the default favicon}\label{if-you-want-to-change-the-default-favicon}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{use_favicon}\NormalTok{( }\DataTypeTok{path =} \StringTok{"path/to/favicon"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+You're now set! You've successfully initiated the project and can go to dev/02\_dev.R.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rstudioapi}\OperatorTok{::}\KeywordTok{navigateToFile}\NormalTok{(}\StringTok{"dev/02_dev.R"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{day-to-day-dev-with-golem}{%
+\section{\texorpdfstring{Day to Day Dev with \texttt{\{golem\}}}{Day to Day Dev with \{golem\}}}\label{day-to-day-dev-with-golem}}
+
+Now that you're all set with your project init, time to move to development :)
+
+App development should happen through the \texttt{dev/02\_dev.R} file, which contains common commands for developping.
+
+\hypertarget{launching-the-app}{%
+\section{Launching the app}\label{launching-the-app}}
+
+To run the app, go to the \texttt{dev/run\_dev.R} file, and run the all thing.
+
+\hypertarget{dev02_dev.r}{%
+\section{\texorpdfstring{\texttt{dev/02\_dev.R}}{dev/02\_dev.R}}\label{dev02_dev.r}}
+
+\hypertarget{add-modules}{%
+\subsection{Add modules}\label{add-modules}}
+
+The \texttt{golem::add\_module()} functions creates a module in the \texttt{R} folder. The file and the modules will be named after the \texttt{name} parameter, by adding \texttt{mod\_} to the R file, and \texttt{mod\_*\_ui} and \texttt{mod\_*\_server} to the UI and server functions.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{add_module}\NormalTok{(}\DataTypeTok{name =} \StringTok{"my_first_module"}\NormalTok{) }\CommentTok{# Name of the module}
+\end{Highlighting}
+\end{Shaded}
+
+The new file will contain:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# mod_UI}
+\NormalTok{mod_my_first_module_ui <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(id)\{}
+\NormalTok{  ns <-}\StringTok{ }\KeywordTok{NS}\NormalTok{(id)}
+  \KeywordTok{tagList}\NormalTok{(}
+  
+\NormalTok{  )}
+\NormalTok{\}}
+
+\NormalTok{mod_my_first_module_server <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(input, output, session)\{}
+\NormalTok{  ns <-}\StringTok{ }\NormalTok{session}\OperatorTok{$}\NormalTok{ns}
+\NormalTok{\}}
+    
+\CommentTok{## To be copied in the UI}
+\CommentTok{# mod_my_first_module_ui("my_first_module_1")}
+    
+\CommentTok{## To be copied in the server}
+\CommentTok{# callModule(mod_my_first_module_server, "my_first_module_1")}
+\end{Highlighting}
+\end{Shaded}
+
+In order not to make errors when putting these into your app, the end of the file will contain code that has to be copied and pasted inside your UI and server functions.
+
+\hypertarget{add-dependencies}{%
+\subsection{Add dependencies}\label{add-dependencies}}
+
+To be called each time you need a new package as a dependency:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use_package}\NormalTok{(}\StringTok{"pkg"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{add-tests}{%
+\subsection{Add tests}\label{add-tests}}
+
+Add more tests to your application:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use_test}\NormalTok{(}\StringTok{"app"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{add-a-browser-button}{%
+\subsection{Add a browser button}\label{add-a-browser-button}}
+
+Learn more about this: \url{https://rtask.thinkr.fr/blog/a-little-trick-for-debugging-shiny/}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{browser_button}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{add-external-files}{%
+\subsection{Add external files}\label{add-external-files}}
+
+These functions create external dependencies (JavaScript and CSS). \texttt{add\_js\_file()} creates a simple JavaScript file, while \texttt{add\_js\_handler()} adds a file with a skeleton for shiny custom handlers.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{add_js_file}\NormalTok{(}\StringTok{"script"}\NormalTok{)}
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{add_js_handler}\NormalTok{(}\StringTok{"script"}\NormalTok{)}
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{add_css_file}\NormalTok{(}\StringTok{"custom"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{adding-these-external-resources-to-your-app}{%
+\section{Adding these external resources to your app}\label{adding-these-external-resources-to-your-app}}
+
+You can add any external resource (JS, css) into \texttt{inst/app/www}.
+
+Then, You'll need to point to these external resources in \texttt{golem\_add\_external\_resources()}. For example, if you've created a CSS file with \texttt{golem::add\_css\_file("custom")}, you can add the file with:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tags}\OperatorTok{$}\KeywordTok{link}\NormalTok{(}\DataTypeTok{rel=}\StringTok{"stylesheet"}\NormalTok{, }\DataTypeTok{type=}\StringTok{"text/css"}\NormalTok{, }\DataTypeTok{href=}\StringTok{"www/custom.css"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Also, you can list here the use of other packages, for example \texttt{useShinyalert()} from the \texttt{\{shinyalert\}} package.
+
+Note: we've chosen to leave it ``raw'', in the sense that there is a \texttt{addResourcePath} and a \texttt{tags\$head}. If you're comfortable with \texttt{\{htmltools\}}, you can build a \texttt{htmltools::htmlDependency}.
+
+\hypertarget{documentation}{%
+\section{Documentation}\label{documentation}}
+
+\hypertarget{vignette}{%
+\subsection{Vignette}\label{vignette}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use_vignette}\NormalTok{(}\StringTok{"shinyexample"}\NormalTok{)}
+\NormalTok{devtools}\OperatorTok{::}\KeywordTok{build_vignettes}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{code-coverage}{%
+\subsection{Code coverage}\label{code-coverage}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use_travis}\NormalTok{()}
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use_appveyor}\NormalTok{()}
+\NormalTok{usethis}\OperatorTok{::}\KeywordTok{use_coverage}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{using-golem-dev-functions}{%
+\section{\texorpdfstring{Using \texttt{\{golem\}} dev functions}{Using \{golem\} dev functions}}\label{using-golem-dev-functions}}
+
+There's a series of tools to make your app behave differently whether it's in dev or prod mode. Notably, the \texttt{app\_prod()} and \texttt{app\_dev()} function tests for \texttt{options(\ "golem.app.prod")} (or return TRUE if this option doesn't exist).
+
+Setting this options at the beginning of your dev process allows to make your app behave in a specific way when you are in dev mode. For example, printing message to the console with \texttt{cat\_dev()}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{options}\NormalTok{( }\StringTok{"golem.app.prod"}\NormalTok{ =}\StringTok{ }\OtherTok{TRUE}\NormalTok{)}
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{cat_dev}\NormalTok{(}\StringTok{"hey}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\KeywordTok{options}\NormalTok{( }\StringTok{"golem.app.prod"}\NormalTok{ =}\StringTok{ }\OtherTok{FALSE}\NormalTok{)}
+\NormalTok{golem}\OperatorTok{::}\KeywordTok{cat_dev}\NormalTok{(}\StringTok{"hey}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## hey
+\end{verbatim}
+
+You can then make any function being ``dev-dependant'' with the \texttt{make\_dev()} function:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{log_dev <-}\StringTok{ }\NormalTok{golem}\OperatorTok{::}\KeywordTok{make_dev}\NormalTok{(log)}
+\KeywordTok{log_dev}\NormalTok{(}\DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 2.302585
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{options}\NormalTok{( }\StringTok{"golem.app.prod"}\NormalTok{ =}\StringTok{ }\OtherTok{TRUE}\NormalTok{)}
+\KeywordTok{log_dev}\NormalTok{(}\DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{part-step-4-secure}{%
+\part{Step 4: Secure}\label{part-step-4-secure}}
+
+\hypertarget{step-secure}{%
+\chapter{Build yourself a safe net}\label{step-secure}}
+
+Securing your app means two things: testing, and locking the application environment.
+
+\hypertarget{testing-your-app}{%
+\section{Testing your app}\label{testing-your-app}}
+
+So first, be sure to include tests all along the building process --- just like any other R code. As the app is contained in a package, you can use standard testing tools for testing the business logic of your app --- as said in the first part, it's important to split the backend functions and algorithm from the user interface. That means that these backend functions can run outside of the application. And yes, if they can run outside of the app, they can be tested the standard way, using \{testthat\}.
+
+When it comes to testing the front end, you can try the \{shinytest\} package from RStudio, if you need to be sure there is no visual regression all along the project development. \{shinyloadtest\}, on the other hand, tests how an application behaves when one, two, three, twenty, one hundred users connect to the app, and gives you a visual report about the connection and response time of each session.
+
+One other tool I like to use is Katalon Studio. It's not R related, and can be used with any kind of web app. How it works is quite simple: it opens your browser where the Shiny app runs, and record everything that happens. Once you stop the recording, you can relaunch the app and it will replay all the events it has recorded. And of course, you can specify your own scenario, define your own events, etc. It's not that straightforward to use, but once you get a good grasp of how it works, it's a very powerful tool.
+
+\hypertarget{a-reproducible-environment}{%
+\section{A reproducible environment}\label{a-reproducible-environment}}
+
+Secondly, secure your app means that it can be deployed again any time in the future --- in other words, you have to ensure you've got a proper handle on the required R version, and of the package versions which are required to run your app. That means that you have to be aware that upgrading a package might break your app --- so, provide an environment that can prevent your app from breaking when a package gets updated. For that, there is, of course, Docker, R specific tools like \texttt{\{packrat\}}, or deploying custom CRAN repositories or package manager.
+
+\hypertarget{secure}{%
+\chapter{Secure your work}\label{secure}}
+
+\hypertarget{git}{%
+\section{Git}\label{git}}
+
+Friends don't let friends work on a coding project without version control.
+
+// TO DO
+
+\hypertarget{ci-and-testing}{%
+\section{CI and testing}\label{ci-and-testing}}
+
+Testing is central for making your application survive in the long run. The \{testthat\} package can be used to test the ``business logic'' side of your app, while the application features can be tested with packages like \{shinytest\}, or software like Katalon.
+
+// TO DO: more info about the tools + link to resources.
+
+\hypertarget{part-step-5-deploy}{%
+\part{Step 5: Deploy}\label{part-step-5-deploy}}
+
+\hypertarget{stepdeploy}{%
+\chapter{Send your app to production}\label{stepdeploy}}
+
+Tools for deployment are not the subject of this blog post so I won't talk about this in detail (remember, we are talking about building 😉 ), but our two tools of choice are Docker \& ShinyProxy, and RStudio Connect.
+
+// TODO: link to resources.
+
+\hypertarget{deploy-golem}{%
+\chapter{\texorpdfstring{Deploy with \texttt{\{golem\}}}{Deploy with \{golem\}}}\label{deploy-golem}}
+
+\hypertarget{local-deployment-1}{%
+\section{Local deployment}\label{local-deployment-1}}
+
+// TODO
+
+\hypertarget{deploying-apps-with-golem}{%
+\section{\texorpdfstring{Deploying Apps with \texttt{\{golem\}}}{Deploying Apps with \{golem\}}}\label{deploying-apps-with-golem}}
+
+The \texttt{dev/03\_deploy.R} file contains function for deploying on various plateforms.
+
+\hypertarget{rstudio-environments}{%
+\section{RStudio Environments}\label{rstudio-environments}}
+
+// TODO
+
+\hypertarget{docker}{%
+\section{Docker}\label{docker}}
+
+// TODO
+
+\hypertarget{part-optimizing}{%
+\part{Optimizing}\label{part-optimizing}}
+
+\hypertarget{optim-caveat}{%
+\chapter{Common Application Caveats}\label{optim-caveat}}
+
+\hypertarget{reactivity-anti-patterns}{%
+\section{Reactivity anti-patterns}\label{reactivity-anti-patterns}}
+
+// TODO
+
+\hypertarget{reading-data}{%
+\section{Reading data}\label{reading-data}}
+
+// TODO
+
+\hypertarget{r-does-too-much}{%
+\section{R does too much}\label{r-does-too-much}}
+
+// TODO
+
+\hypertarget{optimizing-shiny-code}{%
+\chapter{Optimizing Shiny Code}\label{optimizing-shiny-code}}
+
+\hypertarget{reading-data-1}{%
+\section{Reading data}\label{reading-data-1}}
+
+// TODO
+
+\hypertarget{caching-elements}{%
+\section{Caching elements}\label{caching-elements}}
+
+// TODO
+
+\hypertarget{keeping-things-simple}{%
+\section{Keeping things simple}\label{keeping-things-simple}}
+
+// TODO
+
+\hypertarget{optimjs}{%
+\chapter{Using JavaSript}\label{optimjs}}
+
+\hypertarget{client-side-optimization}{%
+\section{Client-side Optimization}\label{client-side-optimization}}
+
+// TODO
+
+\hypertarget{javascript---shiny-communication}{%
+\section{JavaScript \textless{}-\textgreater{} Shiny communication}\label{javascript---shiny-communication}}
+
+// TODO
+
+\hypertarget{common-javascript-patterns-for-shiny}{%
+\section{Common JavaScript patterns for Shiny}\label{common-javascript-patterns-for-shiny}}
+
+// TODO
+
+\hypertarget{about-golem-js-functions}{%
+\section{\texorpdfstring{About \texttt{\{golem\}} js functions}{About \{golem\} js functions}}\label{about-golem-js-functions}}
+
+\texttt{\{golem\}} comes with a series of JavaScript functions that you can call from the server. These functions are added by default with \texttt{golem::js()} in \texttt{app\_ui}.
+
+Then they arer called with \texttt{session\$sendCustomMessage("fonction",\ "ui\_element")}.
+
+This \texttt{ui\_element} define the UI element to interact with. It can be a full jQuery selector, an id or a class.
+
+\hypertarget{golemjs}{%
+\subsection{\texorpdfstring{\texttt{golem::js()}}{golem::js()}}\label{golemjs}}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{showid} \& \texttt{hideid}, \texttt{showclass} \& \texttt{hideclass} show and hide elements through their id or class.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\StringTok{"showid"}\NormalTok{, }\KeywordTok{ns}\NormalTok{(}\StringTok{"plot"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{showhref} \& \texttt{hidehref} hide and show a link by trying to match the \texttt{href} content.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{session}\OperatorTok{$}\KeywordTok{sendCustomMessage}\NormalTok{(}\StringTok{"showhref"}\NormalTok{, }\StringTok{"panel2"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\item
+  \texttt{clickon} click on the element. You have to use the full jQuery selector.
+\item
+  \texttt{show} \& \texttt{hide} show and hide elements, using the full jQuery selector.
+\end{itemize}
+
+\hypertarget{about-jquery-selectors}{%
+\subsection{About jQuery selectors}\label{about-jquery-selectors}}
+
+\begin{itemize}
+\item
+  \texttt{\#plop}: the element with the id \texttt{plop}
+\item
+  \texttt{.pouet}: elements of class \texttt{pouet}
+\item
+  \texttt{"button:contains(\textquotesingle{}this\textquotesingle{})"}: buttons with a text containing \texttt{\textquotesingle{}this\textquotesingle{}}
+\end{itemize}
+
+Note that in html, tags contains attributes. For example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{<a}\OtherTok{ href} \OtherTok{=} \StringTok{"https://thinkr.fr"}\OtherTok{ data-value} \OtherTok{=} \StringTok{"panel2"}\KeywordTok{>}\NormalTok{ThinkR}\KeywordTok{</a>}
+\end{Highlighting}
+\end{Shaded}
+
+contains \texttt{href} \& \texttt{data-value}. You can refer to these attributes with \texttt{{[}{]}} after the tag name.
+
+\begin{itemize}
+\item
+  \texttt{a{[}href\ =\ "https://thinkr.fr"{]}}: link with \texttt{href} being \texttt{https://thinkr.fr}
+\item
+  \texttt{a{[}data-value="panel2"{]}}: link with \texttt{data-value} being \texttt{"panel2"}
+\end{itemize}
+
+
+\end{document}
