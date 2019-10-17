@@ -1,135 +1,172 @@
-# Using JavaSript {#optimjs}
-
-```{r include = FALSE}
-library(magrittr)
-golem::add_js_handler("plop", "golemexample", open = FALSE)
-```
-
+# Using JavaScript {#optimjs}
 
 In its core, building a Shiny app is building a JavaScript app that can talk with an R session. 
-This process is hidden from the common Shiny developer, who usually thinks that everything is done in R. 
-In a sense, it's true, but when you are writting UI elements in Shiny what you are doing is building a series of HTML tags with JavaScript events, that will communicate with R, read results, and update the page the app-user sees. 
-What happens under the hood is a little bit complex and  than that but the general idea is there: R talks to your browser through a websocket, and this very same browser talks to R through the same websocket.
+This process is hidden from the common Shiny developer, who usually works on everything from R. 
+In a sense,  everything is done with R, but when you are writting UI elements in Shiny what you are actually doing is building a series of HTML tags, which are then linked to JavaScript events. 
+Later on, when the app is running, these JavaScript events will communicate with R, in the sense that they will send data to R, and receive data from R. 
+Most of the time, when this JavaScript events are receiving data, that also means that they modify the page the user sees.
+What happens under the hood is a little bit complex and out of scope for this book, but the general idea is there: R talks to your browser through a websocket, and this very same browser talks to R through the same websocket.
 
 // TODO: create here a simple Flowchart 
 // R -> (WebSocket) -> JS 
 // R <- (WebSocket) <- JS 
 
 It's important to note here that the communication happens in both ways: from R to JavaScript, and from JavaScript to R. 
-In fact, what we do when we write a piece of code like `sliderInput("plop", "this", 1, 10, 5)`, what we are doing is creating a binding between JavaScript and R, where JavaScript listens to any event happening on the slider with the id `"plop"`, and whenever JavaScript detects that something happens to this element, its value is sent back to R. 
-With `output$bla <- renderPlot({})`, what we are doing is making the two communicates the other way around: we are telling JavaScript to listen to any incoming data from R for the `id` `"bla"`, and whenever JavaScript sees incoming data from R, it puts it into the proper HTML element. 
+In fact, when we write a piece of code like `sliderInput("plop", "this", 1, 10, 5)`, what we are doing is creating a binding between JavaScript and R, where JavaScript listens to any event happening in the browser on the slider with the id `"plop"`, and whenever JavaScript detects that something happens to this element, something (most of the time its value) is sent back to R. 
+With `output$bla <- renderPlot({})`, what we are doing is making the two communicates the other way around: we are telling JavaScript to listen to any incoming data from R for the `id` `"bla"`, and whenever JavaScript sees incoming data from R, it puts it into the proper HTML tag. 
 
-So even if everything happens in R, we __are__ writting a web app, from R. 
-Once you've realized that, the possibilities are endless: in fact almost anything doable in a web app UI can be done in Shiny. 
-What this also implies is that getting (even a little bit) better at writting HTML, CSS and especially JavaScript will make your app better, lighter, and more performant. 
-Indeed, JavaScript for example is a language which has been designed to interact with a web page: change element appearances, hide and show things, cick somewhere, send alerts... 
-What that means is that knowing just enought JavaScript can improve the quality of your app: especially when you've been using R to build more or less complex interface rendering: conditional pannels, simulating a button click, hide and showing elements are for example good examples of where you should be using JavaScript instead of building conditionnal `renderUI` or `insertUI` in your server.
+So even if everything happens in R, we __are__ writting a web (so HTML, CSS and JavaScript) application, from R. 
+Once you've realized that, the possibilities are endless: in fact almost anything doable in a web app can be done in Shiny. 
+What this also implies is that getting (even a little bit) better at writting HTML, CSS and especially JavaScript will make your app better, lighter, and more efficient. 
+Indeed, JavaScript is a language which has been designed to interact with a web page: change element appearances, hide and show things, cick somewhere, show alerts and prompts... 
+What that means is that knowing just enought JavaScript can improve the quality of your app: especially when you've been using R to build some complex UI renderings: think conditional pannels, simulating a button click from the server, hide and show elements...
+All these things are good examples of where you should be using JavaScript instead of building more or less complex `renderUI` or `insertUI` patterns in your server.
 
 This is what this part aims to do: giving you just enough JavaScript knowledge to lighten your Shiny App, and improve the global user and developer experience.
-In this part, we'll see how to make R and JavaScript communicate with each other. 
-We'll also see how to do some simple "client-side only" optimizations, and explore common patterns for JavaScript in Shiny. 
+In this part, we'll first see some JavaScript basics, which can be used "client-side" only, or later in R & JS communication, which is what we'll see next: how to make R and JavaScript communicate with each other. In this part, we'll also explore common patterns for JavaScript in Shiny. 
 Finally, we'll quickly present some of the functions from `{golem}` which are built on top of JavaScript. 
 
 > Note that this chapter is not supposed to be a comprehensive JavaScript course. 
 External resources are linked at the botton of this chapter if you want to dive deeper into JavaScript.
 
-## JavaScript <-> Shiny communication 
+## A quick introduction to JavaScript
 
-### From R to JavaScript 
+JavaScript is a programming language which has been designed to work in the browser^[
+You can now work with JavaScript in a server with Node.JS, but this is out of scope of this book. 
+See linked resources to learn more.
+].
+JavaScript, as R, can be used as a functional language, but most of what we do in JavaScript is done in an object-oriented way. 
+You have to think of a web page as a tree, where the top of the webpage is the root node, and every element in the page is a node in this tree. 
+And of course, you can work on any of these HTML node with JavaScript: modify it, bind and/or listen to events, hide and show it...
 
-Inside this skeleton:
+JavaScript code can be add to your app "as-is", in other words just as if you were creating a web app: with an html `script` tag.
 
-```{r echo = FALSE}
-readLines("golemexample/inst/app/www/plop.js") %>%
-  glue::as_glue()
-```
+If you're working with `{golem}`, including a JavaScript file is performed using two functions: 
 
-> `golem::add_js_handler()`
++ `golem::add_js_file("name")`, which adds a standard JavaScript file, i.e. one which is not meant to be used to communicate with R.
+We'll see in the first part of this chapter how to add JavaScript code there.
++ `golem::add_js_handler("name")`, which creates a file with a skeleton for shiny handlers. 
+We'll see this second type of elements in the `JavaScript <-> Shiny communication` part.
 
-Called from server-side with:
+### Understanding div, class, and id
 
+Consider this piece of code:
 
-```{r eval = FALSE}
-session$sendCustomMessage("fun", list())
-```
-
-`list()` -> JSON. 
-
-Example:
-
-- JavaScript 
-
-```{js, eval = FALSE, echo = TRUE}
-Shiny.addCustomMessageHandler('monalerte', function(arg) {
-  alert(arg.message);
-  alert(arg.message2);
-})
-```
-
-- R 
-
-```{r eval = FALSE}
-session$sendCustomMessage(
-  "monalerte", 
-  list(
-    message = "Mon premier message", 
-    message2 = "Mon deuxième message"
-  )
+```{r}
+library(shiny)
+fluidPage(
+  titlePanel("Hello Shiny"), 
+  actionButton("go", "go")
 )
 ```
 
+This `{shiny}` code creates a piece of HTML code, which contains three nodes: a `div`, which is a container, an `h2`, which is a level two header, a button which has an id and a class.
+Both are included into the `div`. 
+Let's detail what we've got here:
 
-
-### From JavaScript to R
-
-```{js, eval = FALSE, echo = TRUE}
-Shiny.setInputValue("rand", Math.random())
-```
-
-```{r eval = FALSE}
-observeEvent( input$rand , {
-  print( input$rand )
-})
-```
-
-## Client-side Optimization
-
-> `golem::add_js_file()`
++ HTML tags, which are the building blocks of the "tree": here, `div`, `h2` and `button` are HTML tags.
++ The button has an `id`, which is short for "identifier". 
+This id has to to be unique: it's this reference that allows to spot this exact element, and more specifically it's this id that allows JavaScript and R to talk to each other: if you click on a button, you have to be sure that it's this specific button, and only that one.
++ Elements can have a class, which can apply to multiple elements. 
+This can be used in JavaScript, but it's also very useful for styling elements in CSS. 
 
 ### About jQuery & jQuery selectors
 
-The `jQuery` framework is natively included in Shiny
+The `jQuery` framework is natively included in Shiny.
 
-> jQuery is a fast, small, and feature-rich JavaScript library. It makes things like HTML document traversal and manipulation, event handling, animation, and Ajax much simpler with an easy-to-use API that works across a multitude of browsers. With a combination of versatility and extensibility, jQuery has changed the way that millions of people write JavaScript.
+> jQuery is a fast, small, and feature-rich JavaScript library. It makes things like HTML document traversal and manipulation, event handling, animation, and Ajax much simpler with an easy-to-use API that works across a multitude of browsers. 
 
-It comes with the notion of selectors:
+jQuery is a very (like, very) popular JavaScript library which is designed to manipulate the DOM, its events and its elements. 
+It can be used to do a lot of things, like hide and show, change class, click somewhere... And to be able to do that, it comes with the notion of selectors, which will be put between `$()`.
+You can use:
 
-+ `#plop`: the element with the id `plop`
++ `#plop` to refer to the element with the id `plop`
 
-+ `.pouet`: elements of class `pouet`
++ `.pouet` to refer to element(s) of class `pouet`
 
-+ `"button:contains('this')"`: buttons with a text containing `'this'`
++ `"button:contains('this')"` to refer to the buttons with a text containing `'this'`
 
-Note that in html, tags contains attributes. For example:
+You can also use special HTML attributes.
+For example:
 
 ``` html
 <a href = "https://thinkr.fr" data-value = "panel2">ThinkR</a>
 ```
 
-contains `href` & `data-value`. 
-You can refer to these attributes with `[]` after the tag name.
+contains the `href` & `data-value` attributes.
+You can refer to these with `[]` after the tag name.
 
-+ `a[href = "https://thinkr.fr"]`: link with `href` being `https://thinkr.fr`
++ `a[href = "https://thinkr.fr"]` refers to link(s) with `href` being `https://thinkr.fr`
 
-+ `a[data-value="panel2"]`: link with  `data-value` being `"panel2"`
++ `a[data-value="panel2"]` refers to link(s) with  `data-value` being `"panel2"`
 
-#### div, class, id
+### Common JavaScript patterns for Shiny
 
-+ div == "bloc" in an HTML page
+It's hard to give an exhaustive list of what you can do with JavaScript inside Shiny. 
+As a Shiny app is part JavaScript, part R, once you've got a good grasp of JavaScript you can quickly enhance any of your applications.
+That being said, there are some common things that can be done that would allow you to immedialy optimise your application: i.e. small JavaScript functions that can will prevent you from writing complexe algorithmic logic in your application server. 
 
-+ Can have an `id`,which has to be unique, references with `#nomid`
++ `$('#id').show();` and `$('#id').hide();` show and hide one or more elements that match the given selector.
+For example, this can be use to replace: 
 
-+ It can have a class, class can be added to several elements. Referenced with `.nomclass`
+```{r eval = FALSE}
+output$ui <- renderUI({
+  if (this){
+    tags(...)
+  } else {
+    NULL
+  }
+})
+```
+
++ `alert("message")` uses the built-in alert-box mechanism from the user's browser. 
+It works well as it relies on the browser instead of R. 
+For example, you can use this functionality to replace a call to `{shinyalert}`: the result is a little bit less esthetically pleasing, but that's easier to implement and maintain.
+
++ `var x = prompt("this", "that");` this function open the built-in prompt, which is a text area where the user can input text. 
+When the user click on "OK", the text is stocked in a variable `x` here, which you can then send back to R (see further part down this chapter for info about how to do that). 
+This can replace something like : 
+
+```{r}
+mod <- function() {
+  modalDialog(
+    tagList(
+      textInput(ns("info"), "Your info here")
+    ),
+    footer = tagList(
+      modalButton("Cancel"),
+      actionButton(ns("ok"), "OK")
+    )
+  )
+}
+
+observeEvent(input$show, {
+  showModal(mod())
+})
+observeEvent(input$ok, {
+  removeModal()
+})
+```
+
++ `$('#id').css('color', 'blue');` changes the css attributes of the selected element(s). 
+Here, we're switching to blue on the `#id` element.
+
++ `$("#id").text( "this" );` changes the text content to "this". 
+This can be used to replace 
+
+```{r eval = FALSE}
+output$ui <- renderUI({
+  if (this){
+    tags$p("First")
+  } else {
+    tags$p("Second")
+  }
+})
+```
+
++ `$("#id").remove();` completely removes the element from the DOM. 
+Can be used a replacement for `shiny::removeUI()`.
+
 
 ### Adding attributes to HTML elements
 
@@ -147,9 +184,9 @@ actionButton(
 ```{r eval = FALSE}
 plotOutput(
   "plop"
-  ) %>% tagAppendAttributes(
-    onclick = "alert('hello world')"
-  )
+) %>% tagAppendAttributes(
+  onclick = "alert('hello world')"
+)
 ```
 
 
@@ -174,21 +211,66 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-## Common JavaScript patterns for Shiny
+Real Life example : https://github.com/ColinFay/tidytuesday201942/blob/master/R/mod_dataviz.R#L109 and https://github.com/ColinFay/tidytuesday201942/blob/master/R/mod_dataviz.R#L305
 
-+ `$('#id').show()` 
+## JavaScript <-> Shiny communication 
 
-+ `$('#id').hide()` 
+First of all, 
 
-+ `alert("message")` 
+### From R to JavaScript 
 
-+ `var x = prompt("this", "that")` 
+Inside this skeleton:
 
-+ `$('#id').css('color', 'blue');` 
+```{r echo = FALSE}
+readLines("golex/inst/app/www/plop.js") %>%
+  glue::as_glue()
+```
 
-+ `$("#id").text( "this" );` 
+> `golem::add_js_handler()`
 
-+ `$("#id").remove();` 
+Called from server-side with:
+
+
+```{r eval = FALSE}
+session$sendCustomMessage("fun", list())
+```
+
+`list()` -> JSON. 
+
+Example:
+
+- JavaScript 
+
+```{js, eval = FALSE, echo = TRUE}
+Shiny.addCustomMessageHandler('monalerte', function(arg) {
+alert(arg.message);
+alert(arg.message2);
+})
+```
+
+- R 
+
+```{r eval = FALSE}
+session$sendCustomMessage(
+  "monalerte", 
+  list(
+    message = "Mon premier message", 
+    message2 = "Mon deuxième message"
+  )
+)
+```
+
+### From JavaScript to R
+
+```{js, eval = FALSE, echo = TRUE}
+Shiny.setInputValue("rand", Math.random())
+```
+
+```{r eval = FALSE}
+observeEvent( input$rand , {
+  print( input$rand )
+})
+```
 
 
 ## About `{golem}` js functions
