@@ -14,7 +14,7 @@ update_website() {
   
   cp -fvr $BASE_REPO/docs/* .
   git add *
-  git commit -a -m "Updating book (${TRAVIS_BUILD_NUMBER})"
+  git commit -a -m "Updating book from $BASE_REPO (${TRAVIS_BUILD_NUMBER})"
   git status
   git push
   git status
