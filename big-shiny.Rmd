@@ -14,7 +14,7 @@ With small and simple Shiny apps, no knowledge of HTML, CSS or JavaScript is req
 
 > Complex software is harder to think about, harder to test, harder to debug, and harder to maintain — and above all, harder to learn and use.
 
-`r right_link("Basics of the Unix Philosophy", "http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#id2878339")`
+`r right_link("The Art of Unix Programming", "http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#id2878339")`
 
 
 ### Reaching the cliff of complexity
@@ -22,29 +22,44 @@ With small and simple Shiny apps, no knowledge of HTML, CSS or JavaScript is req
 Things are quite simple when it comes to small prototypes or proof of concepts. 
 But things change when your application reaches "the cliff of complexity"
 ^[We borrow this term from Charity Major, as heard in _Test in Production with Charity Majors_, [CoRecursive](https://corecursive.com/019-test-in-production-with-charity-majors/)].
-But what is complexity? 
+But what do we mean by complexity? 
 Getting a clear definition is not an easy task
 ^[Ironic right?]
- as it very depends on who is concerned.
-In the context of engineering Shiny applications, we can think of complexity from two points of view: the complexity as it is seen by the coder, and the complexity as it is seen by the customer / end user
+ as it very depends on who is concerned and who you're talking to.
+But let's try to come with a definition that will serve us in the context of engineering Shiny applications. 
+When building sofwares, we can think of complexity from two points of view: the complexity as it is seen by the coder, and the complexity as it is seen by the customer / end user
 ^[from _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity"].
 
-+ From the developer point of view. An app is to be considered complex when it is big enough in term of size and functionality so that it makes it impossible to reason about it at once, and you need to rely on tools to handle this complexity.
+#### Two views of complexity
+
++ From the developer point of view
+
+An app is to be considered complex when it is big enough in term of size and functionalities so that it makes it impossible to reason about it at once, and you need to rely on tools to understand and handle this complexity.
 This type of complexity is called _implementation complexity_. 
 One of the goal of this book is to present you a methodology and toolings that will help you reduce this form of complexity. 
+
 For example, we'll talk about a design / prototype / build / secure / deploy, which helps you reduce the complexity of implementing and maintain new app features. 
 We'll also be talking at length about the `{golem}` package, which provides a toolkit for reducing the cognitive load of handling complexity in large Shiny applications. 
 For example, creatign a new Shiny module requires following a very strict structure. 
 One way to do that is to remember how to do that and to code it from scratch (a method which has an important cognitive load and is very error prone). 
 Another way is to copy and paste an existing module and to adapt it, which is, as any copy and paste, likely to lead to errors. 
 Or there is the `{golem}` way, in which you rely on a robust tool to build the foundations for a new module.
+
 Another benefit of adopting automation for common application component is that it allows to be sure that you're following a convention. 
 And conventions are crucial when it comes to building and maintaining complex system: by imposing a formalized structure for a piece of code, it ehances readability, lessens the learning curve, and lightens the chance for typo and/or copy and paste error. 
-+ Customers and users, on the other hand, see complexity as _interface complexity_. 
-Interface complexity can be driven by a lot of elements, with for example the probability of making an error while using the app, difficulty to understand the evolution of the app, unfamiliar behaviour or terms, uncommon forms, visual distraction...
+
+
++  Customers and users
+
+On the other hand, customers and end user see complexity as _interface complexity_. 
+Interface complexity can be driven by a lot of elements, for example the probability of making an error while using the app, the difficulty to understand the logical progression in the the app, the presence of unfamiliar behaviour or terms, visual distractions...
+This book will also bring you strategy to help you cope with the need for simplification when it comes to designin interface. 
+
+#### Balancing complexities
 
 There is an inherent tension between these two source of complexity, as designing an app means finding a good balance between implementation ann interface complexity. 
 Reducing implementation complexity means one has to make some decisions that will lower one while rising the other. 
+
 For example, we can think of something very common in Shiny: the "too much reactivity" pattern. 
 In some cases, coders try to make everything reactive: e.g., three sliders and a selectInput, all updating a plot.
 This behaviour lowers the interface complexity: users don't have to think a lot about what they are doing, they just move things around and it updates. 
@@ -55,13 +70,16 @@ But that comes with a cost: handling delayed reactivity and caching elements, wh
 One other solution is simply to add a button after the input, and only update the plot when the user clicks on it. 
 This pattern makes it easier to control reactivity from an implementation side. 
 But it can make the interface a little bit more complex for the user who have to perform another action. 
+
 We'll argue somewhere else in the book that on the other hand, not enough reactivity is better than too much reactivity, as the latter increases computation time, and relies on the assumption that the user makes the right action on the first try.
 Another good example is `{shiny}`'s `dateRangeInput()` function being able to take a start which is posterior to the end (which is the behaviour of the JavaScript plugin used in `{shiny}` to create this input). 
 Handling this special case is doable: with a little bit of craft, you can watch what the user inputs and throw an error if the start is after the end
 ^[see [shiny/issues/2043#issuecomment-525640738](https://github.com/rstudio/shiny/issues/2043#issuecomment-525640738) for an example].
 That solution augments the implementation complexity, while leaving it as is requires the user to think about wether or not the starting date is before the ending date, thus increasing the interface complexity.
 
--> Insert here something of the like: "It's up to you to think about what's the best balance between these two sources." 
+_-> Insert here something of the like: "It's up to you to think about what's the best balance between these two sources." _
+
+#### Assessing complexity
 
 Another measure that sometime comes in the discussion is the codebase size. 
 It's relatively hard to use this number of lines metric, as R is very permissive when it comes to identation and line break. It also depends on your coding style and the packages you're using. For example, tidyverse packages encourage the use of the pipe (`%>%`)
@@ -85,7 +103,21 @@ iris[
 9 lines of code for something that should also be written in one, three, five...
 
 Another drawback of this metric is that it focuses on numbers instead of readability, and on the long run yes, readability matters
-^["Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess.", from _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity"].
+^["Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess.", from _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity"]. 
+
+// TODO
+
+```{r eval = FALSE}
+devtools::install_github("hrbrmstr/cloc")
+```
+
+```{r eval = FALSE}
+library(cloc)
+cloc_cran("shiny", .progress = FALSE)
+cloc_cran("attempt", .progress = FALSE)
+```
+
+
 
 -> https://github.com/hrbrmstr/cloc
 
