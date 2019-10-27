@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 4 Introduction to {golem} | Building Big Shiny Apps - A Workflow</title>
+  <title>Chapter 15 The Need for Optimization | Building Big Shiny Apps - A Workflow</title>
   <meta name="description" content="Building Robust Shiny Application - A Workflow" />
   <meta name="generator" content="bookdown 0.14 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 4 Introduction to {golem} | Building Big Shiny Apps - A Workflow" />
+  <meta property="og:title" content="Chapter 15 The Need for Optimization | Building Big Shiny Apps - A Workflow" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 4 Introduction to {golem} | Building Big Shiny Apps - A Workflow" />
+  <meta name="twitter:title" content="Chapter 15 The Need for Optimization | Building Big Shiny Apps - A Workflow" />
   
   <meta name="twitter:description" content="Building Robust Shiny Application - A Workflow" />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="structure.html"/>
-<link rel="next" href="workflow.html"/>
+<link rel="prev" href="deploy-golem.html"/>
+<link rel="next" href="optim-caveat.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -333,211 +333,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="golem" class="section level1">
-<h1><span class="header-section-number">Chapter 4</span> Introduction to <code>{golem}</code></h1>
-<p>OK, that’s a lot of things to process.
-Is there a tool that can help us simplify this workflow?
-Of course there is, and it’s called <code>{golem}</code>.</p>
-<p>It can be found at <a href="https://github.com/ThinkR-open/golem" class="uri">https://github.com/ThinkR-open/golem</a></p>
-<p>The stable release can be found on CRAN, and installed with:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;golem&quot;</span>)</a></code></pre></div>
-<p><code>{golem}</code> can only be found on GitHub so you have to install it with:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;Thinkr-open/golem&quot;</span>)</a></code></pre></div>
-<p><code>{golem}</code> is an R package that implements an opinionated framework for building production-ready Shiny apps.
-It all starts with an RStudio project, which contains a predefined setup for building your app.
-The idea is that with <code>{golem}</code>, you don’t have to focus on the foundation of your app, and can spend your time thinking about what you want to do, not about how to do it.
-It’s built on top of the working process we’ve developed at ThinkR, and tries to gather in one place the functions and tools we’ve created for building applications designed for production.</p>
-<div id="getting-started-with-golem" class="section level2">
-<h2><span class="header-section-number">4.1</span> Getting started with <code>{golem}</code></h2>
-<p>Note before using <code>{golem}</code>:</p>
-<ul>
-<li><p>A <code>{golem}</code> app is contained inside a package, so knowing how to build a package is highly recommended.</p></li>
-<li><p>A <code>{golem}</code> app works better if you are working with <code>shiny modules</code>, so knowing how modules work is heavily recommended.</p></li>
-</ul>
-<p>In the rest of the book, we’ll assume you’re working in RStudio.</p>
+<div id="when-optimize" class="section level1">
+<h1><span class="header-section-number">Chapter 15</span> The Need for Optimization</h1>
+<div id="build-first-then-optimize" class="section level2">
+<h2><span class="header-section-number">15.1</span> Build first, then optimize</h2>
+<p>// TODO</p>
 </div>
-<div id="understanding-golem-package-structure" class="section level2">
-<h2><span class="header-section-number">4.2</span> Understanding <code>{golem}</code> package structure</h2>
-<p>When starting a new project with <code>{golem}</code> (here on an app called <code>golex</code>), you’ll start with this specific architecture.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;golex&quot;</span>)</a></code></pre></div>
-<pre><code>golex
-├── DESCRIPTION
-├── NAMESPACE
-├── R
-│   ├── app_server.R
-│   ├── app_ui.R
-│   └── run_app.R
-├── dev
-│   ├── 01_start.R
-│   ├── 02_dev.R
-│   ├── 03_deploy.R
-│   └── run_dev.R
-├── inst
-│   └── app
-│       └── www
-│           ├── favicon.ico
-│           └── plop.js
-└── man
-    └── run_app.Rd</code></pre>
-<p>If you are familiar with packages, this structure will look familiar to you.
-And that’s for a good reason: an app built with <code>{golem}</code> IS a package.</p>
-<p>Let’s focus on these various elements for a moment in order to be sure you understand what part each file plays and how you can use (or not use) each of them.</p>
-<div id="description-namespace" class="section level3">
-<h3><span class="header-section-number">4.2.1</span> <code>DESCRIPTION</code> &amp; <code>NAMESPACE</code></h3>
-<p>The <code>DESCRIPTION</code> and <code>NAMESPACE</code> are standard package files (i.e. they are not <code>{golem}</code>-specific).
-In the first, you’ll find a series of metadata about your package, for example who wrote the package, what’s the package version, what is its goal, who to complain to if things go wrong, and also information about external dependencies, the license, the encoding….</p>
-<p>This <code>DESCRIPTION</code> file will be filled automatically by the first function you’ll run in <code>dev/01_start.R</code>, and by other functions from the <code>dev/</code> scripts.
-In other words, most of the time you won’t interact with it directly, but through wrappers from <code>{golem}</code> and <code>{usethis}</code>.</p>
-<p>The <code>NAMESPACE</code> file is one of the most important file in your package.
-It’s also the one you’ll NEVER edit by end!
-R uses this one to define how to interact with the rest of the library: what function to import and from which package and what function to export, i.e what functions are available when you do <code>library(golex)</code>.
-This file will be built when running the documenting process in your R package: <code>{roxygen2}</code> will scan all your <code>.R</code> files, and build the <code>man/</code> + the <code>NAMESPACE</code>, by scanning the roxygen tags there.</p>
-<p>Explaining how these files are to be filled and how to document your functions is out of the scope of this book, as we hope if you’re reading this lines you’re already familiar with how to build a package.
-If you’d like to learn more about these, here are some resources you can refer to:</p>
-<ul>
-<li><a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html#The-DESCRIPTION-file">Writing R Extensions - The DESCRIPTION file</a></li>
-<li><a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-namespaces">Writing R Extensions - Package namespaces</a></li>
-<li><a href="http://r-pkgs.had.co.nz/description.html">R Packages - Package metadata</a></li>
-<li><a href="http://r-pkgs.had.co.nz/namespace.html">R Packages - Namespace</a></li>
-<li><a href="https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop">Building a package that lasts — eRum 2018 workshop</a></li>
-</ul>
-</div>
-<div id="r" class="section level3">
-<h3><span class="header-section-number">4.2.2</span> R/</h3>
-<p>The <code>R/</code> folder is also the standard folder where you’ll be putting all your app functions.
-When you start your app project, this folder is pre-populated with three <code>.R</code>: <code>app_server.R</code>, <code>app_ui.R</code>, and <code>run_app.R</code>.</p>
-<p>During the process of building your application, all the core functionalities of your app will go there: you’ll put there the content of your modules (with <code>golem::add_modules()</code>) and the utilitarian / business logic functions you’ll build with <code>golem::add_utils()</code> and <code>golem::add_fct()</code>.
-If you want to add a standard file (that is to say out of <code>{golem}</code> nomenclature), you can call <code>usethis::use_r(&quot;name&quot;)</code>, which create a <code>R/name.R</code> file.</p>
-<p>All your <code>.R</code> file should go there, with the only exception of the files you’ll create when deploying to RStudio products: these processes needing an <code>app.R</code> at the root of the project, the <code>golem::add_rstudioconnect_file()</code> will bypass this “.R only in R/” rule to add a file at your package root.
-Good news is that <code>{golem}</code> also knows that a package with an <code>app.R</code> at its root can’t build, so this file is added to the <code>.Rbuildignore</code>.</p>
-<p>If you’ve been building classic Shiny Apps, you’ve been use to <code>source()</code> your R files at the beginning of your <code>app.R</code> or <code>ui.R/server.R</code>.
-Keep in mind that, as we are building a package, we don’t need to source files from one place to another: <code>{golem}</code>, be it in the <code>dev/run_dev.R</code>, <code>app.R</code> for RStudio products, or running the <code>run_app()</code> function, leverages the package structure to allow you to have access to other functions from inside the whole <code>R/</code> folder<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>.</p>
-<p>Note also that this folder can’t contain sub-folders.</p>
-<div id="app_server.r" class="section level4">
-<h4><span class="header-section-number">4.2.2.1</span> app_server.R</h4>
-<pre><code>#&#39; @import shiny
-app_server &lt;- function(input, output,session) {
-  # List the first level callModules here
-}</code></pre>
-<p>This first function contains your server logic.
-If you’re familiar with the classic ‘ui.R / server.R’ methodology, this function can be thought of as a drop in replacement for the content of the function you’ve got in your <code>server.R</code>.</p>
-<p>Building a complex Shiny application commonly implies using Shiny modules. If so, you’ll be adding there a series of <code>callModule()</code>, the ones you’ll get on the very bottom of the file created with <code>golem::add_module()</code>.</p>
-<p>You’ll also find there global elements from your server-logic: top <code>reactiveValues</code>, connections to databases, options setting…</p>
-</div>
-<div id="app_ui.r" class="section level4">
-<h4><span class="header-section-number">4.2.2.2</span> app_ui.R</h4>
-<pre><code>#&#39; @import shiny
-app_ui &lt;- function() {
-  tagList(
-    # Leave this function for adding external resources
-    golem_add_external_resources(),
-    # List the first level UI elements here 
-    fluidPage(
-      h1(&quot;golex&quot;)
-    )
-  )
-}</code></pre>
-<p>This piece of the <code>app_ui.R</code> is designed to received the counterpart of what you put in your server.
-Everything here is to be put after the <code> # List the first level UI elements here </code> line.
-Just as with their server counterparts, the UI side of these elements are the one from the bottom of the file you’re creating with <code>golem::add_module()</code>.</p>
-<p>By default, <code>{golem}</code> uses a <code>fluidPage()</code>, which is <code>{shiny}</code>’s most commonly used template.
-If ever you want to use <code>navBarPage()</code>, this is where you’ll define this: replace one with the other, and you’ll be good to go.
-You can also define any other template page, for example with an <code>htmlTemplate()</code>.
-Keep in mind that removing the <code>fluidPage()</code> here implies that there is no available CSS / JS template to be used anymore, and you’ll need to be adding your own there.</p>
-<pre><code>#&#39; @import shiny
-golem_add_external_resources &lt;- function(){
-  
-  addResourcePath(
-    &#39;www&#39;, system.file(&#39;app/www&#39;, package = &#39;golex&#39;)
-  )
- 
-  tags$head(
-    golem::activate_js(),
-    golem::favicon()
-    # Add here all the external resources
-    # If you have a custom.css in the inst/app/www
-    # Or for example, you can add shinyalert::useShinyalert() here
-    #tags$link(rel=&quot;stylesheet&quot;, type=&quot;text/css&quot;, href=&quot;www/custom.css&quot;)
-  )
-}</code></pre>
-<p>The second part of this file contains the <code>golem_add_external_resources()</code> function, which is used to add, well, external resources.
-You may have noticed that this function is to be found above in the file, in the <code>app_ui()</code> function.
-This function is used for linking to external files inside your applications: notably the files you’ll create with <code>golem::add_css_file()</code> and friends.
-In <code>golem_add_external_resources()</code>, you can also define custom resourcesPath.
-The first line (the one with <code>addResourcePath()</code>) is the one allowing the <code>inst/app/www</code> folder to mounted and be available at <code>www</code> with your app when you launch it.
-That’s why later on, when creating CSS or JS files, you’ll be asked to add there <code>tags$link(rel=&quot;stylesheet&quot;, type=&quot;text/css&quot;, href=&quot;www/custom.css&quot;)</code>.</p>
-<p>The other part of this function, starting with <code>tags$head</code>, creates a <code>&lt;head&gt;</code> tag for your application.
-This <code>&lt;head&gt;</code> tag is a pretty standard tag, which is used in HTML to define a series of metadata about your app.
-We encourage you to add any new external file (e.g pictures) in this <code>inst/app/www</code> folder, so that you can later use it in the UI with the common <code>www</code> prefix.
-An other common pattern would be:</p>
-<ul>
-<li>Adding images in <code>inst/app/img</code></li>
-<li>Calling <code>addResourcePath( 'img', system.file('app/img', package = 'golex') )</code></li>
-<li>Adding elements to your UI with <code>tags$img(src = &quot;img/name.png&quot;)</code>.</li>
-</ul>
-</div>
-<div id="run_app.r" class="section level4">
-<h4><span class="header-section-number">4.2.2.3</span> run_app.R</h4>
-<pre><code>#&#39; Run the Shiny Application
-#&#39;
-#&#39; @export
-#&#39; @importFrom shiny shinyApp
-#&#39; @importFrom golem with_golem_options
-run_app &lt;- function(...) {
-  with_golem_options(
-    app = shinyApp(ui = app_ui, server = app_server), 
-    golem_opts = list(...)
-  )
-}</code></pre>
-<p>This <code>run_app()</code>function is the one that you’ll use to launch the app<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>.</p>
-<p>The body of this function is wrapped inside <code>with_golem_options()</code>, which allows you to pass arguments to the <code>run_app()</code> function, which will later be callable with <code>golem::get_golem_options()</code>.
-Some example of passing arguments include <code>run_app(prod = FALSE)</code> or something in the like of <code>run_app(user = &quot;admin)</code>.</p>
-</div>
-</div>
-<div id="instappwww" class="section level3">
-<h3><span class="header-section-number">4.2.3</span> <code>inst/app/www/</code></h3>
-<p>The <code>inst/app/www/</code> folder contains all the files which are gonna be made available <strong>at application run time</strong>.
-Any web application has external files that allows it to run<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a>.
-For example, <code>{shiny}</code> and its <code>fluidPage()</code> bundles a series of CSS and JavaScript files, notably the <code>Boostrap</code> library, or <code>jQuery</code>.
-These external files enhance your app: CSS for the design part, and JavaScript for the interactive part (more or less).
-On top of that, you can add your own files: your own design with CSS, or your own JavaScript content (as we’ll see in the last chapters of this book).
-In order to work, you have to include, somewhere in the UI, a link to these files.
-That’s what the links in the <code>golem_add_external_resources()</code> are made for: linking the external resources that you’ll build with the following functions.</p>
-<ul>
-<li><code>golem::add_css_file()</code></li>
-<li><code>golem::add_js_file()</code></li>
-<li><code>golem::add_js_handler()</code></li>
-<li><code>golem::use_favicon()</code></li>
-</ul>
-<p>Be aware that these files are available under the <code>www/</code> at <strong>application run time</strong>, i.e. that the <code>www/</code> folder is available by your browser, not by R when it runs / generate your application.
-In other words, you can use the <code>www</code> prefix in the HTML generated in your UI, which is read by your browser, not from the R/server side.
-If you want to link to a file that is read during <strong>application generation</strong>, you’ll need to do, for example, <code>includeMarkdown( system.file(&quot;app/www/plop.md&quot;, package = &quot;golex&quot;) )</code>.</p>
-</div>
-<div id="man" class="section level3">
-<h3><span class="header-section-number">4.2.4</span> <code>man/</code></h3>
-<p>This <code>man/</code> folder includes the package documentation.
-It’s a common folder that is automatically filled when you document your app: notably when running the <code>dev/run_dev.R</code> script and the <code>document_and_reload()</code> function.
-As with the <code>NAMESPACE</code> and <code>DESCRIPTION</code>, these two files are out of scope of this book (and to be honest, you’ll probably never have to interact with them directly).
-To know more about documentation and how to build it, here are some external links:</p>
-<ul>
-<li><a href="http://r-pkgs.had.co.nz/man.html">R Packages - Object documentation</a></li>
-<li><a href="https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop">Building a package that lasts — eRum 2018 workshop</a></li>
-</ul>
+<div id="tools-for-profiling" class="section level2">
+<h2><span class="header-section-number">15.2</span> Tools for profiling</h2>
+<p>// TODO</p>
 
 </div>
 </div>
-</div>
-<div class="footnotes">
-<hr />
-<ol start="9">
-<li id="fn9"><p>
-Same goes for the dependencies: you’ll never have to call <code>library()</code> in an app built with <code>{golem}</code>.<a href="golem.html#fnref9" class="footnote-back">↩</a></p></li>
-<li id="fn10"><p>
-Very technically speaking, it’s the <code>print()</code> from the object outputted by <code>run_app()</code> that launches the app, but that’s another story. <a href="golem.html#fnref10" class="footnote-back">↩</a></p></li>
-<li id="fn11"><p>
-Some webpages don’t need any external sources, as they don’t have any design and are plain HTML, but generally speaking we won’t call this format a web app. <a href="golem.html#fnref11" class="footnote-back">↩</a></p></li>
-</ol>
-</div>
+
+
+
 <hr/>
 <footer>
 <a href="rtask.thinkr.fr"><img src="img/logo400_129.png" alt="ThinkR Website"/></a>
@@ -547,8 +357,8 @@ Some webpages don’t need any external sources, as they don’t have any design
           </div>
         </div>
       </div>
-<a href="structure.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="workflow.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="deploy-golem.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="optim-caveat.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -580,7 +390,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/golem.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/when_optimize.Rmd",
 "text": "Edit"
 },
 "history": {
