@@ -1,10 +1,19 @@
-html:
-	Rscript -e 'bookdown::render_book("index.Rmd", output_format = "bookdown::gitbook", clean = FALSE)'
+html_wip:
+	Rscript -e 'bookdown::render_book("index.Rmd", output_format = "bookdown::gitbook", clean = FALSE, output_dir = "docs/wip")'
 	cp -fvr css/style.css docs/wip/
 	cp -fvr css/thinkr.css docs/wip/
 	cp -fvr css/style_gitbook.css docs/wip/
 	# cp -fvr images _book/
 	# cp -fvr _main.utf8.md docs/wip/main.md
+	
+html_master:
+	Rscript -e 'bookdown::render_book("index.Rmd", output_format = "bookdown::gitbook", clean = FALSE, output_dir = "docs")'
+	cp -fvr css/style.css docs/
+	cp -fvr css/thinkr.css docs/
+	cp -fvr css/style_gitbook.css docs/
+	# cp -fvr images _book/
+	# cp -fvr _main.utf8.md docs/wip/main.md
+	
 
 build:
 	make html

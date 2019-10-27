@@ -12,7 +12,11 @@ install:
   - Rscript -e 'remotes::install_cran(c("golem", "bookdown"))'
   
 script:
-  - make html
+  - if [ $TRAVIS_BRANCH == "wip" ] ; then make html_wip;  fi
+  - if [ $TRAVIS_BRANCH == "master" ] ; then make html_master;  fi
 
 after_success:
-  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && bash deploy.sh
+  - if ([ $TRAVIS_PULL_REQUEST == "false" ] && [ $TRAVIS_BRANCH == "wip" ]) ; then bash deploy.sh;  fi
+  - if ([ $TRAVIS_PULL_REQUEST == "false" ] && [ $TRAVIS_BRANCH == "master" ]) ; then bash deploy.sh;  fi
+
+
