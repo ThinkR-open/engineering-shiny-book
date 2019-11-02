@@ -1,5 +1,9 @@
 # (PART) Building Successful Shiny Apps {-}
 
+> I Too Like to Live Dangerously
+
+<span class = "rigth">Austin Powers</span>
+
 # About Successful Shiny Apps {#successfulshinyapp}
 
 If you're reading this page, chances are you already know what a Shiny App is — a web application that communicates with R, built in R, and working with R. 
@@ -16,19 +20,27 @@ With small and simple Shiny apps, no knowledge of HTML, CSS or JavaScript is req
 
 `r right_link("The Art of Unix Programming", "http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#id2878339")`
 
-
 ### Reaching the cliff of complexity
 
 Things are quite simple when it comes to small prototypes or proof of concepts. 
 But things change when your application reaches "the cliff of complexity"
 ^[We borrow this term from Charity Major, as heard in _Test in Production with Charity Majors_, [CoRecursive](https://corecursive.com/019-test-in-production-with-charity-majors/)].
+
 But what do we mean by complexity? 
-Getting a clear definition is not an easy task
-^[Ironic right?]
+Getting a clear definition is not an easy task^[
+Ironic right?
+]
  as it very depends on who is concerned and who you're talking to.
 But let's try to come with a definition that will serve us in the context of engineering Shiny applications. 
 When building sofwares, we can think of complexity from two points of view: the complexity as it is seen by the coder, and the complexity as it is seen by the customer / end user
 ^[from _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity"].
+
+> With great complexity comes great responsibilities
+
+When your program reaches this state, there is a lot of potential for failure, be it from a developer perspective or from a user point of view. For the code, bugs are harder to anticipate: it's hard to think about all the different paths the software can follow, it's hard to detect bugs because they are deeply nested in the numerous routines the app is doing. 
+It's also hard to think about what the state of your app is at a given moment in time because of the numerous inputs and outputs your app contains. 
+From the user perspective, the more complex an app, the more important the learning curve is. 
+Which means that the user will have to invest time learning how the app works, and will be even more disappointed if ever they realise this time has been a waste. 
 
 #### Two views of complexity
 
@@ -38,7 +50,7 @@ An app is to be considered complex when it is big enough in term of size and fun
 This type of complexity is called _implementation complexity_. 
 One of the goal of this book is to present you a methodology and toolings that will help you reduce this form of complexity. 
 
-For example, we'll talk about a design / prototype / build / secure / deploy, which helps you reduce the complexity of implementing and maintain new app features. 
+For example, we'll talk about the design / prototype / build / secure / deploy workflow, which helps you reduce the complexity of implementing and maintain new app features. 
 We'll also be talking at length about the `{golem}` package, which provides a toolkit for reducing the cognitive load of handling complexity in large Shiny applications. 
 For example, creatign a new Shiny module requires following a very strict structure. 
 One way to do that is to remember how to do that and to code it from scratch (a method which has an important cognitive load and is very error prone). 
@@ -47,7 +59,6 @@ Or there is the `{golem}` way, in which you rely on a robust tool to build the f
 
 Another benefit of adopting automation for common application component is that it allows to be sure that you're following a convention. 
 And conventions are crucial when it comes to building and maintaining complex system: by imposing a formalized structure for a piece of code, it ehances readability, lessens the learning curve, and lightens the chance for typo and/or copy and paste error. 
-
 
 +  Customers and users
 
@@ -79,11 +90,17 @@ That solution augments the implementation complexity, while leaving it as is req
 
 _-> Insert here something of the like: "It's up to you to think about what's the best balance between these two sources." _
 
-#### Assessing complexity
+### Assessing complexity
 
-Another measure that sometime comes in the discussion is the codebase size. 
-It's relatively hard to use this number of lines metric, as R is very permissive when it comes to identation and line break. It also depends on your coding style and the packages you're using. For example, tidyverse packages encourage the use of the pipe (`%>%`)
-^[] 
+How can we get a good overview of this complexity? 
+
+A measure that sometime comes in the discussion for assessing complexity is the codebase size. 
+It's relatively hard to use this metric, as R is very permissive when it comes to identation and line break, and (unlike JavaScript or CSS), it is generally not minified^[
+The minification process is the process of removing all blank characters and put everything on one line so that the file in the output is much smaller.
+]. 
+It also depends on your coding style and the packages you're using. For example, tidyverse encourages the use of the pipe (`%>%`)^[
+"_`%>%` should always have a space before it, and should usually be followed by a new line._", [tidyverse style guide](https://style.tidyverse.org/pipes.html) 
+] 
 with one function by line, producing more lines in the end code.
 
 Consider this piece of valid R code:
@@ -100,10 +117,12 @@ iris[
   ]
 ```
 
-9 lines of code for something that should also be written in one, three, five...
+9 lines of code for something that should also be written in one, three, five... 
+In other words, using this kind of writing style can make the code base larger in term of lines, without really adding complexity to the general program. 
 
-Another drawback of this metric is that it focuses on numbers instead of readability, and on the long run yes, readability matters
-^["Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess.", from _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity"]. 
+Another drawback of this metric is that it focuses on numbers instead of readability, and on the long run yes, readability matters^[
+"Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess.", from _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity"
+]. 
 
 // TODO
 
@@ -122,13 +141,6 @@ cloc_cran("attempt", .progress = FALSE)
 -> Cyclomatic complexity https://en.wikipedia.org/wiki/Cyclomatic_complexity
 
 -> https://github.com/MangoTheCat/cyclocomp 
-
-### With great complexity come great responsibilities
-
-When your program reaches this state, there is a lot of potential for failure, be it from a developer perspective or from a user point of view. For the code, bugs are harder to anticipate: it's hard to think about all the different paths the software can follow, it's hard to detect bugs because they are deeply nested in the numerous routines the app is doing. 
-It's also hard to think about what the state of your app is at a given moment in time because of the numerous inputs and outputs your app contains. 
-From the user perspective, the more complex an app, the more important the learning curve is. 
-Which means that the user will have to invest time learning how the app works, and will be even more disappointed if ever they realise this time has been a waste. 
 
 ### Production Grade Software Engineering
 
