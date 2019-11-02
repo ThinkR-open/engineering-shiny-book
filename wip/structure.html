@@ -160,7 +160,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="1.1" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#a-very-short-introduction-to-shiny"><i class="fa fa-check"></i><b>1.1</b> A (very) short introduction to Shiny</a></li>
 <li class="chapter" data-level="1.2" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#whats-a-complex-shiny-app"><i class="fa fa-check"></i><b>1.2</b> What’s a complex Shiny App?</a><ul>
 <li class="chapter" data-level="1.2.1" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#reaching-the-cliff-of-complexity"><i class="fa fa-check"></i><b>1.2.1</b> Reaching the cliff of complexity</a></li>
-<li class="chapter" data-level="1.2.2" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#with-great-complexity-come-great-responsibilities"><i class="fa fa-check"></i><b>1.2.2</b> With great complexity come great responsibilities</a></li>
+<li class="chapter" data-level="1.2.2" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#with-great-complexity-comes-great-responsibility"><i class="fa fa-check"></i><b>1.2.2</b> With great complexity comes great responsibility</a></li>
 <li class="chapter" data-level="1.2.3" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#production-grade-software-engineering"><i class="fa fa-check"></i><b>1.2.3</b> Production Grade Software Engineering</a></li>
 </ul></li>
 <li class="chapter" data-level="1.3" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#whats-a-successful-shiny-app"><i class="fa fa-check"></i><b>1.3</b> What’s a successful Shiny App?</a><ul>
@@ -404,57 +404,57 @@ As they are backend functions (so specific to a project), <code>{golem}</code> c
 <li><p>For the UI part, <strong>remember that any UI function is designed to render an HTML element</strong>.
 So you can save a file as HTML, and then compare it to a UI object with the <code>golem::expect_html_equal()</code>.</p></li>
 </ul>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">ui &lt;-<span class="st"> </span><span class="kw">tagList</span>(<span class="kw">h1</span>(<span class="st">&quot;Hello world!&quot;</span>))</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">htmltools<span class="op">::</span><span class="kw">save_html</span>(ui, <span class="st">&quot;ui.html&quot;</span>)</a>
-<a class="sourceLine" id="cb5-4" data-line-number="4">golem<span class="op">::</span><span class="kw">expect_html_equal</span>(ui, <span class="st">&quot;ui.html&quot;</span>)</a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co"># Changes </span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6">ui &lt;-<span class="st"> </span><span class="kw">tagList</span>(<span class="kw">h2</span>(<span class="st">&quot;Hello world!&quot;</span>))</a>
-<a class="sourceLine" id="cb5-7" data-line-number="7">golem<span class="op">::</span><span class="kw">expect_html_equal</span>(ui, <span class="st">&quot;ui.html&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">ui &lt;-<span class="st"> </span><span class="kw">tagList</span>(<span class="kw">h1</span>(<span class="st">&quot;Hello world!&quot;</span>))</a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">htmltools<span class="op">::</span><span class="kw">save_html</span>(ui, <span class="st">&quot;ui.html&quot;</span>)</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">golem<span class="op">::</span><span class="kw">expect_html_equal</span>(ui, <span class="st">&quot;ui.html&quot;</span>)</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co"># Changes </span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">ui &lt;-<span class="st"> </span><span class="kw">tagList</span>(<span class="kw">h2</span>(<span class="st">&quot;Hello world!&quot;</span>))</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">golem<span class="op">::</span><span class="kw">expect_html_equal</span>(ui, <span class="st">&quot;ui.html&quot;</span>)</a></code></pre></div>
 <p>This can for example be useful if you need to test a module.
 A UI module function returns an HTML tag list, so once your modules are set you can save them and use them inside tests.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">my_mod_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(<span class="st">&quot;id&quot;</span>)</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb6-4" data-line-number="4">    <span class="kw">selectInput</span>(<span class="kw">ns</span>(<span class="st">&quot;this&quot;</span>), <span class="st">&quot;that&quot;</span>, <span class="dt">choices =</span> LETTERS[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>])</a>
-<a class="sourceLine" id="cb6-5" data-line-number="5">  )</a>
-<a class="sourceLine" id="cb6-6" data-line-number="6">}</a>
-<a class="sourceLine" id="cb6-7" data-line-number="7">my_mod_ui_test &lt;-<span class="st"> </span><span class="kw">tempfile</span>(<span class="dt">fileext =</span> <span class="st">&quot;html&quot;</span>)</a>
-<a class="sourceLine" id="cb6-8" data-line-number="8">htmltools<span class="op">::</span><span class="kw">save_html</span>(<span class="kw">my_mod_ui</span>(<span class="st">&quot;test&quot;</span>), my_mod_ui_test)</a>
-<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co"># Some time later, and of course saved in the test folder, </span></a>
-<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co"># not as a temp file</span></a>
-<a class="sourceLine" id="cb6-11" data-line-number="11">golem<span class="op">::</span><span class="kw">expect_html_equal</span>(<span class="kw">my_mod_ui</span>(<span class="st">&quot;test&quot;</span>), my_mod_ui_test)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">my_mod_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(<span class="st">&quot;id&quot;</span>)</a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">    <span class="kw">selectInput</span>(<span class="kw">ns</span>(<span class="st">&quot;this&quot;</span>), <span class="st">&quot;that&quot;</span>, <span class="dt">choices =</span> LETTERS[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>])</a>
+<a class="sourceLine" id="cb8-5" data-line-number="5">  )</a>
+<a class="sourceLine" id="cb8-6" data-line-number="6">}</a>
+<a class="sourceLine" id="cb8-7" data-line-number="7">my_mod_ui_test &lt;-<span class="st"> </span><span class="kw">tempfile</span>(<span class="dt">fileext =</span> <span class="st">&quot;html&quot;</span>)</a>
+<a class="sourceLine" id="cb8-8" data-line-number="8">htmltools<span class="op">::</span><span class="kw">save_html</span>(<span class="kw">my_mod_ui</span>(<span class="st">&quot;test&quot;</span>), my_mod_ui_test)</a>
+<a class="sourceLine" id="cb8-9" data-line-number="9"><span class="co"># Some time later, and of course saved in the test folder, </span></a>
+<a class="sourceLine" id="cb8-10" data-line-number="10"><span class="co"># not as a temp file</span></a>
+<a class="sourceLine" id="cb8-11" data-line-number="11">golem<span class="op">::</span><span class="kw">expect_html_equal</span>(<span class="kw">my_mod_ui</span>(<span class="st">&quot;test&quot;</span>), my_mod_ui_test)</a></code></pre></div>
 <p><code>{golem}</code> also provides two functions, <code>expect_shinytag()</code> and <code>expect_shinytaglist()</code>, that test if an object is of class <code>&quot;shiny.tag&quot;</code> or <code>&quot;shiny.tag.list&quot;</code>.</p>
 <ul>
 <li>Testing package launch: when launching <code>golem::use_recommended_tests()</code>, you’ll find a test built on top of <code>{processx}</code> that allows to check if the application is launch-able. Here’s a short description of what happens:</li>
 </ul>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># Standard testthat things</span></a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="kw">context</span>(<span class="st">&quot;launch&quot;</span>)</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="kw">library</span>(processx)</a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6">testthat<span class="op">::</span><span class="kw">test_that</span>(</a>
-<a class="sourceLine" id="cb7-7" data-line-number="7">  <span class="st">&quot;app launches&quot;</span>,{</a>
-<a class="sourceLine" id="cb7-8" data-line-number="8">    <span class="co"># We&#39;re creating a new process that runs the app</span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9">    x &lt;-<span class="st"> </span>process<span class="op">$</span><span class="kw">new</span>(</a>
-<a class="sourceLine" id="cb7-10" data-line-number="10">      <span class="st">&quot;R&quot;</span>, </a>
-<a class="sourceLine" id="cb7-11" data-line-number="11">      <span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb7-12" data-line-number="12">        <span class="st">&quot;-e&quot;</span>, </a>
-<a class="sourceLine" id="cb7-13" data-line-number="13">        <span class="co"># As we are in the tests/testthat dir, we&#39;re moving </span></a>
-<a class="sourceLine" id="cb7-14" data-line-number="14">        <span class="co"># two steps back before launching the whole package</span></a>
-<a class="sourceLine" id="cb7-15" data-line-number="15">        <span class="co"># and we try to launch the app</span></a>
-<a class="sourceLine" id="cb7-16" data-line-number="16">        <span class="st">&quot;setwd(&#39;../../&#39;); pkgload::load_all();run_app()&quot;</span></a>
-<a class="sourceLine" id="cb7-17" data-line-number="17">      )</a>
-<a class="sourceLine" id="cb7-18" data-line-number="18">    )</a>
-<a class="sourceLine" id="cb7-19" data-line-number="19">    <span class="co"># We leave some time for the app to launch</span></a>
-<a class="sourceLine" id="cb7-20" data-line-number="20">    <span class="co"># Configure this according to your need</span></a>
-<a class="sourceLine" id="cb7-21" data-line-number="21">    <span class="kw">Sys.sleep</span>(<span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb7-22" data-line-number="22">    <span class="co"># We check that the app is alive</span></a>
-<a class="sourceLine" id="cb7-23" data-line-number="23">    <span class="kw">expect_true</span>(x<span class="op">$</span><span class="kw">is_alive</span>())</a>
-<a class="sourceLine" id="cb7-24" data-line-number="24">    <span class="co"># We kill it</span></a>
-<a class="sourceLine" id="cb7-25" data-line-number="25">    x<span class="op">$</span><span class="kw">kill</span>()</a>
-<a class="sourceLine" id="cb7-26" data-line-number="26">  }</a>
-<a class="sourceLine" id="cb7-27" data-line-number="27">)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># Standard testthat things</span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="kw">context</span>(<span class="st">&quot;launch&quot;</span>)</a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="kw">library</span>(processx)</a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6">testthat<span class="op">::</span><span class="kw">test_that</span>(</a>
+<a class="sourceLine" id="cb9-7" data-line-number="7">  <span class="st">&quot;app launches&quot;</span>,{</a>
+<a class="sourceLine" id="cb9-8" data-line-number="8">    <span class="co"># We&#39;re creating a new process that runs the app</span></a>
+<a class="sourceLine" id="cb9-9" data-line-number="9">    x &lt;-<span class="st"> </span>process<span class="op">$</span><span class="kw">new</span>(</a>
+<a class="sourceLine" id="cb9-10" data-line-number="10">      <span class="st">&quot;R&quot;</span>, </a>
+<a class="sourceLine" id="cb9-11" data-line-number="11">      <span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb9-12" data-line-number="12">        <span class="st">&quot;-e&quot;</span>, </a>
+<a class="sourceLine" id="cb9-13" data-line-number="13">        <span class="co"># As we are in the tests/testthat dir, we&#39;re moving </span></a>
+<a class="sourceLine" id="cb9-14" data-line-number="14">        <span class="co"># two steps back before launching the whole package</span></a>
+<a class="sourceLine" id="cb9-15" data-line-number="15">        <span class="co"># and we try to launch the app</span></a>
+<a class="sourceLine" id="cb9-16" data-line-number="16">        <span class="st">&quot;setwd(&#39;../../&#39;); pkgload::load_all();run_app()&quot;</span></a>
+<a class="sourceLine" id="cb9-17" data-line-number="17">      )</a>
+<a class="sourceLine" id="cb9-18" data-line-number="18">    )</a>
+<a class="sourceLine" id="cb9-19" data-line-number="19">    <span class="co"># We leave some time for the app to launch</span></a>
+<a class="sourceLine" id="cb9-20" data-line-number="20">    <span class="co"># Configure this according to your need</span></a>
+<a class="sourceLine" id="cb9-21" data-line-number="21">    <span class="kw">Sys.sleep</span>(<span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb9-22" data-line-number="22">    <span class="co"># We check that the app is alive</span></a>
+<a class="sourceLine" id="cb9-23" data-line-number="23">    <span class="kw">expect_true</span>(x<span class="op">$</span><span class="kw">is_alive</span>())</a>
+<a class="sourceLine" id="cb9-24" data-line-number="24">    <span class="co"># We kill it</span></a>
+<a class="sourceLine" id="cb9-25" data-line-number="25">    x<span class="op">$</span><span class="kw">kill</span>()</a>
+<a class="sourceLine" id="cb9-26" data-line-number="26">  }</a>
+<a class="sourceLine" id="cb9-27" data-line-number="27">)</a></code></pre></div>
 <p><em>Note</em>: this specific configuration will possibly fail on Continuous integration platform as Gitlab CI or Travis. A workaround is to, inside your CI yml, first install the package with <code>remotes::install_local()</code>, and then replace the <code>setwd (...) run_app()</code> command with <code>myuberapp::run_app()</code>.</p>
 <p>For example:</p>
 <ul>
@@ -469,20 +469,20 @@ A UI module function returns an HTML tag list, so once your modules are set you 
 <ul>
 <li>in <code>test-golem.R</code>:</li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">testthat<span class="op">::</span><span class="kw">test_that</span>(</a>
-<a class="sourceLine" id="cb9-2" data-line-number="2">  <span class="st">&quot;app launches&quot;</span>,{</a>
-<a class="sourceLine" id="cb9-3" data-line-number="3">    x &lt;-<span class="st"> </span>process<span class="op">$</span><span class="kw">new</span>( </a>
-<a class="sourceLine" id="cb9-4" data-line-number="4">      <span class="st">&quot;R&quot;</span>, </a>
-<a class="sourceLine" id="cb9-5" data-line-number="5">      <span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb9-6" data-line-number="6">        <span class="st">&quot;-e&quot;</span>, </a>
-<a class="sourceLine" id="cb9-7" data-line-number="7">        <span class="st">&quot;datuberapp::run_app()&quot;</span></a>
-<a class="sourceLine" id="cb9-8" data-line-number="8">      )</a>
-<a class="sourceLine" id="cb9-9" data-line-number="9">    )</a>
-<a class="sourceLine" id="cb9-10" data-line-number="10">    <span class="kw">Sys.sleep</span>(<span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb9-11" data-line-number="11">    <span class="kw">expect_true</span>(x<span class="op">$</span><span class="kw">is_alive</span>())</a>
-<a class="sourceLine" id="cb9-12" data-line-number="12">    x<span class="op">$</span><span class="kw">kill</span>()</a>
-<a class="sourceLine" id="cb9-13" data-line-number="13">  }</a>
-<a class="sourceLine" id="cb9-14" data-line-number="14">)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">testthat<span class="op">::</span><span class="kw">test_that</span>(</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">  <span class="st">&quot;app launches&quot;</span>,{</a>
+<a class="sourceLine" id="cb11-3" data-line-number="3">    x &lt;-<span class="st"> </span>process<span class="op">$</span><span class="kw">new</span>( </a>
+<a class="sourceLine" id="cb11-4" data-line-number="4">      <span class="st">&quot;R&quot;</span>, </a>
+<a class="sourceLine" id="cb11-5" data-line-number="5">      <span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb11-6" data-line-number="6">        <span class="st">&quot;-e&quot;</span>, </a>
+<a class="sourceLine" id="cb11-7" data-line-number="7">        <span class="st">&quot;datuberapp::run_app()&quot;</span></a>
+<a class="sourceLine" id="cb11-8" data-line-number="8">      )</a>
+<a class="sourceLine" id="cb11-9" data-line-number="9">    )</a>
+<a class="sourceLine" id="cb11-10" data-line-number="10">    <span class="kw">Sys.sleep</span>(<span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb11-11" data-line-number="11">    <span class="kw">expect_true</span>(x<span class="op">$</span><span class="kw">is_alive</span>())</a>
+<a class="sourceLine" id="cb11-12" data-line-number="12">    x<span class="op">$</span><span class="kw">kill</span>()</a>
+<a class="sourceLine" id="cb11-13" data-line-number="13">  }</a>
+<a class="sourceLine" id="cb11-14" data-line-number="14">)</a></code></pre></div>
 </div>
 <div id="documenting" class="section level4">
 <h4><span class="header-section-number">3.1.2.2</span> Documenting</h4>
@@ -502,8 +502,8 @@ Any exported function should have its own documentation, hence you are “forced
 <h4><span class="header-section-number">3.1.3.1</span> Local deployment</h4>
 <p>As your Shiny App is a standard package, it can be built as a <code>tar.gz</code>, sent to your colleagues, friends, and family, and even to the CRAN.
 It can also be installed in any R-package repository. Then, if you’ve built your app with <code>{golem}</code>, you’ll just have to do:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">library</span>(myuberapp)</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="kw">run_app</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">library</span>(myuberapp)</a>
+<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="kw">run_app</span>()</a></code></pre></div>
 <p>to launch your app.</p>
 </div>
 <div id="rstudio-connect-shiny-server" class="section level4">
@@ -514,8 +514,8 @@ So how can we integrate this “Shiny App as Package” into Connect or Shiny Se
 <li><p>Using an internal package manager like <a href="https://www.rstudio.com/products/package-manager/">RStudio Package Manager</a>, where the package app is installed, and then you simply have to create an <code>app.R</code> with the small piece of code from the section just before.</p></li>
 <li><p>Uploading the package folder to the server. In that scenario, you use the package folder as the app package, and upload the whole thing. Then, write an <code>app.R</code> that does:</p></li>
 </ul>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">pkgload<span class="op">::</span><span class="kw">load_all</span>()</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2">shiny<span class="op">::</span><span class="kw">shinyApp</span>(<span class="dt">ui =</span> <span class="kw">app_ui</span>(), <span class="dt">server =</span> app_server)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">pkgload<span class="op">::</span><span class="kw">load_all</span>()</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2">shiny<span class="op">::</span><span class="kw">shinyApp</span>(<span class="dt">ui =</span> <span class="kw">app_ui</span>(), <span class="dt">server =</span> app_server)</a></code></pre></div>
 <p>And of course, don’t forget to add this file in the <code>.Rbuildignore</code>!</p>
 <p>This is the file you’ll get if you run <code>golem::add_rconnect_file()</code>.</p>
 </div>
