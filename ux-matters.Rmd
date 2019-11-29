@@ -9,20 +9,24 @@
 <!-- https://www.cs.tufts.edu/~nr/cs257/archive/mike-cowlishaw/rexx.pdf -->
 <!-- https://books.google.fr/books?id=I-NOcVMGWSUC&pg=PA85&redir_esc=y#v=onepage&q&f=false -->
 <!-- http://www.faqs.org/docs/artu/ch11s01.html -->
-<!-- http://canonical.org/~kragen/tao-of-programming.html#book4 -->
+<!-- http://canonical.org/~kragen/tao-of-programming.html#book4 
+
+> All kinds of things on a Web page can make us stop and think unnecessarily. Take names, for example. Typical culprits are cute or clever names, marketing-induced names, company-specific names, and unfamiliar technical names.
+
+`r right_link("'Don't make me think', Steve Krug", "http://www.sensible.com/dmmt.html")`-->
 
 We have a natural tendency, as R-coders, to be focused on the back-end, i.e the server part of the application
 ^[aka what happens in the server side of a Shiny App]. 
-Which is perfectly normal—chances are you didn't come to R to code front-ends
-^[Front-end are the visual parts of your application, the one with which your user interacts, as opposed to the back-end, which is what is installed on the server. 
+Which is perfectly normal—chances are you didn't come to R to design front-ends
+^[Front-end are the visual parts of your application, the one your user interacts with, as opposed to the back-end, which is what is installed on the server, the part the end user doesn't see. 
 In shiny, front-end is what correspond to the UI, back-end to the server.]. 
 But let's state the truth: no matter how complex and innovative your backend is, your application is bad if your User Experience (UX) is bad. 
 That's the hard truth. 
 If people can't understand how to use your application, your application isn't successful, no matter how incredible the backend is. 
-This natural taste for back-end / server logic can deserve you on the long run: by neglecting the UI, you'll make your application less likely to be adopted among your users. 
+This natural taste for back-end / server logic can deserve you on the long run: by neglecting the UI and the UX, you'll make your application less likely to be adopted among your users. 
 Which is a good way to fail your application project.
 
-## _The Unbearable Lightness of Being_
+## Simplicity is Gold
 
 // TODO
 
@@ -33,29 +37,88 @@ Which is a good way to fail your application project.
 There are mainly two contexts where you'll be building a web app with R: one for professional use (i.e people will rely on this app to do their job), or for fun (i.e people will just use the app as a distraction). 
 But in both cases, people will want the app to be useable, and __easily__ usable. 
 
-If people will use your app in a professional context, they don't want to fight with your interface, read complexe manuals, or lose time understanding what is supposed to do what in your application. 
-Think about all the professional applications and softwares that you've been ranting about during your professional life. 
-You don't want your app to be one of that. On the other end, if users open your app for fun, they are not going to fight your app into submission: they are just going to give up using your app if it's too complex to be used. 
+If people use your app in a professional context, they don't want to fight with your interface, read complexe manuals, or lose time understanding what is supposed to do what in your application. 
+In other words, they want an efficient tool: something that, beyond being accurate, is easy to grasp.
+In a professional context, when it comes to "Business applications", the flatter the learning curve the better.
+Think about all the professional applications and softwares that you've been ranting about during your professional life, all these cranky user interfaces you haven't understand and/or you need to relearn every time you use them. 
+You don't want your app to be one of these applications. 
 
-### Make a self-explanatory app
+And on the other end, if users open your app for fun, they are not going to fight your app into submission: they are just going to give up if it's too complex to be used. 
 
-> All kinds of things on a Web page can make us stop and think unnecessarily. Take names, for example. Typical culprits are cute or clever names, marketing-induced names, company-specific names, and unfamiliar technical names.
+Aiming for simplicity is a hard thing, but following some rules will help you start on a solid ground.
+In this section, we'll review two general principals: the "don't make me think" principle, which states that interfaces should be as self-explanatory as possible, and the "Rule of least surprise", stating that elements should behave the way they are commonly expected to behave.
+These two rules aim at solving one issue when using an application: the bigger the cognitive load, the harder it is to use your app, and of course, the less a success your project will be. 
+
+### How we read the web: scanning content and cognitive load
+
+- Concept of satisfication : https://en.wikipedia.org/wiki/Satisficing, https://uk.sagepub.com/sites/default/files/upm-binaries/25239_Chater~Vol_1~Ch_03.pdf
+
+> And as a rule, people don’t like to puzzle over how to do things. They enjoy puzzles in their place—when they want to be entertained or diverted or challenged—but not when they’re trying to find out what time their dry cleaner closes. 
 
 `r right_link("'Don't make me think', Steve Krug", "http://www.sensible.com/dmmt.html")`
 
--> If things are clickable, it has to look clickable
+### Make a self-evident app (or at least self-explanatory)
+
+> self-evident : "Not needing to be demonstrated or explained; obvious." [lexico.com](https://www.lexico.com/en/definition/self_evident)
+
+> self-explanatory : "Easily understood; not needing explanation." [https://www.lexico.com/en/definition/self_explanatory](https://www.lexico.com/en/definition/self_explanatory)
+
+What's the difference between the two? Let's for example get back to our `{tidytuesday201942}` application. 
+By itself, this application is not self-evident: you need to have a series of background information before understanding what this application was designed for. 
+For example, you might need to have a vague sense of what `tidytuesday` is. 
+If you don't, you'll have to read the home text, which will help you understand what this is. 
+Then, if we have a look at the menu, we see that these are a series of functions from `{ggplot2}`: without any background about the package, you'll have a hard time understanding what this app actually does. 
+
+#### Visual elements
+
+Another good example of making things self-explanatory is to keep in mind that __if something is clickable, it has to look clickable__. 
 
 > "As a user, I should never have to devote a millisecond of thought to whether
 things are clickable—or not" 
 
 `r right_link("'Don't make me think', Steve Krug", "http://www.sensible.com/dmmt.html")`
 
--> If there is a progression in your app, you should have a clear pattern of moving forward
+A good example of this principle is the "Render" button from the [`{tidytuesday201942}`](https://connect.thinkr.fr/tidytuesday201942/) application. 
+This app is built on top of Bootstrap 4, which has no CSS class for `{shiny}` action button^[
+`{shiny}` is built on top of Bootstrap 3, and the action buttons are of class `btn-default`, which was removed in Bootstrap 4.
+]. 
+Result: without any further CSS, the buttons didn't show clearly as buttons, making it harder to decipher they are actually buttons. 
+Compare this native design:
 
--> If you need inputs, this should be made clear
+![](img/tidytuesdaybutton1.png)
 
--> Have some "reading logic": from left to right or right to left, there should be a progression in the way visual elements are organised.
+To the one with a little bit of CSS (which is the one online):
 
+![](img/tidytuesdaybutton2.png)
+
+Yes, it's subtle, yet the second version of the button is clearer to understand.
+
+#### Progression
+
+If there is a progression in your app, you should have designed a clear pattern of moving forward. 
+It can be as simple as putting "Next" buttons on the bottom of each page: but if you need to bring your user from step 1 to step 7, you need to guide them through the whole process. 
+And it has to be clear: a good way to do that is to hide step n + 1 content until step n is fully completed. 
+Indeed, users tend to scan a page without reading it in detail, so if step 2 is available to click and see, there is a great chance that they'll go there. 
+
+Try to hide content at n+1 that needs completeness of step n. 
+That way, you are sure to guide your user along a less painful road of usability.
+
+Another way to help this readabilty is to ensure some kind of linear logic through the app: step 1, data upload, step 2, data cleaning, step 3, data visualisation, step 4, exporting the report. 
+And organise your application around this logic, from left to right / right to left, or from top to bottom. 
+
+#### Inputs and errors
+
+You're the one developing the app, so of course you're conscious of all the inputs that are needed to complete a specific task. 
+But your user might be new to the app, distracted while reading, they might not clearly undertand what they are doing... 
+If an input is necessary, make it clear that it's an input AND that it's mandatory. 
+
+Also, be generous about errors: it's rather frustrating for a user to see an app crash without any explanation about what went wrong.
+So, if something fails or behaves unexpectedly, error messages are a key feature to help your user get on the right track. 
+And, at the same time, helping them correct themselves after an error is the best way to save you time answering angry emails ;)
+
+// TODO 
+
+-> example of implementation (`shiny::showNotification()`, `{shinyAlert}`, custom)
 
 ### "Rule of Least Surprise"
 
@@ -65,12 +128,18 @@ things are clickable—or not"
 
 `r right_link("'Basic of the Unix Philosophy', Eric Steven Raymond", "http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#id2878339")`
 
-Try to find a simple, and efficient UI. 
-One that people can understand and use in a matter of seconds. 
-Don't implement features or visual elements that are not actually needed, just "in case". 
-And spend time working on that UI, really thinking about what visual elements you are implementing. 
+Just imagine for a second if our "Download" button in the `{tidytuesday201942}` app didn't actually download the graph you had generated. 
+Even more, imagine if this button didn't download the graph but something else. 
+How would you feel about this experience? 
 
-## The danger of over-featuring
++ Example: underline text is commonly understood as a link
+
+## The danger of feature-creep
+
+> Optional complexity, on the other hand, is tied to some desirable feature. Optional complexity can be eliminated only by changing the project's objectives.
+
+`r right_link("The Art of Unix Programming", "http://www.catb.org/~esr/writings/taoup/html/ch13s01.html")`
+
 
 ### Restrain reactivity 
 
@@ -105,10 +174,3 @@ Web Accessibility is pretty standard concept in the web development world, and y
 -> Screen to speech technology : html semantic tags
 -> Mobility impairment, people w/ parkinson for example. Exemple of the text input & ENTER button. Making things keyboard friendly. 
 -> ColorBlind, viridis
-
-## Further reading 
-
-// TODO
-
-+ [_'Don't Make Me Think'_, Steve Krug](http://www.sensible.com/dmmt.html)
-
