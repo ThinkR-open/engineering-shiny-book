@@ -1,10 +1,10 @@
 # (PART) Building Successful Shiny Apps {-}
 
+# About Successful Shiny Apps {#successfulshinyapp}
+
 > I Too Like to Live Dangerously
 
 <span class = "right">Austin Powers</span>
-
-# About Successful Shiny Apps {#successfulshinyapp}
 
 If you're reading this page, chances are you already know what a Shiny App is — a web application that communicates with R, built in R, and working with R. 
 The beauty of `{shiny}` is that it makes it easy for anybody to create a small app in a matter of hours.  
@@ -69,7 +69,7 @@ And conventions are crucial when it comes to building and maintaining complex sy
 
 On the other hand, customers and end user see complexity as _interface complexity_. 
 Interface complexity can be driven by a lot of elements, for example the probability of making an error while using the app, the difficulty to understand the logical progression in the app, the presence of unfamiliar behaviour or terms, visual distractions...
-This book will also bring you strategy to help you cope with the need for simplification when it comes to designin interface. 
+This book will also bring you strategy to help you cope with the need for simplification when it comes to designing interface. 
 
 #### Balancing complexities
 
@@ -141,7 +141,7 @@ Another drawback of this metric is that it focuses on numbers instead of readabi
 
 Still, this metric can be useful to reinforce what you've learned from other metrics: it's rather unlikely that you'll find this "extreme" coding style we've just showed, and even if it might not make sense to compare two code base that just differ by 1 or 2 % of lines of code, it's very likely that a code base which is ten, twenty, one hundred times larger is a more complex software. 
 Also, another good sign related to this metric is the number of files in the project: R developers tend to split their functions into several files, so the more files you'll find in a project, the more large the code base is. 
-Numerous files can also be a sign of maintainance complexity: it's harder to reason about an app logic splitted into several files than about something that fits into one linear code inside one file. 
+Numerous files can also be a sign of maintenance complexity: it's harder to reason about an app logic split into several files than about something that fits into one linear code inside one file. 
 
 If you want to use this metric, you can do it straight from R with the `{cloc}` package, available at https://github.com/hrbrmstr/cloc.
 
@@ -181,9 +181,76 @@ Here, just from these two metrics, we can safely assume that `{shiny}` is a more
 
 #### Cyclomatic complexity
 
-->  https://en.wikipedia.org/wiki/Cyclomatic_complexity
+Cyclomatic complexity is a software engineering measure which allows to define the number of different linear paths a piece of code can take. 
+It's computed based on a control-flow graph^[
+A control flow graph is a graph representing all the possible paths a piece of code can take while it's executed.
+] representation of an algorithm. 
+The complexity number is then computed by taking the number of node, and subtracting the number edges plus two times the number of connected components of this graph. 
+We won't go deep into this topic, as there are a lot things going on in this computation. 
+Please refer to the bibliography for further readings about the theory behind this measurement. 
 
--> https://github.com/MangoTheCat/cyclocomp 
+In R, the cyclomatic complexity is computed with the `{cyclocomp}` package, which can be installed from `CRAN` with:
+
+```{r eval = FALSE}
+install.packages("cyclocomp")
+```
+
+The cyclocomp package comes with three main functions: `cyclocomp()`, `cyclocomp_package()`, and `cyclocomp_package_dir	()`. 
+The one we'll be interested in is `cyclocomp_package_dir()`: building successful shiny apps with the `{golem}` framework (we'll get back on that later) means you'll be building your app as a package. 
+You can then use `cyclocomp_package_dir()` to compute the complexity of your app. 
+Here is for example the cyclomatic complexity of the default golem template:
+
+```{r}
+library(cyclocomp)
+cyclocomp_package("golex") %>% head()
+```
+
+And the one from another small application:
+
+```{r}
+cyclocomp_package("tidytuesday201942") %>% head()
+```
+
+And, finally, the one for `{shiny}`:
+
+```{r}
+cyclocomp_package("shiny") %>% head()
+```
+
+> And, bonus, this `cyclocomp_package()` function can also be used to retrieve the number of functions inside the package.
+
+Why does it matter? 
+Successful Shiny apps implies two things: you'll be writing unit tests for your code, and all the inputs from the users will be checked during the application runtime.
+Both means that the more a function is complex, the more it will be hard to reason about: it's almost impossible to make a mental model of a very complex function.
+Checking users inputs is also harder, as a higher complexity might implies that there are several inputs, and / or that an input can have a large number of states along the function execution. 
+It's also harder to maintain complex function: bugs are harder to spot as they might happen only in one of the multiple paths the code can take.
+And of course, integrating changes is harder as you have to think about how new elements will impact all the possible paths the code might take.
+
+So, as The Clash said, "what are we gonna do now?" 
+You might have heard this saying that "if you copy and paste a piece of code twice, you should write a function". 
+Then, this might be a solution here: splitting things in smaller pieces lower the local cyclomatic complexity.
+One thing that can also be done is leveraging the strength of S3 methods to split elements: if you have a function that behave differently based on the type of the input, generics and methods are easier to reason about than if statements inside a larger function.
+But that's not a magic solution: (A) because the global complexity of the app is not lowered by splitting things into pieces, (B) because the deeper the call stack the harder it can be to reason about the big picture. 
+
+#### Other complexity measures
+
+```{r eval = FALSE}
+remotes::install_github("MangoTheCat/packageMetrics2")
+```
+
+
+```{r}
+library(packageMetrics2)
+metrics <- package_metrics("golem")
+res <- data.frame(
+  n = names(metrics), 
+  val = metrics, 
+  expl = list_package_metrics()[names(metrics)]
+)
+res
+
+```
+
 
 ### Production Grade Software Engineering
 
