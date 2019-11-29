@@ -150,7 +150,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#shiny-into-production"><i class="fa fa-check"></i>Shiny into production</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a><ul>
-<li class="chapter" data-level="0.0.1" data-path="index.html"><a href="index.html#contributors-to-this-book"><i class="fa fa-check"></i><b>0.0.1</b> Contributors to this book</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#contributors-to-this-book"><i class="fa fa-check"></i>Contributors to this book</a></li>
 </ul></li>
 </ul></li>
 <li class="part"><span><b>I Building Successful Shiny Apps</b></span></li>
@@ -341,7 +341,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <blockquote>
 <p>I Too Like to Live Dangerously</p>
 </blockquote>
-<p><span class="right">Austin Powers</span></p>
+<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<style>.right{ text-align: right;}</style>
+<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<div class="right">Austin Powers</div>
 <p>If you’re reading this page, chances are you already know what a Shiny App is — a web application that communicates with R, built in R, and working with R.
 The beauty of <code>{shiny}</code> is that it makes it easy for anybody to create a small app in a matter of hours.<br />
 With small and simple Shiny apps, no knowledge of HTML, CSS or JavaScript is required, which makes it really easy to use — you can rapidly create a POC for a data-product and showcase an algorithm or present your results with an elegant, simple to build user interface.</p>
@@ -351,14 +354,6 @@ With small and simple Shiny apps, no knowledge of HTML, CSS or JavaScript is req
 </div>
 <div id="whats-a-complex-shiny-app" class="section level2">
 <h2><span class="header-section-number">1.2</span> What’s a complex Shiny App?</h2>
-<!-- > Complex software is harder to think about, harder to test, harder to debug, and harder to maintain — and above all, harder to learn and use.
-
-<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
-<style>.right{ text-align: right;}</style>
-<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
-<div class="right">
-<a href="http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#id2878339">The Art of Unix Programming</a>
-</div>-->
 <blockquote>
 <p>One of the unfortunate things about reality is that it often poses complex problems that demand complex solutions</p>
 </blockquote>
@@ -375,6 +370,7 @@ But things change when your application reaches “the cliff of complexity”<a 
 <p>But what do we mean by complexity?
 Getting a clear definition is not an easy task<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>
 as it very depends on who is concerned and who you’re talking to.
+A good definition is the one from <a href="http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#id287833">The Art of Unix Programming</a>: <em>“Complex software is harder to think about, harder to test, harder to debug, and harder to maintain — and above all, harder to learn and use.”</em>
 But let’s try to come with a definition that will serve us in the context of engineering Shiny applications.
 When building software, we can think of complexity from two points of view: the complexity as it is seen by the coder, and the complexity as it is seen by the customer / end user.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
 <blockquote>
@@ -424,7 +420,9 @@ But it can make the interface a little bit more complex for the user who have to
 Another good example is <code>{shiny}</code>’s <code>dateRangeInput()</code> function, which takes a start which is posterior to the end (which is the behavior of the JavaScript plugin used in <code>{shiny}</code> to create this input).
 Handling this special case is doable: with a little bit of craft, you can watch what the user inputs and throw an error if the start is after the end.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>
 That solution augments the implementation complexity, while leaving it as is requires the user to think about whether or not the starting date is before the ending date, thus increasing the interface complexity.</p>
-<p><em>-&gt; Insert here something of the like: “It’s up to you to think about what’s the best balance between these two sources.” </em></p>
+<p>So what should we do? It’s up to you: deciding where to draw the line between interface &amp; implementation complexity very much depends of the kind of project you’re working on, and on the kind of users that will use your app.
+Things that you can assess here is the ease of working on implementation of feature (for your team), how much your app will be used, how frequently, by what kind of users…
+Drawing the line between the two is not the simplest thing on earth, and requires to restrain yourself from implementing too much, and still create an application that is easy to use.</p>
 </div>
 </div>
 <div id="assessing-complexity" class="section level3">
@@ -462,16 +460,8 @@ Numerous files can also be a sign of maintenance complexity: it’s harder to re
 <pre class="sourceCode r"><code class="sourceCode r">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;hrbrmstr/cloc&quot;</span>)</code></pre>
 <p>For example, let’s compare a rather big package (<code>{shiny}</code>) with a small one (<code>{attempt}</code>):</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(cloc)
-<span class="kw">library</span>(dplyr)</code></pre>
-<pre><code>
-Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>The following objects are masked from &#39;package:stats&#39;:
-
-    filter, lag</code></pre>
-<pre><code>The following objects are masked from &#39;package:base&#39;:
-
-    intersect, setdiff, setequal, union</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r">shiny_cloc &lt;-<span class="st"> </span><span class="kw">cloc_cran</span>(<span class="st">&quot;shiny&quot;</span>, <span class="dt">.progress =</span> <span class="ot">FALSE</span>)
+<span class="kw">library</span>(dplyr)
+shiny_cloc &lt;-<span class="st"> </span><span class="kw">cloc_cran</span>(<span class="st">&quot;shiny&quot;</span>, <span class="dt">.progress =</span> <span class="ot">FALSE</span>)
 attempt_cloc &lt;-<span class="st"> </span><span class="kw">cloc_cran</span>(<span class="st">&quot;attempt&quot;</span>, <span class="dt">.progress =</span> <span class="ot">FALSE</span>)
 clocs &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(
   shiny_cloc, 
@@ -506,8 +496,8 @@ clocs <span class="op">%&gt;%</span>
 <h4><span class="header-section-number">1.2.2.2</span> Cyclomatic complexity</h4>
 <p>Cyclomatic complexity is a software engineering measure which allows to define the number of different linear paths a piece of code can take.
 It’s computed based on a control-flow graph<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a> representation of an algorithm.
-The complexity number is then computed by taking the number of node, and subtracting the number edges plus two times the number of connected components of this graph.
-We won’t go deep into this topic, as there are a lot things going on in this computation.
+The complexity number is then computed by taking the number of nodes, and subtracting the number of edges plus two times the number of connected components of this graph: <em>M = E − N + 2P</em>, where M is the measure, E the number of edges, N the number of nodes and 2P 2 time the number of connected components.</p>
+<p>We won’t go deep into this topic, as there are a lot things going on in this computation and you can find many documentation about this online.
 Please refer to the bibliography for further readings about the theory behind this measurement.</p>
 <p>In R, the cyclomatic complexity is computed with the <code>{cyclocomp}</code> package, which can be installed from <code>CRAN</code> with:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;cyclocomp&quot;</span>)</code></pre>
@@ -555,11 +545,22 @@ Then, this might be a solution here: splitting things in smaller pieces lower th
 One thing that can also be done is leveraging the strength of S3 methods to split elements: if you have a function that behave differently based on the type of the input, generics and methods are easier to reason about than if statements inside a larger function.
 But that’s not a magic solution: (A) because the global complexity of the app is not lowered by splitting things into pieces, (B) because the deeper the call stack the harder it can be to reason about the big picture.</p>
 </div>
-<div id="other-complexity-measures" class="section level4">
-<h4><span class="header-section-number">1.2.2.3</span> Other complexity measures</h4>
+<div id="other-measures" class="section level4">
+<h4><span class="header-section-number">1.2.2.3</span> Other measures</h4>
+<p>Complexity can come from other sources: unsufficient code coverage leading to bugs that are hard to spot, dependencies that breaks the implementation, old package, or a lot of other things.</p>
+<p>How do we assess that?
+We can have a look at the <code>{packageMetrics2}</code> package to have some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc.</p>
 <pre class="sourceCode r"><code class="sourceCode r">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;MangoTheCat/packageMetrics2&quot;</span>)</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(packageMetrics2)
-metrics &lt;-<span class="st"> </span><span class="kw">package_metrics</span>(<span class="st">&quot;golem&quot;</span>)</code></pre>
+frame_metric &lt;-<span class="st"> </span><span class="cf">function</span>(pkg){
+  metrics &lt;-<span class="st"> </span><span class="kw">package_metrics</span>(pkg)
+  tibble<span class="op">::</span><span class="kw">tibble</span>(
+    <span class="dt">n =</span> <span class="kw">names</span>(metrics), 
+    <span class="dt">val =</span> metrics, 
+    <span class="dt">expl =</span> <span class="kw">list_package_metrics</span>()[<span class="kw">names</span>(metrics)]
+  )
+}</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">frame_metric</span>(<span class="st">&quot;golem&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>knitr<span class="op">::</span><span class="kw">kable</span>()</code></pre>
 <pre><code>Metrics: ARR ATC DWL DEP DPD CCP FLE FRE LIB LLE LNC LNR</code></pre>
 <pre><code>Warning in readLines(f): incomplete final line found on &#39;golem/R/
 add_deploy_helpers.R&#39;</code></pre>
@@ -568,60 +569,259 @@ browser_button.R&#39;</code></pre>
 <pre><code>Warning in readLines(f): incomplete final line found on &#39;golem/R/
 create_golem.R&#39;</code></pre>
 <pre><code>Warning in readLines(f): incomplete final line found on &#39;golem/R/reload.R&#39;</code></pre>
-<pre><code>Warning in readLines(f): incomplete final line found on &#39;golem/R/with_opt.R&#39;</code></pre>
+<pre><code>Warning in readLines(f): incomplete final line found on &#39;golem/R/
+with_opt.R&#39;</code></pre>
 <pre><code>LRE NAT NTF NUP OGH SAP SEM SEQ SWD VIG </code></pre>
-<pre class="sourceCode r"><code class="sourceCode r">res &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
-  <span class="dt">n =</span> <span class="kw">names</span>(metrics), 
-  <span class="dt">val =</span> metrics, 
-  <span class="dt">expl =</span> <span class="kw">list_package_metrics</span>()[<span class="kw">names</span>(metrics)]
-)
-res</code></pre>
-<pre><code>      n                       val
-ARR ARR                         0
-ATC ATC          85.1549755301794
-DWL DWL                      3486
-DEP DEP                        27
-DPD DPD                         0
-CCP CCP          2.33898305084746
-FLE FLE          16.8833333333333
-FRE FRE 2019-08-05T14:50:02+00:00
-LIB LIB                         0
-LLE LLE                        26
-LNC LNC                         0
-LNR LNR                      1464
-LRE LRE 2019-08-05T14:50:02+00:00
-NAT NAT                         0
-NTF NTF                         0
-NUP NUP                         1
-OGH OGH                         1
-SAP SAP                         1
-SEM SEM                         0
-SEQ SEQ                         0
-SWD SWD                        18
-VIG VIG                         4
-                                                 expl
-ARR          Number of times = is used for assignment
-ATC                              Author Test Coverage
-DWL                               Number of Downloads
-DEP                               Num of Dependencies
-DPD                    Number of Reverse-Dependencies
-CCP                             Cyclomatic Complexity
-FLE         Average number of code lines per function
-FRE                             Date of First Release
-LIB               Number of library and require calls
-LLE    Number of code lines longer than 80 characters
-LNC                  Number of lines of compiled code
-LNR                         Number of lines of R code
-LRE                              Date of Last Release
-NAT                 Number of attach and detach calls
-NTF Number of times T/F is used instead of TRUE/FALSE
-NUP                  Updates During the Last 6 Months
-OGH                  Whether the package is on GitHub
-SAP                            Number of sapply calls
-SEM         Number of trailing semicolons in the code
-SEQ               Number of 1:length(vec) expressions
-SWD                             Number of setwd calls
-VIG                               Number of vignettes</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">n</th>
+<th align="left">val</th>
+<th align="left">expl</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ARR</td>
+<td align="left">0</td>
+<td align="left">Number of times = is used for assignment</td>
+</tr>
+<tr class="even">
+<td align="left">ATC</td>
+<td align="left">85.1549755301794</td>
+<td align="left">Author Test Coverage</td>
+</tr>
+<tr class="odd">
+<td align="left">DWL</td>
+<td align="left">3486</td>
+<td align="left">Number of Downloads</td>
+</tr>
+<tr class="even">
+<td align="left">DEP</td>
+<td align="left">27</td>
+<td align="left">Num of Dependencies</td>
+</tr>
+<tr class="odd">
+<td align="left">DPD</td>
+<td align="left">0</td>
+<td align="left">Number of Reverse-Dependencies</td>
+</tr>
+<tr class="even">
+<td align="left">CCP</td>
+<td align="left">2.33898305084746</td>
+<td align="left">Cyclomatic Complexity</td>
+</tr>
+<tr class="odd">
+<td align="left">FLE</td>
+<td align="left">16.8833333333333</td>
+<td align="left">Average number of code lines per function</td>
+</tr>
+<tr class="even">
+<td align="left">FRE</td>
+<td align="left">2019-08-05T14:50:02+00:00</td>
+<td align="left">Date of First Release</td>
+</tr>
+<tr class="odd">
+<td align="left">LIB</td>
+<td align="left">0</td>
+<td align="left">Number of library and require calls</td>
+</tr>
+<tr class="even">
+<td align="left">LLE</td>
+<td align="left">26</td>
+<td align="left">Number of code lines longer than 80 characters</td>
+</tr>
+<tr class="odd">
+<td align="left">LNC</td>
+<td align="left">0</td>
+<td align="left">Number of lines of compiled code</td>
+</tr>
+<tr class="even">
+<td align="left">LNR</td>
+<td align="left">1464</td>
+<td align="left">Number of lines of R code</td>
+</tr>
+<tr class="odd">
+<td align="left">LRE</td>
+<td align="left">2019-08-05T14:50:02+00:00</td>
+<td align="left">Date of Last Release</td>
+</tr>
+<tr class="even">
+<td align="left">NAT</td>
+<td align="left">0</td>
+<td align="left">Number of attach and detach calls</td>
+</tr>
+<tr class="odd">
+<td align="left">NTF</td>
+<td align="left">0</td>
+<td align="left">Number of times T/F is used instead of TRUE/FALSE</td>
+</tr>
+<tr class="even">
+<td align="left">NUP</td>
+<td align="left">1</td>
+<td align="left">Updates During the Last 6 Months</td>
+</tr>
+<tr class="odd">
+<td align="left">OGH</td>
+<td align="left">1</td>
+<td align="left">Whether the package is on GitHub</td>
+</tr>
+<tr class="even">
+<td align="left">SAP</td>
+<td align="left">1</td>
+<td align="left">Number of sapply calls</td>
+</tr>
+<tr class="odd">
+<td align="left">SEM</td>
+<td align="left">0</td>
+<td align="left">Number of trailing semicolons in the code</td>
+</tr>
+<tr class="even">
+<td align="left">SEQ</td>
+<td align="left">0</td>
+<td align="left">Number of 1:length(vec) expressions</td>
+</tr>
+<tr class="odd">
+<td align="left">SWD</td>
+<td align="left">18</td>
+<td align="left">Number of setwd calls</td>
+</tr>
+<tr class="even">
+<td align="left">VIG</td>
+<td align="left">4</td>
+<td align="left">Number of vignettes</td>
+</tr>
+</tbody>
+</table>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">frame_metric</span>(<span class="st">&quot;shiny&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>knitr<span class="op">::</span><span class="kw">kable</span>()</code></pre>
+<pre><code>Metrics: ARR ATC DWL DEP DPD CCP FLE FRE LIB LLE LNC LNR LRE NAT NTF NUP OGH SAP SEM SEQ SWD VIG </code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">n</th>
+<th align="left">val</th>
+<th align="left">expl</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ARR</td>
+<td align="left">14</td>
+<td align="left">Number of times = is used for assignment</td>
+</tr>
+<tr class="even">
+<td align="left">ATC</td>
+<td align="left">29.2461947330273</td>
+<td align="left">Author Test Coverage</td>
+</tr>
+<tr class="odd">
+<td align="left">DWL</td>
+<td align="left">10891594</td>
+<td align="left">Number of Downloads</td>
+</tr>
+<tr class="even">
+<td align="left">DEP</td>
+<td align="left">22</td>
+<td align="left">Num of Dependencies</td>
+</tr>
+<tr class="odd">
+<td align="left">DPD</td>
+<td align="left">708</td>
+<td align="left">Number of Reverse-Dependencies</td>
+</tr>
+<tr class="even">
+<td align="left">CCP</td>
+<td align="left">3.70817843866171</td>
+<td align="left">Cyclomatic Complexity</td>
+</tr>
+<tr class="odd">
+<td align="left">FLE</td>
+<td align="left">24.2420168067227</td>
+<td align="left">Average number of code lines per function</td>
+</tr>
+<tr class="even">
+<td align="left">FRE</td>
+<td align="left">2012-12-01T07:16:17+00:00</td>
+<td align="left">Date of First Release</td>
+</tr>
+<tr class="odd">
+<td align="left">LIB</td>
+<td align="left">1</td>
+<td align="left">Number of library and require calls</td>
+</tr>
+<tr class="even">
+<td align="left">LLE</td>
+<td align="left">424</td>
+<td align="left">Number of code lines longer than 80 characters</td>
+</tr>
+<tr class="odd">
+<td align="left">LNC</td>
+<td align="left">0</td>
+<td align="left">Number of lines of compiled code</td>
+</tr>
+<tr class="even">
+<td align="left">LNR</td>
+<td align="left">24737</td>
+<td align="left">Number of lines of R code</td>
+</tr>
+<tr class="odd">
+<td align="left">LRE</td>
+<td align="left">2019-10-10T11:50:02+00:00</td>
+<td align="left">Date of Last Release</td>
+</tr>
+<tr class="even">
+<td align="left">NAT</td>
+<td align="left">0</td>
+<td align="left">Number of attach and detach calls</td>
+</tr>
+<tr class="odd">
+<td align="left">NTF</td>
+<td align="left">0</td>
+<td align="left">Number of times T/F is used instead of TRUE/FALSE</td>
+</tr>
+<tr class="even">
+<td align="left">NUP</td>
+<td align="left">1</td>
+<td align="left">Updates During the Last 6 Months</td>
+</tr>
+<tr class="odd">
+<td align="left">OGH</td>
+<td align="left">1</td>
+<td align="left">Whether the package is on GitHub</td>
+</tr>
+<tr class="even">
+<td align="left">SAP</td>
+<td align="left">10</td>
+<td align="left">Number of sapply calls</td>
+</tr>
+<tr class="odd">
+<td align="left">SEM</td>
+<td align="left">1</td>
+<td align="left">Number of trailing semicolons in the code</td>
+</tr>
+<tr class="even">
+<td align="left">SEQ</td>
+<td align="left">0</td>
+<td align="left">Number of 1:length(vec) expressions</td>
+</tr>
+<tr class="odd">
+<td align="left">SWD</td>
+<td align="left">6</td>
+<td align="left">Number of setwd calls</td>
+</tr>
+<tr class="even">
+<td align="left">VIG</td>
+<td align="left">0</td>
+<td align="left">Number of vignettes</td>
+</tr>
+</tbody>
+</table>
+<p>If you’re building an app with <code>{golem}</code>, a framework for building shiny apps, you can use the <code>DESCRIPTION</code> file, the one that contains the dependencies, as a starting point for assessing the state of your dependencies:</p>
+<pre class="sourceCode r"><code class="sourceCode r">desc<span class="op">::</span><span class="kw">desc_get_deps</span>(<span class="st">&quot;golex/DESCRIPTION&quot;</span>)</code></pre>
+<pre><code>     type package version
+1 Imports   shiny       *
+2 Imports   golem       *</code></pre>
+<p>Then, it can be used as a series of inputs for our previous function.</p>
 </div>
 </div>
 <div id="production-grade-software-engineering" class="section level3">
