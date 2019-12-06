@@ -146,7 +146,9 @@ Numerous files can also be a sign of maintenance complexity: it's harder to reas
 If you want to use this metric, you can do it straight from R with the `{cloc}` package, available at https://github.com/hrbrmstr/cloc.
 
 ```{r eval = FALSE}
-remotes::install_github("hrbrmstr/cloc")
+if (!requireNamespace("cloc")){
+  remotes::install_github("hrbrmstr/cloc")
+}
 ```
 
 For example, let's compare a rather big package (`{shiny}`) with a small one (`{attempt}`):
@@ -201,19 +203,29 @@ You can then use `cyclocomp_package_dir()` to compute the complexity of your app
 Here is for example the cyclomatic complexity of the default golem template:
 
 ```{r}
+install.packages("golex", repos = NULL)
+
 library(cyclocomp)
 cyclocomp_package("golex") %>% head()
+
+remove.packages("golex")
 ```
 
 And the one from another small application:
 
 ```{r}
+if (!requireNamespace("tidytuesday201942")) {
+  remotes::install_github("ColinFay/tidytuesday201942")
+}
 cyclocomp_package("tidytuesday201942") %>% head()
 ```
 
 And, finally, the one for `{shiny}`:
 
 ```{r}
+if (!requireNamespace("shiny")) {
+  install.packages("shiny")
+}
 cyclocomp_package("shiny") %>% head()
 ```
 
@@ -234,10 +246,11 @@ But that's not a magic solution: (A) because the global complexity of the app is
 
 #### Other complexity measures
 
-```{r eval = FALSE}
-remotes::install_github("MangoTheCat/packageMetrics2")
+```{r}
+if (!requireNamespace("packageMetrics2")) {
+  remotes::install_github("MangoTheCat/packageMetrics2")
+}
 ```
-
 
 ```{r}
 library(packageMetrics2)
