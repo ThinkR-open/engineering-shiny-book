@@ -187,7 +187,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="3.1.4" data-path="structure.html"><a href="structure.html#resources"><i class="fa fa-check"></i><b>3.1.4</b> Resources</a></li>
 </ul></li>
 <li class="chapter" data-level="3.2" data-path="structure.html"><a href="structure.html#using-shiny-modules"><i class="fa fa-check"></i><b>3.2</b> Using Shiny Modules</a></li>
-<li class="chapter" data-level="3.3" data-path="structure.html"><a href="structure.html#splitting-your-app-into-files"><i class="fa fa-check"></i><b>3.3</b> Splitting your app into files</a></li>
+<li class="chapter" data-level="3.3" data-path="structure.html"><a href="structure.html#splitting-your-app-into-files"><i class="fa fa-check"></i><b>3.3</b> Splitting your app into files</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="structure.html"><a href="structure.html#small-is-beautiful"><i class="fa fa-check"></i><b>3.3.1</b> Small is beautiful</a></li>
+<li class="chapter" data-level="3.3.2" data-path="structure.html"><a href="structure.html#conventions-matter"><i class="fa fa-check"></i><b>3.3.2</b> Conventions matter</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="golem.html"><a href="golem.html"><i class="fa fa-check"></i><b>4</b> Introduction to <code>{golem}</code></a><ul>
 <li class="chapter" data-level="4.1" data-path="golem.html"><a href="golem.html#getting-started-with-golem"><i class="fa fa-check"></i><b>4.1</b> Getting started with <code>{golem}</code></a></li>
@@ -373,7 +376,7 @@ Because you know, when you want to push your app into production, you can’t ha
 <p>R-dev: What’s the error?</p>
 <p>IT: It says “could not find package ‘shiny’”.</p>
 <p>R-dev: Ah yes, you need to install {shiny}. Try to run ‘install.packages(“shiny”)’.</p>
-<p>IT: Ok nice. What else?</p>
+<p>IT: OK nice. What else?</p>
 <p>R-dev: Let me think, try also ‘install.packages(“DT”)’… good? Now try ‘install.packages(“ggplot2”)’, and …</p>
 <p>[…]</p>
 <p>IT: Ok, now I source the ‘app.R’, right?</p>
@@ -411,9 +414,9 @@ Learning how to use it is not the subject of this chapter, so feel free to refer
 See also Chapter 5 of <a href="https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107">“Building a package that lasts”</a>.</p>
 <p>What should you test?</p>
 <ul>
-<li><p>First of all, as we’ve said before, the app should be split between the UI part and the backend (or ‘business logic’) part.
-These backend functions are supposed to run without any interactive context, just as plain old functions. So for these ones, <strong>you can do classical tests</strong>.
-As they are backend functions (so specific to a project), <code>{golem}</code> can’t provide any helpers for that.</p></li>
+<li><p>First of all, as we’ve said before, the app should be split between the UI part and the back-end (or ‘business logic’) part.
+These back-end functions are supposed to run without any interactive context, just as plain old functions. So for these ones, <strong>you can do classical tests</strong>.
+As they are back-end functions (so specific to a project), <code>{golem}</code> can’t provide any helpers for that.</p></li>
 <li><p>For the UI part, <strong>remember that any UI function is designed to render an HTML element</strong>.
 So you can save a file as HTML, and then compare it to a UI object with the <code>golem::expect_html_equal()</code>.</p></li>
 </ul>
@@ -555,8 +558,52 @@ Of course changing the port to the one you need.</p>
 </div>
 <div id="splitting-your-app-into-files" class="section level2">
 <h2><span class="header-section-number">3.3</span> Splitting your app into files</h2>
-<p>// TODO</p>
+<div id="small-is-beautiful" class="section level3">
+<h3><span class="header-section-number">3.3.1</span> Small is beautiful</h3>
+<p>There is nothing harder to maintain than a Shiny app which is only made of one, 1 000 lines long <code>app.R</code>.
+Well, there still is the 10 000 lines long <code>app.R</code>, but you’ve got the idea.
+Long scripts are almost always synonym of complexity when it comes to building an application.
+Of course, small and numerous scripts don’t systematically prevent from codebase complexity but they simplify collaboration and maintenance, and of course divide the application logic into smaller, easier to understand bits of code.</p>
+<p>Several things happen when you are working on an app production application that are easier if you’re splitting your project into smaller files :</p>
+<ul>
+<li><p>You’ll be working during a long period of time (either in one run or split across several months) on your codebase, meaning that you’ll have to get back to pieces of code you have written a long time ago.</p></li>
+<li><p>You’ll possibly be developing with others.
+Maintaining a code base when several persons are working on the files is already a complex thing: from time to time you might be working on the same file separately, a situation where you’ll have to be careful about what and how you merge things when changes are implemented.
+Of course, it’s almost impossible to work on the very same file all along the project without losing your mind: even more if this file is thousands of lines long.</p></li>
+<li><p>You’ll be implementing numerous features.
+Numerous features imply a lot of UI &amp; server interaction.
+And in an <code>app.R</code> file of thousands of line, it’s very hard to match the UI element with its server counterpart: when the UI is on line 50 and the server on line 570, you’ll be scrolling a lot when working on that element.</p></li>
+</ul>
+<p>To sum up, there are a lot of reason for splitting your application into smaller pieces: it’s easier to maintain, easier to decipher, and of course it facilitates collaboration.</p>
+</div>
+<div id="conventions-matter" class="section level3">
+<h3><span class="header-section-number">3.3.2</span> Conventions matter</h3>
+<p>So, now that we’ve talk about the benefits of splitting files, let’s think about how to do that.
+Splitting files is good, splitting files using a defined convention is better.
+Why?
+Because using a common convention for your files helps the other developers (and potentially you) to know exactly what is contained in a specific file, and would know where to look for debugging / implementing new features.
+For example, if you follow <code>{golem}</code>’s convention, you’ll know that a file starting with <code>mod_</code> contains a module.</p>
+<p>That’s what we’ll see in this part: a suggestion for a convention on how to split your application into smaller pieces.</p>
+<p>First of all, put everything into an <code>R/</code> folder.
+If you’re building your app using the <code>{golem}</code> framework, this is already what you’re doing: using this package convention to hold the functions for your application.</p>
+<p>Once you’ve got this, here is the <code>{golem}</code>-specific convention for organizing your files:</p>
+<ul>
+<li><p><code>app_*.R</code> (typically <code>app_ui.R</code> and <code>app_server.R</code>) should contain the top level functions which are used to defined your user interface and your server function.</p></li>
+<li><p><code>fct_*</code> are files that contains business logic, potentially large functions.
+They are the backbone of the app but are potentially not specific to a given module.
+They can be added in <code>{golem}</code> with the <code>add_fct(&quot;name&quot;)</code> function.</p></li>
+<li><p><code>mod_*</code> are files that contain ONE module.
+As many shiny apps contains a series of tabs, or at least a tab-like pattern, we suggest that you number then according to their step in the application.
+And as tabs are almost always named, you can use the tab-name as the file name.
+For example, if you’re building a dashboard and the first tab is called “Import”, your should name your file <code>mod_01_import.R</code>, which you can create with <code>golem::add_module(&quot;01_import&quot;)</code>.
+Note that when building a module file with <code>{golem}</code>, you can add a <code>fct_</code> and <code>utils_</code> specific file, that will hold functions and utilities for this specific modules.
+For example, <code>golem::add_module(&quot;01_import&quot;, fct = &quot;readr&quot;, utils = &quot;ui&quot;)</code> will create <code>R/mod_01_import.R</code>, <code>R/mod_01_import_fct_readr.R</code> and <code>R/mod_01_import_utils_ui.R</code>.</p></li>
+<li><p><code>utils_*</code> are files that contain utilities, which are small helper functions.
+For example, you might want to have a <code>not_na</code>, which is <code>not_na &lt;- Negate(is.na)</code>, a <code>not_null</code>, or small tools that you’ll be using application-wide.
+Note that you can also create <code>utils</code> for a specific module.</p></li>
+</ul>
 
+</div>
 </div>
 </div>
 <hr/>
