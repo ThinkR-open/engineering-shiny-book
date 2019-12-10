@@ -4,7 +4,7 @@
 
 > I Too Like to Live Dangerously
 
-<span class = "right">Austin Powers</span>
+`r right_align("Austin Powers")`
 
 If you're reading this page, chances are you already know what a Shiny App is — a web application that communicates with R, built in R, and working with R. 
 The beauty of `{shiny}` is that it makes it easy for anybody to create a small app in a matter of hours.  
@@ -15,10 +15,6 @@ With small and simple Shiny apps, no knowledge of HTML, CSS or JavaScript is req
 // TODO
 
 ## What's a complex Shiny App? 
-
-<!-- > Complex software is harder to think about, harder to test, harder to debug, and harder to maintain — and above all, harder to learn and use.
-
-`r right_link("The Art of Unix Programming", "http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#id2878339")`-->
 
 > One of the unfortunate things about reality is that it often poses complex problems that demand complex solutions
 
@@ -36,6 +32,7 @@ Getting a clear definition is not an easy task^[
 Ironic right?
 ]
 as it very depends on who is concerned and who you're talking to.
+A good definition is the one from [The Art of Unix Programming](http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#id287833): _"Complex software is harder to think about, harder to test, harder to debug, and harder to maintain — and above all, harder to learn and use."_
 But let's try to come with a definition that will serve us in the context of engineering Shiny applications. 
 When building software, we can think of complexity from two points of view: the complexity as it is seen by the coder, and the complexity as it is seen by the customer / end user
 ^[from _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity"].
@@ -94,7 +91,9 @@ Handling this special case is doable: with a little bit of craft, you can watch 
 ^[see [shiny/issues/2043#issuecomment-525640738](https://github.com/rstudio/shiny/issues/2043#issuecomment-525640738){target="_blank"} for an example].
 That solution augments the implementation complexity, while leaving it as is requires the user to think about whether or not the starting date is before the ending date, thus increasing the interface complexity.
 
-_-> Insert here something of the like: "It's up to you to think about what's the best balance between these two sources." _
+So what should we do? It's up to you: deciding where to draw the line between interface & implementation complexity very much depends of the kind of project you're working on, and on the kind of users that will use your app. 
+Things that you can assess here is the ease of working on implementation of feature (for your team), how much your app will be used, how frequently, by what kind of users... 
+Drawing the line between the two is not the simplest thing on earth, and requires to restrain yourself from implementing too much, and still create an application that is easy to use. 
 
 ### Assessing complexity
 
@@ -154,8 +153,8 @@ For example, let's compare a rather big package (`{shiny}`) with a small one (`{
 ```{r}
 library(cloc)
 library(dplyr)
-shiny_cloc <- cloc_cran("shiny", .progress = FALSE)
-attempt_cloc <- cloc_cran("attempt", .progress = FALSE)
+shiny_cloc <- cloc_cran("shiny", .progress = FALSE, repos = "http://cran.irsn.fr/" )
+attempt_cloc <- cloc_cran("attempt", .progress = FALSE, repos = "http://cran.irsn.fr/" )
 clocs <- bind_rows(
   shiny_cloc, 
   attempt_cloc
@@ -185,8 +184,9 @@ Cyclomatic complexity is a software engineering measure which allows to define t
 It's computed based on a control-flow graph^[
 A control flow graph is a graph representing all the possible paths a piece of code can take while it's executed.
 ] representation of an algorithm. 
-The complexity number is then computed by taking the number of node, and subtracting the number edges plus two times the number of connected components of this graph. 
-We won't go deep into this topic, as there are a lot things going on in this computation. 
+The complexity number is then computed by taking the number of nodes, and subtracting the number of edges plus two times the number of connected components of this graph: _M = E − N + 2P_, where M is the measure, E the number of edges, N the number of nodes and 2P 2 time the number of connected components.
+
+We won't go deep into this topic, as there are a lot things going on in this computation and you can find many documentation about this online.
 Please refer to the bibliography for further readings about the theory behind this measurement. 
 
 In R, the cyclomatic complexity is computed with the `{cyclocomp}` package, which can be installed from `CRAN` with:
@@ -232,25 +232,41 @@ Then, this might be a solution here: splitting things in smaller pieces lower th
 One thing that can also be done is leveraging the strength of S3 methods to split elements: if you have a function that behave differently based on the type of the input, generics and methods are easier to reason about than if statements inside a larger function.
 But that's not a magic solution: (A) because the global complexity of the app is not lowered by splitting things into pieces, (B) because the deeper the call stack the harder it can be to reason about the big picture. 
 
-#### Other complexity measures
+#### Other measures
+
+Complexity can come from other sources: unsufficient code coverage leading to bugs that are hard to spot, dependencies that breaks the implementation, old package, or a lot of other things. 
+
+How do we assess that? 
+We can have a look at the `{packageMetrics2}` package to have some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc. 
 
 ```{r eval = FALSE}
 remotes::install_github("MangoTheCat/packageMetrics2")
 ```
 
-
 ```{r}
 library(packageMetrics2)
-metrics <- package_metrics("golem")
-res <- data.frame(
-  n = names(metrics), 
-  val = metrics, 
-  expl = list_package_metrics()[names(metrics)]
-)
-res
-
+frame_metric <- function(pkg){
+  metrics <- package_metrics(pkg)
+  tibble::tibble(
+    n = names(metrics), 
+    val = metrics, 
+    expl = list_package_metrics()[names(metrics)]
+  )
+}
 ```
 
+```{r cache = TRUE, warning = FALSE}
+frame_metric("golem") %>% knitr::kable()
+frame_metric("shiny") %>% knitr::kable()
+```
+
+If you're building an app with `{golem}`, a framework for building shiny apps, you can use the `DESCRIPTION` file, the one that contains the dependencies, as a starting point for assessing the state of your dependencies: 
+
+```{r}
+desc::desc_get_deps("golex/DESCRIPTION")
+```
+
+Then, it can be used as a series of inputs for our previous function. 
 
 ### Production Grade Software Engineering
 
