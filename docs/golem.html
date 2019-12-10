@@ -194,7 +194,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="4" data-path="golem.html"><a href="golem.html"><i class="fa fa-check"></i><b>4</b> Introduction to <code>{golem}</code></a><ul>
 <li class="chapter" data-level="4.1" data-path="golem.html"><a href="golem.html#getting-started-with-golem"><i class="fa fa-check"></i><b>4.1</b> Getting started with <code>{golem}</code></a></li>
-<li class="chapter" data-level="4.2" data-path="golem.html"><a href="golem.html#understanding-golem-package-structure"><i class="fa fa-check"></i><b>4.2</b> Understanding <code>{golem}</code> package structure</a><ul>
+<li class="chapter" data-level="4.2" data-path="golem.html"><a href="golem.html#understanding-golem-app-structure"><i class="fa fa-check"></i><b>4.2</b> Understanding <code>{golem}</code> app structure</a><ul>
 <li class="chapter" data-level="4.2.1" data-path="golem.html"><a href="golem.html#description-namespace"><i class="fa fa-check"></i><b>4.2.1</b> <code>DESCRIPTION</code> &amp; <code>NAMESPACE</code></a></li>
 <li class="chapter" data-level="4.2.2" data-path="golem.html"><a href="golem.html#r"><i class="fa fa-check"></i><b>4.2.2</b> R/</a></li>
 <li class="chapter" data-level="4.2.3" data-path="golem.html"><a href="golem.html#instappwww"><i class="fa fa-check"></i><b>4.2.3</b> <code>inst/app/www/</code></a></li>
@@ -358,28 +358,43 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1><span class="header-section-number">Chapter 4</span> Introduction to <code>{golem}</code></h1>
 <p>OK, that’s a lot of things to process.
 Is there a tool that can help us simplify this workflow?
-Of course there is, and it’s called <code>{golem}</code>.</p>
+Of course there is, and it’s called <code>{golem}</code>, a framework for building production-grade Shiny Application.</p>
 <div id="getting-started-with-golem" class="section level2">
 <h2><span class="header-section-number">4.1</span> Getting started with <code>{golem}</code></h2>
-<p>// TODO</p>
-<p>It can be found at <a href="https://github.com/ThinkR-open/golem" class="uri">https://github.com/ThinkR-open/golem</a></p>
+<p><code>{golem}</code> is an R package that can be thought as a toolkit for simplifying the creation, development and deployment of Shiny applications.
+A lot of things in this book reflect the way <code>{golem}</code> and the packages from the “golem-verse” are designed.
+We advice to use <code>{golem}</code> if you plan on following the workflow described in this book, but of course the workflow will still be valid of you plan on not using <code>{golem}</code>.</p>
 <p>The stable release can be found on CRAN, and installed with:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;golem&quot;</span>)</code></pre>
 <p><code>{golem}</code> dev version can be found on GitHub and you’ll have to install it with:</p>
 <pre class="sourceCode r"><code class="sourceCode r">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;Thinkr-open/golem&quot;</span>)</code></pre>
-<p><code>{golem}</code> is an R package that implements an opinionated framework for building production-ready Shiny apps.
-It all starts with an RStudio project, which contains a predefined setup for building your app.
-The idea is that with <code>{golem}</code>, you don’t have to focus on the foundation of your app, and can spend your time thinking about what you want to do, not about how to do it.
-It’s built on top of the working process we’ve developed at ThinkR, and tries to gather in one place the functions and tools we’ve created for building applications designed for production.</p>
-<p>Note before using <code>{golem}</code>:</p>
+<p>The current version of the package on CRAN is:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)
+tools<span class="op">::</span><span class="kw">CRAN_package_db</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(Package <span class="op">==</span><span class="st"> &quot;golem&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(Version)</code></pre>
+<pre><code>  Version
+1     0.1</code></pre>
+<p>While the current version of the dev version is:</p>
+<pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">tempfile</span>()
+<span class="kw">download.file</span>(<span class="st">&quot;https://raw.githubusercontent.com/ThinkR-open/golem/dev/DESCRIPTION&quot;</span>, x)
+desc<span class="op">::</span><span class="kw">desc_get_version</span>(x)</code></pre>
+<pre><code>[1] &#39;0.1.0.9600&#39;</code></pre>
+<p><code>{golem}</code> is an R package that implements an opinionated framework for building production-ready Shiny apps.</p>
+<p>The motivation behind <code>{golem}</code> is that building a proof-of-concept application is easy, but things change when the application becomes larger and more complex, and especially when it comes to sending that app to production.
+And until recently there hasn’t been any real framework for building and deploying production-grade Shiny Apps.
+This is where <code>{golem}</code> comes into play: offering Shiny developers a toolkit for making a stable, easy-to-maintain, and robust for production web application with R.
+<code>{golem}</code> has been developed to abstract away the most common engineering tasks (for example, module creation, addition of external CSS or JavaScript file, …), so you can focus on what matters: building the application.
+And once your application is ready to be deployed, <code>{golem}</code> guides you through testing, and brings you tool for deploying to common platforms.</p>
+<p>Some things to keep in mind before using <code>{golem}</code>:</p>
 <ul>
-<li><p>A <code>{golem}</code> app is contained inside a package, so knowing how to build a package is highly recommended.</p></li>
-<li><p>A <code>{golem}</code> app works better if you are working with <code>shiny modules</code>, so knowing how modules work is heavily recommended.</p></li>
+<li><p>A <code>{golem}</code> application is contained inside a package, so knowing how to build a package is recommended but not necessary.
+The good news is also that everything you know about package development can be applied to <code>{golem}</code>.</p></li>
+<li><p>A <code>{golem}</code> app works better if you are working with <code>shiny modules</code>, so knowing how modules work is also recommended but not necessary.</p></li>
 </ul>
-<p>In the rest of the book, we’ll assume you’re working in RStudio.</p>
 </div>
-<div id="understanding-golem-package-structure" class="section level2">
-<h2><span class="header-section-number">4.2</span> Understanding <code>{golem}</code> package structure</h2>
+<div id="understanding-golem-app-structure" class="section level2">
+<h2><span class="header-section-number">4.2</span> Understanding <code>{golem}</code> app structure</h2>
 <p>When starting a new project with <code>{golem}</code> (here on an app called <code>golex</code>), you’ll start with this specific architecture.</p>
 <pre class="sourceCode r"><code class="sourceCode r">fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;golex&quot;</span>)</code></pre>
 <pre><code>golex
