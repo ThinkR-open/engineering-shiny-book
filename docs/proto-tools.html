@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 16 The Need for Optimization | Building Big Shiny Apps - A Workflow</title>
+  <title>Chapter 10 Tools for prototyping | Building Big Shiny Apps - A Workflow</title>
   <meta name="description" content="Building Robust Shiny Application - A Workflow" />
   <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 16 The Need for Optimization | Building Big Shiny Apps - A Workflow" />
+  <meta property="og:title" content="Chapter 10 Tools for prototyping | Building Big Shiny Apps - A Workflow" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 16 The Need for Optimization | Building Big Shiny Apps - A Workflow" />
+  <meta name="twitter:title" content="Chapter 10 Tools for prototyping | Building Big Shiny Apps - A Workflow" />
   
   <meta name="twitter:description" content="Building Robust Shiny Application - A Workflow" />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="deploy-golem.html">
-<link rel="next" href="optim-caveat.html">
+<link rel="prev" href="proto-rmdfirst.html">
+<link rel="next" href="stepbuild.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -351,15 +351,68 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="when-optimize" class="section level1">
-<h1><span class="header-section-number">Chapter 16</span> The Need for Optimization</h1>
-<div id="build-first-then-optimize" class="section level2">
-<h2><span class="header-section-number">16.1</span> Build first, then optimize</h2>
-<p>// TODO</p>
+<div id="proto-tools" class="section level1">
+<h1><span class="header-section-number">Chapter 10</span> Tools for prototyping</h1>
+<p>Building the User Interface first should require the least possible calculations from the server part of your application.
+You focus on the appearance.<br />
+The UI is usually a collection of buttons, figures and tables.
+Some being triggered by others.
+When first building your interface, you may only want to focus on where you place the different boxes and graphs.
+You will use the different <code>*Input</code> from {shiny} for inputs that will later affect the server part.
+You will also set the place for <code>*Output</code>, but these outputs will be empty.<br />
+To show a first overview of what will look like your interface, you can use fake data and figures to fill the blank outputs.
+This is where <a href="https://thinkr-open.github.io/shinipsum/">{shinipsum}</a> and <a href="https://thinkr-open.github.io/fakir/">{fakir}</a> come to help.</p>
+<div id="fast-prototyping-with-shinipsum" class="section level2">
+<h2><span class="header-section-number">10.1</span> Fast prototyping with <code>{shinipsum}</code></h2>
+<p>The goal of {shinipsum} is to provide random shiny elements to simulate interface outputs.
+Use <code>lorem</code>, the long “Lorem Ipsum” text to fill in text parts.
+Use the <code>random_*</code> functions in the <code>server</code> part of your application in combination with the appropriate <code>render*()</code>.
+This will fill the corresponding call to <code>*Output()</code> in the <code>UI</code>.<br />
+For instance:</p>
+<ul>
+<li><code>random_DT()</code> renders a <code>DT::datatable()</code> output with one of existing R internal datasets.<br />
+</li>
+<li><code>random_ggplot(type = &quot;point&quot;)</code> renders a random {ggplot2} graph with the selected <code>type</code> (corresponding to <code>geom()</code> in {ggplot2}).<br />
+</li>
+<li><code>random_text(nwords = 10)</code> renders a text with the defined number of words.</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
+<span class="kw">library</span>(shinipsum)
+<span class="kw">library</span>(DT)
+ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(
+  <span class="kw">h2</span>(<span class="st">&quot;A Random DT&quot;</span>),
+  <span class="kw">DTOutput</span>(<span class="st">&quot;data_table&quot;</span>),
+  <span class="kw">h2</span>(<span class="st">&quot;A Random Plot&quot;</span>),
+  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>),
+  <span class="kw">h2</span>(<span class="st">&quot;A Random Text&quot;</span>),
+  <span class="kw">tableOutput</span>(<span class="st">&quot;text&quot;</span>)
+)
+
+server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {
+  output<span class="op">$</span>data_table &lt;-<span class="st"> </span>DT<span class="op">::</span><span class="kw">renderDT</span>({
+    <span class="kw">random_DT</span>(<span class="dv">5</span>, <span class="dv">5</span>)
+  })
+  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({
+    <span class="kw">random_ggplot</span>()
+  })
+  output<span class="op">$</span>text &lt;-<span class="st"> </span><span class="kw">renderText</span>({
+    <span class="kw">random_text</span>(<span class="dt">nwords =</span> <span class="dv">50</span>)
+  })
+}
+<span class="kw">shinyApp</span>(ui, server)</code></pre>
+<p><img src="img/shinipsum.png" width="90%" /></p>
+<p>Find out more in the corresponding website: <a href="https://thinkr-open.github.io/shinipsum/" class="uri">https://thinkr-open.github.io/shinipsum/</a></p>
 </div>
-<div id="tools-for-profiling" class="section level2">
-<h2><span class="header-section-number">16.2</span> Tools for profiling</h2>
-<p>// TODO</p>
+<div id="using-fakir-for-fake-data-generation" class="section level2">
+<h2><span class="header-section-number">10.2</span> Using <code>{fakir}</code> for fake data generation</h2>
+<p>{fakir} was primarily created to provide fake datasets for R tutorials and exercises.
+“Fake support ticket dataset” is built using <code>fake_ticket_client()</code> and “Fake questionnaire on mean of transport / goal dataset” is built using <code>fake_sondage_answers()</code>.
+They contain dates, numeric and character variables, with missing values allowing multiple exercises on data cleaning and graph building.
+They can also be joined with the included {sf} geographical dataset <code>fra_sf</code> allowing for maps creation.<br />
+Fake datasets created with {fakir} can be used to build light examples on the use of the inputs, for filters or interactive maps for instance.
+When building your application inside a R package, as recommended in this book using {golem}, you may want to build small reproducible examples of your functions, to be presented in the vignettes and tested in the unit tests, prior to building the Shiny Apps itself.
+You can create these examples using {fakir}.</p>
+<p>Find out more in the corresponding website: <a href="https://thinkr-open.github.io/fakir/" class="uri">https://thinkr-open.github.io/fakir/</a></p>
 
 </div>
 </div>
@@ -375,8 +428,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="deploy-golem.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="optim-caveat.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="proto-rmdfirst.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="stepbuild.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -406,7 +459,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/when_optimize.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/prototyping-fakir-shinipsum.Rmd",
 "text": "Edit"
 },
 "history": {
