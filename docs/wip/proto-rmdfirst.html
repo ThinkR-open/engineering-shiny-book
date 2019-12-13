@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 14 Send your app to production | Building Big Shiny Apps - A Workflow</title>
+  <title>Chapter 9 Building with RMarkdown | Building Big Shiny Apps - A Workflow</title>
   <meta name="description" content="Building Robust Shiny Application - A Workflow" />
   <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 14 Send your app to production | Building Big Shiny Apps - A Workflow" />
+  <meta property="og:title" content="Chapter 9 Building with RMarkdown | Building Big Shiny Apps - A Workflow" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 14 Send your app to production | Building Big Shiny Apps - A Workflow" />
+  <meta name="twitter:title" content="Chapter 9 Building with RMarkdown | Building Big Shiny Apps - A Workflow" />
   
   <meta name="twitter:description" content="Building Robust Shiny Application - A Workflow" />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="secure.html">
-<link rel="next" href="deploy-golem.html">
+<link rel="prev" href="stepprotopype.html">
+<link rel="next" href="proto-tools.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -358,11 +358,59 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="stepdeploy" class="section level1">
-<h1><span class="header-section-number">Chapter 14</span> Send your app to production</h1>
-<p>Tools for deployment are not the subject of this blog post so I won’t talk about this in detail (remember, we are talking about building 😉 ), but our two tools of choice are Docker &amp; ShinyProxy, and RStudio Connect.</p>
-<p>// TODO: link to resources.</p>
+<div id="proto-rmdfirst" class="section level1">
+<h1><span class="header-section-number">Chapter 9</span> Building with RMarkdown</h1>
+<p>Once again, we advise not to directly write in the Shiny application.
+We recommend using the ‘Rmd first’ method.</p>
+<p>It is important to correctly visualize the structure of your application before the build:
+number of pages and elements, how the different elements interact with each other, what are the inputs needed and the outputs.
+If you worked the ‘UI-first’, this should be clearer now.
+It is then time to develop the core of the different parts of the application.</p>
+<div id="define-the-content-of-the-application" class="section level2">
+<h2><span class="header-section-number">9.1</span> Define the content of the application</h2>
+<p>Put everything in Rmarkdown files.
+Use the Rmarkdown files as the sandbox of your application.
+If you work for a client, Rmd files knitted as HTML or PDF are easily shared for discussions about their expectations.
+When there are modifications of expectations or needs to visualize different propositions, knitting a Rmd file is usually easier than manually clicking on your Shiny application to reach the modified part and take a snapshot.</p>
+<p>Your application may contain data wrangling operations, multi-parameters based models, summary tables outputs, graphical outputs.
+All this manipulations do not require the interactivity of the Shiny application to be developed.</p>
+<p>We propose to divide the different parts of your Shiny application into multiple Rmarkdown files where you present and develop the content.<br />
+You may want to create one Rmarkdown file for each page / tab of the graphical interface.
+The static development will simplify the multiple tests necessary during development to verify that algorithms output the correct results, to propose different colors combinations for your graphs, to improve the speed of operations, …
+You can use some dataset examples from real cases, small reproducible examples, or from fake datasets (See §<a href="proto-tools.html#proto-tools">10</a>).</p>
+</div>
+<div id="fill-the-rmd-files" class="section level2">
+<h2><span class="header-section-number">9.2</span> Fill the Rmd files</h2>
+<p>Rmarkdown files are the place to write what you have in mind.
+As soon as it is related to your Shiny application of course.
+Write your questions, your objectives.
+Detail methods used and choices you made for your data wrangling, models, visualization.
+This will help you present them to your client, boss, colleagues.
+This will also help yourself in the future when you will want to debug some parts of your code.
+This will simplify discussion with other developers if you separated the work between multiple persons.</p>
+<blockquote>
+<p>Note that developing in multiple Rmd files helps the allocation of work between multiple developers and will reduce code conflicts during development.</p>
+</blockquote>
+</div>
+<div id="use-the-rmd-first-method-to-document-further" class="section level2">
+<h2><span class="header-section-number">9.3</span> Use the ‘Rmd first’ method to document further</h2>
+<p>We recommend building Shiny Apps in a package.
+A package requires documentation and unit tests.
+While you develop the content of your application in a series of Rmarkdown files, it is a good time to create functions.
+Indeed, the code written in the Rmarkdown will be used a second time in the Shiny application when time has come to include it.
+To reduce copy-pasting, you may want to take advantage of the package structure to create functions of your code and store them in the ‘R’ directory of the package.
+As you write your function, write its roxygen documentation and list dependencies.
+Also, because you created your code based on one or multiple examples, you are able to directly write unit tests for your newly created functions.
+Writing a proper documentation and unit tests will save you a lot of time when you will implement the different functionalities in your application.
+This will often allow to detect cascading modifications of the outputs during the <em>check</em> of the package, before you play with the graphical interface.</p>
+<blockquote>
+<p>The Rmd files are the vignette of the package.
+Store them in the vignette directory, so that they are built and tested when you <em>check</em> the package.</p>
+</blockquote>
+<p>Note that once the application is set up and functionalities included, you will surely got back to the code to debug, add new functionalities, …
+Continue to use the Rmarkdown files after the prototyping phase all along the development.</p>
 
+</div>
 </div>
 <hr/>
 <footer>
@@ -373,8 +421,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="secure.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="deploy-golem.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="stepprotopype.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="proto-tools.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -404,7 +452,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/step-by-step-deploy.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/prototyping-rmd-first.Rmd",
 "text": "Edit"
 },
 "history": {
