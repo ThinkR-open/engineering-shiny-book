@@ -30,7 +30,7 @@ Because you know, when you want to push your app into production, you can't have
 >
 >R-dev: Ah yes, you need to install {shiny}. Try to run 'install.packages("shiny")'. 
 >
->IT: Ok nice. What else?
+>IT: OK nice. What else?
 >
 >R-dev: Let me think, try also 'install.packages("DT")'... good? Now try 'install.packages("ggplot2")', and ...
 >
@@ -81,9 +81,9 @@ See also Chapter 5 of ["Building a package that lasts"](https://speakerdeck.com/
 
 What should you test? 
 
-+ First of all, as we've said before, the app should be split between the UI part and the backend (or 'business logic') part. 
-These backend functions are supposed to run without any interactive context, just as plain old functions. So for these ones, __you can do classical tests__. 
-As they are backend functions (so specific to a project), `{golem}` can't provide any helpers for that. 
++ First of all, as we've said before, the app should be split between the UI part and the back-end (or 'business logic') part. 
+These back-end functions are supposed to run without any interactive context, just as plain old functions. So for these ones, __you can do classical tests__. 
+As they are back-end functions (so specific to a project), `{golem}` can't provide any helpers for that. 
 
 + For the UI part, __remember that any UI function is designed to render an HTML element__. 
 So you can save a file as HTML, and then compare it to a UI object with the `golem::expect_html_equal()`.
@@ -245,8 +245,480 @@ You'll get the Dockerfile you need with `golem::add_dockerfile()`.
 
 ## Using Shiny Modules
 
-// TODO 
+### Small is beautiful 
+
+Modules are one of the most powerful tool for building Shiny Application.
+But what are they? 
+
+> Shiny modules address the namespacing problem in Shiny UI and server logic, adding a level of abstraction beyond functions
+
+`r right_link("Modularizing Shiny app code", "https://shiny.rstudio.com/articles/modules.html")`
+
+Let's first untangle this quote with a simple example about what is shiny namespace problem. 
+
+#### One million "Validate" buttons
+
+Shiny needs its outputs and inputs to have a __unique id__. 
+And unfortunately, we can't bypass that: when you send a plot __from R to the browser__, i.e from the `server` to the `ui`, the browser needs to know exactly where to put this element. 
+This "exactly where" is handled through the use of an `id`. 
+Ids are not a Shiny specific concept: they are at the very root of the way web pages work. 
+Understanding all of this is not the purpose of this chapter: just remember that Shiny inputs and outputs id __have__ to be unique, so that the browser knows where to put what it receives from R, and R knows what to listen to from the browser. 
+The need to be unique is made a little bit complex by the way Shiny handles the names, as it share a global pool for all the id names, with no native way to use namespaces. 
+
+Namespaces are a computer science concept which has been designed to handle a common issue: how to share the same name for a variable in various place of your program without them conflicting. 
+In other words, how to use an object called `foo` several times in the program, and still be sure that it's correctly used depending on the context. 
+R itself has a system for namespaces ; that's what packages do and why you can have `purrr::flatten` and `jsonlite::flatten`: the function name is the same, but the two live in a different namespace, and they can mean two different things, as the symbol is evaluated inside two different namespaces. 
+If you want to learn more about namespaces, please refer to the [7.4 Special environments](https://adv-r.hadley.nz/environments.html#special-environments) chapter from _Advanced R_.
+
+So, that's what modules are made for: creating small namespaces where you can safely define `ids` without conflicting. 
+Why do we need to do that? 
+Think about the number of times you've created a "ok" or "validate" button. 
+How do you handle that? 
+By creating `validate1`, `validate2`, and so on and so forth. 
+And if you think about it, you're mimicking a namespacing process: a `validate` in namespace `1`, another in namespace `2`. 
+
+
+```{r eval = FALSE}
+library(shiny)
+ui <- function(request){
+  fluidPage(
+    sliderInput("choice1", "choice 1", 1, 10, 5),
+    actionButton("validate1", "Validate choice 1"),
+    sliderInput("choice2", "choice 2", 1, 10, 5),
+    actionButton("validate2", "Validate choice 2")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  observeEvent( input$validate1 , {
+    print(input$choice1)
+  })
+  observeEvent( input$validate2 , {
+    print(input$choice2)
+  })
+  
+}
+
+shinyApp(ui, server)
+```
+
+This, of course, is an approach that works.
+Well, it works as long as your code base is small. 
+But how can you be sure that you're not creating `validate6` on line 55 and another on line 837?
+How can you be make sure that you're deleting the correct combination of UI/server components if they are named that way? 
+Also, how do you work smoothly in a context where you have to scroll from `sliderInput("choice1"` to `observeEvent( input$choice1 , {` which might be separated by thousands of lines? 
+
+#### A bite-sized code base
+
+And of course, you know the saying that _"if you copy and paste something more than twice, you should make a function"_, so how do we refactor this piece of code so that it's reusable?
+
+Yes, you guessed right: using shiny modules. 
+Shiny modules aim at three things: simplifying id namespacing, split the code base into a series of functions, and allow UI/Server parts of your app to be reused. 
+Most of the time, modules are used to do the two first: I'd say that 90% of the module I write are never reused^[
+Most of the time, pieces / panels of the app are to unique too be reused elsewhere.
+] ; they are here to allow me to split the code base into smaller, more manageable pieces. 
+
+With Shiny modules, you'll be writing a combination of UI and server functions. 
+Think of them as small, standalone Shiny apps, which output and handle a fraction of your global application. 
+If you've been developing R packages, and you always try to split your functions into series of smaller functions, that's the exact same thing: you are, with just a little bit of tweaking, doing the same thing. 
+That is to say creating smaller functions that are easier to understand, develop and maintain. 
+
+### A practical walk through 
+
+#### Your first Shiny Module
+
+So, here is how you'd refactor the example from before with modules: 
+
+```{r eval = FALSE}
+name_ui <- function(id){
+  ns <- NS(id)
+  tagList(
+    sliderInput(ns("choice"), "Choice", 1, 10, 5),
+    actionButton(ns("validate"), "Validate Choice")
+  )
+}
+
+name_server <- function(input, output, session){
+  ns <- session$ns
+  
+  observeEvent( input$validate , {
+    print(input$choice)
+  })
+  
+}
+
+library(shiny)
+ui <- function(request){
+  fluidPage(
+    name_ui("name_ui_1"),
+    name_ui("name_ui_2")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  callModule(name_server, "name_ui_1")
+  callModule(name_server, "name_ui_2")
+}
+
+shinyApp(ui, server)
+
+```
+
+Let's stop for a minute and decompose what we've got here. 
+
+The __server__ function is pretty much the same as before: you'll just be using the same code as the one you've been using so far.
+
+The __ui__ function has some new things in it. Well, two new things, which are `ns <- NS(id)` and `ns(inputId)`. 
+That's where the namespacing happens. 
+You can think about this function as a way to add a namespace to your id: you've been doing `validate1` and `validate2` before, now you're doing this with the function created by `ns <- NS(id)`.
+
+You'll find this little piece of code on top of all the module ui functions.
+To understand what it does, let's try and run it outside of Shiny: 
+
+```{r}
+id <- "name_ui_1"
+ns <- NS(id)
+ns("choice")
+```
+
+And here it is, our namespaced id! 
+
+And of course, calling it with various id will create various namespaces for the id, preventing you from id conflicts^[
+Well, of course you can still have inner module id conflicts, but they are easier to avoid, detect, and fix. 
+].
+All you have to do now is to make sure that ids are unique at the "upper" levels. 
+Then you can have as many `validate` input as you want in your app: as long as this `validate` is unique inside your module you're good to go. 
+
+The `app_ui` contains a series of call to `module_ui_function(unique_id, ...)` with potential parameters: 
+
+```{r eval = FALSE}
+name_ui <- function(id, butname){
+  ns <- NS(id)
+  tagList(
+    actionButton(ns("validate"), butname)
+  )
+}
+
+name_ui("name_ui_1", "Validate Choice")
+name_ui("name_ui_2", "Validate Choice, again")
+```
+
+```
+<button id="name_ui_1-validate" type="button" class="btn btn-default action-button">Validate Choice</button>
+
+<button id="name_ui_2-validate" type="button" class="btn btn-default action-button">Validate Choice, again</button>
+```
+
+The `app_server` side contains a series of `callModule(module_server_function, unique_id, ...)`,  with potential parameters. 
+
+#### Passing args to your modules
+
+Shiny modules will potentially be reused. 
+It's not the general pattern, but they can. 
+
+In that case, you'll potentially be using extra arguments to generate the UI and server conditionally.
+Let's for example have a look at [mod_dataviz.R](https://github.com/ColinFay/tidytuesday201942/blob/master/R/mod_dataviz.R#L17) from the `{tidytuesday201942}` Shiny application. 
+
+This application contains 6 tabs, 4 of them being pretty much alike: a side bar with inputs, an a main panel with a button and the plot. 
+This is a typical case of where you should reuse modules: if two or more parts are relatively similar, it's easier to bundle it inside a reusable module, and condition the ui/server with function arguments. 
+
+![](img/tidytuesdayapp.png)
+
+Here, are some example of how it works in the UI:
+
+```{r eval = FALSE}
+mod_dataviz_ui <- function(id, type = c("point", "hist", "boxplot", "bar")){
+  h4(
+    sprintf( "Create a geom_%s", type )
+  ),
+  if (type == "boxplot" | type =="bar") {
+    selectInput(
+      ns("x"),
+      "x", 
+      choices = names_that_are(c("logical", "character"))
+    )
+  } else {
+    selectInput(
+      ns("x"),
+      "x", 
+      choices = names_that_are("numeric")
+    )
+  }
+}
+```
+
+And in the server:
+
+```{r eval = FALSE}
+mod_dataviz_server <- function(input, output, session, type){
+  if (type == "point"){
+    x <- rlang::sym(input$x)
+    y <- rlang::sym(input$y)
+    color <- rlang::sym(input$color)
+    r$plot <- ggplot(
+      big_epa_cars, 
+      aes(!!x, !!y, color = !!color)
+    )  +
+      geom_point() + 
+      scale_color_manual(
+        values = color_values(
+          1:length(unique(pull(big_epa_cars, !!color))), 
+          palette = input$palette
+        )
+      )
+  } 
+}
+```
+
+Then, the app server is:
+
+```{r}
+app_server <- function(input, output,session) {
+  #callModule(mod_raw_server, "raw_ui_1")
+  callModule(mod_dataviz_server, "dataviz_ui_1", type = "point")
+  callModule(mod_dataviz_server, "dataviz_ui_2", type = "hist")
+  callModule(mod_dataviz_server, "dataviz_ui_3", type = "boxplot")
+  callModule(mod_dataviz_server, "dataviz_ui_4", type = "bar")
+}
+```
+
+And the UI:
+
+```{r}
+app_ui <- function() {
+  # [...]
+  tagList(
+    fluidRow(
+      id = "geom_point", mod_dataviz_ui("dataviz_ui_1", "point")
+    ), 
+    fluidRow(
+      id = "geom_hist", mod_dataviz_ui("dataviz_ui_2", "hist")
+    )
+  )
+}
+```
+
+### Communication between modules 
+
+One of the hardest part about modules is sharing data across them. 
+There are at least two approach: returning reactive, or the "stratégie du petit r" (to pronounce with a french accent). 
+
+#### Returning values from the module
+
+One common approach is return reactive values from one module, and to pass it to another. 
+
+```{r eval = FALSE}
+name_ui <- function(id){
+  ns <- NS(id)
+  tagList(
+    sliderInput(ns("choice"), "Choice", 1, 10, 5)
+  )
+}
+
+name_server <- function(input, output, session){
+  ns <- session$ns
+  
+  return(
+    reactive({
+      input$choice
+    })
+  )
+}
+
+name_b_ui <- function(id){
+  ns <- NS(id)
+  tagList(
+    actionButton(ns("validate"), "Print")
+  )
+}
+
+name_b_server <- function(input, output, session, react){
+  ns <- session$ns
+  observeEvent( input$validate , {
+    print(react())
+  })
+  
+}
+
+library(shiny)
+ui <- function(request){
+  fluidPage(
+    name_ui("name_ui_1"),
+    name_b_ui("name_ui_2")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  res <- callModule(name_server, "name_ui_1")
+  callModule(name_b_server, "name_ui_2", react = res)
+}
+
+shinyApp(ui, server)
+
+```
+
+That works well, but for large Shiny Apps it might be hard to handle large list of reactive outputs / inputs. 
+It might also create some reactivity issues, as they are harder to control. 
+
+#### The "stratégie du petit r"
+
+With this strategy, instead of passing reactives as function input, we'll be creating a global reactive list which is passed along other modules. 
+The idea is that it allows us to be less preoccupied about what your module takes as input.
+Here, we will be creating a "global" `reactiveValues()` that we will pass downstream. 
+
+```{r eval = FALSE}
+name_ui <- function(id){
+  ns <- NS(id)
+  tagList(
+    sliderInput(ns("choice"), "Choice", 1, 10, 5)
+  )
+}
+
+name_server <- function(input, output, session, r){
+  ns <- session$ns
+  observeEvent( input$choice , {
+    r$choice <- input$choice
+  })
+  
+}
+
+name_b_ui <- function(id){
+  ns <- NS(id)
+  tagList(
+    actionButton(ns("validate"), "Print")
+  )
+}
+
+name_b_server <- function(input, output, session, r){
+  ns <- session$ns
+  observeEvent( input$validate , {
+    print(r$choice)
+  })
+  
+}
+
+library(shiny)
+ui <- function(request){
+  fluidPage(
+    name_ui("name_ui_1"),
+    name_b_ui("name_ui_2")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  r <- reactiveValues()
+  callModule(name_server, "name_ui_1", r)
+  callModule(name_b_server, "name_ui_2", r)
+}
+
+shinyApp(ui, server)
+
+```
+
+The plus side of this method is that whenever you're add something in one module, it's immediately available in the other modules. 
+The down side is that it can be harder to reason about the app, as the input / content of the `r` is not specified anywhere: as you don't pass any arguments to your function other than `r`, you don't really know what's inside. 
+
+Also, not that if you want to share your module, for example in a package, you should document the structure of the `r`. 
+For example: 
+
+```
+#' @param r a `reactiveValues()` with a `choice` element in it. This `r$choice` will be printed to the R console.
+```
+
+#### A third way
+
+There is another way to share data across modules, which is creating an R6 object which is then pass along the modules. 
+In the spirit, it's more or less the same as passing the `r` list, except that it is not a reactive object, making it more robust to the complexity of handling reactivity invalidation across modules. 
+
+This methods is explain in the chapter [Reactivity anti-patterns](#optim-caveat) of this book. 
+
+
+#### When should you modularize?
+
+From the very beginning. 
+The overhead of writing a module compared to putting everything inside the app function is relatively low: it's even simpler if you are working in a framework like `{golem}`, which promotes the use of modules from the very beginning of your application. 
+
+> "Yes but I just want to write a small app, nothing fancy
+
+Production apps almost always started as a small POC. 
+Then the small POC becomes an interesting idea. 
+Then this idea becomes a strategical asset. 
+And before you know it your 'not-that-fancy' app needs to become larger 
 
 ## Splitting your app into files
 
-// TODO
+### Small is beautiful (bis repetita)
+
+There is nothing harder to maintain than a Shiny app which is only made of one 1000 lines long `app.R`. 
+Well, there still is the 10 000 lines long `app.R`, but you've got the idea. 
+Long scripts are almost always synonym of complexity when it comes to building an application. 
+Of course, small and numerous scripts don't systematically prevent from codebase complexity but they simplify collaboration and maintenance, and of course divide the application logic into smaller, easier to understand bits of code. 
+
+So yes, big files are complex to handle and make development harder.
+Indeed, here is what happens when you're working on a production application:
+
++ You'll be working during a long period of time (either in one run or split across several months) on your codebase, meaning that you'll have to get back to pieces of code you have written a long time ago. 
+
++ You'll possibly be developing with others. 
+Maintaining a code base when several persons are working on the files is already a complex thing: from time to time you might be working on the same file separately, a situation where you'll have to be careful about what and how you merge things when changes are implemented. 
+Of course, it's almost impossible to work on one same file all along the project without losing your mind: even more if this file is thousands of lines long. 
+
++ You'll be implementing numerous features. 
+Numerous features imply a lot of UI & server interaction. 
+And in an `app.R` file of thousands of line, it's very hard to match the UI element with its server counterpart: when the UI is on line 50 and the server on line 570, you'll be scrolling a lot when working on that element. 
+
+So yes, there are a lot of reasons for splitting your application into smaller pieces: it's easier to maintain, easier to decipher, and of course it facilitates collaboration. 
+
+### Conventions matter
+
+So, now that we've talk about the benefits of splitting files, let's think about how to do that. 
+Splitting files is good, splitting files using a defined convention is better. 
+Why? 
+Because using a common convention for your files helps the other developers (and potentially you) to know exactly what is contained in a specific file, and that way it helps everybody know where to look for debugging / implementing new features. 
+For example, if you follow `{golem}`'s convention, you'll know that a file starting with `mod_` contains a module, so if I take over a project, look in the `R/` folder and see files starting with these three letters, I'll know immediately what these files contain.
+
+That's what we'll see in this part: a proposition for a convention on how to split your application into smaller pieces. 
+
+First of all, put everything into an `R/` folder. 
+If you're building your app using the `{golem}` framework, this is already what you're doing: using this package convention to hold the functions for your application.
+
+Once you've got this, here is the `{golem}`-specific convention for organizing your files:
+
++ `app_*.R` (typically `app_ui.R` and `app_server.R`) should contain the top level functions which are used to defined your user interface and your server function. 
+
++ `fct_*` are files that contains business logic, potentially large functions. 
+They are the backbone of the app but are potentially not specific to a given module. 
+They can be added in `{golem}` with the `add_fct("name")` function. 
+
++ `mod_*` are files that contain ONE module. 
+As many shiny apps contains a series of tabs, or at least a tab-like pattern, we suggest that you number then according to their step in the application. 
+And as tabs are almost always named, you can use the tab-name as the file name. 
+For example, if you're building a dashboard and the first tab is called "Import", your should name your file `mod_01_import.R`, which you can create with `golem::add_module("01_import")`. 
+Note that when building a module file with `{golem}`, you can add a `fct_` and `utils_` specific file, that will hold functions and utilities for this specific modules. 
+For example, `golem::add_module("01_import", fct = "readr", utils = "ui")` will create `R/mod_01_import.R`, `R/mod_01_import_fct_readr.R` and `R/mod_01_import_utils_ui.R`. 
+
++ `utils_*` are files that contain utilities, which are small helper functions.
+For example, you might want to have a `not_na`, which is `not_na <- Negate(is.na)`, a `not_null`, or small tools that you'll be using application-wide. 
+Note that you can also create `utils` for a specific module. 
+
++ `*_ui_*`, for example `utils_ui.R`, relates to the user interface. Anything back-end can be noted using `*_server_*`, for example `fct_connection_server.R` will contain functions that are related to the connection to a database, and which are specifically used from the server side. 
+
+Of course, as with any convention, you might be deviating from time to time from this pattern. 
+Your app may not have that many functions, or maybe the functions can all fit into one `utils_` file. 
+But be it one or thousands of file, it's always a good practice to stick to a formalized pattern. 
