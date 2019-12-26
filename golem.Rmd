@@ -6,13 +6,13 @@ knitr::opts_chunk$set( comment = "")
 
 OK, that’s a lot of things to process. 
 Is there a tool that can help us simplify this workflow? 
-Of course there is, and it’s called `{golem}`.
+Of course there is, and it’s called `{golem}`, a framework for building production-grade Shiny Application.
 
 ## Getting started with `{golem}`
 
-// TODO
-
-It can be found at https://github.com/ThinkR-open/golem
+`{golem}` is an R package that can be thought as a toolkit for simplifying the creation, development and deployment of Shiny applications. 
+A lot of things in this book reflect the way `{golem}` and the packages from the "golem-verse" are designed. 
+We advice to use `{golem}` if you plan on following the workflow described in this book, but of course the workflow will still be valid of you plan on not using `{golem}`.
 
 The stable release can be found on CRAN, and installed with:
 
@@ -20,27 +20,46 @@ The stable release can be found on CRAN, and installed with:
 install.packages("golem")
 ```
 
-
 `{golem}` dev version can be found on GitHub and you'll have to install it with:
 
 ```{r eval = FALSE}
 remotes::install_github("Thinkr-open/golem")
 ```
 
+The current version of the package on CRAN is: 
+
+```{r}
+library(dplyr, warn.conflicts = FALSE)
+tools::CRAN_package_db() %>%
+  filter(Package == "golem") %>% 
+  select(Version)
+```
+
+While the current version of the dev version is: 
+
+```{r}
+x <- tempfile()
+download.file("https://raw.githubusercontent.com/ThinkR-open/golem/dev/DESCRIPTION", x)
+desc::desc_get_version(x)
+```
+
+
 `{golem}` is an R package that implements an opinionated framework for building production-ready Shiny apps. 
-It all starts with an RStudio project, which contains a predefined setup for building your app. 
-The idea is that with `{golem}`, you don’t have to focus on the foundation of your app, and can spend your time thinking about what you want to do, not about how to do it. 
-It’s built on top of the working process we’ve developed at ThinkR, and tries to gather in one place the functions and tools we’ve created for building applications designed for production.
 
-Note before using `{golem}`: 
+The motivation behind `{golem}` is that building a proof-of-concept application is easy, but things change when the application becomes larger and more complex, and especially when it comes to sending that app to production. 
+And until recently there hasn't been any real framework for building and deploying production-grade Shiny Apps. 
+This is where `{golem}` comes into play: offering Shiny developers  a toolkit for making a stable, easy-to-maintain, and robust for production web application with R. 
+`{golem}` has been developed to abstract away the most common engineering tasks (for example, module creation, addition of external CSS or JavaScript file, ...), so you can focus on what matters: building the application. 
+And once your application is ready to be deployed, `{golem}` guides you through testing, and brings you tool for deploying to common platforms.
 
-- A `{golem}` app is contained inside a package, so knowing how to build a package is highly recommended. 
+Some things to keep in mind before using `{golem}`: 
 
-- A `{golem}` app works better if you are working with `shiny modules`, so knowing how modules work is heavily recommended.
+- A `{golem}` application is contained inside a package, so knowing how to build a package is recommended but not necessary. 
+The good news is also that everything you know about package development can be applied to `{golem}`.
 
-In the rest of the book, we'll assume you're working in RStudio. 
+- A `{golem}` app works better if you are working with `shiny modules`, so knowing how modules work is also recommended but not necessary. 
 
-## Understanding `{golem}` package structure
+## Understanding `{golem}` app structure
 
 ```{r include = FALSE}
 library(magrittr)
