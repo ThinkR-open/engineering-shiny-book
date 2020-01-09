@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Vincent Guyader, Cervan Girard, Sébastien Rochette" />
 
 
-<meta name="date" content="2020-01-08" />
+<meta name="date" content="2020-01-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -187,7 +187,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="3.1.4" data-path="structure.html"><a href="structure.html#resources"><i class="fa fa-check"></i><b>3.1.4</b> Resources</a></li>
 </ul></li>
 <li class="chapter" data-level="3.2" data-path="structure.html"><a href="structure.html#using-shiny-modules"><i class="fa fa-check"></i><b>3.2</b> Using Shiny Modules</a><ul>
-<li class="chapter" data-level="3.2.1" data-path="structure.html"><a href="structure.html#small-is-beautiful"><i class="fa fa-check"></i><b>3.2.1</b> Small is beautiful</a></li>
+<li class="chapter" data-level="3.2.1" data-path="structure.html"><a href="structure.html#small-is-beautiful-1"><i class="fa fa-check"></i><b>3.2.1</b> Small is beautiful</a></li>
 <li class="chapter" data-level="3.2.2" data-path="structure.html"><a href="structure.html#a-practical-walk-through"><i class="fa fa-check"></i><b>3.2.2</b> A practical walk through</a></li>
 <li class="chapter" data-level="3.2.3" data-path="structure.html"><a href="structure.html#communication-between-modules"><i class="fa fa-check"></i><b>3.2.3</b> Communication between modules</a></li>
 </ul></li>
@@ -374,7 +374,7 @@ And in the end, this is the case: most of the Shiny apps out there are written w
 <p>In fact, when you are writing UI elements in Shiny, <strong>what you are actually doing is building a series of HTML tags, which are then linked to JavaScript events</strong>.
 Later on, when the app is running, these JavaScript events will communicate with R, in the sense that they will send data to R, and receive data from R.
 Most of the time, when these JavaScript events are receiving data, they modify the page the user sees.
-What happens under the hood is a little bit complex and out of scope for this book, but the general idea is: R talks to your browser through a web socket (that you can imagine as a small “phone line” with both software modules listening at each end<a href="#fn22" class="footnote-ref" id="fnref22"><sup>22</sup></a>), and this browser talks to R through the same web socket.</p>
+What happens under the hood is a little bit complex and out of scope for this book, but the general idea is: R talks to your browser through a web socket (that you can imagine as a small “phone line” with both software modules listening at each end<a href="#fn23" class="footnote-ref" id="fnref23"><sup>23</sup></a>), and this browser talks to R through the same web socket.</p>
 <p>// TODO: create here a simple Flowchart</p>
 <p>// R -&gt; (Web Socket) -&gt; JS</p>
 <p>// R &lt;- (Web Socket) &lt;- JS</p>
@@ -386,7 +386,7 @@ Once you’ve realized that, the possibilities are endless: in fact almost anyth
 What this also implies is that getting (even a little bit) better at writing HTML, CSS, and especially JavaScript will make your app better, lighter, and more user-friendly, as JavaScript is a language that has been designed to interact with a web page: change element appearances, hide and show things, click somewhere, show alerts and prompts…
 <strong>Knowing just enough JavaScript can improve the quality of your app</strong>: especially when you’ve been using R to render some complex UIs: think conditional panels, simulating a button click from the server, hide and show elements…
 All these things are good examples of where you should be using JavaScript instead of building more or less complex <code>renderUI</code> or <code>insertUI</code> patterns in your server.</p>
-<p>Moreover, the number of JavaScript libraries available on the web is tremendous ; and the good news is that Shiny has everything it needs to bundle external JavaScript libraries inside your application<a href="#fn23" class="footnote-ref" id="fnref23"><sup>23</sup></a>.</p>
+<p>Moreover, the number of JavaScript libraries available on the web is tremendous ; and the good news is that Shiny has everything it needs to bundle external JavaScript libraries inside your application<a href="#fn24" class="footnote-ref" id="fnref24"><sup>24</sup></a>.</p>
 <p>This is what this section of the book aims at: giving you just enough JavaScript knowledge to lighten your Shiny App, in order to improve the global user and developer experience.
 In this part, we’ll first review some JavaScript basics which can be used “client-side” only, i.e. only in your browser, or by making R &amp; JS communicate with each other.
 In this section, we’ll also explore common patterns for JavaScript in Shiny.
@@ -397,7 +397,7 @@ External resources are linked all throughout this chapter and at the end if you 
 </blockquote>
 <div id="a-quick-introduction-to-javascript" class="section level2">
 <h2><span class="header-section-number">20.1</span> A quick introduction to JavaScript</h2>
-<p>JavaScript is a programming language which has been designed to work in the browser<a href="#fn24" class="footnote-ref" id="fnref24"><sup>24</sup></a>.
+<p>JavaScript is a programming language which has been designed to work in the browser<a href="#fn25" class="footnote-ref" id="fnref25"><sup>25</sup></a>.
 There are three ways to include the JavaScript code inside your web app:</p>
 <ul>
 <li>As an external file, which is served to the browser alongside your main application page</li>
@@ -622,7 +622,7 @@ For example, you can add this <code>alertme</code> / <code>onclick</code> behavi
     <span class="at">alertme</span>(<span class="kw">this</span>.<span class="at">id</span>)<span class="op">;</span>
   <span class="op">}</span>)<span class="op">;</span>
 <span class="op">}</span>)<span class="op">;</span></code></pre>
-<p>Then, all the plots from your app will receive this on-click event<a href="#fn25" class="footnote-ref" id="fnref25"><sup>25</sup></a>.</p>
+<p>Then, all the plots from your app will receive this on-click event<a href="#fn26" class="footnote-ref" id="fnref26"><sup>26</sup></a>.</p>
 <p>Note that there is a series of <code>Shiny events</code> which are specific to Shiny but that can be used just like the one we’ve just seen:</p>
 <pre class="sourceCode js"><code class="sourceCode javascript"><span class="kw">function</span> <span class="at">alertme</span>()<span class="op">{</span>
   <span class="kw">var</span> name <span class="op">=</span> <span class="at">prompt</span>(<span class="st">&quot;Who are you?&quot;</span>)<span class="op">;</span>
@@ -877,20 +877,22 @@ You’ll find it at <a href="http://connect.thinkr.fr/js4shinyfieldnotes/" class
 
 
 
+
+
 <div class="footnotes">
 <hr />
-<ol start="22">
-<li id="fn22"><p>
-See this <a href="https://dev.to/buzzingbuzzer/comment/g0g">dev.to</a> post for a quick introduction to the general concept of web socket<a href="optimjs.html#fnref22" class="footnote-back">↩</a></p></li>
+<ol start="23">
 <li id="fn23"><p>
-This can also be done by wrapping a JS libraries inside a package, which will later be used inside an application.
-See for example <a href="https://github.com/ColinFay/glouton"><code>{glouton}</code></a>, which is a wrapper around the <a href="https://github.com/js-cookie/js-cookie"><code>js-cookie</code></a> JavaScript library.<a href="optimjs.html#fnref23" class="footnote-back">↩</a></p></li>
+See this <a href="https://dev.to/buzzingbuzzer/comment/g0g">dev.to</a> post for a quick introduction to the general concept of web socket<a href="optimjs.html#fnref23" class="footnote-back">↩</a></p></li>
 <li id="fn24"><p>
-You can now work with JavaScript in a server with Node.JS, but this is out of scope of this book.
-See linked resources to learn more.<a href="optimjs.html#fnref24" class="footnote-back">↩</a></p></li>
+This can also be done by wrapping a JS libraries inside a package, which will later be used inside an application.
+See for example <a href="https://github.com/ColinFay/glouton"><code>{glouton}</code></a>, which is a wrapper around the <a href="https://github.com/js-cookie/js-cookie"><code>js-cookie</code></a> JavaScript library.<a href="optimjs.html#fnref24" class="footnote-back">↩</a></p></li>
 <li id="fn25"><p>
+You can now work with JavaScript in a server with Node.JS, but this is out of scope of this book.
+See linked resources to learn more.<a href="optimjs.html#fnref25" class="footnote-back">↩</a></p></li>
+<li id="fn26"><p>
 This <code>click</code> behavior can also be done through <code>$(&quot;.shiny-plot-output&quot;).click(...)</code>.
-We chose to display the <code>on(&quot;click&quot;)</code> pattern as it can be generalized to all DOM events.<a href="optimjs.html#fnref25" class="footnote-back">↩</a></p></li>
+We chose to display the <code>on(&quot;click&quot;)</code> pattern as it can be generalized to all DOM events.<a href="optimjs.html#fnref26" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
 <hr/>
