@@ -30,7 +30,7 @@ Understand the big picture, but implement one small feature at a time.
 Deeply rooted in the [Unix Philosophy](http://www.catb.org/~esr/writings/taoup/html/ch01s07.html), the KISS principle stands for "Keep It Simple, Stupid".
 
 The story behind this principle is supposed to be that Kelly Johnson, lead engineer at the Lockheed Skunk Works, gave his workers a set of very common tools and said that the airplanes should be repairable with these tools, and these tools only. 
-The idea behind being, that the action of repairing the aircrafts that come out of their factories should be possible to carry out by the average engineer. 
+The idea behind being, that the action of repairing the aircraft that come out of their factories should be possible to carry out by the average engineer. 
 
 KISS will: 
 
@@ -52,32 +52,56 @@ That way, you can write regression tests for these functions to ensure they are 
 
 ## Working as a team: tools & organisation
 
-Big Shiny Apps usually mean that several people will work on the application. 
-For example, at ThinkR, 3 to 4 people usually work on the application. 
-So, how do we organize that?
+Complex Shiny Apps usually imply that several people will work on the application. 
+For example, at ThinkR, 3 to 4 people usually work on the application, but there might be more people involved on larger project. 
+Working as a team, whatever the coding project, requires discipline and organisation. 
+How can we achieve that?
 
 ### From the tools point of view: 
 
-// TODO
+#### Version Control & Test all the things
 
-+ Use version control (not sure I have to expand on that topic ;) )
-+ Think of your shiny app as a tree, and divide it as much as possible into little pieces. 
-Then, create one Shiny module piece by piece. 
-This allows you to split the work, and also to have smaller files — it's easier to work on 20 files of 200 lines than on one big app.R file. 
+When you are working on a complex application, chances are that you'll be working on it for a significant period of time, meaning that you'll write code, modify it, use it, go back to it after a few weeks, change some other things, and probably break things. 
+Breaking things is a natural process of software engineering, notably when working on a piece of code during a long period.
+Remember the last chapter where we defined that complex applications are too large to be understood fully? 
+Adding code that breaks the codebase will happen with complex app, so the sooner you take measure to solve code break the better. 
+
+As you can't prevent code to break, you should at least get the tooling to:
+
++ Be informed that the code has broken
++ Be able to identify changes, and to potentially get back in time to a previous code base. 
+
+To get informed about a code break, you'll need to write tests for your app, and to use Continuous Integration so that you're sure this is automatically detected^[
+Relying on automatic tooling for monitoring code base is way safer than relying on developers to do manual checks every time they commit code.
+].
+
+We'll get back to testing and version control in depth in [chapter 14](#step-secure).
+
+#### Small is beautiful 
+
+Last chapter introduced the notion of complexity in size, where the app grows so large that it's very hard to have a good grasp of it. 
+A large code base implies that the safe way to work is to split the app in pieces as much as possible.  
+Splitting a Shiny project is made possible by following two techniques: 
+
++ Split your app into Shiny Modules, so that your app be though of as a tree, making is possible for every developer to concentrate on one node, and only one, instead of having to think about the global infrastructure when implementing features
+
+![](img/app_tree.png)
+
++ Extract your core "non-reactive" functions, that we will also call the "business logic", and include them in external files, so that you can work on these outside of the app: in other words, so that you don't have to relaunch the whole app every time you need to do something new
+
+We'll get back to Shiny module and how to organised your project in the next chapter. 
 
 ### From the organisational point of view
 
-// TODO
-
 First of all, you'll need one person (or maybe two) to be in charge of supervising the whole project. 
 It's hard to have the complete picture of what the app is doing, and most of the time, as a developer, you don't need to. 
-On the other hand, if the work is correctly splitted between members of the team, you'll probably be focusing on one or more part(s) of the application, but you don't need to know every single bit of what the application is doing. 
+On the other hand, if the work is correctly spit between members of the team, you'll probably be focusing on one or more part(s) of the application, but you don't need to know every single bit of what the application is doing. 
 
 But someone has to be get the whole picture: what each part of the software is doing, and how to make all work together, and of course how to check that, at the end of the day, the results returned by the application are the correct ones. 
 This very same person will be the one that kicks off the project, and write the first draft of the application. 
 If you're following the workflow we'll describe in this book, this person in charge of supervising will create a `{golem}` project, fill the information, and define the application structure by providing the modules, and the prototype of the app. 
 
-If you're working following `git flow` (described in chapetr 13), this person in charge of managing the app will also be in charge of reviewing the pull requests and merging them to `dev` if they solve the associated issue.
+If you're working following `git flow` (described in chapter 13), this person in charge of managing the app will also be in charge of reviewing the pull requests and merging them to `dev` if they solve the associated issue.
 Don't worry if this sounds like a foreign language to you, we'll get back to this method in this book. 
 
 Once this skeleton of an app is created, create a series of tasks to be accomplished. 
@@ -85,7 +109,7 @@ Using a Version Control System like `git` will help you there: you'll open a ser
 Other management tools can be used there: for example `redmine`, `jira`, or any issue tracking software can play this role. 
 We strongly suggest to use git, either on GitHub or on GitLab, as it can be easily integrated with R, and of course as it can also be used for doing versioning. 
 
-As the app will be splitted in various Shiny Modules, you can assign the development of one or more module(s) to one member of the team.
+As the app will be split in various Shiny Modules, you can assign the development of one or more module(s) to one member of the team.
 Remember that it's simpler to work in a context where one developer is assigned to one module, even if in reality it's a little bit more complex than that, and several members of the team might go back and forth working on a module. 
 But in a perfect world, one module equals one file, and every body safely works on their own part of the application. 
 Then, only one person is in charge of making all the pieces fit together.
