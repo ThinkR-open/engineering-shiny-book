@@ -88,7 +88,7 @@ As they are back-end functions (so specific to a project), `{golem}` can't provi
 + For the UI part, __remember that any UI function is designed to render an HTML element__. 
 So you can save a file as HTML, and then compare it to a UI object with the `golem::expect_html_equal()`.
 
-```{r eval = FALSE}
+```{r structure-1, eval = FALSE}
 library(shiny)
 ui <- tagList(h1("Hello world!"))
 htmltools::save_html(ui, "ui.html")
@@ -101,7 +101,7 @@ golem::expect_html_equal(ui, "ui.html")
 This can for example be useful if you need to test a module. 
 A UI module function returns an HTML tag list, so once your modules are set you can save them and use them inside tests. 
 
-```{r eval = FALSE}
+```{r structure-2, eval = FALSE}
 my_mod_ui <- function(id){
   ns <- NS("id")
   tagList(
@@ -119,7 +119,7 @@ golem::expect_html_equal(my_mod_ui("test"), my_mod_ui_test)
  
 + Testing package launch: when launching `golem::use_recommended_tests()`, you'll find a test built on top of `{processx}` that allows to check if the application is launch-able. Here's a short description of what happens: 
 
-```{r eval = FALSE}
+```{r structure-3, eval = FALSE}
 # Standard testthat things
 context("launch")
 
@@ -166,7 +166,7 @@ test:
 
 - in `test-golem.R`:
 
-```{r eval = FALSE}
+```{r structure-4, eval = FALSE}
 testthat::test_that(
   "app launches",{
     x <- process$new( 
@@ -201,7 +201,7 @@ Also, building a Shiny App as a package allows you to write standard R documenta
 As your Shiny App is a standard package, it can be built as a `tar.gz`, sent to your colleagues, friends, and family, and even to the CRAN. 
 It can also be installed in any R-package repository. Then, if you've built your app with `{golem}`, you'll just have to do: 
 
-```{r eval=FALSE}
+```{r structure-5, eval=FALSE}
 library(myuberapp)
 run_app()
 ```
@@ -217,7 +217,7 @@ So how can we integrate this "Shiny App as Package" into Connect or Shiny Server
 
 + Uploading the package folder to the server. In that scenario, you use the package folder as the app package, and upload the whole thing. Then, write an `app.R` that does: 
 
-```{r eval = FALSE}
+```{r structure-6, eval = FALSE}
 pkgload::load_all()
 shiny::shinyApp(ui = app_ui(), server = app_server)
 ```
@@ -262,23 +262,25 @@ Shiny needs its outputs and inputs to have a __unique id__.
 And unfortunately, we can't bypass that: when you send a plot __from R to the browser__, i.e from the `server` to the `ui`, the browser needs to know exactly where to put this element. 
 This "exactly where" is handled through the use of an `id`. 
 Ids are not a Shiny specific concept: they are at the very root of the way web pages work. 
-Understanding all of this is not the purpose of this chapter: just remember that Shiny inputs and outputs id __have__ to be unique, so that the browser knows where to put what it receives from R, and R knows what to listen to from the browser. 
+Understanding all of this is not the purpose of this chapter: just remember that Shiny inputs and outputs ids __have__ to be unique, so that the browser knows where to put what it receives from R, and R knows what to listen to from the browser. 
 The need to be unique is made a little bit complex by the way Shiny handles the names, as it share a global pool for all the id names, with no native way to use namespaces. 
 
 Namespaces are a computer science concept which has been designed to handle a common issue: how to share the same name for a variable in various place of your program without them conflicting. 
 In other words, how to use an object called `foo` several times in the program, and still be sure that it's correctly used depending on the context. 
-R itself has a system for namespaces ; that's what packages do and why you can have `purrr::flatten` and `jsonlite::flatten`: the function name is the same, but the two live in a different namespace, and they can mean two different things, as the symbol is evaluated inside two different namespaces. 
+R itself has a system for namespaces ; that's what packages do and why you can have `purrr::flatten` and `jsonlite::flatten`: the function name is the same, but the two live in different namespaces, and they can mean two different things, as the symbol is evaluated inside two different namespaces. 
 If you want to learn more about namespaces, please refer to the [7.4 Special environments](https://adv-r.hadley.nz/environments.html#special-environments) chapter from _Advanced R_.
 
-So, that's what modules are made for: creating small namespaces where you can safely define `ids` without conflicting. 
+So, that's what modules are made for: creating small namespaces where you can safely define `ids` without conflicting with other ids in the app. 
 Why do we need to do that? 
 Think about the number of times you've created a "ok" or "validate" button. 
 How do you handle that? 
 By creating `validate1`, `validate2`, and so on and so forth. 
 And if you think about it, you're mimicking a namespacing process: a `validate` in namespace `1`, another in namespace `2`. 
 
+Consider this piece of code:
 
-```{r eval = FALSE}
+
+```{r structure-7, eval = FALSE}
 library(shiny)
 ui <- function(request){
   fluidPage(
@@ -324,7 +326,7 @@ Most of the time, pieces / panels of the app are to unique too be reused elsewhe
 
 With Shiny modules, you'll be writing a combination of UI and server functions. 
 Think of them as small, standalone Shiny apps, which output and handle a fraction of your global application. 
-If you've been developing R packages, and you always try to split your functions into series of smaller functions, that's the exact same thing: you are, with just a little bit of tweaking, doing the same thing. 
+If you've been developing R packages, you'd probably trying to split your functions into series of smaller functions, that's the exact same thing: you are, with just a little bit of tweaking, doing the same thing. 
 That is to say creating smaller functions that are easier to understand, develop and maintain. 
 
 ### A practical walk through 
@@ -333,7 +335,7 @@ That is to say creating smaller functions that are easier to understand, develop
 
 So, here is how you'd refactor the example from before with modules: 
 
-```{r eval = FALSE}
+```{r structure-8, eval = FALSE}
 name_ui <- function(id){
   ns <- NS(id)
   tagList(
@@ -383,7 +385,7 @@ You can think about this function as a way to add a namespace to your id: you've
 You'll find this little piece of code on top of all the module ui functions.
 To understand what it does, let's try and run it outside of Shiny: 
 
-```{r}
+```{r structure-9}
 id <- "name_ui_1"
 ns <- NS(id)
 ns("choice")
@@ -399,7 +401,7 @@ Then you can have as many `validate` input as you want in your app: as long as t
 
 The `app_ui` contains a series of call to `module_ui_function(unique_id, ...)` with potential parameters: 
 
-```{r eval = FALSE}
+```{r structure-10, eval = FALSE}
 name_ui <- function(id, butname){
   ns <- NS(id)
   tagList(
@@ -428,13 +430,13 @@ In that case, you'll potentially be using extra arguments to generate the UI and
 Let's for example have a look at [mod_dataviz.R](https://github.com/ColinFay/tidytuesday201942/blob/master/R/mod_dataviz.R#L17) from the `{tidytuesday201942}` Shiny application. 
 
 This application contains 6 tabs, 4 of them being pretty much alike: a side bar with inputs, an a main panel with a button and the plot. 
-This is a typical case of where you should reuse modules: if two or more parts are relatively similar, it's easier to bundle it inside a reusable module, and condition the ui/server with function arguments. 
+This is a typical case where you should reuse modules: if two or more parts are relatively similar, it's easier to bundle it inside a reusable module, and condition the ui/server with function arguments. 
 
 ![](img/tidytuesdayapp.png)
 
-Here, are some example of how it works in the UI:
+Here, are some examples of how it works in the UI:
 
-```{r eval = FALSE}
+```{r structure-11, eval = FALSE}
 mod_dataviz_ui <- function(id, type = c("point", "hist", "boxplot", "bar")){
   h4(
     sprintf( "Create a geom_%s", type )
@@ -457,7 +459,7 @@ mod_dataviz_ui <- function(id, type = c("point", "hist", "boxplot", "bar")){
 
 And in the server:
 
-```{r eval = FALSE}
+```{r structure-12, eval = FALSE}
 mod_dataviz_server <- function(input, output, session, type){
   if (type == "point"){
     x <- rlang::sym(input$x)
@@ -480,7 +482,7 @@ mod_dataviz_server <- function(input, output, session, type){
 
 Then, the app server is:
 
-```{r}
+```{r structure-13}
 app_server <- function(input, output,session) {
   #callModule(mod_raw_server, "raw_ui_1")
   callModule(mod_dataviz_server, "dataviz_ui_1", type = "point")
@@ -492,7 +494,7 @@ app_server <- function(input, output,session) {
 
 And the UI:
 
-```{r}
+```{r structure-14}
 app_ui <- function() {
   # [...]
   tagList(
@@ -509,13 +511,13 @@ app_ui <- function() {
 ### Communication between modules 
 
 One of the hardest part about modules is sharing data across them. 
-There are at least two approach: returning reactive, or the "stratégie du petit r" (to pronounce with a french accent). 
+There are at least two approaches: returning reactive, or the "stratégie du petit r" (to be pronounced with a french accent). 
 
 #### Returning values from the module
 
-One common approach is return reactive values from one module, and to pass it to another. 
+One common approach is return a reactive from one module, and to pass it to another. 
 
-```{r eval = FALSE}
+```{r structure-15, eval = FALSE}
 name_ui <- function(id){
   ns <- NS(id)
   tagList(
@@ -578,7 +580,7 @@ With this strategy, instead of passing reactives as function input, we'll be cre
 The idea is that it allows us to be less preoccupied about what your module takes as input.
 Here, we will be creating a "global" `reactiveValues()` that we will pass downstream. 
 
-```{r eval = FALSE}
+```{r structure-16, eval = FALSE}
 name_ui <- function(id){
   ns <- NS(id)
   tagList(
