@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Vincent Guyader, Cervan Girard, Sébastien Rochette" />
 
 
-<meta name="date" content="2020-01-09" />
+<meta name="date" content="2020-01-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -586,18 +586,19 @@ But what are they?</p>
 And unfortunately, we can’t bypass that: when you send a plot <strong>from R to the browser</strong>, i.e from the <code>server</code> to the <code>ui</code>, the browser needs to know exactly where to put this element.
 This “exactly where” is handled through the use of an <code>id</code>.
 Ids are not a Shiny specific concept: they are at the very root of the way web pages work.
-Understanding all of this is not the purpose of this chapter: just remember that Shiny inputs and outputs id <strong>have</strong> to be unique, so that the browser knows where to put what it receives from R, and R knows what to listen to from the browser.
+Understanding all of this is not the purpose of this chapter: just remember that Shiny inputs and outputs ids <strong>have</strong> to be unique, so that the browser knows where to put what it receives from R, and R knows what to listen to from the browser.
 The need to be unique is made a little bit complex by the way Shiny handles the names, as it share a global pool for all the id names, with no native way to use namespaces.</p>
 <p>Namespaces are a computer science concept which has been designed to handle a common issue: how to share the same name for a variable in various place of your program without them conflicting.
 In other words, how to use an object called <code>foo</code> several times in the program, and still be sure that it’s correctly used depending on the context.
-R itself has a system for namespaces ; that’s what packages do and why you can have <code>purrr::flatten</code> and <code>jsonlite::flatten</code>: the function name is the same, but the two live in a different namespace, and they can mean two different things, as the symbol is evaluated inside two different namespaces.
+R itself has a system for namespaces ; that’s what packages do and why you can have <code>purrr::flatten</code> and <code>jsonlite::flatten</code>: the function name is the same, but the two live in different namespaces, and they can mean two different things, as the symbol is evaluated inside two different namespaces.
 If you want to learn more about namespaces, please refer to the <a href="https://adv-r.hadley.nz/environments.html#special-environments">7.4 Special environments</a> chapter from <em>Advanced R</em>.</p>
-<p>So, that’s what modules are made for: creating small namespaces where you can safely define <code>ids</code> without conflicting.
+<p>So, that’s what modules are made for: creating small namespaces where you can safely define <code>ids</code> without conflicting with other ids in the app.
 Why do we need to do that?
 Think about the number of times you’ve created a “ok” or “validate” button.
 How do you handle that?
 By creating <code>validate1</code>, <code>validate2</code>, and so on and so forth.
 And if you think about it, you’re mimicking a namespacing process: a <code>validate</code> in namespace <code>1</code>, another in namespace <code>2</code>.</p>
+<p>Consider this piece of code:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
 ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){
   <span class="kw">fluidPage</span>(
@@ -637,7 +638,7 @@ Shiny modules aim at three things: simplifying id namespacing, split the code ba
 Most of the time, modules are used to do the two first: I’d say that 90% of the module I write are never reused<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a> ; they are here to allow me to split the code base into smaller, more manageable pieces.</p>
 <p>With Shiny modules, you’ll be writing a combination of UI and server functions.
 Think of them as small, standalone Shiny apps, which output and handle a fraction of your global application.
-If you’ve been developing R packages, and you always try to split your functions into series of smaller functions, that’s the exact same thing: you are, with just a little bit of tweaking, doing the same thing.
+If you’ve been developing R packages, you’d probably trying to split your functions into series of smaller functions, that’s the exact same thing: you are, with just a little bit of tweaking, doing the same thing.
 That is to say creating smaller functions that are easier to understand, develop and maintain.</p>
 </div>
 </div>
@@ -718,9 +719,9 @@ It’s not the general pattern, but they can.</p>
 <p>In that case, you’ll potentially be using extra arguments to generate the UI and server conditionally.
 Let’s for example have a look at <a href="https://github.com/ColinFay/tidytuesday201942/blob/master/R/mod_dataviz.R#L17">mod_dataviz.R</a> from the <code>{tidytuesday201942}</code> Shiny application.</p>
 <p>This application contains 6 tabs, 4 of them being pretty much alike: a side bar with inputs, an a main panel with a button and the plot.
-This is a typical case of where you should reuse modules: if two or more parts are relatively similar, it’s easier to bundle it inside a reusable module, and condition the ui/server with function arguments.</p>
+This is a typical case where you should reuse modules: if two or more parts are relatively similar, it’s easier to bundle it inside a reusable module, and condition the ui/server with function arguments.</p>
 <p><img src="img/tidytuesdayapp.png" /></p>
-<p>Here, are some example of how it works in the UI:</p>
+<p>Here, are some examples of how it works in the UI:</p>
 <pre class="sourceCode r"><code class="sourceCode r">mod_dataviz_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id, <span class="dt">type =</span> <span class="kw">c</span>(<span class="st">&quot;point&quot;</span>, <span class="st">&quot;hist&quot;</span>, <span class="st">&quot;boxplot&quot;</span>, <span class="st">&quot;bar&quot;</span>)){
   <span class="kw">h4</span>(
     <span class="kw">sprintf</span>( <span class="st">&quot;Create a geom_%s&quot;</span>, type )
@@ -783,10 +784,10 @@ This is a typical case of where you should reuse modules: if two or more parts a
 <div id="communication-between-modules" class="section level3">
 <h3><span class="header-section-number">3.2.3</span> Communication between modules</h3>
 <p>One of the hardest part about modules is sharing data across them.
-There are at least two approach: returning reactive, or the “stratégie du petit r” (to pronounce with a french accent).</p>
+There are at least two approaches: returning reactive, or the “stratégie du petit r” (to be pronounced with a french accent).</p>
 <div id="returning-values-from-the-module" class="section level4">
 <h4><span class="header-section-number">3.2.3.1</span> Returning values from the module</h4>
-<p>One common approach is return reactive values from one module, and to pass it to another.</p>
+<p>One common approach is return a reactive from one module, and to pass it to another.</p>
 <pre class="sourceCode r"><code class="sourceCode r">name_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){
   ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)
   <span class="kw">tagList</span>(
