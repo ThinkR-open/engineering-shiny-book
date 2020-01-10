@@ -4,8 +4,11 @@
 #   x$output_dir <- "docs/wip"
 #   yaml::write_yaml(x, "_bookdown.yml")
 # }
+library(magrittr) 
+namer::name_dir_chunks(".")
 bookdown::render_book("index.Rmd", output_dir = "docs")
-git2r::add(".", "docs")
+rsconnect::writeManifest("docs")
+git2r::add(".", "*")
 git2r::commit(
   ".", message = sprintf("%s stable book build", Sys.time())
     )
