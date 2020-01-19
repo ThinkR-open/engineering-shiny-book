@@ -375,14 +375,143 @@ To sum up, a good rule to live by is that you shouldn't add a feature for the sa
 
 `r right_link("Ludwig Mies van der Rohe", "http://www.masterofdetails.fr/mies-van-der-rohe-less-is-more/")`
 
-## About Accessibility 
+## Web Accessibility 
 
-// TODO
+### About Accessibility
 
-A user interface needs to be "ready to be consumed" by the broader audience possible. 
-That means people with visual, mobility, or cognitive disabilities. 
+When building professionnal Shiny applications, you have to keep in mind that, potentially, this app will be consume by a large audience. 
+A large audience means that there's a chance that your app will be used by people with visual, mobility, or maybe cognitive disabilities^[
+And of course, other type of disabilities.
+]. 
+Web Accessibility deals with the process of making the web available to people with disabilities. 
 
-Web Accessibility is pretty standard concept in the web development world, and you can learn about this straight from the first chapter of [learn.freecodecamp.org](https://learn.freecodecamp.org/). 
--> Screen to speech technology : html semantic tags
--> Mobility impairment, people w/ parkinson for example. Example of the text input & ENTER button. Making things keyboard friendly. 
--> Color Blind, videodisc
+> The Web is fundamentally designed to work for all people, whatever their hardware, software, language, location, or ability. When the Web meets this goal, it is accessible to people with a diverse range of hearing, movement, sight, and cognitive ability.
+
+`r right_link("Accessibility in Context - The Web Accessibility Initiative", "https://www.w3.org/WAI/fundamentals/accessibility-intro/")`
+
+When learning to code a web app through "canonical" courses, you'll be introduced to web Accessibility very early.
+For example, you can learn about this straight from the first chapter of [learn.freecodecamp.org](https://learn.freecodecamp.org/). 
+The first course, "Responsive Web Design Certification", has a chapter on web accessibility just after the one on HTML and CSS. 
+
+### Making your App Accessible
+
+#### HTML element: Semantic tags, and tags metadata
+
+In HTML, there are two kind of elements: the one without "meanings" like `<div>` or `<span>`, and the one which are considered meaningful, like `<title>` or `<article>`. 
+The second ones are called "semantic tags", as they have a specific meaning in the sens that they define what they contain. 
+
+```{r, results="asis"}
+library(htmltools)
+tags$article(
+  tags$h2("Title"),
+  tags$div("Content")
+)
+```
+
+One other HTML method you can use is tags attributes as metadata. 
+Tags attributes are complementary elements you can add to a tag to add information: most of the time, you'll be using it to add a CSS class, and identifier, or maybe some events like `onclick`^[
+See the JavaScript chapter.
+].
+But these can also be used to add, for example, an alternate text to an image: this `alt` being the one which is read when the image is not available, either because the page couldn't reach the resource, or because the person navigating the app is using a screen to speech technology. 
+
+```{r eval = FALSE}
+library(shiny)
+ui <- function(request){
+  tagList(
+    plotOutput("plot") %>% 
+      tagAppendAttributes(alt = "Plot of iris")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  output$plot <- renderPlot({
+    plot(iris)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+What makes these two things similar (semantic tags and tags metadata) is that they are both unseen by user without any impairment: if the image is correcly rendered and the user is capable of reading images, chances are that this user will see the image. 
+But these elements are made for people with disabilities, and especially users who might be using screen to speech technologies: these visitors use a software that scans the textual content of the page and reads it, and that helps navigate through the page. 
+
+This navigation is also crucial when it comes to screen to speech technology: these softwares will be able to read the `<title>` tag, jump to the `<nav>`, or straight to the `<article>` on the page. 
+Hence the importance of structuring the page: these technologies need the app to be built in a structured way, so that it's possible to jump from one section to another, and other common tasks a fully capable user will commonly do. 
+
+#### Navigation 
+
+Your app user might also have mobility impairement. 
+For example, some with parkinson might be using your app, or someone with a handicap making it harder for them to move their hand and click. 
+For these users, moving an arm to grab the mouse might be challenging, and they might be navigating the web using their keyboard only. 
+
+When building your app, thinking about how these users will be able to use it is crucial: maybe there are so may button they need to __click__ that they won't be able to use it. 
+So, as much as possible, make everything doable with a keyboard: for example, if you have a `textInput()` with a validation button below, allow the user to validate by pressing the ENTER on their keyboard.
+
+```{r eval = FALSE}
+library(shiny)
+ui <- function(request){
+  tagList(
+    textInput("text", "title") %>% 
+      tagAppendAttributes(
+        onKeyPress = "Shiny.setInputValue('keypress', {value : event.key}, {priority: 'event'})"
+      ), 
+    actionButton("go", "Go")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  observeEvent( input$keypress , {
+    
+    if (input$keypress$value == "Enter"){
+      # ...
+    }
+    
+  })
+  
+}
+
+shinyApp(ui, server)
+```
+
+Note that if you need a more systemic way to do this, you can do it with the `{nter}` package:
+
+```{r}
+# Taken from https://github.com/JohnCoene/nter
+library(nter)
+library(shiny)
+
+ui <- fluidPage(
+  textInput("text", ""),
+  actionButton("send", "Don't click hit enter"),
+  verbatimTextOutput("typed"),
+  nter("send", "text") # trigger 'send' button when 'text' is active.
+)
+
+server <- function(input, output) {
+  
+  txt <- eventReactive(input$send, {
+    input$text
+  })
+
+  output$typed <- renderPrint(txt())
+}
+
+shinyApp(ui, server)
+```
+
+#### Color choices
+
+Color blindness is also a common impairment when it comes to web accessibility.
+
+### Evaluating your App Accessibility
+
+### Further reading 
+
