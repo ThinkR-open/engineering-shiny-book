@@ -395,6 +395,15 @@ The first course, "Responsive Web Design Certification", has a chapter on web ac
 
 ### Making your App Accessible
 
+#### Hierarchy
+
+Headers are not just there to make your application stylish. 
+`<h1>` to `<h6>` are there so they can create a hierarchy inside your webpage: `<h1>` being more important (hierarchically speaking) than `<h2>`.
+In a perfectly designed website, you'd only have one header of level 1, a small amount of level 2 headers, more header of level 3, etc. 
+
+Hence, you shouldn't rely on the header level for styling: don't use an `<h1>` because you need a larger title somewhere in your app. 
+If you want to increase the size of an header, use CSS, which we will see in an upcoming chapter.
+
 #### HTML element: Semantic tags, and tags metadata
 
 In HTML, there are two kind of elements: the one without "meanings" like `<div>` or `<span>`, and the one which are considered meaningful, like `<title>` or `<article>`. 
@@ -440,7 +449,9 @@ What makes these two things similar (semantic tags and tags metadata) is that th
 But these elements are made for people with disabilities, and especially users who might be using screen to speech technologies: these visitors use a software that scans the textual content of the page and reads it, and that helps navigate through the page. 
 
 This navigation is also crucial when it comes to screen to speech technology: these softwares will be able to read the `<title>` tag, jump to the `<nav>`, or straight to the `<article>` on the page. 
-Hence the importance of structuring the page: these technologies need the app to be built in a structured way, so that it's possible to jump from one section to another, and other common tasks a fully capable user will commonly do. 
+Hence the importance of structuring the page: these technologies need the app to be built in a structured way, so that it's possible to jump from one section to another, and other common tasks a fully capable user will commonly do.
+
+Some other tags exists and can be used for semantic purpose: for example `<address>`, `<video>`, or `<label>`.
 
 #### Navigation 
 
@@ -510,8 +521,109 @@ shinyApp(ui, server)
 #### Color choices
 
 Color blindness is also a common impairment when it comes to web accessibility.
+And it's a rather common deficiency: according to [colourblindawareness.org](http://www.colourblindawareness.org/), _"colour (color) blindness (colour vision deficiency, or CVD) affects approximately 1 in 12 men (8%) and 1 in 200 women in the world"_.
 
-### Evaluating your App Accessibility
+Keeping in mind this prevalence of color blindness is even more important in the context of Shiny, where we are developing data science products, which most of the time include data visualisation. 
+If designed wrong, dataviz can be unreadable for some specific type of color blindness. 
+That's why we recommend using the `viridis` palette, which has been created to be readble by the most common types of color blindess. 
 
-### Further reading 
+Here are for example a visualisation through the lense of various type of color blindness: 
 
+```{r}
+# Function to generate the graph
+with_palette <- function(palette) {
+  x <- y <- seq(-8 * pi, 8 * pi, len = 40)
+  r <- sqrt(outer(x^2, y^2, "+"))
+  filled.contour(cos(r^2) * exp(-r / (2 * pi)),
+    axes = FALSE,
+    color.palette = palette,
+    asp = 1
+  )
+}
+
+```
+
+With the `jet.colors` palette from `{matlab}`
+
+```{r}
+with_palette(matlab::jet.colors)
+```
+
+```{r}
+with_palette(viridis::viridis)
+```
+
+Even without color-blindness, it's already way more readable.
+But let's now use the `{dichromat}` package to simulate color blindness.
+
+```{r}
+library(dichromat)
+library(purrr)
+```
+
++ Deutan with `jet.colors` and `viridis`
+
+```{r}
+graph <- partial(dichromat, type = "deutan")
+with_palette(
+  compose( graph, matlab::jet.colors )
+)
+with_palette(
+  compose( graph, viridis::viridis )
+)
+```
+
+
++ Protan with `jet.colors` and `viridis`
+
+```{r}
+graph <- partial(dichromat, type = "protan")
+with_palette(
+  compose( graph, matlab::jet.colors )
+)
+with_palette(
+  compose( graph, viridis::viridis )
+)
+```
+
++ Tritan with `jet.colors` and `viridis`
+
+```{r}
+graph <- partial(dichromat, type = "tritan")
+with_palette(
+  compose( graph, matlab::jet.colors )
+)
+with_palette(
+  compose( graph, viridis::viridis )
+)
+```
+
+```{r}
+par(mfrow=c(2,1))
+with_palette(
+  compose(
+    partial(dichromat, type = "deutan"),
+    matlab::jet.colors
+    )
+)
+with_palette(
+  compose(
+    partial(dichromat, type = "deutan"),
+    viridis::viridis
+    )
+)
+```
+
+As you can see, the viridis palette always gives a more readable graph than the `jet.colors` one. 
+And, the plus side, it looks fantastic. 
+So don't hesitate to try and use it!
+
+### Evaluating your App Accessibility & Further reading 
+
++ [Evaluating Web Accessibility](https://www.w3.org/WAI/test-evaluate/), with lengthy reports and advices about checking the accessibility of your website
+
++ [https://www.webaccessibility.com/](https://www.webaccessibility.com/) has an online checker for webpage accessibility, and allows you to freely test 5 pages.
+
+![](img/hexmakeaccessibility.png)
+
+> {hexmake} accessibility results
