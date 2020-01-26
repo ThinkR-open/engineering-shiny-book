@@ -2,10 +2,83 @@
 
 # The Need for Optimization {#when-optimize}
 
+> The most powerful optimization technique in any programmer’s toolbox is to do nothing.
+
+`right_link("The Art of Unix Programming", "")`
+
 ## Build first, then optimize
 
-// TODO 
+### Identifying bottlenecks
+
+As Donald Knuth puts it _"Premature optimization is the root of all evil"_. 
+What does that means? 
+That focusing on optimizing small portions of your app before making it work fully is the best way to lose time along the way. 
+Even more if you're not carefully using profiling tools: say your application is a little bit slow, or using too many memory, and you've got a specific bottleneck in your app. 
+
+// TODO: diagram of an application bottleneck
+
+This is the very thing you should be optimizing: having faster code anywhere else expect this bottleneck won't make your app faster—you'll just make your app reach the bottleneck faster, but there will still be this part of your app that slows everything down. 
+But it's something you might only realize when the app is fully built: pieces might be fast together, but slow when put together. 
+It's also possible that the test dataset you've been using from the start works just fine, but when you try your app with a bigger, more realistic dataset, or maybe you've been using an example dataset so that you don't have to query the database every time you implement a new feature, and the SQL query to the database is very slow. 
+
+### Do you need faster functions?
+
+Optimizing an app is a matter of trade-offs: of course, in a perfect world, every piece of the app would be tailored to be fast, easy to maintain, and elegant. 
+But in our world, you have deadlines, limited times, and we're all but humans. 
+That means that at the end of the day, your app won't be completely perfect: a software can __always__ be better. 
+No piece of code has ever reached complete perfection. 
+But do you want to spend 5 days out of the 30 you've planned optimizing a function so that it runs in a quarter of a second instead of half a second, then realize the critical bottleneck of your app is actually the SQL query and not the data manipulation? 
+Of course a function runnning two times faster is a good thing, but think about it in context: for example, how many times is this function called ? 
+We can safely bet that if your function is only called once, making it twice faster is a little bit too much, unless you have unlimited time to work on your project. 
+And in that case lucky you, you can spend a massive amount of time building the perfect software.
+
+### Don't sacrifice readability
+
+As said in the last section, every piece of code can be rewritten to be faster, either from R to R or using a lower level language: for example C or C++. 
+You can also rebuild data manipulation code from one package to another, use complexe data structures to optimizing memory usage, etc, etc.
+But that comes with a price: not keeping thing simples for the sake of local optimization makes maintainance harder, even more if you're using a lesser known language/package, which implies that you might be the only person alive being able to maintain a portion of code, or that your colleague taking over the project will have to spend hours learning the tools you've been building. 
+So think about it: is local optimization worth the extra hours you'll have to spend correcting bugs when the app will crash and when you'll be the only one able to correct it?
+
+For example, let's compare both these implementations of the same function, one in R, and one in C++. 
+Of course, the C++ function is faster than the R one—this is the very reason of using C++ with R. 
+Though, how much faster is worth the trade-off of being sure you'll get someone in your team to take over the maintainance if needed? 
+Using external languages or complex data structures implies that from the start, you'll need to think about who and how your codebase will be maintain over the years. 
+
+```{r when-optimize-1}
+library("Rcpp")
+cppFunction("
+bool isOddCpp(int num) {
+   int result = (num % 2 == 1);
+   return result;
+}")
+isOddR <- function(num = 10L) { 
+  result <- (num %% 2L == 1L) 
+  return(result)
+} 
+isOddR(42L)
+isOddCpp(42L)
+
+microbenchmark::microbenchmark(
+  cpp = isOddCpp(42L),
+  native = isOddR(42L)
+)
+```
+
+So, to sum up, there are three ways to optimize your application & R code, and the bad news is that you' can't optimize for all of them: 
+
++ Optimizing for speed
++ Optimizing for memory
++ Optimizing for readability
+
+Leading a successful project means that you should, as much as possible, find the perfect balance between these three. 
 
 ## Tools for profiling 
 
+### Profiling R code 
+
+// TODO 
+
+### Profiling Shiny
+
 // TODO
+

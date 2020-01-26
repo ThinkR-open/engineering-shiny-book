@@ -116,7 +116,7 @@ golem::expect_html_equal(my_mod_ui("test"), my_mod_ui_test)
 ```
 
 `{golem}` also provides two functions, `expect_shinytag()` and `expect_shinytaglist()`, that test if an object is of class `"shiny.tag"` or  `"shiny.tag.list"`.
- 
+
 + Testing package launch: when launching `golem::use_recommended_tests()`, you'll find a test built on top of `{processx}` that allows to check if the application is launch-able. Here's a short description of what happens: 
 
 ```{r structure-3, eval = FALSE}
@@ -157,11 +157,11 @@ For example:
 
 ```
 test:
-  stage: test
-  script: 
-  - echo "Running tests"
-  - R -e 'remotes::install_local()'
-  - R -e 'devtools::check()'
+stage: test
+script: 
+- echo "Running tests"
+- R -e 'remotes::install_local()'
+- R -e 'devtools::check()'
 ```
 
 - in `test-golem.R`:
@@ -272,7 +272,7 @@ If you want to learn more about namespaces, please refer to the [7.4 Special env
 
 So, that's what modules are made for: creating small namespaces where you can safely define `ids` without conflicting with other ids in the app. 
 Why do we need to do that? 
-Think about the number of times you've created a "ok" or "validate" button. 
+Think about the number of times you've created a "OK" or "validate" button. 
 How do you handle that? 
 By creating `validate1`, `validate2`, and so on and so forth. 
 And if you think about it, you're mimicking a namespacing process: a `validate` in namespace `1`, another in namespace `2`. 
@@ -663,7 +663,95 @@ Then the small POC becomes an interesting idea.
 Then this idea becomes a strategical asset. 
 And before you know it your 'not-that-fancy' app needs to become larger 
 
-## Splitting your app into files
+## Structuring your app 
+
+### Business logic & application logic
+
+If you think of the how your application is composed, there are two main things that make it run: 
+
++ Application logic, which are the things that make your Shiny app interactive: structure, buttons, table, interactivity, etc. 
+These application logic is not specific to your core business: you could use it for any other line of work.
+Most of the time, these functions have no other use case than your interactive application: they are not meant to be used outside your app, and could work in a lot of other professional context.
+
++ Business logic, which are the core algorithms and functions that make your application specific to your area of work. 
+You can recognize these as they can be run outside any interactive context. 
+For example, if you've been making specific computation and algorithm, if you have a custom plot or `geom` for `{ggplot2}`, if your doing specific calls to a database, etc. 
+
+These two families of functions do not have to live together, and they shouldn't if you want to keep your sanity when you'll be building an app—you'll end up having to rerun the app from scratch and spend 3 minutes clicking everywhere just to be sure you've correctly set the color palette for the graph on the last `tabPanel()`. 
+Trust us, we've been there, and it's not pretty. 
+
+So what's the way to go? 
+Extract the business function from the reactive functions. 
+Literally.
+Compare this pattern:
+
+```{r structure-1-bis, eval = FALSE}
+library(shiny)
+library(dplyr)
+ui <- function(request){
+  tagList(
+    tableOutput("tbl")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  output$tbl <- renderTable({
+    mtcars %>%
+      # [...] %>% 
+      # [...] %>% 
+      # [...] %>% 
+      # [...] %>% 
+      # [...] %>% 
+      top_n(10)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+To this one:
+
+```{r structure-2-bis, eval = FALSE}
+library(shiny)
+library(dplyr)
+top_this <- function(tbl){
+  tbl %>%
+    # [...] %>% 
+    # [...] %>% 
+    # [...] %>% 
+    # [...] %>% 
+    top_n(10)
+}
+
+ui <- function(request){
+  tagList(
+    tableOutput("tbl")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  output$tbl <- renderTable({
+    top_this(mtcars)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+They both do the exact same thing. 
+The difference being that the first can be easily explored without having to relaunch the app. 
+It also can be tested, documented, and reused outside the app. 
+And the other benefit you'll get from that approach is that it lower the cognitive load when debugging: you are either debugging an application issue, or a business logic issue, but never debugging both of them at the same time.
+So put them in a separate file, so that you'll be able to work and test them without having to relaunch your whole app for the 300th time of the day. 
+And if you want to be even more strict about this, you can write a package for these functions, so that they are neatly separated from the package containing the Shiny application.
 
 ### Small is beautiful (bis repetita)
 
