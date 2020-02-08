@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Vincent Guyader, Cervan Girard, Sébastien Rochette" />
 
 
-<meta name="date" content="2020-02-08" />
+<meta name="date" content="2020-02-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -310,8 +310,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12" data-path="step-secure.html"><a href="step-secure.html"><i class="fa fa-check"></i><b>12</b> Build yourself a safety net</a><ul>
 <li class="chapter" data-level="12.1" data-path="step-secure.html"><a href="step-secure.html#testing-your-app"><i class="fa fa-check"></i><b>12.1</b> Testing your app</a><ul>
 <li class="chapter" data-level="12.1.1" data-path="step-secure.html"><a href="step-secure.html#testing-the-business-logic"><i class="fa fa-check"></i><b>12.1.1</b> Testing the business logic</a></li>
+<li class="chapter" data-level="12.1.2" data-path="step-secure.html"><a href="step-secure.html#testing-the-interactive-logic"><i class="fa fa-check"></i><b>12.1.2</b> Testing the interactive logic</a></li>
+<li class="chapter" data-level="12.1.3" data-path="step-secure.html"><a href="step-secure.html#testing-the-app-load"><i class="fa fa-check"></i><b>12.1.3</b> Testing the app load</a></li>
 </ul></li>
-<li class="chapter" data-level="12.2" data-path="step-secure.html"><a href="step-secure.html#a-reproducible-environment"><i class="fa fa-check"></i><b>12.2</b> A reproducible environment</a></li>
+<li class="chapter" data-level="12.2" data-path="step-secure.html"><a href="step-secure.html#a-reproducible-environment"><i class="fa fa-check"></i><b>12.2</b> A reproducible environment</a><ul>
+<li class="chapter" data-level="12.2.1" data-path="step-secure.html"><a href="step-secure.html#renv"><i class="fa fa-check"></i><b>12.2.1</b> {renv}</a></li>
+<li class="chapter" data-level="12.2.2" data-path="step-secure.html"><a href="step-secure.html#docker-rstudio-connect"><i class="fa fa-check"></i><b>12.2.2</b> Docker &amp; RStudio Connect</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="secure.html"><a href="secure.html"><i class="fa fa-check"></i><b>13</b> Version Control</a><ul>
 <li class="chapter" data-level="13.1" data-path="secure.html"><a href="secure.html#using-version-control-with-git"><i class="fa fa-check"></i><b>13.1</b> Using Version Control with <code>git</code></a><ul>
@@ -451,14 +456,14 @@ Here is a simple example with <code>{memoise}</code>:</p>
 <span id="cb126-7"><a href="optimizing-shiny-code.html#cb126-7"></a>mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct)</span>
 <span id="cb126-8"><a href="optimizing-shiny-code.html#cb126-8"></a><span class="kw">tic</span>()</span>
 <span id="cb126-9"><a href="optimizing-shiny-code.html#cb126-9"></a><span class="kw">mfct</span>(<span class="dv">2</span>)</span></code></pre></div>
-<pre><code>[1] &quot;2020-02-08 23:43:19 CET&quot;</code></pre>
+<pre><code>[1] &quot;2020-02-09 00:06:29 CET&quot;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span id="cb128-1"><a href="optimizing-shiny-code.html#cb128-1"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>2.008 sec elapsed</code></pre>
+<pre><code>2.012 sec elapsed</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span id="cb130-1"><a href="optimizing-shiny-code.html#cb130-1"></a><span class="kw">tic</span>()</span>
 <span id="cb130-2"><a href="optimizing-shiny-code.html#cb130-2"></a><span class="kw">mfct</span>(<span class="dv">2</span>)</span></code></pre></div>
-<pre><code>[1] &quot;2020-02-08 23:43:19 CET&quot;</code></pre>
+<pre><code>[1] &quot;2020-02-09 00:06:29 CET&quot;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="optimizing-shiny-code.html#cb132-1"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>0.08 sec elapsed</code></pre>
+<pre><code>0.054 sec elapsed</code></pre>
 <p>Let’s try with another example that might look more like what we can find in a Shiny App: connecting to a database</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="optimizing-shiny-code.html#cb134-1"></a>con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</span>
 <span id="cb134-2"><a href="optimizing-shiny-code.html#cb134-2"></a>  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </span>
@@ -468,7 +473,7 @@ Here is a simple example with <code>{memoise}</code>:</p>
 <span id="cb134-6"><a href="optimizing-shiny-code.html#cb134-6"></a>  con, </span>
 <span id="cb134-7"><a href="optimizing-shiny-code.html#cb134-7"></a>  <span class="st">&quot;diams&quot;</span>, </span>
 <span id="cb134-8"><a href="optimizing-shiny-code.html#cb134-8"></a>  dplyr<span class="op">::</span><span class="kw">bind_rows</span>(</span>
-<span id="cb134-9"><a href="optimizing-shiny-code.html#cb134-9"></a>    purrr<span class="op">::</span><span class="kw">rerun</span>(<span class="dv">100</span>, ggplot2<span class="op">::</span>diamonds)</span>
+<span id="cb134-9"><a href="optimizing-shiny-code.html#cb134-9"></a>    purrr<span class="op">::</span><span class="kw">rerun</span>(<span class="dv">10</span>, ggplot2<span class="op">::</span>diamonds)</span>
 <span id="cb134-10"><a href="optimizing-shiny-code.html#cb134-10"></a>  )</span>
 <span id="cb134-11"><a href="optimizing-shiny-code.html#cb134-11"></a>)</span>
 <span id="cb134-12"><a href="optimizing-shiny-code.html#cb134-12"></a></span>
@@ -481,17 +486,17 @@ Here is a simple example with <code>{memoise}</code>:</p>
 <span id="cb134-19"><a href="optimizing-shiny-code.html#cb134-19"></a><span class="kw">tic</span>()</span>
 <span id="cb134-20"><a href="optimizing-shiny-code.html#cb134-20"></a>res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</span>
 <span id="cb134-21"><a href="optimizing-shiny-code.html#cb134-21"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>7.782 sec elapsed</code></pre>
+<pre><code>0.972 sec elapsed</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="optimizing-shiny-code.html#cb136-1"></a><span class="kw">tic</span>()</span>
 <span id="cb136-2"><a href="optimizing-shiny-code.html#cb136-2"></a>res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</span>
 <span id="cb136-3"><a href="optimizing-shiny-code.html#cb136-3"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>0.021 sec elapsed</code></pre>
+<pre><code>0.025 sec elapsed</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span id="cb138-1"><a href="optimizing-shiny-code.html#cb138-1"></a><span class="kw">all.equal</span>(res_a, res_b)</span></code></pre></div>
 <pre><code>[1] TRUE</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="optimizing-shiny-code.html#cb140-1"></a><span class="kw">tic</span>()</span>
 <span id="cb140-2"><a href="optimizing-shiny-code.html#cb140-2"></a>res_c &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</span>
 <span id="cb140-3"><a href="optimizing-shiny-code.html#cb140-3"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>2.024 sec elapsed</code></pre>
+<pre><code>0.201 sec elapsed</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="optimizing-shiny-code.html#cb142-1"></a><span class="kw">setequal</span>(res_a, res_c)</span></code></pre></div>
 <pre><code>[1] FALSE</code></pre>
 <p>Note that you can change where the cache is stored by <code>{memoise}</code>. Here, we’ll save it in the temp directory, but don’t do this in production.</p>
@@ -502,8 +507,8 @@ Here is a simple example with <code>{memoise}</code>:</p>
 <span id="cb145-4"><a href="optimizing-shiny-code.html#cb145-4"></a>res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</span>
 <span id="cb145-5"><a href="optimizing-shiny-code.html#cb145-5"></a>res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</span>
 <span id="cb145-6"><a href="optimizing-shiny-code.html#cb145-6"></a>fs<span class="op">::</span><span class="kw">dir_ls</span>(tpd)</span></code></pre></div>
-<pre><code>/var/folders/5z/rm2h62lj45d332kfpj28c8zm0000gn/T/RtmpLNTaBt/uviqtfgnpw/92059a5d24bd2269
-/var/folders/5z/rm2h62lj45d332kfpj28c8zm0000gn/T/RtmpLNTaBt/uviqtfgnpw/a69594dd7f9457a8</code></pre>
+<pre><code>/var/folders/5z/rm2h62lj45d332kfpj28c8zm0000gn/T/RtmpHwHaFl/uviqtfgnpw/352e65d5b419cb18
+/var/folders/5z/rm2h62lj45d332kfpj28c8zm0000gn/T/RtmpHwHaFl/uviqtfgnpw/9661739f96e59424</code></pre>
 <p>As you can see, I now have two cache objects inside the directory I’ve specified as a <code>cache_filesystem</code>.</p>
 </div>
 <div id="caching-shiny" class="section level3">
@@ -591,8 +596,9 @@ Listening on http://127.0.0.1:8268</code></pre>
 <span id="cb149-45"><a href="optimizing-shiny-code.html#cb149-45"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <pre><code>
 Listening on http://127.0.0.1:7319</code></pre>
-<pre><code>Warning in gzfile(file, mode): cannot open compressed file &#39;cache//
-66f8f39d62e22e0a&#39;, probable reason &#39;No such file or directory&#39;</code></pre>
+<pre><code>Warning in gzfile(file, mode): cannot open compressed file
+&#39;cache//16ef352ce1eb582c&#39;, probable reason &#39;No such file or
+directory&#39;</code></pre>
 <pre><code>Warning: Error in gzfile: cannot open the connection</code></pre>
 <p><img src="building-shiny-apps-workflow_files/figure-html/optimizing-shiny-code-5-1.png" width="672" /></p>
 <p>You’ll see that the first time you run this piece of code, it will take a couple of seconds to render the table for a new <code>input$cut</code> value.
@@ -605,8 +611,8 @@ If your application needs “fresh” data every time it is used, for example be
 <pre><code># A tibble: 2 x 1
          size
   &lt;fs::bytes&gt;
-1       4.33M
-2      18.46M</code></pre>
+1     462.31K
+2       1.86M</code></pre>
 <p>Managing cache at a system level is out of scope for this book, but note that the most commonly accepted rule for deleting cache is called <strong>LRU</strong>, for <strong>Least Recently Used</strong>.
 The underlying principle of this approach is that users tend to need what they have needed recently: hence the more a piece of data has been used recently, the more likely it is that it will be needed soon.</p>
 <p>And this can be seen with:</p>
@@ -614,8 +620,8 @@ The underlying principle of this approach is that users tend to need what they h
 <pre><code># A tibble: 2 x 1
   access_time        
   &lt;dttm&gt;             
-1 2020-02-08 23:44:34
-2 2020-02-08 23:45:33</code></pre>
+1 2020-02-09 00:06:37
+2 2020-02-09 00:07:11</code></pre>
 </div>
 </div>
 <div id="paralellizing-shiny" class="section level2">
