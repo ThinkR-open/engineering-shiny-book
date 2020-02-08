@@ -1,4 +1,4 @@
-# (PART) Step 4: Secure {-}
+# (PART) Step 4: Strengthen {-}
 
 # Build yourself a safety net {#step-secure}
 
@@ -6,16 +6,46 @@
 
 > JD 
 
-Securing your app means two things: testing, and locking the application environment.
+Strengthening your app means two things: testing, and locking the application environment.
 
 ## Testing your app
 
+### Testing the business logic
+
+If you have been following the good practices we have listed in previous chapters, your current application has at least these two properties: 
+
++ The business-logic functions are separated from your interactive-logic functions.
++ Your application is inside a package.
+
+On top of being a sane organization approach, using this separation inside a package structure allows to leverage all the tooling that has been built for testing "standard" packages. 
+
+R developers have been developing packages for a long time, and at the time of writing these lines (February 2020), more than 15,000 packages are available on CRAN. 
+To sustain these developments, a lot of tooling has been created to secure the development process, and especially in the field of creating unit tests for your package.
+
+Unit tests are a general concept in software engineering that describes the process of writing a form of assessment of your code validity. 
+A simplified explanation is that if you write a function call `meaning_of_life` that returns `42`, you will expect this function to always return `42`, and to be alerted if ever this value changes. 
+Using unit tests is a way to secure your work in the future, be it from future you or from collaborator: if anyone comes and change the code behind `meaning_of_life` so that the result is no longer `42`, the developer working on this piece of code will be able to catch it. 
+
+There are several packages in R that can be used to implement unit testing, and you can even implement your own tests. 
+One of the most popular right now^[
+Based on the number of Reverse dependencies & suggests at https://cran.r-project.org/web/packages/testthat/index.html
+] is [`{testthat}`](https://testthat.r-lib.org/), by Hadley Wickham.
+
+Example of a test: 
+
+``` r
+test_that("The meaning of life is 42", {
+  expect_equal(
+    meaning_of_life(), 
+    42
+  )
+})
+```
+
++ 
+
 // TODO
 
-So first, be sure to include tests all along the building process — just like any other R code. 
-As the app is contained in a package, you can use standard testing tools for testing the business logic of your app — as said in the first part, it’s important to split the backend functions and algorithm from the user interface. 
-That means that these backend functions can run outside of the application.
-And yes, if they can run outside of the app, they can be tested the standard way, using {testthat}.
 
 When it comes to testing the front end, you can try the {shinytest} package from RStudio, if you need to be sure there is no visual regression all along the project development. 
 {shinyloadtest}, on the other hand, tests how an application behaves when one, two, three, twenty, one hundred users connect to the app, and gives you a visual report about the connection and response time of each session.

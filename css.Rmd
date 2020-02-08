@@ -4,13 +4,30 @@
 
 ### About CSS
 
-CSS, for `Cascading Style Sheets`, is one of the most commonly used technology that powers the web today, along wîth HTML and JavaSCript. 
-HTML is a series of tags that define your web page structure, and JavaScript is a language that allows you to manipulate the page (well, it can do a lot more than that, but we're simplifying to make it understandable). 
-CSS is what handles the design, i.e. the visual interface of the webpage: the color of the header, the font, the background, and things like that (again, we're simplifying for the sake of clarity). 
-Every HTML element is shown with a default style: for example all `<h1>` have the size `2em` and are in bold, and `<strong>` is in bold.
-This is what we'll be using CSS for: overriding these default values.
+CSS, for `Cascading Style Sheets`, is one of main technologies that power the web today, along with HTML and JavaScript. 
+HTML is a series of tags that define your web page structure, and JavaScript is a programming language that allows you to manipulate the page (well, it can do a lot more than that, but we're simplifying to make it understandable). 
+CSS is what handles the design, i.e. the visual rendering of the web page: the color of the header, the font, the background, and everything that makes a web page looks like it's not from 1983 (again, we're simplifying for the sake of clarity). 
+On every browser, each HTML element has a default style: for example all `<h1>` have the size `2em` and are in bold, and `<strong>` is in bold.
+But we might not be happy with what a "standard page" (with no CSS) looks like: that's the very reason of CSS, modifying the visual rendering of the page. 
 
-In Shiny, there is a default CSS: the one from Bootstrap. 
+If you want to get an idea of the importance of CSS, try installing extensions like [Web Developer](https://chrome.google.com/webstore/detail/web-developer/bfbameneiokkgbdmiekhjnmfkcnldhhm) for Google Chrome. 
+Then, if you go on the extension and choose CSS, click "Disable All Style", to see what a page without CSS looks like. 
+
+For example, here is what [rtask.thinkr.fr](https://rtask.thinkr.fr) looks like: 
+
+![](img/rtask_with_css.png)
+
+And here is what it looks like without CSS:
+
+![](rtask_without_css.png)
+
+![](rtask_without_css2.png)
+
+CSS now seems pretty useful right?
+
+### Shiny's default: `fluidPage()`
+
+In Shiny, there is a default CSS: the one from Bootstrap 4. 
 As you can see if you have created a `fluidPage()` before, there is already styling applied. 
 
 Compare: 
@@ -67,8 +84,141 @@ Yes, that's subtle, but you can see how it makes the difference on larger apps.
 
 ## Getting started with CSS 
 
-// TODO
+CSS is a descriptive language, meaning that you will have to declare the style either on a tag or inside an external file. 
+We will see how to integrate CSS inside your Shiny application in the next section, but before that, let's start with a short introduction to CSS^[
+Of course, this part will not make you an expert CSS programmer, but we hope you will get an idea of how it works, enough to get you started and want to learn more!
+].
+
+### About CSS syntax
+
+CSS syntax is composed of two elements: a selector, and a declaration block. 
+The CSS selector describes how to identify the HTML tags that will be affected by the style declared with key-value pairs in the declaration block that follows.
+And because an example will be easier to understand, here is a simple CSS rule:
+
+``` css
+h2 {
+  color:red;
+}
+```
+
+Here, the selector is `h2`, meaning that the HTML tags aimed by the style are the `<h2>` tags. 
+The declaration block contains the key-value pair telling that the `color` will be `red`.
+Note that each key-value pair must end with a semicolon. 
+
+### CSS selectors
+
+CSS selectors are a wide topic, as there are many combinations of things you might want to select inside an HTML page. 
+
+The first type of selectors are the "standard" ones `name`, `id`, or `class`. These refer to the elements composing an HTML tag: for example, with `<h2 id = "tileone" class = "standard">One</h2>`, the name is `h2`, the id `tileone`, and the class `standard`^[
+Note that in HTML, id must be unique, but class must not.
+].
+
+To select these three elements in CSS: 
+
++ Write the name as-is: `h2`
++ Prefix the id with `#`: `#tileone`
++ Prefix the class with `.`: `.standard`
+
+You can also combine these elements, for example `h2.standard` will select all the `h2` tags with a class `standard`, and `h2,h3` will select the `h2` and the `h3`.
+
+You can build more complex selectors: for example `div.standard > p` will select all the `<p>` tags that are contained inside a `div` of class `standard` (CSS combinator), or `a:hover`, which dictates the style of the `a` tags when they are hovered by the mouse (CSS pseudo-class), `div.standard::first-letter`, that select the first letter of the `div` of class `standard` (CSS pseudo-elements), and `h2[data-value="hey"]`, which selects all the `h2` with a `data-value` attribute set to `"hey"` (CSS attribute selector). 
+
+As you can see, lots of complex selectors can be built with CSS, to target very specific elements of your UI. 
+But mastering these complex selectors is not the main goal of this chapter, hence we will just be using standard selectors in the rest of the examples in this book. 
+
+### CSS properties
+
+Now that you have selected elements, it is time to apply some styles!
+Between the brackets of the declaration block, you will have to define a series of key-value elements defining the properties of the style: the key here is the css property, followed by its value.
+
+For example, `color: red;` or `text-align: center;` define that for the selected HTML elements, the color will be red, or the text centered. 
+We will not cover all the possible properties, as there hundreds of them. 
+Feel free to refer to the [CSS Reference](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference) page from Mozilla for an exhaustive list of available properties.
 
 ## Integrate CSS files to your Shiny App
 
+Ok, but now you've got a grasp on how to getting started writing your own CSS, how do you integrate it inside your Shiny Application? 
+There are two methods that can be used: integrating it inside a `tags$script()` straight into you application UI code, or by writing it into an external file. 
+Note that the good practice is considered to be the integration of an external file. 
+
+### Inline CSS
+
+If you need to add style to one specific element, you can write it straight inside the HTML tag:
+
+```{r css-1-bis}
+library(shiny)
+ui <- function(request){
+  tagList(
+    h2(style = "color:red;", "This is red")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+
+}
+
+shinyApp(ui, server)
+```
+
+But this method loses all the advantages of CSS, notably the possibility to apply style to multiple elements. 
+Use it with caution.
+
+### Writing in a `tags$style()`
+
+If you had a `tags$style()` somewhere inside your UI code (generally at the very beginning of your UI), you can then add CSS code straight to your application. 
+
+Here is an example: 
+
+```{r css-2-bis}
+library(shiny)
+ui <- function(request){
+  tagList(
+    tags$style(
+      "h2{
+        color:red;
+      }"
+    ), 
+    h2("This is red")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+
+}
+
+shinyApp(ui, server)
+```
+
+This works, but shouldn't be considered as the best option: indeed, if you have a large amount of CSS code to insert to your app, it can make the code harder to read as it adds a large amount of visual noise.
+That's why it's best to go with the alternative of writing the CSS inside a separate file: it allows to separate things and to make the UI code lighter, as it's easier to maintain a separate CSS file than CSS written straight into R code. 
+
+### Including External Files
+
+To include an external CSS file, you will have to use another tags: `tags$link()`.
+What this tag will contain is these three elements: 
+
++ `rel="stylesheet"`
++ `type="text/css"`
++ `href="www/custom.css"`
+
+The first two are standard: you do not need to change them, they are necessary to indicate to the HTML page that you are creating a stylesheet, with the type being text/css.
+The `href` is the one you will need to change: this path points to where your style file is located. 
+
+If you are building your application with `{golem}`, the good news is that this file creation and linking is transparent: if you call `golem::add_css_file("name")`, a file will be created at `inst/app/www`, and this file will be automatically linked inside your UI thanks to the `bundle_resouces()` function. 
+
+### Using R packages
+
 // TODO
+
+## External resources 
+
+// TODO
+

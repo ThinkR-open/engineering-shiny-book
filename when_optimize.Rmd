@@ -4,7 +4,7 @@
 
 > The most powerful optimization technique in any programmer’s toolbox is to do nothing.
 
-`right_link("The Art of Unix Programming", "")`
+`r right_link("The Art of Unix Programming", "")`
 
 ## Build first, then optimize
 
@@ -41,28 +41,30 @@ So think about it: is local optimization worth the extra hours you'll have to sp
 
 For example, let's compare both these implementations of the same function, one in R, and one in C++. 
 Of course, the C++ function is faster than the R one—this is the very reason of using C++ with R. 
-Though, how much faster is worth the trade-off of being sure you'll get someone in your team to take over the maintainance if needed? 
-Using external languages or complex data structures implies that from the start, you'll need to think about who and how your codebase will be maintain over the years. 
+Though, how much faster is worth the trade-off of being sure you'll get someone in your team to take over the maintenance if needed? 
+Using external languages or complex data structures implies that from the start, you'll need to think about who and how your code base will be maintain over the years. 
 
 ```{r when-optimize-1}
 library("Rcpp")
 cppFunction("
-bool isOddCpp(int num) {
-   int result = (num % 2 == 1);
-   return result;
+double mean_cpp(NumericVector x) {
+  int j;
+  int size = x.size();
+  double res = 0;
+  for (j = 0; j < size; j++){
+    res = res + x[j];
+  }
+  return res / size;
 }")
-isOddR <- function(num = 10L) { 
-  result <- (num %% 2L == 1L) 
-  return(result)
-} 
-isOddR(42L)
-isOddCpp(42L)
 
-microbenchmark::microbenchmark(
-  cpp = isOddCpp(42L),
-  native = isOddR(42L)
+bench::mark(
+  cpp = mean_cpp(1:100),
+  native = mean(1:100), 
+  iterations = 1000
 )
 ```
+
+(Note: we'll come back on `bench::mark` in the next chapter)
 
 So, to sum up, there are three ways to optimize your application & R code, and the bad news is that you' can't optimize for all of them: 
 
@@ -76,7 +78,91 @@ Leading a successful project means that you should, as much as possible, find th
 
 ### Profiling R code 
 
-// TODO 
+#### Identifying bottlenecks
+
+The best way to profile R code is by using the `{profvis}` package^[
+`{utils}` also comes with a function call `Rprof()`, but we won't be examining this one here.
+], a package designed to evaluate how much time each part of a function call take. 
+That way, you can spot the bottleneck of your function, a task which would have to be done by guessing, which will, most of the time, come with bad guesses: 
+
+> One of the lessons that the original Unix programmers learned early is that intuition is a poor guide to where the bottlenecks are, even for one who knows the code in question intimately.
+
+`r right_link("The Art of Unix Programming", "")`
+
+Using a tool like `{profvis}` allows to have a details view of what takes a long time to run in your R code. 
+Here is how it works: 
+
+```{r when-optimize-1-bis, eval = FALSE}
+x <- function(){
+  profvis::pause(0.1)
+  lapply(1:10, function(x){
+    x * 10
+  })
+  y()
+}
+
+y <- function(){
+  profvis::pause(0.2)
+  1e4 * 9
+  z()
+}
+
+z <- function(){
+  profvis::pause(0.3)
+  print("hey")
+}
+profvis::profvis({
+  x()
+})
+```
+
+![](img/profviz_out.png)
+
+What you see now is what is called a `flame graph`: it's a detailled timing of how your function has run. 
+What you see on top is the expression evaluated, and on the bottom a detail of the call stack, with what looks like a Gantt diagram. 
+This result reads as such: the wider the function call, the more time it has taken R to computer this piece of code. 
+If you hover over one of the band, you'll get more details about the function call timing. 
+
+Here it is, now you have identified bottlenecks!
+
+#### Benchmarking R Code
+
+Identifying bottlenecks is a start, but what to do now? 
+In the chapter about optimization, we'll dive deeper into common strategies for optimizing R & Shiny code. 
+But before that, remember this rule: __never start optimizing if you can't benchmark this optimization__.
+Why? 
+Because developers are not perfect and some optimization technics might lead to slower code.
+Of course, most of the time they won't, but in some cases adopting optimization technics leads to writting slower code, because we've missed a bottleneck in our new code. 
+And of course, without a clear documentation of what we are doing, we will be missing it, relying only on our intuition as an assurance of speed gain. 
+
+In other words, if you want to be sure that you're actually doing code optimization, be sure that you have a basis to compare with. 
+How to do that? 
+One thing that can be done is to keep an RMarkdown file with your starting point: use this notebook to keep track of what you're doing, by noting where you're starting from (i.e, what's the original function you want to optimize), and compare it with the new one. 
+By using an Rmd, you can also document the strategies you've been using to optimize the code: "switched from for loop to vectorize function", "changed from x to y", etc. 
+
+And of course, you will need to time things. 
+To do that, you can use the `{bench}` package, which compares the execution time (and other metrics) of two functions. 
+
+```{r when-optimize-2}
+x <- function(size){
+  res <- numeric(size)
+  for (i in 1:size){
+    res[i] <- i * 10
+  }
+  return(res)
+}
+y <- function(size){
+  (1:size) * 10
+}
+bench::mark(
+  `for` = x(1000), 
+  vectorized = y(1000), 
+  iterations = 1000
+)
+```
+
+Here, we have an empiric evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest. 
+And, bonus point, `{bench}` takes time to check that the two outputs are the same, so that you're sure that you're not comparing apple and oranges!
 
 ### Profiling Shiny
 
