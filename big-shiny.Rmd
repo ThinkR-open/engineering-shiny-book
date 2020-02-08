@@ -121,7 +121,7 @@ with one function by line, producing more lines in the end code.
 
 Consider this piece of valid R code:
 
-```{r big-shiny-1}
+```{r big-shiny-1 }
 iris[
   1
   :
@@ -136,7 +136,7 @@ iris[
 
 9 lines of code for something that could also be written in one line.  
 
-```{r big-shiny-2}
+```{r big-shiny-2 }
 iris[1:5, c("Species")]
 ```
 
@@ -159,7 +159,7 @@ if (!requireNamespace("cloc")){
 
 For example, let's compare a rather big package (`{shiny}`) with a small one (`{attempt}`):
 
-```{r big-shiny-4}
+```{r big-shiny-4 }
 library(cloc)
 library(dplyr)
 shiny_cloc <- cloc_cran("shiny", .progress = FALSE, repos = "http://cran.irsn.fr/" )
@@ -213,38 +213,42 @@ Here is for example the cyclomatic complexity of the default golem template:
 remotes::install_local("golex", upgrade = "never")
 ```
 
+```{r big-shiny-7, echo=FALSE}
+db <- memoise::cache_filesystem(here::here("fcache/"))
+cyclocomp_package <- memoise::memoise(cyclocomp::cyclocomp_package, cache = db)
+```
 
-```{r big-shiny-7}
+```{r big-shiny-8 }
 library(cyclocomp)
 cyclocomp_package("golex") %>% head()
 ```
 
-```{r big-shiny-8, include = FALSE}
+```{r big-shiny-9, include = FALSE}
 remove.packages("golex")
 ```
 
 And the one from another small application:
 
-```{r big-shiny-9, include = FALSE}
+```{r big-shiny-10, include = FALSE}
 if (!requireNamespace("tidytuesday201942")) {
   remotes::install_github("ColinFay/tidytuesday201942")
 }
 ```
 
 
-```{r big-shiny-10}
+```{r big-shiny-11 }
 cyclocomp_package("tidytuesday201942") %>% head()
 ```
 
 And, finally, the one for `{shiny}`:
 
-```{r big-shiny-11, include = FALSE}
+```{r big-shiny-12, include = FALSE}
 if (!requireNamespace("shiny")) {
   remotes::install_cran("shiny")
 }
 ```
 
-```{r big-shiny-12}
+```{r big-shiny-13 }
 cyclocomp_package("shiny") %>% head()
 ```
 
@@ -270,13 +274,13 @@ Complexity can come from other sources: unsufficient code coverage leading to bu
 How do we assess that? 
 We can have a look at the `{packageMetrics2}` package to have some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc. 
 
-```{r big-shiny-13, include = FALSE}
+```{r big-shiny-14, include = FALSE}
 if (!requireNamespace("packageMetrics2")) {
   remotes::install_github("MangoTheCat/packageMetrics2")
 }
 ```
 
-```{r big-shiny-14}
+```{r big-shiny-15 }
 library(packageMetrics2)
 frame_metric <- function(pkg){
   metrics <- package_metrics(pkg)
@@ -288,19 +292,19 @@ frame_metric <- function(pkg){
 }
 ```
 
-```{r big-shiny-1-bis, echo=FALSE}
-db <- memoise::cache_filesystem("fcache/")
+```{r big-shiny-16, echo=FALSE}
+db <- memoise::cache_filesystem(here::here("fcache/"))
 frame_metric <- memoise::memoise(frame_metric, cache = db)
 ```
 
-```{r big-shiny-15, cache = TRUE, warning = FALSE}
+```{r big-shiny-17, cache = TRUE, warning = FALSE}
 frame_metric("golem") %>% knitr::kable()
 frame_metric("shiny") %>% knitr::kable()
 ```
 
 If you're building an app with `{golem}`, a framework for building shiny apps, you can use the `DESCRIPTION` file, the one that contains the dependencies, as a starting point for assessing the state of your dependencies: 
 
-```{r big-shiny-16}
+```{r big-shiny-18 }
 desc::desc_get_deps("golex/DESCRIPTION")
 ```
 

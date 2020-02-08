@@ -1,6 +1,6 @@
 # Optimizing Shiny Code
 
-## Optmizing R code 
+## Optimizing R code 
 
 // TODO 
 
@@ -85,10 +85,18 @@ toc()
 setequal(res_a, res_c)
 ```
 
-Note that you can change where the cache is stored by `{memoise}`:
+Note that you can change where the cache is stored by `{memoise}`. Here, we'll save it in the temp directory, but don't do this in production.
+
+```{r optimizing-shiny-code-1-bis}
+tpd <- fs::path(tempdir(), paste(sample(letters, 10), collapse = ""))
+```
+
+```{r optimizing-shiny-code-2-bis, include = FALSE, error = TRUE}
+try(fs::dir_delete(tpd))
+```
 
 ```{r optimizing-shiny-code-3}
-tpd <- tempdir()
+tpd <- fs::dir_create(tpd)
 dfs <- cache_filesystem(tpd)
 mfct <- memoise(fct_sql, cache = dfs)
 res_a <- mfct("SELECT * FROM diams WHERE cut = 'Ideal'", con)
