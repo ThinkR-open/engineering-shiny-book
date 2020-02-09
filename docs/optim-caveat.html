@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 17 Common Application Caveats | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="Chapter 17 Common Application Caveats | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 17 Common Application Caveats | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="when-optimize.html">
-<link rel="next" href="optimizing-shiny-code.html">
+<link rel="prev" href="when-optimize.html"/>
+<link rel="next" href="optimizing-shiny-code.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -40,6 +40,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -59,28 +62,25 @@
 
 
 <style type="text/css">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -89,9 +89,9 @@ pre.numberSource code > span > a:first-child::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {   }
+  {  }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+a.sourceLine::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -445,113 +445,113 @@ This function updates <strong>every time a reactive object it contains is invali
 es, this works well if you have a small amount of reactive objects in the observer, but that gets tricky whenever you start adding things inside your <code>observe()</code>, as you might be launching a computation 10 times if your reactive scope contains 10 reactive objects that are somehow invalidated in chain.
 And believe me, we’ve seen pieces of code where the <code>observe()</code> contains hundreds of lines of code, with reactives objects all over the place.</p>
 <p>For example, let’s start with that:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="optim-caveat.html#cb120-1"></a><span class="co">## DON&#39;T DO GLOBAL VARIABLES, IT&#39;S JUST TO SIMPLIFY THE EXAMPLE</span></span>
-<span id="cb120-2"><a href="optim-caveat.html#cb120-2"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
-<span id="cb120-3"><a href="optim-caveat.html#cb120-3"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb120-4"><a href="optim-caveat.html#cb120-4"></a><span class="kw">library</span>(cli)</span>
-<span id="cb120-5"><a href="optim-caveat.html#cb120-5"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
-<span id="cb120-6"><a href="optim-caveat.html#cb120-6"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb120-7"><a href="optim-caveat.html#cb120-7"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;txt&quot;</span>)</span>
-<span id="cb120-8"><a href="optim-caveat.html#cb120-8"></a>  )</span>
-<span id="cb120-9"><a href="optim-caveat.html#cb120-9"></a>}</span>
-<span id="cb120-10"><a href="optim-caveat.html#cb120-10"></a></span>
-<span id="cb120-11"><a href="optim-caveat.html#cb120-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb120-12"><a href="optim-caveat.html#cb120-12"></a>  <span class="kw">observe</span>({</span>
-<span id="cb120-13"><a href="optim-caveat.html#cb120-13"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb120-14"><a href="optim-caveat.html#cb120-14"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb120-15"><a href="optim-caveat.html#cb120-15"></a>    <span class="kw">print</span>(input<span class="op">$</span>txt)</span>
-<span id="cb120-16"><a href="optim-caveat.html#cb120-16"></a>  })</span>
-<span id="cb120-17"><a href="optim-caveat.html#cb120-17"></a>}</span>
-<span id="cb120-18"><a href="optim-caveat.html#cb120-18"></a></span>
-<span id="cb120-19"><a href="optim-caveat.html#cb120-19"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb120-1" title="1"><span class="co">## DON&#39;T DO GLOBAL VARIABLES, IT&#39;S JUST TO SIMPLIFY THE EXAMPLE</span></a>
+<a class="sourceLine" id="cb120-2" title="2">i &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb120-3" title="3"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb120-4" title="4"><span class="kw">library</span>(cli)</a>
+<a class="sourceLine" id="cb120-5" title="5">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb120-6" title="6">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb120-7" title="7">    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;txt&quot;</span>)</a>
+<a class="sourceLine" id="cb120-8" title="8">  )</a>
+<a class="sourceLine" id="cb120-9" title="9">}</a>
+<a class="sourceLine" id="cb120-10" title="10"></a>
+<a class="sourceLine" id="cb120-11" title="11">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</a>
+<a class="sourceLine" id="cb120-12" title="12">  <span class="kw">observe</span>({</a>
+<a class="sourceLine" id="cb120-13" title="13">    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb120-14" title="14">    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</a>
+<a class="sourceLine" id="cb120-15" title="15">    <span class="kw">print</span>(input<span class="op">$</span>txt)</a>
+<a class="sourceLine" id="cb120-16" title="16">  })</a>
+<a class="sourceLine" id="cb120-17" title="17">}</a>
+<a class="sourceLine" id="cb120-18" title="18"></a>
+<a class="sourceLine" id="cb120-19" title="19"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p>Oh, and then, let’s add a small selectInput</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="optim-caveat.html#cb121-1"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
-<span id="cb121-2"><a href="optim-caveat.html#cb121-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb121-3"><a href="optim-caveat.html#cb121-3"></a><span class="kw">library</span>(cli)</span>
-<span id="cb121-4"><a href="optim-caveat.html#cb121-4"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
-<span id="cb121-5"><a href="optim-caveat.html#cb121-5"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb121-6"><a href="optim-caveat.html#cb121-6"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;txt&quot;</span>), </span>
-<span id="cb121-7"><a href="optim-caveat.html#cb121-7"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;tolower&quot;</span>, <span class="st">&quot;casse&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>))</span>
-<span id="cb121-8"><a href="optim-caveat.html#cb121-8"></a>  )</span>
-<span id="cb121-9"><a href="optim-caveat.html#cb121-9"></a>}</span>
-<span id="cb121-10"><a href="optim-caveat.html#cb121-10"></a></span>
-<span id="cb121-11"><a href="optim-caveat.html#cb121-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb121-12"><a href="optim-caveat.html#cb121-12"></a>  <span class="kw">observe</span>({</span>
-<span id="cb121-13"><a href="optim-caveat.html#cb121-13"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb121-14"><a href="optim-caveat.html#cb121-14"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb121-15"><a href="optim-caveat.html#cb121-15"></a>    <span class="cf">if</span> (input<span class="op">$</span>tolower <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
-<span id="cb121-16"><a href="optim-caveat.html#cb121-16"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(input<span class="op">$</span>txt))</span>
-<span id="cb121-17"><a href="optim-caveat.html#cb121-17"></a>    } <span class="cf">else</span>  {</span>
-<span id="cb121-18"><a href="optim-caveat.html#cb121-18"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(input<span class="op">$</span>txt))</span>
-<span id="cb121-19"><a href="optim-caveat.html#cb121-19"></a>    }</span>
-<span id="cb121-20"><a href="optim-caveat.html#cb121-20"></a>  })</span>
-<span id="cb121-21"><a href="optim-caveat.html#cb121-21"></a>}</span>
-<span id="cb121-22"><a href="optim-caveat.html#cb121-22"></a></span>
-<span id="cb121-23"><a href="optim-caveat.html#cb121-23"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb121-1" title="1">i &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb121-2" title="2"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb121-3" title="3"><span class="kw">library</span>(cli)</a>
+<a class="sourceLine" id="cb121-4" title="4">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb121-5" title="5">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb121-6" title="6">    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;txt&quot;</span>), </a>
+<a class="sourceLine" id="cb121-7" title="7">    <span class="kw">selectInput</span>(<span class="st">&quot;tolower&quot;</span>, <span class="st">&quot;casse&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>))</a>
+<a class="sourceLine" id="cb121-8" title="8">  )</a>
+<a class="sourceLine" id="cb121-9" title="9">}</a>
+<a class="sourceLine" id="cb121-10" title="10"></a>
+<a class="sourceLine" id="cb121-11" title="11">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</a>
+<a class="sourceLine" id="cb121-12" title="12">  <span class="kw">observe</span>({</a>
+<a class="sourceLine" id="cb121-13" title="13">    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb121-14" title="14">    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</a>
+<a class="sourceLine" id="cb121-15" title="15">    <span class="cf">if</span> (input<span class="op">$</span>tolower <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</a>
+<a class="sourceLine" id="cb121-16" title="16">      <span class="kw">print</span>(<span class="kw">tolower</span>(input<span class="op">$</span>txt))</a>
+<a class="sourceLine" id="cb121-17" title="17">    } <span class="cf">else</span>  {</a>
+<a class="sourceLine" id="cb121-18" title="18">      <span class="kw">print</span>(<span class="kw">tolower</span>(input<span class="op">$</span>txt))</a>
+<a class="sourceLine" id="cb121-19" title="19">    }</a>
+<a class="sourceLine" id="cb121-20" title="20">  })</a>
+<a class="sourceLine" id="cb121-21" title="21">}</a>
+<a class="sourceLine" id="cb121-22" title="22"></a>
+<a class="sourceLine" id="cb121-23" title="23"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p>And, as time goes by, we add another control flow to our <code>observe()</code>:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="optim-caveat.html#cb122-1"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
-<span id="cb122-2"><a href="optim-caveat.html#cb122-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb122-3"><a href="optim-caveat.html#cb122-3"></a><span class="kw">library</span>(cli)</span>
-<span id="cb122-4"><a href="optim-caveat.html#cb122-4"></a><span class="kw">library</span>(stringi)</span>
-<span id="cb122-5"><a href="optim-caveat.html#cb122-5"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
-<span id="cb122-6"><a href="optim-caveat.html#cb122-6"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb122-7"><a href="optim-caveat.html#cb122-7"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;txt&quot;</span>), </span>
-<span id="cb122-8"><a href="optim-caveat.html#cb122-8"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;tolower&quot;</span>, <span class="st">&quot;casse&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)), </span>
-<span id="cb122-9"><a href="optim-caveat.html#cb122-9"></a>    <span class="kw">checkboxInput</span>(<span class="st">&quot;rev&quot;</span>, <span class="st">&quot;reverse&quot;</span>)</span>
-<span id="cb122-10"><a href="optim-caveat.html#cb122-10"></a>  )</span>
-<span id="cb122-11"><a href="optim-caveat.html#cb122-11"></a>}</span>
-<span id="cb122-12"><a href="optim-caveat.html#cb122-12"></a></span>
-<span id="cb122-13"><a href="optim-caveat.html#cb122-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb122-14"><a href="optim-caveat.html#cb122-14"></a>  <span class="kw">observe</span>({</span>
-<span id="cb122-15"><a href="optim-caveat.html#cb122-15"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb122-16"><a href="optim-caveat.html#cb122-16"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb122-17"><a href="optim-caveat.html#cb122-17"></a>    <span class="cf">if</span> (input<span class="op">$</span>rev){</span>
-<span id="cb122-18"><a href="optim-caveat.html#cb122-18"></a>      x &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(input<span class="op">$</span>txt)</span>
-<span id="cb122-19"><a href="optim-caveat.html#cb122-19"></a>    } <span class="cf">else</span> {</span>
-<span id="cb122-20"><a href="optim-caveat.html#cb122-20"></a>      x &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
-<span id="cb122-21"><a href="optim-caveat.html#cb122-21"></a>    }</span>
-<span id="cb122-22"><a href="optim-caveat.html#cb122-22"></a>    <span class="cf">if</span> (input<span class="op">$</span>tolower <span class="op">==</span><span class="st"> &quot;lower&quot;</span>){</span>
-<span id="cb122-23"><a href="optim-caveat.html#cb122-23"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(x))</span>
-<span id="cb122-24"><a href="optim-caveat.html#cb122-24"></a>    } <span class="cf">else</span> {</span>
-<span id="cb122-25"><a href="optim-caveat.html#cb122-25"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(x))</span>
-<span id="cb122-26"><a href="optim-caveat.html#cb122-26"></a>    }</span>
-<span id="cb122-27"><a href="optim-caveat.html#cb122-27"></a>  })</span>
-<span id="cb122-28"><a href="optim-caveat.html#cb122-28"></a>}</span>
-<span id="cb122-29"><a href="optim-caveat.html#cb122-29"></a></span>
-<span id="cb122-30"><a href="optim-caveat.html#cb122-30"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb122-1" title="1">i &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb122-2" title="2"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb122-3" title="3"><span class="kw">library</span>(cli)</a>
+<a class="sourceLine" id="cb122-4" title="4"><span class="kw">library</span>(stringi)</a>
+<a class="sourceLine" id="cb122-5" title="5">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb122-6" title="6">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb122-7" title="7">    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;txt&quot;</span>), </a>
+<a class="sourceLine" id="cb122-8" title="8">    <span class="kw">selectInput</span>(<span class="st">&quot;tolower&quot;</span>, <span class="st">&quot;casse&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)), </a>
+<a class="sourceLine" id="cb122-9" title="9">    <span class="kw">checkboxInput</span>(<span class="st">&quot;rev&quot;</span>, <span class="st">&quot;reverse&quot;</span>)</a>
+<a class="sourceLine" id="cb122-10" title="10">  )</a>
+<a class="sourceLine" id="cb122-11" title="11">}</a>
+<a class="sourceLine" id="cb122-12" title="12"></a>
+<a class="sourceLine" id="cb122-13" title="13">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</a>
+<a class="sourceLine" id="cb122-14" title="14">  <span class="kw">observe</span>({</a>
+<a class="sourceLine" id="cb122-15" title="15">    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb122-16" title="16">    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</a>
+<a class="sourceLine" id="cb122-17" title="17">    <span class="cf">if</span> (input<span class="op">$</span>rev){</a>
+<a class="sourceLine" id="cb122-18" title="18">      x &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(input<span class="op">$</span>txt)</a>
+<a class="sourceLine" id="cb122-19" title="19">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb122-20" title="20">      x &lt;-<span class="st"> </span>input<span class="op">$</span>txt</a>
+<a class="sourceLine" id="cb122-21" title="21">    }</a>
+<a class="sourceLine" id="cb122-22" title="22">    <span class="cf">if</span> (input<span class="op">$</span>tolower <span class="op">==</span><span class="st"> &quot;lower&quot;</span>){</a>
+<a class="sourceLine" id="cb122-23" title="23">      <span class="kw">print</span>(<span class="kw">tolower</span>(x))</a>
+<a class="sourceLine" id="cb122-24" title="24">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb122-25" title="25">      <span class="kw">print</span>(<span class="kw">tolower</span>(x))</a>
+<a class="sourceLine" id="cb122-26" title="26">    }</a>
+<a class="sourceLine" id="cb122-27" title="27">  })</a>
+<a class="sourceLine" id="cb122-28" title="28">}</a>
+<a class="sourceLine" id="cb122-29" title="29"></a>
+<a class="sourceLine" id="cb122-30" title="30"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p>And it would be nice to keep the selected values into a reactive list, so that we can reuse it elsewhere.
 And maybe you would like to add a checkbox so that the logs are printed to the console only if checked.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="optim-caveat.html#cb123-1"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
-<span id="cb123-2"><a href="optim-caveat.html#cb123-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb123-3"><a href="optim-caveat.html#cb123-3"></a><span class="kw">library</span>(cli)</span>
-<span id="cb123-4"><a href="optim-caveat.html#cb123-4"></a><span class="kw">library</span>(stringi)</span>
-<span id="cb123-5"><a href="optim-caveat.html#cb123-5"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
-<span id="cb123-6"><a href="optim-caveat.html#cb123-6"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb123-7"><a href="optim-caveat.html#cb123-7"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;txt&quot;</span>), </span>
-<span id="cb123-8"><a href="optim-caveat.html#cb123-8"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;tolower&quot;</span>, <span class="st">&quot;casse&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)), </span>
-<span id="cb123-9"><a href="optim-caveat.html#cb123-9"></a>    <span class="kw">checkboxInput</span>(<span class="st">&quot;rev&quot;</span>, <span class="st">&quot;reverse&quot;</span>)</span>
-<span id="cb123-10"><a href="optim-caveat.html#cb123-10"></a>  )</span>
-<span id="cb123-11"><a href="optim-caveat.html#cb123-11"></a>}</span>
-<span id="cb123-12"><a href="optim-caveat.html#cb123-12"></a></span>
-<span id="cb123-13"><a href="optim-caveat.html#cb123-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb123-14"><a href="optim-caveat.html#cb123-14"></a>  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>()</span>
-<span id="cb123-15"><a href="optim-caveat.html#cb123-15"></a>  <span class="kw">observe</span>({</span>
-<span id="cb123-16"><a href="optim-caveat.html#cb123-16"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb123-17"><a href="optim-caveat.html#cb123-17"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb123-18"><a href="optim-caveat.html#cb123-18"></a>    <span class="cf">if</span> (input<span class="op">$</span>rev) {</span>
-<span id="cb123-19"><a href="optim-caveat.html#cb123-19"></a>      r<span class="op">$</span>x &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(input<span class="op">$</span>txt) </span>
-<span id="cb123-20"><a href="optim-caveat.html#cb123-20"></a>    } <span class="cf">else</span> {</span>
-<span id="cb123-21"><a href="optim-caveat.html#cb123-21"></a>      r<span class="op">$</span>x &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
-<span id="cb123-22"><a href="optim-caveat.html#cb123-22"></a>    }</span>
-<span id="cb123-23"><a href="optim-caveat.html#cb123-23"></a>    <span class="cf">if</span> (input<span class="op">$</span>tolower <span class="op">==</span><span class="st"> &quot;lower&quot;</span>){</span>
-<span id="cb123-24"><a href="optim-caveat.html#cb123-24"></a>      r<span class="op">$</span>x &lt;-<span class="st"> </span><span class="kw">tolower</span>(r<span class="op">$</span>x)</span>
-<span id="cb123-25"><a href="optim-caveat.html#cb123-25"></a>    } <span class="cf">else</span> {</span>
-<span id="cb123-26"><a href="optim-caveat.html#cb123-26"></a>      r<span class="op">$</span>x &lt;-<span class="st"> </span><span class="kw">toupper</span>(r<span class="op">$</span>x)</span>
-<span id="cb123-27"><a href="optim-caveat.html#cb123-27"></a>    }</span>
-<span id="cb123-28"><a href="optim-caveat.html#cb123-28"></a>  })</span>
-<span id="cb123-29"><a href="optim-caveat.html#cb123-29"></a>}</span>
-<span id="cb123-30"><a href="optim-caveat.html#cb123-30"></a></span>
-<span id="cb123-31"><a href="optim-caveat.html#cb123-31"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb123-1" title="1">i &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb123-2" title="2"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb123-3" title="3"><span class="kw">library</span>(cli)</a>
+<a class="sourceLine" id="cb123-4" title="4"><span class="kw">library</span>(stringi)</a>
+<a class="sourceLine" id="cb123-5" title="5">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb123-6" title="6">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb123-7" title="7">    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;txt&quot;</span>), </a>
+<a class="sourceLine" id="cb123-8" title="8">    <span class="kw">selectInput</span>(<span class="st">&quot;tolower&quot;</span>, <span class="st">&quot;casse&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)), </a>
+<a class="sourceLine" id="cb123-9" title="9">    <span class="kw">checkboxInput</span>(<span class="st">&quot;rev&quot;</span>, <span class="st">&quot;reverse&quot;</span>)</a>
+<a class="sourceLine" id="cb123-10" title="10">  )</a>
+<a class="sourceLine" id="cb123-11" title="11">}</a>
+<a class="sourceLine" id="cb123-12" title="12"></a>
+<a class="sourceLine" id="cb123-13" title="13">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</a>
+<a class="sourceLine" id="cb123-14" title="14">  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>()</a>
+<a class="sourceLine" id="cb123-15" title="15">  <span class="kw">observe</span>({</a>
+<a class="sourceLine" id="cb123-16" title="16">    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb123-17" title="17">    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</a>
+<a class="sourceLine" id="cb123-18" title="18">    <span class="cf">if</span> (input<span class="op">$</span>rev) {</a>
+<a class="sourceLine" id="cb123-19" title="19">      r<span class="op">$</span>x &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(input<span class="op">$</span>txt) </a>
+<a class="sourceLine" id="cb123-20" title="20">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb123-21" title="21">      r<span class="op">$</span>x &lt;-<span class="st"> </span>input<span class="op">$</span>txt</a>
+<a class="sourceLine" id="cb123-22" title="22">    }</a>
+<a class="sourceLine" id="cb123-23" title="23">    <span class="cf">if</span> (input<span class="op">$</span>tolower <span class="op">==</span><span class="st"> &quot;lower&quot;</span>){</a>
+<a class="sourceLine" id="cb123-24" title="24">      r<span class="op">$</span>x &lt;-<span class="st"> </span><span class="kw">tolower</span>(r<span class="op">$</span>x)</a>
+<a class="sourceLine" id="cb123-25" title="25">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb123-26" title="26">      r<span class="op">$</span>x &lt;-<span class="st"> </span><span class="kw">toupper</span>(r<span class="op">$</span>x)</a>
+<a class="sourceLine" id="cb123-27" title="27">    }</a>
+<a class="sourceLine" id="cb123-28" title="28">  })</a>
+<a class="sourceLine" id="cb123-29" title="29">}</a>
+<a class="sourceLine" id="cb123-30" title="30"></a>
+<a class="sourceLine" id="cb123-31" title="31"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p>Ok, now can you tell how many potential invalidation points we’ve got here?
 Three: whenever <code>input$txt</code>, <code>input$rev</code> or <code>input$tolower</code> change.
 Of course, three is not that much, but you get the idea.</p>
@@ -570,19 +570,19 @@ Then, if a reactive context is invalidated, <strong>you know why</strong>.</p>
 <p>// TODO</p>
 <p>So the general pattern is that one: we create “flags” with an <code>init</code> function, trigger these “flags” with <code>trigger()</code>, and wherever we want these flags to invalidate the reactive context, we <code>watch()</code> these flags.</p>
 <p>The idea here is to get a full control over the reactive flow: we only invalidate contexts when we want, making the general flow of the app more predictable.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="optim-caveat.html#cb124-1"></a>init &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">session =</span> <span class="kw">getDefaultReactiveDomain</span>()){</span>
-<span id="cb124-2"><a href="optim-caveat.html#cb124-2"></a>  session<span class="op">$</span>userData[[name]] &lt;-<span class="st"> </span><span class="kw">reactiveVal</span>(<span class="dv">0</span>)</span>
-<span id="cb124-3"><a href="optim-caveat.html#cb124-3"></a>}</span>
-<span id="cb124-4"><a href="optim-caveat.html#cb124-4"></a></span>
-<span id="cb124-5"><a href="optim-caveat.html#cb124-5"></a>trigger &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">session =</span> <span class="kw">getDefaultReactiveDomain</span>()){</span>
-<span id="cb124-6"><a href="optim-caveat.html#cb124-6"></a>  session<span class="op">$</span>userData[[name]](</span>
-<span id="cb124-7"><a href="optim-caveat.html#cb124-7"></a>    session<span class="op">$</span>userData[[name]]() <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb124-8"><a href="optim-caveat.html#cb124-8"></a>  )</span>
-<span id="cb124-9"><a href="optim-caveat.html#cb124-9"></a>}</span>
-<span id="cb124-10"><a href="optim-caveat.html#cb124-10"></a></span>
-<span id="cb124-11"><a href="optim-caveat.html#cb124-11"></a>watch &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">session =</span> <span class="kw">getDefaultReactiveDomain</span>()){</span>
-<span id="cb124-12"><a href="optim-caveat.html#cb124-12"></a>  session<span class="op">$</span>userData[[name]]()</span>
-<span id="cb124-13"><a href="optim-caveat.html#cb124-13"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb124-1" title="1">init &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">session =</span> <span class="kw">getDefaultReactiveDomain</span>()){</a>
+<a class="sourceLine" id="cb124-2" title="2">  session<span class="op">$</span>userData[[name]] &lt;-<span class="st"> </span><span class="kw">reactiveVal</span>(<span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb124-3" title="3">}</a>
+<a class="sourceLine" id="cb124-4" title="4"></a>
+<a class="sourceLine" id="cb124-5" title="5">trigger &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">session =</span> <span class="kw">getDefaultReactiveDomain</span>()){</a>
+<a class="sourceLine" id="cb124-6" title="6">  session<span class="op">$</span>userData[[name]](</a>
+<a class="sourceLine" id="cb124-7" title="7">    session<span class="op">$</span>userData[[name]]() <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb124-8" title="8">  )</a>
+<a class="sourceLine" id="cb124-9" title="9">}</a>
+<a class="sourceLine" id="cb124-10" title="10"></a>
+<a class="sourceLine" id="cb124-11" title="11">watch &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">session =</span> <span class="kw">getDefaultReactiveDomain</span>()){</a>
+<a class="sourceLine" id="cb124-12" title="12">  session<span class="op">$</span>userData[[name]]()</a>
+<a class="sourceLine" id="cb124-13" title="13">}</a></code></pre></div>
 <p>And, bonus, as these functions use the <code>session</code> object, they are available across all modules. That also means that you can easily trigger an event inside a model from another one.</p>
 </div>
 <div id="using-r6-as-a-data-storage" class="section level3">
@@ -594,38 +594,38 @@ Why would we want to do that?</p>
 <p>Sharing an R6 object makes it simpler but without the complexity of sharing &amp; handling reactive objects.</p>
 <p>So basically, the idea is to hold the whole logic of your data reading / cleaning / processing / outputing inside an R6 class.
 You’ll then initiate an instance of this class, then pass this object through your modules and submodules.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="optim-caveat.html#cb125-1"></a>nameui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
-<span id="cb125-2"><a href="optim-caveat.html#cb125-2"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
-<span id="cb125-3"><a href="optim-caveat.html#cb125-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb125-4"><a href="optim-caveat.html#cb125-4"></a>    <span class="co"># [...]</span></span>
-<span id="cb125-5"><a href="optim-caveat.html#cb125-5"></a>  )</span>
-<span id="cb125-6"><a href="optim-caveat.html#cb125-6"></a>}</span>
-<span id="cb125-7"><a href="optim-caveat.html#cb125-7"></a></span>
-<span id="cb125-8"><a href="optim-caveat.html#cb125-8"></a>name &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, obj){</span>
-<span id="cb125-9"><a href="optim-caveat.html#cb125-9"></a>  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</span>
-<span id="cb125-10"><a href="optim-caveat.html#cb125-10"></a>  output<span class="op">$</span>that &lt;-<span class="st"> </span><span class="kw">renderThis</span>({</span>
-<span id="cb125-11"><a href="optim-caveat.html#cb125-11"></a>    obj<span class="op">$</span><span class="kw">compute</span>()</span>
-<span id="cb125-12"><a href="optim-caveat.html#cb125-12"></a>  })</span>
-<span id="cb125-13"><a href="optim-caveat.html#cb125-13"></a>}</span>
-<span id="cb125-14"><a href="optim-caveat.html#cb125-14"></a></span>
-<span id="cb125-15"><a href="optim-caveat.html#cb125-15"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb125-16"><a href="optim-caveat.html#cb125-16"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
-<span id="cb125-17"><a href="optim-caveat.html#cb125-17"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb125-18"><a href="optim-caveat.html#cb125-18"></a>    <span class="kw">nameui</span>(<span class="st">&quot;nameui&quot;</span>)</span>
-<span id="cb125-19"><a href="optim-caveat.html#cb125-19"></a>  )</span>
-<span id="cb125-20"><a href="optim-caveat.html#cb125-20"></a>}</span>
-<span id="cb125-21"><a href="optim-caveat.html#cb125-21"></a></span>
-<span id="cb125-22"><a href="optim-caveat.html#cb125-22"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb125-23"><a href="optim-caveat.html#cb125-23"></a>  input, </span>
-<span id="cb125-24"><a href="optim-caveat.html#cb125-24"></a>  output, </span>
-<span id="cb125-25"><a href="optim-caveat.html#cb125-25"></a>  session</span>
-<span id="cb125-26"><a href="optim-caveat.html#cb125-26"></a>){</span>
-<span id="cb125-27"><a href="optim-caveat.html#cb125-27"></a>  obj &lt;-<span class="st"> </span>MyDataProcess<span class="op">$</span><span class="kw">new</span>()</span>
-<span id="cb125-28"><a href="optim-caveat.html#cb125-28"></a>  <span class="kw">callModule</span>(name, <span class="st">&quot;nameui&quot;</span>, obj)</span>
-<span id="cb125-29"><a href="optim-caveat.html#cb125-29"></a>  </span>
-<span id="cb125-30"><a href="optim-caveat.html#cb125-30"></a>}</span>
-<span id="cb125-31"><a href="optim-caveat.html#cb125-31"></a></span>
-<span id="cb125-32"><a href="optim-caveat.html#cb125-32"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb125-1" title="1">nameui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</a>
+<a class="sourceLine" id="cb125-2" title="2">  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</a>
+<a class="sourceLine" id="cb125-3" title="3">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb125-4" title="4">    <span class="co"># [...]</span></a>
+<a class="sourceLine" id="cb125-5" title="5">  )</a>
+<a class="sourceLine" id="cb125-6" title="6">}</a>
+<a class="sourceLine" id="cb125-7" title="7"></a>
+<a class="sourceLine" id="cb125-8" title="8">name &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, obj){</a>
+<a class="sourceLine" id="cb125-9" title="9">  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</a>
+<a class="sourceLine" id="cb125-10" title="10">  output<span class="op">$</span>that &lt;-<span class="st"> </span><span class="kw">renderThis</span>({</a>
+<a class="sourceLine" id="cb125-11" title="11">    obj<span class="op">$</span><span class="kw">compute</span>()</a>
+<a class="sourceLine" id="cb125-12" title="12">  })</a>
+<a class="sourceLine" id="cb125-13" title="13">}</a>
+<a class="sourceLine" id="cb125-14" title="14"></a>
+<a class="sourceLine" id="cb125-15" title="15"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb125-16" title="16">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb125-17" title="17">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb125-18" title="18">    <span class="kw">nameui</span>(<span class="st">&quot;nameui&quot;</span>)</a>
+<a class="sourceLine" id="cb125-19" title="19">  )</a>
+<a class="sourceLine" id="cb125-20" title="20">}</a>
+<a class="sourceLine" id="cb125-21" title="21"></a>
+<a class="sourceLine" id="cb125-22" title="22">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb125-23" title="23">  input, </a>
+<a class="sourceLine" id="cb125-24" title="24">  output, </a>
+<a class="sourceLine" id="cb125-25" title="25">  session</a>
+<a class="sourceLine" id="cb125-26" title="26">){</a>
+<a class="sourceLine" id="cb125-27" title="27">  obj &lt;-<span class="st"> </span>MyDataProcess<span class="op">$</span><span class="kw">new</span>()</a>
+<a class="sourceLine" id="cb125-28" title="28">  <span class="kw">callModule</span>(name, <span class="st">&quot;nameui&quot;</span>, obj)</a>
+<a class="sourceLine" id="cb125-29" title="29">  </a>
+<a class="sourceLine" id="cb125-30" title="30">}</a>
+<a class="sourceLine" id="cb125-31" title="31"></a>
+<a class="sourceLine" id="cb125-32" title="32"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p>Of course, this makes sense if you’re combining it with the trigger / watch from before :)</p>
 </div>
 <div id="get-sure-its-tested" class="section level4">
@@ -660,11 +660,13 @@ This is where using an R6 for your business logic of your app makes sense: this 
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -672,12 +674,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -689,6 +690,10 @@ gitbook.start({
 "text": "Edit"
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -707,8 +712,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();

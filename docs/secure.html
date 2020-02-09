@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 13 Version Control | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="Chapter 13 Version Control | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 13 Version Control | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="step-secure.html">
-<link rel="next" href="stepdeploy.html">
+<link rel="prev" href="step-secure.html"/>
+<link rel="next" href="stepdeploy.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -40,6 +40,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -59,28 +62,25 @@
 
 
 <style type="text/css">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -89,9 +89,9 @@ pre.numberSource code > span > a:first-child::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {   }
+  {  }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+a.sourceLine::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -435,7 +435,7 @@ Or the unsolvable problem of integrating changes when several people have been w
 Or the inability to find back something you’ve written a while back?</p>
 <p>If so, you might have been craving for Version Control (now shortened VC).
 In this chapter, we’ll be focusing on <code>git</code>, but you should be aware that other VC system exist, but they are less popular than <code>git</code>.
-<code>Git</code> was designed to handle collaboration on code projects<a href="optimjs.html#fn29" class="footnote-ref" id="fnref29"><sup>29</sup></a> where potentially a lot of people have to interact and make changes to the codebase.
+<code>Git</code> was designed to handle collaboration on code projects<a href="#fn29" class="footnote-ref" id="fnref29"><sup>29</sup></a> where potentially a lot of people have to interact and make changes to the codebase.
 <code>Git</code> might feel a little bit daunting at first, and even seasoned developers still misuse it, or don’t understand it completely.
 But don’t give up: the benefits from learning it really outweigh the (apparent) complexity.</p>
 <p>There are many advantages to VC, and here is a non-exhaustive list:</p>
@@ -463,7 +463,7 @@ That way, changes on a branch on a server can be downloaded (it’s called <code
 <div id="commit" class="section level4">
 <h4><span class="header-section-number">13.1.2.1</span> <code>commit</code></h4>
 <p>A <code>commit</code> is a photography of a codebase at a given moment in time.
-Every commits is associated with two things: a <code>sha1</code>, which is a unique reference in the history and that allows you to identify this precise state when you need to get back in time, and a <code>message</code>, which is a piece of text that describes the commit<a href="optimjs.html#fn30" class="footnote-ref" id="fnref30"><sup>30</sup></a>.
+Every commits is associated with two things: a <code>sha1</code>, which is a unique reference in the history and that allows you to identify this precise state when you need to get back in time, and a <code>message</code>, which is a piece of text that describes the commit<a href="#fn30" class="footnote-ref" id="fnref30"><sup>30</sup></a>.
 Note that message are mandatory: you can’t commit without them.
 Don’t overlook these messages: they might seem like a constraint at first but they are a life save when you need to understand the history of a project.</p>
 <p>There is no strict rule about what and when to commit.
@@ -476,7 +476,7 @@ In other word, you’ll permanently record these commits (so the series of chang
 <p>Making a push implies two things:</p>
 <ul>
 <li><p>Other people in the team will be able to retrieve the changes you’ve made</p></li>
-<li><p>These changes will be recorded permanently in the project history<a href="optimjs.html#fn31" class="footnote-ref" id="fnref31"><sup>31</sup></a>.</p></li>
+<li><p>These changes will be recorded permanently in the project history<a href="#fn31" class="footnote-ref" id="fnref31"><sup>31</sup></a>.</p></li>
 </ul>
 </div>
 <div id="pull" class="section level4">
@@ -559,11 +559,13 @@ The {testthat} package can be used to test the “business logic” side of your
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -571,12 +573,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -588,6 +589,10 @@ gitbook.start({
 "text": "Edit"
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -606,8 +611,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();

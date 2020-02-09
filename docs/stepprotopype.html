@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 9 Building an “ipsum-app” | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="Chapter 9 Building an “ipsum-app” | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 9 Building an “ipsum-app” | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="css.html">
-<link rel="next" href="proto-rmdfirst.html">
+<link rel="prev" href="css.html"/>
+<link rel="next" href="proto-rmdfirst.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -40,6 +40,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -59,28 +62,25 @@
 
 
 <style type="text/css">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -89,9 +89,9 @@ pre.numberSource code > span > a:first-child::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {   }
+  {  }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+a.sourceLine::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -466,34 +466,34 @@ For instance:</p>
 <ul>
 <li><code>random_DT()</code> renders a <code>DT::datatable()</code> output with one of existing R internal datasets.<br />
 </li>
-<li><code>random_ggplot(type = "point")</code> renders a random {ggplot2} graph with the selected <code>type</code> (corresponding to <code>geom()</code> in {ggplot2}).<br />
+<li><code>random_ggplot(type = &quot;point&quot;)</code> renders a random {ggplot2} graph with the selected <code>type</code> (corresponding to <code>geom()</code> in {ggplot2}).<br />
 </li>
 <li><code>random_text(nwords = 10)</code> renders a text with the defined number of words.</li>
 </ul>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="stepprotopype.html#cb89-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb89-2"><a href="stepprotopype.html#cb89-2"></a><span class="kw">library</span>(shinipsum)</span>
-<span id="cb89-3"><a href="stepprotopype.html#cb89-3"></a><span class="kw">library</span>(DT)</span>
-<span id="cb89-4"><a href="stepprotopype.html#cb89-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb89-5"><a href="stepprotopype.html#cb89-5"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random DT&quot;</span>),</span>
-<span id="cb89-6"><a href="stepprotopype.html#cb89-6"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;data_table&quot;</span>),</span>
-<span id="cb89-7"><a href="stepprotopype.html#cb89-7"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random Plot&quot;</span>),</span>
-<span id="cb89-8"><a href="stepprotopype.html#cb89-8"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>),</span>
-<span id="cb89-9"><a href="stepprotopype.html#cb89-9"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random Text&quot;</span>),</span>
-<span id="cb89-10"><a href="stepprotopype.html#cb89-10"></a>  <span class="kw">tableOutput</span>(<span class="st">&quot;text&quot;</span>)</span>
-<span id="cb89-11"><a href="stepprotopype.html#cb89-11"></a>)</span>
-<span id="cb89-12"><a href="stepprotopype.html#cb89-12"></a></span>
-<span id="cb89-13"><a href="stepprotopype.html#cb89-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb89-14"><a href="stepprotopype.html#cb89-14"></a>  output<span class="op">$</span>data_table &lt;-<span class="st"> </span>DT<span class="op">::</span><span class="kw">renderDT</span>({</span>
-<span id="cb89-15"><a href="stepprotopype.html#cb89-15"></a>    <span class="kw">random_DT</span>(<span class="dv">5</span>, <span class="dv">5</span>)</span>
-<span id="cb89-16"><a href="stepprotopype.html#cb89-16"></a>  })</span>
-<span id="cb89-17"><a href="stepprotopype.html#cb89-17"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb89-18"><a href="stepprotopype.html#cb89-18"></a>    <span class="kw">random_ggplot</span>()</span>
-<span id="cb89-19"><a href="stepprotopype.html#cb89-19"></a>  })</span>
-<span id="cb89-20"><a href="stepprotopype.html#cb89-20"></a>  output<span class="op">$</span>text &lt;-<span class="st"> </span><span class="kw">renderText</span>({</span>
-<span id="cb89-21"><a href="stepprotopype.html#cb89-21"></a>    <span class="kw">random_text</span>(<span class="dt">nwords =</span> <span class="dv">50</span>)</span>
-<span id="cb89-22"><a href="stepprotopype.html#cb89-22"></a>  })</span>
-<span id="cb89-23"><a href="stepprotopype.html#cb89-23"></a>}</span>
-<span id="cb89-24"><a href="stepprotopype.html#cb89-24"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" title="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb89-2" title="2"><span class="kw">library</span>(shinipsum)</a>
+<a class="sourceLine" id="cb89-3" title="3"><span class="kw">library</span>(DT)</a>
+<a class="sourceLine" id="cb89-4" title="4">ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</a>
+<a class="sourceLine" id="cb89-5" title="5">  <span class="kw">h2</span>(<span class="st">&quot;A Random DT&quot;</span>),</a>
+<a class="sourceLine" id="cb89-6" title="6">  <span class="kw">DTOutput</span>(<span class="st">&quot;data_table&quot;</span>),</a>
+<a class="sourceLine" id="cb89-7" title="7">  <span class="kw">h2</span>(<span class="st">&quot;A Random Plot&quot;</span>),</a>
+<a class="sourceLine" id="cb89-8" title="8">  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>),</a>
+<a class="sourceLine" id="cb89-9" title="9">  <span class="kw">h2</span>(<span class="st">&quot;A Random Text&quot;</span>),</a>
+<a class="sourceLine" id="cb89-10" title="10">  <span class="kw">tableOutput</span>(<span class="st">&quot;text&quot;</span>)</a>
+<a class="sourceLine" id="cb89-11" title="11">)</a>
+<a class="sourceLine" id="cb89-12" title="12"></a>
+<a class="sourceLine" id="cb89-13" title="13">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</a>
+<a class="sourceLine" id="cb89-14" title="14">  output<span class="op">$</span>data_table &lt;-<span class="st"> </span>DT<span class="op">::</span><span class="kw">renderDT</span>({</a>
+<a class="sourceLine" id="cb89-15" title="15">    <span class="kw">random_DT</span>(<span class="dv">5</span>, <span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb89-16" title="16">  })</a>
+<a class="sourceLine" id="cb89-17" title="17">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</a>
+<a class="sourceLine" id="cb89-18" title="18">    <span class="kw">random_ggplot</span>()</a>
+<a class="sourceLine" id="cb89-19" title="19">  })</a>
+<a class="sourceLine" id="cb89-20" title="20">  output<span class="op">$</span>text &lt;-<span class="st"> </span><span class="kw">renderText</span>({</a>
+<a class="sourceLine" id="cb89-21" title="21">    <span class="kw">random_text</span>(<span class="dt">nwords =</span> <span class="dv">50</span>)</a>
+<a class="sourceLine" id="cb89-22" title="22">  })</a>
+<a class="sourceLine" id="cb89-23" title="23">}</a>
+<a class="sourceLine" id="cb89-24" title="24"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p><img src="img/shinipsum.png" width="90%" /></p>
 <p>Find out more in the corresponding website: <a href="https://thinkr-open.github.io/shinipsum/" class="uri">https://thinkr-open.github.io/shinipsum/</a></p>
 </div>
@@ -526,11 +526,13 @@ You can create these examples using {fakir}.</p>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -538,12 +540,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -555,6 +556,10 @@ gitbook.start({
 "text": "Edit"
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -573,8 +578,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();

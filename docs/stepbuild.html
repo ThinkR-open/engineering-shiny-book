@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 11 Building app with {golem} | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="Chapter 11 Building app with {golem} | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 11 Building app with {golem} | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="proto-rmdfirst.html">
-<link rel="next" href="step-secure.html">
+<link rel="prev" href="proto-rmdfirst.html"/>
+<link rel="next" href="step-secure.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -40,6 +40,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -59,28 +62,25 @@
 
 
 <style type="text/css">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -89,9 +89,9 @@ pre.numberSource code > span > a:first-child::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {   }
+  {  }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+a.sourceLine::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -432,7 +432,7 @@ As the UI, functionalities and modules have been defined in the previous steps, 
 <h3><span class="header-section-number">11.1.1</span> Create a package</h3>
 <p>Once the package is installed, you can got to File &gt; New Project… in RStudio, and choose “Package for Shiny App Using golem” input.</p>
 <p>If you want to do it through command line, you can use:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="stepbuild.html#cb90-1"></a>golem<span class="op">::</span><span class="kw">create_shiny_template</span>(<span class="dt">path =</span> <span class="st">&quot;path/to/package&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb90-1" title="1">golem<span class="op">::</span><span class="kw">create_shiny_template</span>(<span class="dt">path =</span> <span class="st">&quot;path/to/package&quot;</span>)</a></code></pre></div>
 <p>This command allows you to create “illegally-named” package (for example, <code>1234</code>) by passing the <code>check_name</code> argument to <code>FALSE</code>. Note that this is not recommended and <strong>should only be done if you know what you are doing</strong>.</p>
 <p>Once you’ve got that, a new RStudio project will be launched. Here is the structure of this project:</p>
 <pre><code>DESCRIPTION               
@@ -474,52 +474,52 @@ That’s because a <code>{golem}</code> app IS a package.</p>
 <div id="fill-the-desc" class="section level3">
 <h3><span class="header-section-number">11.2.1</span> Fill the DESC</h3>
 <p>First, fill the DESCRIPTION by adding information about the package that will contain your app:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="stepbuild.html#cb92-1"></a>golem<span class="op">::</span><span class="kw">fill_desc</span>(</span>
-<span id="cb92-2"><a href="stepbuild.html#cb92-2"></a>  <span class="dt">pkg_name =</span> <span class="st">&quot;shinyexample&quot;</span>, <span class="co"># The Name of the package containing the App </span></span>
-<span id="cb92-3"><a href="stepbuild.html#cb92-3"></a>  <span class="dt">pkg_title =</span> , <span class="co"># The Title of the package containing the App </span></span>
-<span id="cb92-4"><a href="stepbuild.html#cb92-4"></a>  <span class="dt">pkg_description =</span> , <span class="co"># The Description of the package containing the App </span></span>
-<span id="cb92-5"><a href="stepbuild.html#cb92-5"></a>  <span class="dt">author_first_name =</span> , <span class="co"># Your First Name</span></span>
-<span id="cb92-6"><a href="stepbuild.html#cb92-6"></a>  <span class="dt">author_last_name =</span> ,  <span class="co"># Your Last Name</span></span>
-<span id="cb92-7"><a href="stepbuild.html#cb92-7"></a>  <span class="dt">author_email =</span> ,      <span class="co"># Your Email</span></span>
-<span id="cb92-8"><a href="stepbuild.html#cb92-8"></a>  <span class="dt">repo_url =</span> <span class="ot">NULL</span>)      <span class="co"># The (optional) URL of the GitHub Repo</span></span></code></pre></div>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb92-1" title="1">golem<span class="op">::</span><span class="kw">fill_desc</span>(</a>
+<a class="sourceLine" id="cb92-2" title="2">  <span class="dt">pkg_name =</span> <span class="st">&quot;shinyexample&quot;</span>, <span class="co"># The Name of the package containing the App </span></a>
+<a class="sourceLine" id="cb92-3" title="3">  <span class="dt">pkg_title =</span> , <span class="co"># The Title of the package containing the App </span></a>
+<a class="sourceLine" id="cb92-4" title="4">  <span class="dt">pkg_description =</span> , <span class="co"># The Description of the package containing the App </span></a>
+<a class="sourceLine" id="cb92-5" title="5">  <span class="dt">author_first_name =</span> , <span class="co"># Your First Name</span></a>
+<a class="sourceLine" id="cb92-6" title="6">  <span class="dt">author_last_name =</span> ,  <span class="co"># Your Last Name</span></a>
+<a class="sourceLine" id="cb92-7" title="7">  <span class="dt">author_email =</span> ,      <span class="co"># Your Email</span></a>
+<a class="sourceLine" id="cb92-8" title="8">  <span class="dt">repo_url =</span> <span class="ot">NULL</span>)      <span class="co"># The (optional) URL of the GitHub Repo</span></a></code></pre></div>
 </div>
 <div id="set-common-files" class="section level3">
 <h3><span class="header-section-number">11.2.2</span> Set common Files</h3>
 <p>If you want to use the MIT licence, README, code of conduct, lifecycle badge, and news</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="stepbuild.html#cb93-1"></a>usethis<span class="op">::</span><span class="kw">use_mit_license</span>(<span class="dt">name =</span> <span class="st">&quot;Your Name&quot;</span>)  <span class="co"># You can set another licence here</span></span>
-<span id="cb93-2"><a href="stepbuild.html#cb93-2"></a>usethis<span class="op">::</span><span class="kw">use_readme_rmd</span>()</span>
-<span id="cb93-3"><a href="stepbuild.html#cb93-3"></a>usethis<span class="op">::</span><span class="kw">use_code_of_conduct</span>()</span>
-<span id="cb93-4"><a href="stepbuild.html#cb93-4"></a>usethis<span class="op">::</span><span class="kw">use_lifecycle_badge</span>(<span class="st">&quot;Experimental&quot;</span>)</span>
-<span id="cb93-5"><a href="stepbuild.html#cb93-5"></a>usethis<span class="op">::</span><span class="kw">use_news_md</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb93-1" title="1">usethis<span class="op">::</span><span class="kw">use_mit_license</span>(<span class="dt">name =</span> <span class="st">&quot;Your Name&quot;</span>)  <span class="co"># You can set another licence here</span></a>
+<a class="sourceLine" id="cb93-2" title="2">usethis<span class="op">::</span><span class="kw">use_readme_rmd</span>()</a>
+<a class="sourceLine" id="cb93-3" title="3">usethis<span class="op">::</span><span class="kw">use_code_of_conduct</span>()</a>
+<a class="sourceLine" id="cb93-4" title="4">usethis<span class="op">::</span><span class="kw">use_lifecycle_badge</span>(<span class="st">&quot;Experimental&quot;</span>)</a>
+<a class="sourceLine" id="cb93-5" title="5">usethis<span class="op">::</span><span class="kw">use_news_md</span>()</a></code></pre></div>
 </div>
 <div id="add-a-data-raw-folder" class="section level3">
 <h3><span class="header-section-number">11.2.3</span> Add a data-raw folder</h3>
 <p>If you have data in your package</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="stepbuild.html#cb94-1"></a>usethis<span class="op">::</span><span class="kw">use_data_raw</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb94-1" title="1">usethis<span class="op">::</span><span class="kw">use_data_raw</span>()</a></code></pre></div>
 </div>
 <div id="init-tests" class="section level3">
 <h3><span class="header-section-number">11.2.4</span> Init Tests</h3>
 <p>Create a template for tests:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="stepbuild.html#cb95-1"></a>golem<span class="op">::</span><span class="kw">use_recommended_tests</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb95-1" title="1">golem<span class="op">::</span><span class="kw">use_recommended_tests</span>()</a></code></pre></div>
 </div>
 <div id="use-recommended-package" class="section level3">
 <h3><span class="header-section-number">11.2.5</span> Use Recommended Package</h3>
 <p>This will add “shiny”, “DT”, “attempt”, “glue”, “htmltools”, and “golem” as a dependecy to your package.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="stepbuild.html#cb96-1"></a>golem<span class="op">::</span><span class="kw">use_recommended_dep</span>(<span class="st">&quot;&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb96-1" title="1">golem<span class="op">::</span><span class="kw">use_recommended_dep</span>(<span class="st">&quot;&quot;</span>)</a></code></pre></div>
 </div>
 <div id="add-various-tools" class="section level3">
 <h3><span class="header-section-number">11.2.6</span> Add various tools</h3>
 <p>These two functions add a file with various functions that can be used along the process of building your app.</p>
 <p>See each file in details for a description of the functions.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="stepbuild.html#cb97-1"></a>golem<span class="op">::</span><span class="kw">use_utils_ui</span>()</span>
-<span id="cb97-2"><a href="stepbuild.html#cb97-2"></a>golem<span class="op">::</span><span class="kw">use_utils_server</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb97-1" title="1">golem<span class="op">::</span><span class="kw">use_utils_ui</span>()</a>
+<a class="sourceLine" id="cb97-2" title="2">golem<span class="op">::</span><span class="kw">use_utils_server</span>()</a></code></pre></div>
 </div>
 <div id="if-you-want-to-change-the-default-favicon" class="section level3">
 <h3><span class="header-section-number">11.2.7</span> If you want to change the default favicon</h3>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="stepbuild.html#cb98-1"></a>golem<span class="op">::</span><span class="kw">use_favicon</span>( <span class="dt">path =</span> <span class="st">&quot;path/to/favicon&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb98-1" title="1">golem<span class="op">::</span><span class="kw">use_favicon</span>( <span class="dt">path =</span> <span class="st">&quot;path/to/favicon&quot;</span>)</a></code></pre></div>
 <p>You’re now set!
 You’ve successfully initiated the project and can go to dev/02_dev.R.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="stepbuild.html#cb99-1"></a>rstudioapi<span class="op">::</span><span class="kw">navigateToFile</span>(<span class="st">&quot;dev/02_dev.R&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb99-1" title="1">rstudioapi<span class="op">::</span><span class="kw">navigateToFile</span>(<span class="st">&quot;dev/02_dev.R&quot;</span>)</a></code></pre></div>
 </div>
 </div>
 <div id="day-to-day-dev-with-golem" class="section level2">
@@ -537,56 +537,56 @@ You’ve successfully initiated the project and can go to dev/02_dev.R.</p>
 <h3><span class="header-section-number">11.5.1</span> Add modules</h3>
 <p>The <code>golem::add_module()</code> functions creates a module in the <code>R</code> folder.
 The file and the modules will be named after the <code>name</code> parameter, by adding <code>mod_</code> to the R file, and <code>mod_*_ui</code> and <code>mod_*_server</code> to the UI and server functions.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="stepbuild.html#cb100-1"></a>golem<span class="op">::</span><span class="kw">add_module</span>(<span class="dt">name =</span> <span class="st">&quot;my_first_module&quot;</span>) <span class="co"># Name of the module</span></span></code></pre></div>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb100-1" title="1">golem<span class="op">::</span><span class="kw">add_module</span>(<span class="dt">name =</span> <span class="st">&quot;my_first_module&quot;</span>) <span class="co"># Name of the module</span></a></code></pre></div>
 <p>The new file will contain:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="stepbuild.html#cb101-1"></a><span class="co"># mod_UI</span></span>
-<span id="cb101-2"><a href="stepbuild.html#cb101-2"></a>mod_my_first_module_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
-<span id="cb101-3"><a href="stepbuild.html#cb101-3"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
-<span id="cb101-4"><a href="stepbuild.html#cb101-4"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb101-5"><a href="stepbuild.html#cb101-5"></a>  </span>
-<span id="cb101-6"><a href="stepbuild.html#cb101-6"></a>  )</span>
-<span id="cb101-7"><a href="stepbuild.html#cb101-7"></a>}</span>
-<span id="cb101-8"><a href="stepbuild.html#cb101-8"></a></span>
-<span id="cb101-9"><a href="stepbuild.html#cb101-9"></a>mod_my_first_module_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb101-10"><a href="stepbuild.html#cb101-10"></a>  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</span>
-<span id="cb101-11"><a href="stepbuild.html#cb101-11"></a>}</span>
-<span id="cb101-12"><a href="stepbuild.html#cb101-12"></a>    </span>
-<span id="cb101-13"><a href="stepbuild.html#cb101-13"></a><span class="co">## To be copied in the UI</span></span>
-<span id="cb101-14"><a href="stepbuild.html#cb101-14"></a><span class="co"># mod_my_first_module_ui(&quot;my_first_module_1&quot;)</span></span>
-<span id="cb101-15"><a href="stepbuild.html#cb101-15"></a>    </span>
-<span id="cb101-16"><a href="stepbuild.html#cb101-16"></a><span class="co">## To be copied in the server</span></span>
-<span id="cb101-17"><a href="stepbuild.html#cb101-17"></a><span class="co"># callModule(mod_my_first_module_server, &quot;my_first_module_1&quot;)</span></span></code></pre></div>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb101-1" title="1"><span class="co"># mod_UI</span></a>
+<a class="sourceLine" id="cb101-2" title="2">mod_my_first_module_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</a>
+<a class="sourceLine" id="cb101-3" title="3">  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</a>
+<a class="sourceLine" id="cb101-4" title="4">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb101-5" title="5">  </a>
+<a class="sourceLine" id="cb101-6" title="6">  )</a>
+<a class="sourceLine" id="cb101-7" title="7">}</a>
+<a class="sourceLine" id="cb101-8" title="8"></a>
+<a class="sourceLine" id="cb101-9" title="9">mod_my_first_module_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</a>
+<a class="sourceLine" id="cb101-10" title="10">  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</a>
+<a class="sourceLine" id="cb101-11" title="11">}</a>
+<a class="sourceLine" id="cb101-12" title="12">    </a>
+<a class="sourceLine" id="cb101-13" title="13"><span class="co">## To be copied in the UI</span></a>
+<a class="sourceLine" id="cb101-14" title="14"><span class="co"># mod_my_first_module_ui(&quot;my_first_module_1&quot;)</span></a>
+<a class="sourceLine" id="cb101-15" title="15">    </a>
+<a class="sourceLine" id="cb101-16" title="16"><span class="co">## To be copied in the server</span></a>
+<a class="sourceLine" id="cb101-17" title="17"><span class="co"># callModule(mod_my_first_module_server, &quot;my_first_module_1&quot;)</span></a></code></pre></div>
 <p>In order not to make errors when putting these into your app, the end of the file will contain code that has to be copied and pasted inside your UI and server functions.</p>
 </div>
 <div id="add-dependencies" class="section level3">
 <h3><span class="header-section-number">11.5.2</span> Add dependencies</h3>
 <p>To be called each time you need a new package as a dependency:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="stepbuild.html#cb102-1"></a>usethis<span class="op">::</span><span class="kw">use_package</span>(<span class="st">&quot;pkg&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" title="1">usethis<span class="op">::</span><span class="kw">use_package</span>(<span class="st">&quot;pkg&quot;</span>)</a></code></pre></div>
 </div>
 <div id="add-tests" class="section level3">
 <h3><span class="header-section-number">11.5.3</span> Add tests</h3>
 <p>Add more tests to your application:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="stepbuild.html#cb103-1"></a>usethis<span class="op">::</span><span class="kw">use_test</span>(<span class="st">&quot;app&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb103-1" title="1">usethis<span class="op">::</span><span class="kw">use_test</span>(<span class="st">&quot;app&quot;</span>)</a></code></pre></div>
 </div>
 <div id="add-a-browser-button" class="section level3">
 <h3><span class="header-section-number">11.5.4</span> Add a browser button</h3>
 <p>Learn more about this: <a href="https://rtask.thinkr.fr/blog/a-little-trick-for-debugging-shiny/" class="uri">https://rtask.thinkr.fr/blog/a-little-trick-for-debugging-shiny/</a></p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="stepbuild.html#cb104-1"></a>golem<span class="op">::</span><span class="kw">browser_button</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb104-1" title="1">golem<span class="op">::</span><span class="kw">browser_button</span>()</a></code></pre></div>
 </div>
 <div id="add-external-files" class="section level3">
 <h3><span class="header-section-number">11.5.5</span> Add external files</h3>
 <p>These functions create external dependencies (JavaScript and CSS). <code>add_js_file()</code> creates a simple JavaScript file, while <code>add_js_handler()</code> adds a file with a skeleton for shiny custom handlers.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="stepbuild.html#cb105-1"></a>golem<span class="op">::</span><span class="kw">add_js_file</span>(<span class="st">&quot;script&quot;</span>)</span>
-<span id="cb105-2"><a href="stepbuild.html#cb105-2"></a>golem<span class="op">::</span><span class="kw">add_js_handler</span>(<span class="st">&quot;script&quot;</span>)</span>
-<span id="cb105-3"><a href="stepbuild.html#cb105-3"></a>golem<span class="op">::</span><span class="kw">add_css_file</span>(<span class="st">&quot;custom&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb105-1" title="1">golem<span class="op">::</span><span class="kw">add_js_file</span>(<span class="st">&quot;script&quot;</span>)</a>
+<a class="sourceLine" id="cb105-2" title="2">golem<span class="op">::</span><span class="kw">add_js_handler</span>(<span class="st">&quot;script&quot;</span>)</a>
+<a class="sourceLine" id="cb105-3" title="3">golem<span class="op">::</span><span class="kw">add_css_file</span>(<span class="st">&quot;custom&quot;</span>)</a></code></pre></div>
 </div>
 </div>
 <div id="adding-these-external-resources-to-your-app" class="section level2">
 <h2><span class="header-section-number">11.6</span> Adding these external resources to your app</h2>
 <p>You can add any external resource (JS, css) into <code>inst/app/www</code>.</p>
 <p>Then, You’ll need to point to these external resources in <code>golem_add_external_resources()</code>.
-For example, if you’ve created a CSS file with <code>golem::add_css_file("custom")</code>, you can add the file with:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="stepbuild.html#cb106-1"></a>tags<span class="op">$</span><span class="kw">link</span>(<span class="dt">rel=</span><span class="st">&quot;stylesheet&quot;</span>, <span class="dt">type=</span><span class="st">&quot;text/css&quot;</span>, <span class="dt">href=</span><span class="st">&quot;www/custom.css&quot;</span>)</span></code></pre></div>
+For example, if you’ve created a CSS file with <code>golem::add_css_file(&quot;custom&quot;)</code>, you can add the file with:</p>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb106-1" title="1">tags<span class="op">$</span><span class="kw">link</span>(<span class="dt">rel=</span><span class="st">&quot;stylesheet&quot;</span>, <span class="dt">type=</span><span class="st">&quot;text/css&quot;</span>, <span class="dt">href=</span><span class="st">&quot;www/custom.css&quot;</span>)</a></code></pre></div>
 <p>Also, you can list here the use of other packages, for example <code>useShinyalert()</code> from the <code>{shinyalert}</code> package.</p>
 <p>Note: we’ve chosen to leave it “raw”, in the sense that there is a <code>addResourcePath</code> and a <code>tags$head</code>.
 If you’re comfortable with <code>{htmltools}</code>, you can build a <code>htmltools::htmlDependency</code>.</p>
@@ -595,33 +595,33 @@ If you’re comfortable with <code>{htmltools}</code>, you can build a <code>htm
 <h2><span class="header-section-number">11.7</span> Documentation</h2>
 <div id="vignette" class="section level3">
 <h3><span class="header-section-number">11.7.1</span> Vignette</h3>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="stepbuild.html#cb107-1"></a>usethis<span class="op">::</span><span class="kw">use_vignette</span>(<span class="st">&quot;shinyexample&quot;</span>)</span>
-<span id="cb107-2"><a href="stepbuild.html#cb107-2"></a>devtools<span class="op">::</span><span class="kw">build_vignettes</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb107-1" title="1">usethis<span class="op">::</span><span class="kw">use_vignette</span>(<span class="st">&quot;shinyexample&quot;</span>)</a>
+<a class="sourceLine" id="cb107-2" title="2">devtools<span class="op">::</span><span class="kw">build_vignettes</span>()</a></code></pre></div>
 </div>
 <div id="code-coverage" class="section level3">
 <h3><span class="header-section-number">11.7.2</span> Code coverage</h3>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="stepbuild.html#cb108-1"></a>usethis<span class="op">::</span><span class="kw">use_travis</span>()</span>
-<span id="cb108-2"><a href="stepbuild.html#cb108-2"></a>usethis<span class="op">::</span><span class="kw">use_appveyor</span>()</span>
-<span id="cb108-3"><a href="stepbuild.html#cb108-3"></a>usethis<span class="op">::</span><span class="kw">use_coverage</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb108-1" title="1">usethis<span class="op">::</span><span class="kw">use_travis</span>()</a>
+<a class="sourceLine" id="cb108-2" title="2">usethis<span class="op">::</span><span class="kw">use_appveyor</span>()</a>
+<a class="sourceLine" id="cb108-3" title="3">usethis<span class="op">::</span><span class="kw">use_coverage</span>()</a></code></pre></div>
 </div>
 </div>
 <div id="using-golem-dev-functions" class="section level2">
 <h2><span class="header-section-number">11.8</span> Using <code>{golem}</code> dev functions</h2>
 <p>There’s a series of tools to make your app behave differently whether it’s in dev or prod mode.
-Notably, the <code>app_prod()</code> and <code>app_dev()</code> function tests for <code>options( "golem.app.prod")</code> (or return TRUE if this option doesn’t exist).</p>
+Notably, the <code>app_prod()</code> and <code>app_dev()</code> function tests for <code>options( &quot;golem.app.prod&quot;)</code> (or return TRUE if this option doesn’t exist).</p>
 <p>Setting this options at the beginning of your dev process allows to make your app behave in a specific way when you are in dev mode.
 For example, printing message to the console with <code>cat_dev()</code>.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="stepbuild.html#cb109-1"></a><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">TRUE</span>)</span>
-<span id="cb109-2"><a href="stepbuild.html#cb109-2"></a>golem<span class="op">::</span><span class="kw">cat_dev</span>(<span class="st">&quot;hey</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb109-3"><a href="stepbuild.html#cb109-3"></a><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">FALSE</span>)</span>
-<span id="cb109-4"><a href="stepbuild.html#cb109-4"></a>golem<span class="op">::</span><span class="kw">cat_dev</span>(<span class="st">&quot;hey</span><span class="ch">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" title="1"><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb109-2" title="2">golem<span class="op">::</span><span class="kw">cat_dev</span>(<span class="st">&quot;hey</span><span class="ch">\n</span><span class="st">&quot;</span>)</a>
+<a class="sourceLine" id="cb109-3" title="3"><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb109-4" title="4">golem<span class="op">::</span><span class="kw">cat_dev</span>(<span class="st">&quot;hey</span><span class="ch">\n</span><span class="st">&quot;</span>)</a></code></pre></div>
 <pre><code>hey</code></pre>
 <p>You can then make any function being “dev-dependant” with the <code>make_dev()</code> function:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb111-1"><a href="stepbuild.html#cb111-1"></a>log_dev &lt;-<span class="st"> </span>golem<span class="op">::</span><span class="kw">make_dev</span>(log)</span>
-<span id="cb111-2"><a href="stepbuild.html#cb111-2"></a><span class="kw">log_dev</span>(<span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb111-1" title="1">log_dev &lt;-<span class="st"> </span>golem<span class="op">::</span><span class="kw">make_dev</span>(log)</a>
+<a class="sourceLine" id="cb111-2" title="2"><span class="kw">log_dev</span>(<span class="dv">10</span>)</a></code></pre></div>
 <pre><code>[1] 2.302585</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb113-1"><a href="stepbuild.html#cb113-1"></a><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">TRUE</span>)</span>
-<span id="cb113-2"><a href="stepbuild.html#cb113-2"></a><span class="kw">log_dev</span>(<span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb113-1" title="1"><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb113-2" title="2"><span class="kw">log_dev</span>(<span class="dv">10</span>)</a></code></pre></div>
 
 </div>
 </div>
@@ -643,11 +643,13 @@ For example, printing message to the console with <code>cat_dev()</code>.</p>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -655,12 +657,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -672,6 +673,10 @@ gitbook.start({
 "text": "Edit"
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -690,8 +695,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();

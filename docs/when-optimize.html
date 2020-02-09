@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 16 The Need for Optimization | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="Chapter 16 The Need for Optimization | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 16 The Need for Optimization | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="deploy-golem.html">
-<link rel="next" href="optim-caveat.html">
+<link rel="prev" href="deploy-golem.html"/>
+<link rel="next" href="optim-caveat.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -40,6 +40,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -59,28 +62,25 @@
 
 
 <style type="text/css">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -89,9 +89,9 @@ pre.numberSource code > span > a:first-child::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {   }
+  {  }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+a.sourceLine::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -465,28 +465,28 @@ So think about it: is local optimization worth the extra hours you’ll have to 
 Of course, the C++ function is faster than the R one—this is the very reason of using C++ with R.
 Though, how much faster is worth the trade-off of being sure you’ll get someone in your team to take over the maintenance if needed?
 Using external languages or complex data structures implies that from the start, you’ll need to think about who and how your code base will be maintain over the years.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="when-optimize.html#cb115-1"></a><span class="kw">library</span>(<span class="st">&quot;Rcpp&quot;</span>)</span>
-<span id="cb115-2"><a href="when-optimize.html#cb115-2"></a><span class="kw">cppFunction</span>(<span class="st">&quot;</span></span>
-<span id="cb115-3"><a href="when-optimize.html#cb115-3"></a><span class="st">double mean_cpp(NumericVector x) {</span></span>
-<span id="cb115-4"><a href="when-optimize.html#cb115-4"></a><span class="st">  int j;</span></span>
-<span id="cb115-5"><a href="when-optimize.html#cb115-5"></a><span class="st">  int size = x.size();</span></span>
-<span id="cb115-6"><a href="when-optimize.html#cb115-6"></a><span class="st">  double res = 0;</span></span>
-<span id="cb115-7"><a href="when-optimize.html#cb115-7"></a><span class="st">  for (j = 0; j &lt; size; j++){</span></span>
-<span id="cb115-8"><a href="when-optimize.html#cb115-8"></a><span class="st">    res = res + x[j];</span></span>
-<span id="cb115-9"><a href="when-optimize.html#cb115-9"></a><span class="st">  }</span></span>
-<span id="cb115-10"><a href="when-optimize.html#cb115-10"></a><span class="st">  return res / size;</span></span>
-<span id="cb115-11"><a href="when-optimize.html#cb115-11"></a><span class="st">}&quot;</span>)</span>
-<span id="cb115-12"><a href="when-optimize.html#cb115-12"></a></span>
-<span id="cb115-13"><a href="when-optimize.html#cb115-13"></a>bench<span class="op">::</span><span class="kw">mark</span>(</span>
-<span id="cb115-14"><a href="when-optimize.html#cb115-14"></a>  <span class="dt">cpp =</span> <span class="kw">mean_cpp</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>),</span>
-<span id="cb115-15"><a href="when-optimize.html#cb115-15"></a>  <span class="dt">native =</span> <span class="kw">mean</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>), </span>
-<span id="cb115-16"><a href="when-optimize.html#cb115-16"></a>  <span class="dt">iterations =</span> <span class="dv">1000</span></span>
-<span id="cb115-17"><a href="when-optimize.html#cb115-17"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb115-1" title="1"><span class="kw">library</span>(<span class="st">&quot;Rcpp&quot;</span>)</a>
+<a class="sourceLine" id="cb115-2" title="2"><span class="kw">cppFunction</span>(<span class="st">&quot;</span></a>
+<a class="sourceLine" id="cb115-3" title="3"><span class="st">double mean_cpp(NumericVector x) {</span></a>
+<a class="sourceLine" id="cb115-4" title="4"><span class="st">  int j;</span></a>
+<a class="sourceLine" id="cb115-5" title="5"><span class="st">  int size = x.size();</span></a>
+<a class="sourceLine" id="cb115-6" title="6"><span class="st">  double res = 0;</span></a>
+<a class="sourceLine" id="cb115-7" title="7"><span class="st">  for (j = 0; j &lt; size; j++){</span></a>
+<a class="sourceLine" id="cb115-8" title="8"><span class="st">    res = res + x[j];</span></a>
+<a class="sourceLine" id="cb115-9" title="9"><span class="st">  }</span></a>
+<a class="sourceLine" id="cb115-10" title="10"><span class="st">  return res / size;</span></a>
+<a class="sourceLine" id="cb115-11" title="11"><span class="st">}&quot;</span>)</a>
+<a class="sourceLine" id="cb115-12" title="12"></a>
+<a class="sourceLine" id="cb115-13" title="13">bench<span class="op">::</span><span class="kw">mark</span>(</a>
+<a class="sourceLine" id="cb115-14" title="14">  <span class="dt">cpp =</span> <span class="kw">mean_cpp</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>),</a>
+<a class="sourceLine" id="cb115-15" title="15">  <span class="dt">native =</span> <span class="kw">mean</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>), </a>
+<a class="sourceLine" id="cb115-16" title="16">  <span class="dt">iterations =</span> <span class="dv">1000</span></a>
+<a class="sourceLine" id="cb115-17" title="17">)</a></code></pre></div>
 <pre><code># A tibble: 2 x 6
   expression      min   median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 cpp          2.79µs   5.79µs   113870.    3.32KB        0
-2 native       5.26µs   9.52µs    66913.        0B        0</code></pre>
+1 cpp          2.77µs    6.9µs   102534.    3.32KB        0
+2 native       5.62µs   9.04µs    98388.        0B        0</code></pre>
 <p>(Note: we’ll come back on <code>bench::mark</code> in the next chapter)</p>
 <p>So, to sum up, there are three ways to optimize your application &amp; R code, and the bad news is that you’ can’t optimize for all of them:</p>
 <ul>
@@ -503,7 +503,7 @@ Using external languages or complex data structures implies that from the start,
 <h3><span class="header-section-number">16.2.1</span> Profiling R code</h3>
 <div id="identifying-bottlenecks-1" class="section level4">
 <h4><span class="header-section-number">16.2.1.1</span> Identifying bottlenecks</h4>
-<p>The best way to profile R code is by using the <code>{profvis}</code> package<a href="optimjs.html#fn32" class="footnote-ref" id="fnref32"><sup>32</sup></a>, a package designed to evaluate how much time each part of a function call take.
+<p>The best way to profile R code is by using the <code>{profvis}</code> package<a href="#fn32" class="footnote-ref" id="fnref32"><sup>32</sup></a>, a package designed to evaluate how much time each part of a function call take.
 That way, you can spot the bottleneck of your function, a task which would have to be done by guessing, which will, most of the time, come with bad guesses:</p>
 <blockquote>
 <p>One of the lessons that the original Unix programmers learned early is that intuition is a poor guide to where the bottlenecks are, even for one who knows the code in question intimately.</p>
@@ -516,27 +516,27 @@ That way, you can spot the bottleneck of your function, a task which would have 
 </div>
 <p>Using a tool like <code>{profvis}</code> allows to have a details view of what takes a long time to run in your R code.
 Here is how it works:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="when-optimize.html#cb117-1"></a>x &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb117-2"><a href="when-optimize.html#cb117-2"></a>  profvis<span class="op">::</span><span class="kw">pause</span>(<span class="fl">0.1</span>)</span>
-<span id="cb117-3"><a href="when-optimize.html#cb117-3"></a>  <span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="cf">function</span>(x){</span>
-<span id="cb117-4"><a href="when-optimize.html#cb117-4"></a>    x <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
-<span id="cb117-5"><a href="when-optimize.html#cb117-5"></a>  })</span>
-<span id="cb117-6"><a href="when-optimize.html#cb117-6"></a>  <span class="kw">y</span>()</span>
-<span id="cb117-7"><a href="when-optimize.html#cb117-7"></a>}</span>
-<span id="cb117-8"><a href="when-optimize.html#cb117-8"></a></span>
-<span id="cb117-9"><a href="when-optimize.html#cb117-9"></a>y &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb117-10"><a href="when-optimize.html#cb117-10"></a>  profvis<span class="op">::</span><span class="kw">pause</span>(<span class="fl">0.2</span>)</span>
-<span id="cb117-11"><a href="when-optimize.html#cb117-11"></a>  <span class="fl">1e4</span> <span class="op">*</span><span class="st"> </span><span class="dv">9</span></span>
-<span id="cb117-12"><a href="when-optimize.html#cb117-12"></a>  <span class="kw">z</span>()</span>
-<span id="cb117-13"><a href="when-optimize.html#cb117-13"></a>}</span>
-<span id="cb117-14"><a href="when-optimize.html#cb117-14"></a></span>
-<span id="cb117-15"><a href="when-optimize.html#cb117-15"></a>z &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb117-16"><a href="when-optimize.html#cb117-16"></a>  profvis<span class="op">::</span><span class="kw">pause</span>(<span class="fl">0.3</span>)</span>
-<span id="cb117-17"><a href="when-optimize.html#cb117-17"></a>  <span class="kw">print</span>(<span class="st">&quot;hey&quot;</span>)</span>
-<span id="cb117-18"><a href="when-optimize.html#cb117-18"></a>}</span>
-<span id="cb117-19"><a href="when-optimize.html#cb117-19"></a>profvis<span class="op">::</span><span class="kw">profvis</span>({</span>
-<span id="cb117-20"><a href="when-optimize.html#cb117-20"></a>  <span class="kw">x</span>()</span>
-<span id="cb117-21"><a href="when-optimize.html#cb117-21"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb117-1" title="1">x &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb117-2" title="2">  profvis<span class="op">::</span><span class="kw">pause</span>(<span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb117-3" title="3">  <span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="cf">function</span>(x){</a>
+<a class="sourceLine" id="cb117-4" title="4">    x <span class="op">*</span><span class="st"> </span><span class="dv">10</span></a>
+<a class="sourceLine" id="cb117-5" title="5">  })</a>
+<a class="sourceLine" id="cb117-6" title="6">  <span class="kw">y</span>()</a>
+<a class="sourceLine" id="cb117-7" title="7">}</a>
+<a class="sourceLine" id="cb117-8" title="8"></a>
+<a class="sourceLine" id="cb117-9" title="9">y &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb117-10" title="10">  profvis<span class="op">::</span><span class="kw">pause</span>(<span class="fl">0.2</span>)</a>
+<a class="sourceLine" id="cb117-11" title="11">  <span class="fl">1e4</span> <span class="op">*</span><span class="st"> </span><span class="dv">9</span></a>
+<a class="sourceLine" id="cb117-12" title="12">  <span class="kw">z</span>()</a>
+<a class="sourceLine" id="cb117-13" title="13">}</a>
+<a class="sourceLine" id="cb117-14" title="14"></a>
+<a class="sourceLine" id="cb117-15" title="15">z &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb117-16" title="16">  profvis<span class="op">::</span><span class="kw">pause</span>(<span class="fl">0.3</span>)</a>
+<a class="sourceLine" id="cb117-17" title="17">  <span class="kw">print</span>(<span class="st">&quot;hey&quot;</span>)</a>
+<a class="sourceLine" id="cb117-18" title="18">}</a>
+<a class="sourceLine" id="cb117-19" title="19">profvis<span class="op">::</span><span class="kw">profvis</span>({</a>
+<a class="sourceLine" id="cb117-20" title="20">  <span class="kw">x</span>()</a>
+<a class="sourceLine" id="cb117-21" title="21">})</a></code></pre></div>
 <p><img src="img/profviz_out.png" /></p>
 <p>What you see now is what is called a <code>flame graph</code>: it’s a detailled timing of how your function has run.
 What you see on top is the expression evaluated, and on the bottom a detail of the call stack, with what looks like a Gantt diagram.
@@ -559,26 +559,26 @@ One thing that can be done is to keep an RMarkdown file with your starting point
 By using an Rmd, you can also document the strategies you’ve been using to optimize the code: “switched from for loop to vectorize function”, “changed from x to y”, etc.</p>
 <p>And of course, you will need to time things.
 To do that, you can use the <code>{bench}</code> package, which compares the execution time (and other metrics) of two functions.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="when-optimize.html#cb118-1"></a>x &lt;-<span class="st"> </span><span class="cf">function</span>(size){</span>
-<span id="cb118-2"><a href="when-optimize.html#cb118-2"></a>  res &lt;-<span class="st"> </span><span class="kw">numeric</span>(size)</span>
-<span id="cb118-3"><a href="when-optimize.html#cb118-3"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>size){</span>
-<span id="cb118-4"><a href="when-optimize.html#cb118-4"></a>    res[i] &lt;-<span class="st"> </span>i <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
-<span id="cb118-5"><a href="when-optimize.html#cb118-5"></a>  }</span>
-<span id="cb118-6"><a href="when-optimize.html#cb118-6"></a>  <span class="kw">return</span>(res)</span>
-<span id="cb118-7"><a href="when-optimize.html#cb118-7"></a>}</span>
-<span id="cb118-8"><a href="when-optimize.html#cb118-8"></a>y &lt;-<span class="st"> </span><span class="cf">function</span>(size){</span>
-<span id="cb118-9"><a href="when-optimize.html#cb118-9"></a>  (<span class="dv">1</span><span class="op">:</span>size) <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
-<span id="cb118-10"><a href="when-optimize.html#cb118-10"></a>}</span>
-<span id="cb118-11"><a href="when-optimize.html#cb118-11"></a>bench<span class="op">::</span><span class="kw">mark</span>(</span>
-<span id="cb118-12"><a href="when-optimize.html#cb118-12"></a>  <span class="st">`</span><span class="dt">for</span><span class="st">`</span> =<span class="st"> </span><span class="kw">x</span>(<span class="dv">1000</span>), </span>
-<span id="cb118-13"><a href="when-optimize.html#cb118-13"></a>  <span class="dt">vectorized =</span> <span class="kw">y</span>(<span class="dv">1000</span>), </span>
-<span id="cb118-14"><a href="when-optimize.html#cb118-14"></a>  <span class="dt">iterations =</span> <span class="dv">1000</span></span>
-<span id="cb118-15"><a href="when-optimize.html#cb118-15"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" title="1">x &lt;-<span class="st"> </span><span class="cf">function</span>(size){</a>
+<a class="sourceLine" id="cb118-2" title="2">  res &lt;-<span class="st"> </span><span class="kw">numeric</span>(size)</a>
+<a class="sourceLine" id="cb118-3" title="3">  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>size){</a>
+<a class="sourceLine" id="cb118-4" title="4">    res[i] &lt;-<span class="st"> </span>i <span class="op">*</span><span class="st"> </span><span class="dv">10</span></a>
+<a class="sourceLine" id="cb118-5" title="5">  }</a>
+<a class="sourceLine" id="cb118-6" title="6">  <span class="kw">return</span>(res)</a>
+<a class="sourceLine" id="cb118-7" title="7">}</a>
+<a class="sourceLine" id="cb118-8" title="8">y &lt;-<span class="st"> </span><span class="cf">function</span>(size){</a>
+<a class="sourceLine" id="cb118-9" title="9">  (<span class="dv">1</span><span class="op">:</span>size) <span class="op">*</span><span class="st"> </span><span class="dv">10</span></a>
+<a class="sourceLine" id="cb118-10" title="10">}</a>
+<a class="sourceLine" id="cb118-11" title="11">bench<span class="op">::</span><span class="kw">mark</span>(</a>
+<a class="sourceLine" id="cb118-12" title="12">  <span class="st">`</span><span class="dt">for</span><span class="st">`</span> =<span class="st"> </span><span class="kw">x</span>(<span class="dv">1000</span>), </a>
+<a class="sourceLine" id="cb118-13" title="13">  <span class="dt">vectorized =</span> <span class="kw">y</span>(<span class="dv">1000</span>), </a>
+<a class="sourceLine" id="cb118-14" title="14">  <span class="dt">iterations =</span> <span class="dv">1000</span></a>
+<a class="sourceLine" id="cb118-15" title="15">)</a></code></pre></div>
 <pre><code># A tibble: 2 x 6
   expression      min   median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 for          48.5µs  59.62µs    11023.    30.5KB        0
-2 vectorized   6.14µs   9.41µs    64949.    11.8KB        0</code></pre>
+1 for         50.49µs   64.6µs    11048.    30.5KB        0
+2 vectorized   8.75µs   11.1µs    49983.    11.8KB        0</code></pre>
 <p>Here, we have an empiric evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest.
 And, bonus point, <code>{bench}</code> takes time to check that the two outputs are the same, so that you’re sure that you’re not comparing apple and oranges!</p>
 </div>
@@ -605,11 +605,13 @@ And, bonus point, <code>{bench}</code> takes time to check that the two outputs 
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -617,12 +619,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -634,6 +635,10 @@ gitbook.start({
 "text": "Edit"
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -652,8 +657,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
