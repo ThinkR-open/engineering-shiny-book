@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 4 Introduction to {golem} | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="Chapter 4 Introduction to {golem} | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 4 Introduction to {golem} | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="structure.html">
-<link rel="next" href="workflow.html">
+<link rel="prev" href="structure.html"/>
+<link rel="next" href="workflow.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -40,6 +40,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -59,28 +62,25 @@
 
 
 <style type="text/css">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -89,9 +89,9 @@ pre.numberSource code > span > a:first-child::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {   }
+  {  }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+a.sourceLine::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -431,20 +431,20 @@ Of course there is, and it’s called <code>{golem}</code>, a framework for buil
 A lot of things in this book reflect the way <code>{golem}</code> and the packages from the “golem-verse” are designed.
 We advice to use <code>{golem}</code> if you plan on following the workflow described in this book, but of course the workflow will still be valid of you plan on not using <code>{golem}</code>.</p>
 <p>The stable release can be found on CRAN, and installed with:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="golem.html#cb48-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;golem&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;golem&quot;</span>)</a></code></pre></div>
 <p><code>{golem}</code> dev version can be found on GitHub and you’ll have to install it with:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="golem.html#cb49-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;Thinkr-open/golem&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" title="1">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;Thinkr-open/golem&quot;</span>)</a></code></pre></div>
 <p>The current version of the package on CRAN is:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="golem.html#cb50-1"></a><span class="kw">library</span>(dplyr, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb50-2"><a href="golem.html#cb50-2"></a>tools<span class="op">::</span><span class="kw">CRAN_package_db</span>() <span class="op">%&gt;%</span></span>
-<span id="cb50-3"><a href="golem.html#cb50-3"></a><span class="st">  </span><span class="kw">filter</span>(Package <span class="op">==</span><span class="st"> &quot;golem&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb50-4"><a href="golem.html#cb50-4"></a><span class="st">  </span><span class="kw">select</span>(Version)</span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" title="1"><span class="kw">library</span>(dplyr, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb50-2" title="2">tools<span class="op">::</span><span class="kw">CRAN_package_db</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb50-3" title="3"><span class="st">  </span><span class="kw">filter</span>(Package <span class="op">==</span><span class="st"> &quot;golem&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb50-4" title="4"><span class="st">  </span><span class="kw">select</span>(Version)</a></code></pre></div>
 <pre><code>  Version
 1     0.1</code></pre>
 <p>While the current version of the dev version is:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="golem.html#cb52-1"></a>x &lt;-<span class="st"> </span><span class="kw">tempfile</span>()</span>
-<span id="cb52-2"><a href="golem.html#cb52-2"></a><span class="kw">download.file</span>(<span class="st">&quot;https://raw.githubusercontent.com/ThinkR-open/golem/dev/DESCRIPTION&quot;</span>, x)</span>
-<span id="cb52-3"><a href="golem.html#cb52-3"></a>desc<span class="op">::</span><span class="kw">desc_get_version</span>(x)</span></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" title="1">x &lt;-<span class="st"> </span><span class="kw">tempfile</span>()</a>
+<a class="sourceLine" id="cb52-2" title="2"><span class="kw">download.file</span>(<span class="st">&quot;https://raw.githubusercontent.com/ThinkR-open/golem/dev/DESCRIPTION&quot;</span>, x)</a>
+<a class="sourceLine" id="cb52-3" title="3">desc<span class="op">::</span><span class="kw">desc_get_version</span>(x)</a></code></pre></div>
 <pre><code>[1] &#39;0.1.0.9700&#39;</code></pre>
 <p><code>{golem}</code> is an R package that implements an opinionated framework for building production-ready Shiny apps.</p>
 <p>The motivation behind <code>{golem}</code> is that building a proof-of-concept application is easy, but things change when the application becomes larger and more complex, and especially when it comes to sending that app to production.
@@ -462,7 +462,7 @@ The good news is also that everything you know about package development can be 
 <div id="understanding-golem-app-structure" class="section level2">
 <h2><span class="header-section-number">4.2</span> Understanding <code>{golem}</code> app structure</h2>
 <p>When starting a new project with <code>{golem}</code> (here on an app called <code>golex</code>), you’ll start with this specific architecture.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="golem.html#cb54-1"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;golex&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" title="1">fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;golex&quot;</span>)</a></code></pre></div>
 <pre><code>golex
 ├── DESCRIPTION
 ├── NAMESPACE
@@ -510,11 +510,11 @@ If you’d like to learn more about these, here are some resources you can refer
 <p>The <code>R/</code> folder is also the standard folder where you’ll be putting all your app functions.
 When you start your app project, this folder is pre-populated with three <code>.R</code>: <code>app_server.R</code>, <code>app_ui.R</code>, and <code>run_app.R</code>.</p>
 <p>During the process of building your application, all the core functionalities of your app will go there: you’ll put there the content of your modules (with <code>golem::add_modules()</code>) and the utilitarian / business logic functions you’ll build with <code>golem::add_utils()</code> and <code>golem::add_fct()</code>.
-If you want to add a standard file (that is to say out of <code>{golem}</code> nomenclature), you can call <code>usethis::use_r("name")</code>, which create a <code>R/name.R</code> file.</p>
+If you want to add a standard file (that is to say out of <code>{golem}</code> nomenclature), you can call <code>usethis::use_r(&quot;name&quot;)</code>, which create a <code>R/name.R</code> file.</p>
 <p>All your <code>.R</code> file should go there, with the only exception of the files you’ll create when deploying to RStudio products: these processes needing an <code>app.R</code> at the root of the project, the <code>golem::add_rstudioconnect_file()</code> will bypass this “.R only in R/” rule to add a file at your package root.
 Good news is that <code>{golem}</code> also knows that a package with an <code>app.R</code> at its root can’t build, so this file is added to the <code>.Rbuildignore</code>.</p>
 <p>If you’ve been building classic Shiny Apps, you’ve been use to <code>source()</code> your R files at the beginning of your <code>app.R</code> or <code>ui.R/server.R</code>.
-Keep in mind that, as we are building a package, we don’t need to source files from one place to another: <code>{golem}</code>, be it in the <code>dev/run_dev.R</code>, <code>app.R</code> for RStudio products, or running the <code>run_app()</code> function, leverages the package structure to allow you to have access to other functions from inside the whole <code>R/</code> folder<a href="optimjs.html#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a>.</p>
+Keep in mind that, as we are building a package, we don’t need to source files from one place to another: <code>{golem}</code>, be it in the <code>dev/run_dev.R</code>, <code>app.R</code> for RStudio products, or running the <code>run_app()</code> function, leverages the package structure to allow you to have access to other functions from inside the whole <code>R/</code> folder<a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a>.</p>
 <p>Note also that this folder can’t contain sub-folders.</p>
 <div id="app_server.r" class="section level4">
 <h4><span class="header-section-number">4.2.2.1</span> app_server.R</h4>
@@ -568,7 +568,7 @@ You may have noticed that this function is to be found above in the file, in the
 This function is used for linking to external files inside your applications: notably the files you’ll create with <code>golem::add_css_file()</code> and friends.
 In <code>golem_add_external_resources()</code>, you can also define custom resourcesPath.
 The first line (the one with <code>addResourcePath()</code>) is the one allowing the <code>inst/app/www</code> folder to mounted and be available at <code>www</code> with your app when you launch it.
-That’s why later on, when creating CSS or JS files, you’ll be asked to add there <code>tags$link(rel="stylesheet", type="text/css", href="www/custom.css")</code>.</p>
+That’s why later on, when creating CSS or JS files, you’ll be asked to add there <code>tags$link(rel=&quot;stylesheet&quot;, type=&quot;text/css&quot;, href=&quot;www/custom.css&quot;)</code>.</p>
 <p>The other part of this function, starting with <code>tags$head</code>, creates a <code>&lt;head&gt;</code> tag for your application.
 This <code>&lt;head&gt;</code> tag is a pretty standard tag, which is used in HTML to define a series of metadata about your app.
 We encourage you to add any new external file (e.g pictures) in this <code>inst/app/www</code> folder, so that you can later use it in the UI with the common <code>www</code> prefix.
@@ -576,7 +576,7 @@ An other common pattern would be:</p>
 <ul>
 <li>Adding images in <code>inst/app/img</code></li>
 <li>Calling <code>addResourcePath( 'img', system.file('app/img', package = 'golex') )</code></li>
-<li>Adding elements to your UI with <code>tags$img(src = "img/name.png")</code>.</li>
+<li>Adding elements to your UI with <code>tags$img(src = &quot;img/name.png&quot;)</code>.</li>
 </ul>
 </div>
 <div id="run_app.r" class="section level4">
@@ -592,15 +592,15 @@ run_app &lt;- function(...) {
     golem_opts = list(...)
   )
 }</code></pre>
-<p>This <code>run_app()</code>function is the one that you’ll use to launch the app<a href="optimjs.html#fn16" class="footnote-ref" id="fnref16"><sup>16</sup></a>.</p>
+<p>This <code>run_app()</code>function is the one that you’ll use to launch the app<a href="#fn16" class="footnote-ref" id="fnref16"><sup>16</sup></a>.</p>
 <p>The body of this function is wrapped inside <code>with_golem_options()</code>, which allows you to pass arguments to the <code>run_app()</code> function, which will later be callable with <code>golem::get_golem_options()</code>.
-Some example of passing arguments include <code>run_app(prod = FALSE)</code> or something in the like of <code>run_app(user = "admin)</code>.</p>
+Some example of passing arguments include <code>run_app(prod = FALSE)</code> or something in the like of <code>run_app(user = &quot;admin)</code>.</p>
 </div>
 </div>
 <div id="instappwww" class="section level3">
 <h3><span class="header-section-number">4.2.3</span> <code>inst/app/www/</code></h3>
 <p>The <code>inst/app/www/</code> folder contains all the files which are gonna be made available <strong>at application run time</strong>.
-Any web application has external files that allows it to run<a href="optimjs.html#fn17" class="footnote-ref" id="fnref17"><sup>17</sup></a>.
+Any web application has external files that allows it to run<a href="#fn17" class="footnote-ref" id="fnref17"><sup>17</sup></a>.
 For example, <code>{shiny}</code> and its <code>fluidPage()</code> bundles a series of CSS and JavaScript files, notably the <code>Boostrap</code> library, or <code>jQuery</code>.
 These external files enhance your app: CSS for the design part, and JavaScript for the interactive part (more or less).
 On top of that, you can add your own files: your own design with CSS, or your own JavaScript content (as we’ll see in the last chapters of this book).
@@ -614,7 +614,7 @@ That’s what the links in the <code>golem_add_external_resources()</code> are m
 </ul>
 <p>Be aware that these files are available under the <code>www/</code> at <strong>application run time</strong>, i.e. that the <code>www/</code> folder is available by your browser, not by R when it runs / generate your application.
 In other words, you can use the <code>www</code> prefix in the HTML generated in your UI, which is read by your browser, not from the R/server side.
-If you want to link to a file that is read during <strong>application generation</strong>, you’ll need to do, for example, <code>includeMarkdown( system.file("app/www/plop.md", package = "golex") )</code>.</p>
+If you want to link to a file that is read during <strong>application generation</strong>, you’ll need to do, for example, <code>includeMarkdown( system.file(&quot;app/www/plop.md&quot;, package = &quot;golex&quot;) )</code>.</p>
 </div>
 <div id="man" class="section level3">
 <h3><span class="header-section-number">4.2.4</span> <code>man/</code></h3>
@@ -645,11 +645,13 @@ To know more about documentation and how to build it, here are some external lin
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -657,12 +659,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -674,6 +675,10 @@ gitbook.start({
 "text": "Edit"
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -692,8 +697,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();

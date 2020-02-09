@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 18 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="Chapter 18 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 18 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="optim-caveat.html">
-<link rel="next" href="optimjs.html">
+<link rel="prev" href="optim-caveat.html"/>
+<link rel="next" href="optimjs.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -40,6 +40,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -59,28 +62,25 @@
 
 
 <style type="text/css">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -89,9 +89,9 @@ pre.numberSource code > span > a:first-child::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {   }
+  {  }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+a.sourceLine::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -431,12 +431,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="whats-caching" class="section level3">
 <h3><span class="header-section-number">18.2.1</span> What’s caching?</h3>
 <p>Caching is the process of storing resources intensive results so that when they are needed again, your programm can reuse the result again without having to redo it another time.</p>
-<p>Let’s imagine that you know that you’ll need to use a phone number many time in the day, and for the purpose of this thought experiment you’re completly unable to remember it<a href="optimjs.html#fn33" class="footnote-ref" id="fnref33"><sup>33</sup></a>.
+<p>Let’s imagine that you know that you’ll need to use a phone number many time in the day, and for the purpose of this thought experiment you’re completly unable to remember it<a href="#fn33" class="footnote-ref" id="fnref33"><sup>33</sup></a>.
 What are you going to do?
 There are two solutions here: either every time you need it you look in the phone book or in your phone contact list, making it so that it takes a couple of seconds every time, or you use a post-it that you put on your computer screen with the number of it, so that you have direct access to it when you need it.
 It takes a couple of seconds the first time you look for the number, but it’s almost instantaneous the next times you need it.</p>
 <p>This is what caching do: keep the result of computation so when they are needed in the very same context, they are quickly accessible.
-The downside being that you only have limited space on your screen: when your screen is covered by sticky notes, you can’t store any more notes<a href="optimjs.html#fn34" class="footnote-ref" id="fnref34"><sup>34</sup></a>.</p>
+The downside being that you only have limited space on your screen: when your screen is covered by sticky notes, you can’t store any more notes<a href="#fn34" class="footnote-ref" id="fnref34"><sup>34</sup></a>.</p>
 <p>In the context of an interactive application in a framework like Shiny, it makes much sense to cache data structures: users tend to repeat what they do, or go back and forth between parameters.
 For example, if you have a graph that take 2 seconds to render (which is quite common in Shiny), you don’t want these 2 seconds to be repeated over and over again when users switch from one parameter to another and back to the first, as the two graphs will be the same for the same parameter.
 Same goes for queries to a database: if a query is done with the same parameters, and you know that they will return the same result, there is no need to ask the database—ask the cache to retrieve the data.</p>
@@ -447,68 +447,68 @@ Same goes for queries to a database: if a query is done with the same parameters
 They both more or less work the same way: you’ll call a memoization function on another function, and cache is created for this function.
 Then everytime you call this function again with the same parameters, the cache is returned instead of computing again.
 Here is a simple example with <code>{memoise}</code>:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="optimizing-shiny-code.html#cb126-1"></a><span class="kw">library</span>(memoise)</span>
-<span id="cb126-2"><a href="optimizing-shiny-code.html#cb126-2"></a><span class="kw">library</span>(tictoc)</span>
-<span id="cb126-3"><a href="optimizing-shiny-code.html#cb126-3"></a>fct &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">sleep =</span> <span class="dv">1</span>){</span>
-<span id="cb126-4"><a href="optimizing-shiny-code.html#cb126-4"></a>  <span class="kw">Sys.sleep</span>(sleep)</span>
-<span id="cb126-5"><a href="optimizing-shiny-code.html#cb126-5"></a>  <span class="kw">return</span>(<span class="kw">Sys.time</span>())</span>
-<span id="cb126-6"><a href="optimizing-shiny-code.html#cb126-6"></a>}</span>
-<span id="cb126-7"><a href="optimizing-shiny-code.html#cb126-7"></a>mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct)</span>
-<span id="cb126-8"><a href="optimizing-shiny-code.html#cb126-8"></a><span class="kw">tic</span>()</span>
-<span id="cb126-9"><a href="optimizing-shiny-code.html#cb126-9"></a><span class="kw">mfct</span>(<span class="dv">2</span>)</span></code></pre></div>
-<pre><code>[1] &quot;2020-02-09 00:06:29 CET&quot;</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb128-1"><a href="optimizing-shiny-code.html#cb128-1"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>2.012 sec elapsed</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb130-1"><a href="optimizing-shiny-code.html#cb130-1"></a><span class="kw">tic</span>()</span>
-<span id="cb130-2"><a href="optimizing-shiny-code.html#cb130-2"></a><span class="kw">mfct</span>(<span class="dv">2</span>)</span></code></pre></div>
-<pre><code>[1] &quot;2020-02-09 00:06:29 CET&quot;</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="optimizing-shiny-code.html#cb132-1"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>0.054 sec elapsed</code></pre>
+<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb126-1" title="1"><span class="kw">library</span>(memoise)</a>
+<a class="sourceLine" id="cb126-2" title="2"><span class="kw">library</span>(tictoc)</a>
+<a class="sourceLine" id="cb126-3" title="3">fct &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">sleep =</span> <span class="dv">1</span>){</a>
+<a class="sourceLine" id="cb126-4" title="4">  <span class="kw">Sys.sleep</span>(sleep)</a>
+<a class="sourceLine" id="cb126-5" title="5">  <span class="kw">return</span>(<span class="kw">Sys.time</span>())</a>
+<a class="sourceLine" id="cb126-6" title="6">}</a>
+<a class="sourceLine" id="cb126-7" title="7">mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct)</a>
+<a class="sourceLine" id="cb126-8" title="8"><span class="kw">tic</span>()</a>
+<a class="sourceLine" id="cb126-9" title="9"><span class="kw">mfct</span>(<span class="dv">2</span>)</a></code></pre></div>
+<pre><code>[1] &quot;2020-02-09 22:07:15 CET&quot;</code></pre>
+<div class="sourceCode" id="cb128"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb128-1" title="1"><span class="kw">toc</span>()</a></code></pre></div>
+<pre><code>2.008 sec elapsed</code></pre>
+<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb130-1" title="1"><span class="kw">tic</span>()</a>
+<a class="sourceLine" id="cb130-2" title="2"><span class="kw">mfct</span>(<span class="dv">2</span>)</a></code></pre></div>
+<pre><code>[1] &quot;2020-02-09 22:07:15 CET&quot;</code></pre>
+<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb132-1" title="1"><span class="kw">toc</span>()</a></code></pre></div>
+<pre><code>0.078 sec elapsed</code></pre>
 <p>Let’s try with another example that might look more like what we can find in a Shiny App: connecting to a database</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="optimizing-shiny-code.html#cb134-1"></a>con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</span>
-<span id="cb134-2"><a href="optimizing-shiny-code.html#cb134-2"></a>  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </span>
-<span id="cb134-3"><a href="optimizing-shiny-code.html#cb134-3"></a>  <span class="dt">dbname =</span> <span class="st">&quot;:memory:&quot;</span></span>
-<span id="cb134-4"><a href="optimizing-shiny-code.html#cb134-4"></a>)</span>
-<span id="cb134-5"><a href="optimizing-shiny-code.html#cb134-5"></a>DBI<span class="op">::</span><span class="kw">dbWriteTable</span>(</span>
-<span id="cb134-6"><a href="optimizing-shiny-code.html#cb134-6"></a>  con, </span>
-<span id="cb134-7"><a href="optimizing-shiny-code.html#cb134-7"></a>  <span class="st">&quot;diams&quot;</span>, </span>
-<span id="cb134-8"><a href="optimizing-shiny-code.html#cb134-8"></a>  dplyr<span class="op">::</span><span class="kw">bind_rows</span>(</span>
-<span id="cb134-9"><a href="optimizing-shiny-code.html#cb134-9"></a>    purrr<span class="op">::</span><span class="kw">rerun</span>(<span class="dv">10</span>, ggplot2<span class="op">::</span>diamonds)</span>
-<span id="cb134-10"><a href="optimizing-shiny-code.html#cb134-10"></a>  )</span>
-<span id="cb134-11"><a href="optimizing-shiny-code.html#cb134-11"></a>)</span>
-<span id="cb134-12"><a href="optimizing-shiny-code.html#cb134-12"></a></span>
-<span id="cb134-13"><a href="optimizing-shiny-code.html#cb134-13"></a>fct_sql &lt;-<span class="st"> </span><span class="cf">function</span>(SQL, con){</span>
-<span id="cb134-14"><a href="optimizing-shiny-code.html#cb134-14"></a>  DBI<span class="op">::</span><span class="kw">dbGetQuery</span>(</span>
-<span id="cb134-15"><a href="optimizing-shiny-code.html#cb134-15"></a>    con, SQL</span>
-<span id="cb134-16"><a href="optimizing-shiny-code.html#cb134-16"></a>  ) </span>
-<span id="cb134-17"><a href="optimizing-shiny-code.html#cb134-17"></a>}</span>
-<span id="cb134-18"><a href="optimizing-shiny-code.html#cb134-18"></a>mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql)</span>
-<span id="cb134-19"><a href="optimizing-shiny-code.html#cb134-19"></a><span class="kw">tic</span>()</span>
-<span id="cb134-20"><a href="optimizing-shiny-code.html#cb134-20"></a>res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</span>
-<span id="cb134-21"><a href="optimizing-shiny-code.html#cb134-21"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>0.972 sec elapsed</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="optimizing-shiny-code.html#cb136-1"></a><span class="kw">tic</span>()</span>
-<span id="cb136-2"><a href="optimizing-shiny-code.html#cb136-2"></a>res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</span>
-<span id="cb136-3"><a href="optimizing-shiny-code.html#cb136-3"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>0.025 sec elapsed</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb138-1"><a href="optimizing-shiny-code.html#cb138-1"></a><span class="kw">all.equal</span>(res_a, res_b)</span></code></pre></div>
+<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb134-1" title="1">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</a>
+<a class="sourceLine" id="cb134-2" title="2">  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </a>
+<a class="sourceLine" id="cb134-3" title="3">  <span class="dt">dbname =</span> <span class="st">&quot;:memory:&quot;</span></a>
+<a class="sourceLine" id="cb134-4" title="4">)</a>
+<a class="sourceLine" id="cb134-5" title="5">DBI<span class="op">::</span><span class="kw">dbWriteTable</span>(</a>
+<a class="sourceLine" id="cb134-6" title="6">  con, </a>
+<a class="sourceLine" id="cb134-7" title="7">  <span class="st">&quot;diams&quot;</span>, </a>
+<a class="sourceLine" id="cb134-8" title="8">  dplyr<span class="op">::</span><span class="kw">bind_rows</span>(</a>
+<a class="sourceLine" id="cb134-9" title="9">    purrr<span class="op">::</span><span class="kw">rerun</span>(<span class="dv">10</span>, ggplot2<span class="op">::</span>diamonds)</a>
+<a class="sourceLine" id="cb134-10" title="10">  )</a>
+<a class="sourceLine" id="cb134-11" title="11">)</a>
+<a class="sourceLine" id="cb134-12" title="12"></a>
+<a class="sourceLine" id="cb134-13" title="13">fct_sql &lt;-<span class="st"> </span><span class="cf">function</span>(SQL, con){</a>
+<a class="sourceLine" id="cb134-14" title="14">  DBI<span class="op">::</span><span class="kw">dbGetQuery</span>(</a>
+<a class="sourceLine" id="cb134-15" title="15">    con, SQL</a>
+<a class="sourceLine" id="cb134-16" title="16">  ) </a>
+<a class="sourceLine" id="cb134-17" title="17">}</a>
+<a class="sourceLine" id="cb134-18" title="18">mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql)</a>
+<a class="sourceLine" id="cb134-19" title="19"><span class="kw">tic</span>()</a>
+<a class="sourceLine" id="cb134-20" title="20">res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
+<a class="sourceLine" id="cb134-21" title="21"><span class="kw">toc</span>()</a></code></pre></div>
+<pre><code>0.795 sec elapsed</code></pre>
+<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb136-1" title="1"><span class="kw">tic</span>()</a>
+<a class="sourceLine" id="cb136-2" title="2">res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
+<a class="sourceLine" id="cb136-3" title="3"><span class="kw">toc</span>()</a></code></pre></div>
+<pre><code>0.049 sec elapsed</code></pre>
+<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb138-1" title="1"><span class="kw">all.equal</span>(res_a, res_b)</a></code></pre></div>
 <pre><code>[1] TRUE</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="optimizing-shiny-code.html#cb140-1"></a><span class="kw">tic</span>()</span>
-<span id="cb140-2"><a href="optimizing-shiny-code.html#cb140-2"></a>res_c &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</span>
-<span id="cb140-3"><a href="optimizing-shiny-code.html#cb140-3"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>0.201 sec elapsed</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="optimizing-shiny-code.html#cb142-1"></a><span class="kw">setequal</span>(res_a, res_c)</span></code></pre></div>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb140-1" title="1"><span class="kw">tic</span>()</a>
+<a class="sourceLine" id="cb140-2" title="2">res_c &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</a>
+<a class="sourceLine" id="cb140-3" title="3"><span class="kw">toc</span>()</a></code></pre></div>
+<pre><code>0.217 sec elapsed</code></pre>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb142-1" title="1"><span class="kw">setequal</span>(res_a, res_c)</a></code></pre></div>
 <pre><code>[1] FALSE</code></pre>
 <p>Note that you can change where the cache is stored by <code>{memoise}</code>. Here, we’ll save it in the temp directory, but don’t do this in production.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="optimizing-shiny-code.html#cb144-1"></a>tpd &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">path</span>(<span class="kw">tempdir</span>(), <span class="kw">paste</span>(<span class="kw">sample</span>(letters, <span class="dv">10</span>), <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span>))</span></code></pre></div>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb145-1"><a href="optimizing-shiny-code.html#cb145-1"></a>tpd &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">dir_create</span>(tpd)</span>
-<span id="cb145-2"><a href="optimizing-shiny-code.html#cb145-2"></a>dfs &lt;-<span class="st"> </span><span class="kw">cache_filesystem</span>(tpd)</span>
-<span id="cb145-3"><a href="optimizing-shiny-code.html#cb145-3"></a>mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql, <span class="dt">cache =</span> dfs)</span>
-<span id="cb145-4"><a href="optimizing-shiny-code.html#cb145-4"></a>res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</span>
-<span id="cb145-5"><a href="optimizing-shiny-code.html#cb145-5"></a>res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</span>
-<span id="cb145-6"><a href="optimizing-shiny-code.html#cb145-6"></a>fs<span class="op">::</span><span class="kw">dir_ls</span>(tpd)</span></code></pre></div>
-<pre><code>/var/folders/5z/rm2h62lj45d332kfpj28c8zm0000gn/T/RtmpHwHaFl/uviqtfgnpw/352e65d5b419cb18
-/var/folders/5z/rm2h62lj45d332kfpj28c8zm0000gn/T/RtmpHwHaFl/uviqtfgnpw/9661739f96e59424</code></pre>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb144-1" title="1">tpd &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">path</span>(<span class="kw">tempdir</span>(), <span class="kw">paste</span>(<span class="kw">sample</span>(letters, <span class="dv">10</span>), <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb145-1" title="1">tpd &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">dir_create</span>(tpd)</a>
+<a class="sourceLine" id="cb145-2" title="2">dfs &lt;-<span class="st"> </span><span class="kw">cache_filesystem</span>(tpd)</a>
+<a class="sourceLine" id="cb145-3" title="3">mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql, <span class="dt">cache =</span> dfs)</a>
+<a class="sourceLine" id="cb145-4" title="4">res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
+<a class="sourceLine" id="cb145-5" title="5">res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</a>
+<a class="sourceLine" id="cb145-6" title="6">fs<span class="op">::</span><span class="kw">dir_ls</span>(tpd)</a></code></pre></div>
+<pre><code>/var/folders/5z/rm2h62lj45d332kfpj28c8zm0000gn/T/Rtmpob5gM4/uviqtfgnpw/3c4685d12a0859c1
+/var/folders/5z/rm2h62lj45d332kfpj28c8zm0000gn/T/Rtmpob5gM4/uviqtfgnpw/8455612d397f9296</code></pre>
 <p>As you can see, I now have two cache objects inside the directory I’ve specified as a <code>cache_filesystem</code>.</p>
 </div>
 <div id="caching-shiny" class="section level3">
@@ -517,87 +517,87 @@ Here is a simple example with <code>{memoise}</code>:</p>
 This function behaves more or less like the <code>renderPlot()</code> function, except that it is tailored for caching.
 The extra arguments you’ll find are <code>cacheKeyExpr</code> and <code>sizePolicy</code>: the former is the list of inputs and values that allow to cache the plot—conceptually, every time these values and inputs are the same, they produce the same graph.
 <code>sizePolicy</code> is a function that returns a <code>width</code> and an <code>height</code>, and which are used to round the plot dimension in pixels, so that not every pixel combination are generated in the cache.</p>
-<p>The good news is that converting existing <code>renderPlot()</code> functions to <code>renderCachedPlot()</code> is pretty straightforward in most cases: take your current <code>renderPlot()</code>, and add the cache keys<a href="optimjs.html#fn35" class="footnote-ref" id="fnref35"><sup>35</sup></a>.</p>
+<p>The good news is that converting existing <code>renderPlot()</code> functions to <code>renderCachedPlot()</code> is pretty straightforward in most cases: take your current <code>renderPlot()</code>, and add the cache keys<a href="#fn35" class="footnote-ref" id="fnref35"><sup>35</sup></a>.</p>
 <p>Here is an example:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="optimizing-shiny-code.html#cb147-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb147-2"><a href="optimizing-shiny-code.html#cb147-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
-<span id="cb147-3"><a href="optimizing-shiny-code.html#cb147-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb147-4"><a href="optimizing-shiny-code.html#cb147-4"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;tbl&quot;</span>, <span class="st">&quot;Table&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;iris&quot;</span>, <span class="st">&quot;mtcars&quot;</span>, <span class="st">&quot;airquality&quot;</span>)),</span>
-<span id="cb147-5"><a href="optimizing-shiny-code.html#cb147-5"></a>    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
-<span id="cb147-6"><a href="optimizing-shiny-code.html#cb147-6"></a>  )</span>
-<span id="cb147-7"><a href="optimizing-shiny-code.html#cb147-7"></a>}</span>
-<span id="cb147-8"><a href="optimizing-shiny-code.html#cb147-8"></a></span>
-<span id="cb147-9"><a href="optimizing-shiny-code.html#cb147-9"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb147-10"><a href="optimizing-shiny-code.html#cb147-10"></a>  input, </span>
-<span id="cb147-11"><a href="optimizing-shiny-code.html#cb147-11"></a>  output, </span>
-<span id="cb147-12"><a href="optimizing-shiny-code.html#cb147-12"></a>  session</span>
-<span id="cb147-13"><a href="optimizing-shiny-code.html#cb147-13"></a>){</span>
-<span id="cb147-14"><a href="optimizing-shiny-code.html#cb147-14"></a>  </span>
-<span id="cb147-15"><a href="optimizing-shiny-code.html#cb147-15"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderCachedPlot</span>({</span>
-<span id="cb147-16"><a href="optimizing-shiny-code.html#cb147-16"></a>    <span class="kw">plot</span>(</span>
-<span id="cb147-17"><a href="optimizing-shiny-code.html#cb147-17"></a>      <span class="kw">get</span>(input<span class="op">$</span>tbl)</span>
-<span id="cb147-18"><a href="optimizing-shiny-code.html#cb147-18"></a>    )</span>
-<span id="cb147-19"><a href="optimizing-shiny-code.html#cb147-19"></a>  }, <span class="dt">cacheKeyExpr =</span> {</span>
-<span id="cb147-20"><a href="optimizing-shiny-code.html#cb147-20"></a>    input<span class="op">$</span>tbl</span>
-<span id="cb147-21"><a href="optimizing-shiny-code.html#cb147-21"></a>  })</span>
-<span id="cb147-22"><a href="optimizing-shiny-code.html#cb147-22"></a></span>
-<span id="cb147-23"><a href="optimizing-shiny-code.html#cb147-23"></a>}</span>
-<span id="cb147-24"><a href="optimizing-shiny-code.html#cb147-24"></a></span>
-<span id="cb147-25"><a href="optimizing-shiny-code.html#cb147-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb147-1" title="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb147-2" title="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb147-3" title="3">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb147-4" title="4">    <span class="kw">selectInput</span>(<span class="st">&quot;tbl&quot;</span>, <span class="st">&quot;Table&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;iris&quot;</span>, <span class="st">&quot;mtcars&quot;</span>, <span class="st">&quot;airquality&quot;</span>)),</a>
+<a class="sourceLine" id="cb147-5" title="5">    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</a>
+<a class="sourceLine" id="cb147-6" title="6">  )</a>
+<a class="sourceLine" id="cb147-7" title="7">}</a>
+<a class="sourceLine" id="cb147-8" title="8"></a>
+<a class="sourceLine" id="cb147-9" title="9">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb147-10" title="10">  input, </a>
+<a class="sourceLine" id="cb147-11" title="11">  output, </a>
+<a class="sourceLine" id="cb147-12" title="12">  session</a>
+<a class="sourceLine" id="cb147-13" title="13">){</a>
+<a class="sourceLine" id="cb147-14" title="14">  </a>
+<a class="sourceLine" id="cb147-15" title="15">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderCachedPlot</span>({</a>
+<a class="sourceLine" id="cb147-16" title="16">    <span class="kw">plot</span>(</a>
+<a class="sourceLine" id="cb147-17" title="17">      <span class="kw">get</span>(input<span class="op">$</span>tbl)</a>
+<a class="sourceLine" id="cb147-18" title="18">    )</a>
+<a class="sourceLine" id="cb147-19" title="19">  }, <span class="dt">cacheKeyExpr =</span> {</a>
+<a class="sourceLine" id="cb147-20" title="20">    input<span class="op">$</span>tbl</a>
+<a class="sourceLine" id="cb147-21" title="21">  })</a>
+<a class="sourceLine" id="cb147-22" title="22"></a>
+<a class="sourceLine" id="cb147-23" title="23">}</a>
+<a class="sourceLine" id="cb147-24" title="24"></a>
+<a class="sourceLine" id="cb147-25" title="25"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <pre><code>
 Listening on http://127.0.0.1:8268</code></pre>
 <p><img src="building-shiny-apps-workflow_files/figure-html/optimizing-shiny-code-4-1.png" width="672" /></p>
 <p>If you try this app, the first rendering of the three plots will take a little bit of time, but every subsequent rendering of the plot is almost instantaneous.</p>
 <p>And if we apply what we’ve just sen with <code>{memoise}</code>:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="optimizing-shiny-code.html#cb149-1"></a>con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</span>
-<span id="cb149-2"><a href="optimizing-shiny-code.html#cb149-2"></a>  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </span>
-<span id="cb149-3"><a href="optimizing-shiny-code.html#cb149-3"></a>  <span class="dt">dbname =</span> <span class="st">&quot;:memory:&quot;</span></span>
-<span id="cb149-4"><a href="optimizing-shiny-code.html#cb149-4"></a>)</span>
-<span id="cb149-5"><a href="optimizing-shiny-code.html#cb149-5"></a>DBI<span class="op">::</span><span class="kw">dbWriteTable</span>(</span>
-<span id="cb149-6"><a href="optimizing-shiny-code.html#cb149-6"></a>  con, </span>
-<span id="cb149-7"><a href="optimizing-shiny-code.html#cb149-7"></a>  <span class="st">&quot;diams&quot;</span>, </span>
-<span id="cb149-8"><a href="optimizing-shiny-code.html#cb149-8"></a>  dplyr<span class="op">::</span><span class="kw">bind_rows</span>(</span>
-<span id="cb149-9"><a href="optimizing-shiny-code.html#cb149-9"></a>    purrr<span class="op">::</span><span class="kw">rerun</span>(<span class="dv">100</span>, ggplot2<span class="op">::</span>diamonds)</span>
-<span id="cb149-10"><a href="optimizing-shiny-code.html#cb149-10"></a>  )</span>
-<span id="cb149-11"><a href="optimizing-shiny-code.html#cb149-11"></a>)</span>
-<span id="cb149-12"><a href="optimizing-shiny-code.html#cb149-12"></a></span>
-<span id="cb149-13"><a href="optimizing-shiny-code.html#cb149-13"></a>fct_sql &lt;-<span class="st"> </span><span class="cf">function</span>(cut, con){</span>
-<span id="cb149-14"><a href="optimizing-shiny-code.html#cb149-14"></a>  <span class="co"># NEVER EVER SPRINTF AN SQL CODE LIKE THAT</span></span>
-<span id="cb149-15"><a href="optimizing-shiny-code.html#cb149-15"></a>  <span class="co"># IT&#39;S SENSITIVE TO SQL INJECTIONS, WE&#39;RE</span></span>
-<span id="cb149-16"><a href="optimizing-shiny-code.html#cb149-16"></a>  <span class="co"># DOING IT FOR THE EXAMPLE</span></span>
-<span id="cb149-17"><a href="optimizing-shiny-code.html#cb149-17"></a>  DBI<span class="op">::</span><span class="kw">dbGetQuery</span>(</span>
-<span id="cb149-18"><a href="optimizing-shiny-code.html#cb149-18"></a>    con, <span class="kw">sprintf</span>(</span>
-<span id="cb149-19"><a href="optimizing-shiny-code.html#cb149-19"></a>      <span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;%s&#39;&quot;</span>, </span>
-<span id="cb149-20"><a href="optimizing-shiny-code.html#cb149-20"></a>      cut</span>
-<span id="cb149-21"><a href="optimizing-shiny-code.html#cb149-21"></a>    )</span>
-<span id="cb149-22"><a href="optimizing-shiny-code.html#cb149-22"></a>  )  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</span>
-<span id="cb149-23"><a href="optimizing-shiny-code.html#cb149-23"></a>}</span>
-<span id="cb149-24"><a href="optimizing-shiny-code.html#cb149-24"></a>db &lt;-<span class="st"> </span><span class="kw">cache_filesystem</span>(<span class="st">&quot;cache/&quot;</span>)</span>
-<span id="cb149-25"><a href="optimizing-shiny-code.html#cb149-25"></a>fct_sql &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql, <span class="dt">cache =</span> db)</span>
-<span id="cb149-26"><a href="optimizing-shiny-code.html#cb149-26"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
-<span id="cb149-27"><a href="optimizing-shiny-code.html#cb149-27"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb149-28"><a href="optimizing-shiny-code.html#cb149-28"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;cut&quot;</span>, <span class="st">&quot;cut&quot;</span>, <span class="kw">unique</span>(ggplot2<span class="op">::</span>diamonds<span class="op">$</span>cut)),</span>
-<span id="cb149-29"><a href="optimizing-shiny-code.html#cb149-29"></a>    <span class="kw">tableOutput</span>(<span class="st">&quot;tbl&quot;</span>)</span>
-<span id="cb149-30"><a href="optimizing-shiny-code.html#cb149-30"></a>  )</span>
-<span id="cb149-31"><a href="optimizing-shiny-code.html#cb149-31"></a>}</span>
-<span id="cb149-32"><a href="optimizing-shiny-code.html#cb149-32"></a></span>
-<span id="cb149-33"><a href="optimizing-shiny-code.html#cb149-33"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb149-34"><a href="optimizing-shiny-code.html#cb149-34"></a>  input, </span>
-<span id="cb149-35"><a href="optimizing-shiny-code.html#cb149-35"></a>  output, </span>
-<span id="cb149-36"><a href="optimizing-shiny-code.html#cb149-36"></a>  session</span>
-<span id="cb149-37"><a href="optimizing-shiny-code.html#cb149-37"></a>){</span>
-<span id="cb149-38"><a href="optimizing-shiny-code.html#cb149-38"></a>  </span>
-<span id="cb149-39"><a href="optimizing-shiny-code.html#cb149-39"></a>  output<span class="op">$</span>tbl &lt;-<span class="st"> </span><span class="kw">renderTable</span>({</span>
-<span id="cb149-40"><a href="optimizing-shiny-code.html#cb149-40"></a>    <span class="kw">fct_sql</span>(input<span class="op">$</span>cut, con)</span>
-<span id="cb149-41"><a href="optimizing-shiny-code.html#cb149-41"></a>  })</span>
-<span id="cb149-42"><a href="optimizing-shiny-code.html#cb149-42"></a></span>
-<span id="cb149-43"><a href="optimizing-shiny-code.html#cb149-43"></a>}</span>
-<span id="cb149-44"><a href="optimizing-shiny-code.html#cb149-44"></a></span>
-<span id="cb149-45"><a href="optimizing-shiny-code.html#cb149-45"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb149-1" title="1">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</a>
+<a class="sourceLine" id="cb149-2" title="2">  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </a>
+<a class="sourceLine" id="cb149-3" title="3">  <span class="dt">dbname =</span> <span class="st">&quot;:memory:&quot;</span></a>
+<a class="sourceLine" id="cb149-4" title="4">)</a>
+<a class="sourceLine" id="cb149-5" title="5">DBI<span class="op">::</span><span class="kw">dbWriteTable</span>(</a>
+<a class="sourceLine" id="cb149-6" title="6">  con, </a>
+<a class="sourceLine" id="cb149-7" title="7">  <span class="st">&quot;diams&quot;</span>, </a>
+<a class="sourceLine" id="cb149-8" title="8">  dplyr<span class="op">::</span><span class="kw">bind_rows</span>(</a>
+<a class="sourceLine" id="cb149-9" title="9">    purrr<span class="op">::</span><span class="kw">rerun</span>(<span class="dv">100</span>, ggplot2<span class="op">::</span>diamonds)</a>
+<a class="sourceLine" id="cb149-10" title="10">  )</a>
+<a class="sourceLine" id="cb149-11" title="11">)</a>
+<a class="sourceLine" id="cb149-12" title="12"></a>
+<a class="sourceLine" id="cb149-13" title="13">fct_sql &lt;-<span class="st"> </span><span class="cf">function</span>(cut, con){</a>
+<a class="sourceLine" id="cb149-14" title="14">  <span class="co"># NEVER EVER SPRINTF AN SQL CODE LIKE THAT</span></a>
+<a class="sourceLine" id="cb149-15" title="15">  <span class="co"># IT&#39;S SENSITIVE TO SQL INJECTIONS, WE&#39;RE</span></a>
+<a class="sourceLine" id="cb149-16" title="16">  <span class="co"># DOING IT FOR THE EXAMPLE</span></a>
+<a class="sourceLine" id="cb149-17" title="17">  DBI<span class="op">::</span><span class="kw">dbGetQuery</span>(</a>
+<a class="sourceLine" id="cb149-18" title="18">    con, <span class="kw">sprintf</span>(</a>
+<a class="sourceLine" id="cb149-19" title="19">      <span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;%s&#39;&quot;</span>, </a>
+<a class="sourceLine" id="cb149-20" title="20">      cut</a>
+<a class="sourceLine" id="cb149-21" title="21">    )</a>
+<a class="sourceLine" id="cb149-22" title="22">  )  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a>
+<a class="sourceLine" id="cb149-23" title="23">}</a>
+<a class="sourceLine" id="cb149-24" title="24">db &lt;-<span class="st"> </span><span class="kw">cache_filesystem</span>(<span class="st">&quot;cache/&quot;</span>)</a>
+<a class="sourceLine" id="cb149-25" title="25">fct_sql &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql, <span class="dt">cache =</span> db)</a>
+<a class="sourceLine" id="cb149-26" title="26">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb149-27" title="27">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb149-28" title="28">    <span class="kw">selectInput</span>(<span class="st">&quot;cut&quot;</span>, <span class="st">&quot;cut&quot;</span>, <span class="kw">unique</span>(ggplot2<span class="op">::</span>diamonds<span class="op">$</span>cut)),</a>
+<a class="sourceLine" id="cb149-29" title="29">    <span class="kw">tableOutput</span>(<span class="st">&quot;tbl&quot;</span>)</a>
+<a class="sourceLine" id="cb149-30" title="30">  )</a>
+<a class="sourceLine" id="cb149-31" title="31">}</a>
+<a class="sourceLine" id="cb149-32" title="32"></a>
+<a class="sourceLine" id="cb149-33" title="33">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb149-34" title="34">  input, </a>
+<a class="sourceLine" id="cb149-35" title="35">  output, </a>
+<a class="sourceLine" id="cb149-36" title="36">  session</a>
+<a class="sourceLine" id="cb149-37" title="37">){</a>
+<a class="sourceLine" id="cb149-38" title="38">  </a>
+<a class="sourceLine" id="cb149-39" title="39">  output<span class="op">$</span>tbl &lt;-<span class="st"> </span><span class="kw">renderTable</span>({</a>
+<a class="sourceLine" id="cb149-40" title="40">    <span class="kw">fct_sql</span>(input<span class="op">$</span>cut, con)</a>
+<a class="sourceLine" id="cb149-41" title="41">  })</a>
+<a class="sourceLine" id="cb149-42" title="42"></a>
+<a class="sourceLine" id="cb149-43" title="43">}</a>
+<a class="sourceLine" id="cb149-44" title="44"></a>
+<a class="sourceLine" id="cb149-45" title="45"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <pre><code>
 Listening on http://127.0.0.1:7319</code></pre>
 <pre><code>Warning in gzfile(file, mode): cannot open compressed file
-&#39;cache//16ef352ce1eb582c&#39;, probable reason &#39;No such file or
+&#39;cache//358a053661e48575&#39;, probable reason &#39;No such file or
 directory&#39;</code></pre>
 <pre><code>Warning: Error in gzfile: cannot open the connection</code></pre>
 <p><img src="building-shiny-apps-workflow_files/figure-html/optimizing-shiny-code-5-1.png" width="672" /></p>
@@ -607,7 +607,7 @@ But if you re-select this input a second time, the output will show instantaneou
 If your application needs “fresh” data every time it is used, for example because data in the SQL database are updated every hour, cache won’t help you here, on the contrary: the same inputs on the function will render different output.</p>
 <p>Note thought that, just like our computer screen from before, you don’t have unlimited space when it come to storing cache:storing a large amount of cache will take space on your disk.</p>
 <p>For example, from our stored cache from before:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="optimizing-shiny-code.html#cb153-1"></a>fs<span class="op">::</span><span class="kw">dir_info</span>(tpd)[, <span class="st">&quot;size&quot;</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb153-1" title="1">fs<span class="op">::</span><span class="kw">dir_info</span>(tpd)[, <span class="st">&quot;size&quot;</span>]</a></code></pre></div>
 <pre><code># A tibble: 2 x 1
          size
   &lt;fs::bytes&gt;
@@ -616,12 +616,12 @@ If your application needs “fresh” data every time it is used, for example be
 <p>Managing cache at a system level is out of scope for this book, but note that the most commonly accepted rule for deleting cache is called <strong>LRU</strong>, for <strong>Least Recently Used</strong>.
 The underlying principle of this approach is that users tend to need what they have needed recently: hence the more a piece of data has been used recently, the more likely it is that it will be needed soon.</p>
 <p>And this can be seen with:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="optimizing-shiny-code.html#cb155-1"></a>fs<span class="op">::</span><span class="kw">dir_info</span>(tpd)[, <span class="st">&quot;access_time&quot;</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb155-1" title="1">fs<span class="op">::</span><span class="kw">dir_info</span>(tpd)[, <span class="st">&quot;access_time&quot;</span>]</a></code></pre></div>
 <pre><code># A tibble: 2 x 1
   access_time        
   &lt;dttm&gt;             
-1 2020-02-09 00:06:37
-2 2020-02-09 00:07:11</code></pre>
+1 2020-02-09 22:07:23
+2 2020-02-09 22:08:00</code></pre>
 </div>
 </div>
 <div id="paralellizing-shiny" class="section level2">
@@ -645,11 +645,13 @@ The underlying principle of this approach is that users tend to need what they h
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -657,12 +659,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -674,6 +675,10 @@ gitbook.start({
 "text": "Edit"
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -692,8 +697,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();

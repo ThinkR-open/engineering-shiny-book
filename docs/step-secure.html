@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 12 Build yourself a safety net | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="Chapter 12 Build yourself a safety net | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 12 Build yourself a safety net | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="stepbuild.html">
-<link rel="next" href="secure.html">
+<link rel="prev" href="stepbuild.html"/>
+<link rel="next" href="secure.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -40,6 +40,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -59,28 +62,25 @@
 
 
 <style type="text/css">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -89,9 +89,9 @@ pre.numberSource code > span > a:first-child::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {   }
+  {  }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+a.sourceLine::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -445,15 +445,15 @@ To sustain these developments, a lot of tooling has been created to secure the d
 A simplified explanation is that if you write a function call <code>meaning_of_life</code> that returns <code>42</code>, you will expect this function to always return <code>42</code>, and to be alerted if ever this value changes.
 Using unit tests is a way to secure your work in the future, be it from future you or from collaborator: if anyone comes and change the code behind <code>meaning_of_life</code> so that the result is no longer <code>42</code>, the developer working on this piece of code will be able to catch it.</p>
 <p>There are several packages in R that can be used to implement unit testing, and you can even implement your own tests.
-One of the most popular right now<a href="optimjs.html#fn28" class="footnote-ref" id="fnref28"><sup>28</sup></a> is <a href="https://testthat.r-lib.org/"><code>{testthat}</code></a>, by Hadley Wickham.
+One of the most popular right now<a href="#fn28" class="footnote-ref" id="fnref28"><sup>28</sup></a> is <a href="https://testthat.r-lib.org/"><code>{testthat}</code></a>, by Hadley Wickham.
 This testing framework lets you write a series of tests and expectations, which are then launch when calling <code>devtools::test()</code>, either locally or in you CI system.
 Here is an example of testing that the <code>meaning_of_life</code> will alway be <code>42</code>.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="step-secure.html#cb114-1"></a><span class="kw">test_that</span>(<span class="st">&quot;The meaning of life is 42&quot;</span>, {</span>
-<span id="cb114-2"><a href="step-secure.html#cb114-2"></a>  <span class="kw">expect_equal</span>(</span>
-<span id="cb114-3"><a href="step-secure.html#cb114-3"></a>    <span class="kw">meaning_of_life</span>(), </span>
-<span id="cb114-4"><a href="step-secure.html#cb114-4"></a>    <span class="dv">42</span></span>
-<span id="cb114-5"><a href="step-secure.html#cb114-5"></a>  )</span>
-<span id="cb114-6"><a href="step-secure.html#cb114-6"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb114-1" title="1"><span class="kw">test_that</span>(<span class="st">&quot;The meaning of life is 42&quot;</span>, {</a>
+<a class="sourceLine" id="cb114-2" title="2">  <span class="kw">expect_equal</span>(</a>
+<a class="sourceLine" id="cb114-3" title="3">    <span class="kw">meaning_of_life</span>(), </a>
+<a class="sourceLine" id="cb114-4" title="4">    <span class="dv">42</span></a>
+<a class="sourceLine" id="cb114-5" title="5">  )</a>
+<a class="sourceLine" id="cb114-6" title="6">})</a></code></pre></div>
 <p>If you want to learn more about how to use <code>{testthat}</code>, you can refer to the following resources:</p>
 <ul>
 <li><p><a href="https://testthat.r-lib.org/"><code>{testthat}</code> online documentation</a></p></li>
@@ -509,11 +509,13 @@ That means that you have to be aware that upgrading a package might break your a
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -521,12 +523,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -538,6 +539,10 @@ gitbook.start({
 "text": "Edit"
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -556,8 +561,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();

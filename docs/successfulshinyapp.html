@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 1 About Successful Shiny Apps | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="Chapter 1 About Successful Shiny Apps | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 1 About Successful Shiny Apps | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="index.html">
-<link rel="next" href="planning.html">
+<link rel="prev" href="index.html"/>
+<link rel="next" href="planning.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -40,6 +40,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -59,28 +62,25 @@
 
 
 <style type="text/css">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -89,9 +89,9 @@ pre.numberSource code > span > a:first-child::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {   }
+  {  }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+a.sourceLine::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -438,7 +438,7 @@ With very little training, you can rapidly create a proof-of-concept (POC) for a
 <p>The first version of <code>{shiny}</code> was published in 2012.
 Since then, it has been one of the top project of the RStudio team.
 At the time of writing these lines (January 2020), there are more than 4600 commits in the master branch of the main GitHub repository, made by 46 contributors.
-It is now downloaded around 400K times a month, according to <a href="https://cranlogs.r-pkg.org/badges/shiny">cranlogs</a>, and has 711 reverse dependencies (package that depends on it) according to <code>devtools::revdep("shiny")</code>.</p>
+It is now downloaded around 400K times a month, according to <a href="https://cranlogs.r-pkg.org/badges/shiny">cranlogs</a>, and has 711 reverse dependencies (package that depends on it) according to <code>devtools::revdep(&quot;shiny&quot;)</code>.</p>
 <p>If you are very new to Shiny, this book might feel a little bit complex.
 Indeed, it relies on the assumption that you already know how to build (at least basic) Shiny applications and that you want to push your Shiny skills to the next level.
 If you are very new to Shiny, we suggest you start with the <a href="https://mastering-shiny.org/">Mastering Shiny book</a> before reading the present book.</p>
@@ -458,13 +458,13 @@ If you are very new to Shiny, we suggest you start with the <a href="https://mas
 <div id="reaching-the-cliff-of-complexity" class="section level3">
 <h3><span class="header-section-number">1.2.1</span> Reaching the cliff of complexity</h3>
 <p>After a few hours of practice, things seems quite straightforward when it comes to small prototypes or proof of concepts.
-But things change when your application reaches “the cliff of complexity”<a href="optimjs.html#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.</p>
+But things change when your application reaches “the cliff of complexity”<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.</p>
 <p>But what do we mean by complexity?
-Getting a clear definition is not an easy task<a href="optimjs.html#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>
+Getting a clear definition is not an easy task<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>
 as it very depends on who is concerned and who you are talking to.
 A good definition is the one from <a href="http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#id287833">The Art of Unix Programming</a>: <em>“Complex software is harder to think about, harder to test, harder to debug, and harder to maintain — and above all, harder to learn and use.”</em>
 But let us try to come with a definition that will serve us in the context of engineering Shiny applications.
-When building software, we can think of complexity from two points of view: the complexity as it is seen by the coder, and the complexity as it is seen by the customer / end user.<a href="optimjs.html#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
+When building software, we can think of complexity from two points of view: the complexity as it is seen by the coder, and the complexity as it is seen by the customer / end user.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
 <blockquote>
 <p>With great complexity comes great responsibility</p>
 </blockquote>
@@ -518,7 +518,7 @@ Another good example is <code>{shiny}</code>’s <code>dateRangeInput()</code> f
 This function requires the user to choose a starting date and an ending date.
 However, the function allows to choose a start posterior to the end (which is the behavior of the JavaScript plugin used in <code>{shiny}</code> to create this input).
 If theses dates are used to filter data upper tjan starting date and lower than ending date, this behaviour will be problematic for your application.
-Handling this special case is doable: with a little bit of craft, you can watch what the user inputs and throw an error if the start is after the end.<a href="optimjs.html#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>
+Handling this special case is doable: with a little bit of craft, you can watch what the user inputs and throw an error if the start is after the end.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>
 That solution increases implementation complexity, while leaving it as is requires the user to think about whether or not the starting date is before the ending date, thus increasing the interface complexity.</p>
 <!-- COMMENT: The solution should be the starting text of the following paragraph -->
 <!-- So what should we do? It is up to you: deciding where to draw the line between interface & implementation complexity very much depends on the kind of project you are working on, and on the kind of users that will use your app.  -->
@@ -540,23 +540,23 @@ Some tools and measures may help warn you about the complexity of the code you a
 <div id="codebase-size" class="section level4">
 <h4><span class="header-section-number">1.2.3.1</span> Codebase size</h4>
 <p>The total number of lines of code or the number of files may be good indices of potential complexity if used as an order of magnitude (100, 1000, 10000 lines), but do not reduce number of lines at the cost of readability.
-R is very permissive when it comes to indentation and line breaks, and, unlike JavaScript or CSS, it is generally not minified<a href="optimjs.html#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>.<br />
+R is very permissive when it comes to indentation and line breaks, and, unlike JavaScript or CSS, it is generally not minified<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>.<br />
 Number of lines of code depends on your coding style and the packages you are using.</p>
 <p>Consider this piece of valid R code:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="successfulshinyapp.html#cb1-1"></a>iris[</span>
-<span id="cb1-2"><a href="successfulshinyapp.html#cb1-2"></a>  <span class="dv">1</span></span>
-<span id="cb1-3"><a href="successfulshinyapp.html#cb1-3"></a>  <span class="op">:</span></span>
-<span id="cb1-4"><a href="successfulshinyapp.html#cb1-4"></a><span class="st">    </span><span class="dv">5</span>, </span>
-<span id="cb1-5"><a href="successfulshinyapp.html#cb1-5"></a>    <span class="st">&quot;Species&quot;</span></span>
-<span id="cb1-6"><a href="successfulshinyapp.html#cb1-6"></a>  ]</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">iris[</a>
+<a class="sourceLine" id="cb1-2" title="2">  <span class="dv">1</span></a>
+<a class="sourceLine" id="cb1-3" title="3">  <span class="op">:</span></a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="st">    </span><span class="dv">5</span>, </a>
+<a class="sourceLine" id="cb1-5" title="5">    <span class="st">&quot;Species&quot;</span></a>
+<a class="sourceLine" id="cb1-6" title="6">  ]</a></code></pre></div>
 <pre><code>[1] setosa setosa setosa setosa setosa
 Levels: setosa versicolor virginica</code></pre>
 <p>Six lines of code for something that could also be written in one line.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="successfulshinyapp.html#cb3-1"></a>iris[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="st">&quot;Species&quot;</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">iris[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="st">&quot;Species&quot;</span>]</a></code></pre></div>
 <pre><code>[1] setosa setosa setosa setosa setosa
 Levels: setosa versicolor virginica</code></pre>
 <p>In other words, using this kind of writing style can make the code base larger in term of lines, without really adding complexity to the general program.</p>
-<p>Another drawback of this metric is that it focuses on numbers instead of readability, and in the long run, yes, readability matters.<a href="optimjs.html#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> For example, <a href="https://www.tidyverse.org/" target="_blank"><code>{tidyverse}</code></a> packages encourage the use of the pipe (<code>%&gt;%</code>)<a href="optimjs.html#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>
+<p>Another drawback of this metric is that it focuses on numbers instead of readability, and in the long run, yes, readability matters.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> For example, <a href="https://www.tidyverse.org/" target="_blank"><code>{tidyverse}</code></a> packages encourage the use of the pipe (<code>%&gt;%</code>)<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>
 with one function by line.
 This eases readability, but produces many lines in the end code.</p>
 <p>Still, this metric can be useful to reinforce what you have learned from other metrics.
@@ -566,36 +566,36 @@ Numerous files can also be a sign of maintenance complexity.
 It may be harder to reason about an app logic split into several files than about something that fits into one linear code inside one file.
 Altough, you can define files that respect the visual structure of the application, with explicit filenames.</p>
 <p>If you want to use the number of lines metric, you can directly use R with the <code>{cloc}</code> package, available at <a href="https://github.com/hrbrmstr/cloc" class="uri">https://github.com/hrbrmstr/cloc</a>.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="successfulshinyapp.html#cb5-1"></a><span class="cf">if</span> (<span class="op">!</span><span class="kw">requireNamespace</span>(<span class="st">&quot;cloc&quot;</span>)){</span>
-<span id="cb5-2"><a href="successfulshinyapp.html#cb5-2"></a>  remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;hrbrmstr/cloc&quot;</span>)</span>
-<span id="cb5-3"><a href="successfulshinyapp.html#cb5-3"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="cf">if</span> (<span class="op">!</span><span class="kw">requireNamespace</span>(<span class="st">&quot;cloc&quot;</span>)){</a>
+<a class="sourceLine" id="cb5-2" title="2">  remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;hrbrmstr/cloc&quot;</span>)</a>
+<a class="sourceLine" id="cb5-3" title="3">}</a></code></pre></div>
 <p>For example, let us compare a rather big package (<code>{shiny}</code>) with a small one (<code>{attempt}</code>):</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="successfulshinyapp.html#cb6-1"></a><span class="kw">library</span>(cloc)</span>
-<span id="cb6-2"><a href="successfulshinyapp.html#cb6-2"></a><span class="kw">library</span>(dplyr)</span>
-<span id="cb6-3"><a href="successfulshinyapp.html#cb6-3"></a>shiny_cloc &lt;-<span class="st"> </span><span class="kw">cloc_cran</span>(<span class="st">&quot;shiny&quot;</span>, <span class="dt">.progress =</span> <span class="ot">FALSE</span>, <span class="dt">repos =</span> <span class="st">&quot;http://cran.irsn.fr/&quot;</span> )</span>
-<span id="cb6-4"><a href="successfulshinyapp.html#cb6-4"></a>attempt_cloc &lt;-<span class="st"> </span><span class="kw">cloc_cran</span>(<span class="st">&quot;attempt&quot;</span>, <span class="dt">.progress =</span> <span class="ot">FALSE</span>, <span class="dt">repos =</span> <span class="st">&quot;http://cran.irsn.fr/&quot;</span> )</span>
-<span id="cb6-5"><a href="successfulshinyapp.html#cb6-5"></a>clocs &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(</span>
-<span id="cb6-6"><a href="successfulshinyapp.html#cb6-6"></a>  shiny_cloc, </span>
-<span id="cb6-7"><a href="successfulshinyapp.html#cb6-7"></a>  attempt_cloc</span>
-<span id="cb6-8"><a href="successfulshinyapp.html#cb6-8"></a>)</span>
-<span id="cb6-9"><a href="successfulshinyapp.html#cb6-9"></a></span>
-<span id="cb6-10"><a href="successfulshinyapp.html#cb6-10"></a><span class="co"># Counting lines of code</span></span>
-<span id="cb6-11"><a href="successfulshinyapp.html#cb6-11"></a>clocs <span class="op">%&gt;%</span></span>
-<span id="cb6-12"><a href="successfulshinyapp.html#cb6-12"></a><span class="st">  </span><span class="kw">group_by</span>(pkg) <span class="op">%&gt;%</span></span>
-<span id="cb6-13"><a href="successfulshinyapp.html#cb6-13"></a><span class="st">  </span><span class="kw">summarise</span>(</span>
-<span id="cb6-14"><a href="successfulshinyapp.html#cb6-14"></a>    <span class="dt">loc =</span> <span class="kw">sum</span>(loc)</span>
-<span id="cb6-15"><a href="successfulshinyapp.html#cb6-15"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">library</span>(cloc)</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="kw">library</span>(dplyr)</a>
+<a class="sourceLine" id="cb6-3" title="3">shiny_cloc &lt;-<span class="st"> </span><span class="kw">cloc_cran</span>(<span class="st">&quot;shiny&quot;</span>, <span class="dt">.progress =</span> <span class="ot">FALSE</span>, <span class="dt">repos =</span> <span class="st">&quot;http://cran.irsn.fr/&quot;</span> )</a>
+<a class="sourceLine" id="cb6-4" title="4">attempt_cloc &lt;-<span class="st"> </span><span class="kw">cloc_cran</span>(<span class="st">&quot;attempt&quot;</span>, <span class="dt">.progress =</span> <span class="ot">FALSE</span>, <span class="dt">repos =</span> <span class="st">&quot;http://cran.irsn.fr/&quot;</span> )</a>
+<a class="sourceLine" id="cb6-5" title="5">clocs &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(</a>
+<a class="sourceLine" id="cb6-6" title="6">  shiny_cloc, </a>
+<a class="sourceLine" id="cb6-7" title="7">  attempt_cloc</a>
+<a class="sourceLine" id="cb6-8" title="8">)</a>
+<a class="sourceLine" id="cb6-9" title="9"></a>
+<a class="sourceLine" id="cb6-10" title="10"><span class="co"># Counting lines of code</span></a>
+<a class="sourceLine" id="cb6-11" title="11">clocs <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-12" title="12"><span class="st">  </span><span class="kw">group_by</span>(pkg) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-13" title="13"><span class="st">  </span><span class="kw">summarise</span>(</a>
+<a class="sourceLine" id="cb6-14" title="14">    <span class="dt">loc =</span> <span class="kw">sum</span>(loc)</a>
+<a class="sourceLine" id="cb6-15" title="15">  )</a></code></pre></div>
 <pre><code># A tibble: 2 x 2
   pkg       loc
   &lt;chr&gt;   &lt;int&gt;
 1 attempt  4011
 2 shiny   71478</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="successfulshinyapp.html#cb8-1"></a><span class="co"># Counting files</span></span>
-<span id="cb8-2"><a href="successfulshinyapp.html#cb8-2"></a>clocs <span class="op">%&gt;%</span></span>
-<span id="cb8-3"><a href="successfulshinyapp.html#cb8-3"></a><span class="st">  </span><span class="kw">group_by</span>(pkg) <span class="op">%&gt;%</span></span>
-<span id="cb8-4"><a href="successfulshinyapp.html#cb8-4"></a><span class="st">  </span><span class="kw">summarise</span>(</span>
-<span id="cb8-5"><a href="successfulshinyapp.html#cb8-5"></a>    <span class="dt">files =</span> <span class="kw">sum</span>(file_count)</span>
-<span id="cb8-6"><a href="successfulshinyapp.html#cb8-6"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># Counting files</span></a>
+<a class="sourceLine" id="cb8-2" title="2">clocs <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="st">  </span><span class="kw">group_by</span>(pkg) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="st">  </span><span class="kw">summarise</span>(</a>
+<a class="sourceLine" id="cb8-5" title="5">    <span class="dt">files =</span> <span class="kw">sum</span>(file_count)</a>
+<a class="sourceLine" id="cb8-6" title="6">  )</a></code></pre></div>
 <pre><code># A tibble: 2 x 2
   pkg     files
   &lt;chr&gt;   &lt;int&gt;
@@ -606,25 +606,25 @@ Altough, you can define files that respect the visual structure of the applicati
 <div id="cyclomatic-complexity" class="section level4">
 <h4><span class="header-section-number">1.2.3.2</span> Cyclomatic complexity</h4>
 <p>Cyclomatic complexity is a software engineering measure which allows to define the number of different linear paths a piece of code can take, the higher the number of paths through one function, the harder is the mental model build.
-Cyclomatic complexity is computed based on a control-flow graph<a href="optimjs.html#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a> representation of an algorithm.
+Cyclomatic complexity is computed based on a control-flow graph<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a> representation of an algorithm.
 The complexity number is then computed by taking the number of nodes, and subtracting the number of edges plus two times the number of connected components of this graph: <span class="math inline">\(M = E − N + 2P\)</span>, where <span class="math inline">\(M\)</span> is the measure, <span class="math inline">\(E\)</span> the number of edges, <span class="math inline">\(N\)</span> the number of nodes and <span class="math inline">\(2P\)</span> is 2 time the number of connected components.</p>
 <p>We will not go deep into this topic, as there are a lot things going on in this computation and you can find many documentation about this online.
 Please refer to the bibliography for further readings about the theory behind this measurement.</p>
 <p>In R, the cyclomatic complexity is computed with the <code>{cyclocomp}</code> package, which can be installed from <code>CRAN</code> with:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="successfulshinyapp.html#cb10-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;cyclocomp&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;cyclocomp&quot;</span>)</a></code></pre></div>
 <p>The cyclocomp package comes with three main functions: <code>cyclocomp()</code>, <code>cyclocomp_package()</code>, and <code>cyclocomp_package_dir()</code>.
 The one we will be interested in is <code>cyclocomp_package_dir()</code>: building successful shiny apps with the <code>{golem}</code> framework (we will get back on that later) means you will be building your app as a package.
 You can then use <code>cyclocomp_package_dir()</code> to compute the complexity of your app.
 Here is for example the cyclomatic complexity of the default golem template:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="successfulshinyapp.html#cb11-1"></a><span class="kw">library</span>(cyclocomp)</span>
-<span id="cb11-2"><a href="successfulshinyapp.html#cb11-2"></a><span class="kw">cyclocomp_package</span>(<span class="st">&quot;golex&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">library</span>(cyclocomp)</a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="kw">cyclocomp_package</span>(<span class="st">&quot;golex&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a></code></pre></div>
 <pre><code>                          name cyclocomp
 1                   app_server         1
 2                       app_ui         1
 3 golem_add_external_resources         1
 4                      run_app         1</code></pre>
 <p>And the one from another small application:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="successfulshinyapp.html#cb13-1"></a><span class="kw">cyclocomp_package</span>(<span class="st">&quot;tidytuesday201942&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw">cyclocomp_package</span>(<span class="st">&quot;tidytuesday201942&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a></code></pre></div>
 <pre><code>                  name cyclocomp
 24      mod_dataviz_ui         8
 23  mod_dataviz_server         7
@@ -633,7 +633,7 @@ Here is for example the cyclomatic complexity of the default golem template:</p>
 39           undisplay         4
 37 tagRemoveAttributes         3</code></pre>
 <p>And, finally, the one for <code>{shiny}</code>:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="successfulshinyapp.html#cb15-1"></a><span class="kw">cyclocomp_package</span>(<span class="st">&quot;shiny&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="kw">cyclocomp_package</span>(<span class="st">&quot;shiny&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a></code></pre></div>
 <pre><code>                       name cyclocomp
 507                  untar2        75
 119            diagnoseCode        54
@@ -657,16 +657,16 @@ But that is not a magic solution: (A) because the global complexity of the app i
 <p>Complexity can come from other sources: unsufficient code coverage leading to bugs that are hard to spot, dependencies that breaks the implementation, old package, or a lot of other things.</p>
 <p>We can use the <code>{packageMetrics2}</code> package to spot multiple metrics like the number of dependencies, the code coverage, the number of releases.
 This also includes number of lines of R code and cyclomatic complexity.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="successfulshinyapp.html#cb17-1"></a><span class="kw">library</span>(packageMetrics2)</span>
-<span id="cb17-2"><a href="successfulshinyapp.html#cb17-2"></a>frame_metric &lt;-<span class="st"> </span><span class="cf">function</span>(pkg){</span>
-<span id="cb17-3"><a href="successfulshinyapp.html#cb17-3"></a>  metrics &lt;-<span class="st"> </span><span class="kw">package_metrics</span>(pkg)</span>
-<span id="cb17-4"><a href="successfulshinyapp.html#cb17-4"></a>  tibble<span class="op">::</span><span class="kw">tibble</span>(</span>
-<span id="cb17-5"><a href="successfulshinyapp.html#cb17-5"></a>    <span class="dt">n =</span> <span class="kw">names</span>(metrics), </span>
-<span id="cb17-6"><a href="successfulshinyapp.html#cb17-6"></a>    <span class="dt">val =</span> metrics, </span>
-<span id="cb17-7"><a href="successfulshinyapp.html#cb17-7"></a>    <span class="dt">expl =</span> <span class="kw">list_package_metrics</span>()[<span class="kw">names</span>(metrics)]</span>
-<span id="cb17-8"><a href="successfulshinyapp.html#cb17-8"></a>  )</span>
-<span id="cb17-9"><a href="successfulshinyapp.html#cb17-9"></a>}</span></code></pre></div>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="successfulshinyapp.html#cb18-1"></a><span class="kw">frame_metric</span>(<span class="st">&quot;golem&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>knitr<span class="op">::</span><span class="kw">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="kw">library</span>(packageMetrics2)</a>
+<a class="sourceLine" id="cb17-2" title="2">frame_metric &lt;-<span class="st"> </span><span class="cf">function</span>(pkg){</a>
+<a class="sourceLine" id="cb17-3" title="3">  metrics &lt;-<span class="st"> </span><span class="kw">package_metrics</span>(pkg)</a>
+<a class="sourceLine" id="cb17-4" title="4">  tibble<span class="op">::</span><span class="kw">tibble</span>(</a>
+<a class="sourceLine" id="cb17-5" title="5">    <span class="dt">n =</span> <span class="kw">names</span>(metrics), </a>
+<a class="sourceLine" id="cb17-6" title="6">    <span class="dt">val =</span> metrics, </a>
+<a class="sourceLine" id="cb17-7" title="7">    <span class="dt">expl =</span> <span class="kw">list_package_metrics</span>()[<span class="kw">names</span>(metrics)]</a>
+<a class="sourceLine" id="cb17-8" title="8">  )</a>
+<a class="sourceLine" id="cb17-9" title="9">}</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1"><span class="kw">frame_metric</span>(<span class="st">&quot;golem&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>knitr<span class="op">::</span><span class="kw">kable</span>()</a></code></pre></div>
 <pre><code>Metrics: ARR ATC DWL DEP DPD CCP FLE FRE LIB LLE LNC LNR LRE NAT NTF NUP OGH SAP SEM SEQ SWD VIG </code></pre>
 <table>
 <thead>
@@ -684,12 +684,12 @@ This also includes number of lines of R code and cyclomatic complexity.</p>
 </tr>
 <tr class="even">
 <td align="left">ATC</td>
-<td align="left">85.1549755301794</td>
+<td align="left">NA</td>
 <td align="left">Author Test Coverage</td>
 </tr>
 <tr class="odd">
 <td align="left">DWL</td>
-<td align="left">7746</td>
+<td align="left">7818</td>
 <td align="left">Number of Downloads</td>
 </tr>
 <tr class="even">
@@ -789,7 +789,7 @@ This also includes number of lines of R code and cyclomatic complexity.</p>
 </tr>
 </tbody>
 </table>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="successfulshinyapp.html#cb20-1"></a><span class="kw">frame_metric</span>(<span class="st">&quot;shiny&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>knitr<span class="op">::</span><span class="kw">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="kw">frame_metric</span>(<span class="st">&quot;shiny&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>knitr<span class="op">::</span><span class="kw">kable</span>()</a></code></pre></div>
 <pre><code>Metrics: ARR ATC DWL DEP DPD CCP FLE FRE LIB LLE LNC LNR LRE NAT NTF NUP OGH SAP SEM SEQ SWD VIG </code></pre>
 <table>
 <thead>
@@ -812,7 +812,7 @@ This also includes number of lines of R code and cyclomatic complexity.</p>
 </tr>
 <tr class="odd">
 <td align="left">DWL</td>
-<td align="left">12096031</td>
+<td align="left">12107245</td>
 <td align="left">Number of Downloads</td>
 </tr>
 <tr class="even">
@@ -913,12 +913,12 @@ This also includes number of lines of R code and cyclomatic complexity.</p>
 </tbody>
 </table>
 <p>If you are building you Shiny application with <code>{golem}</code>, a framework for building shiny apps, you can use the <code>DESCRIPTION</code> file, the one that contains the list of dependencies, as a starting point to explore these metrics for your dependencies:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="successfulshinyapp.html#cb22-1"></a>desc<span class="op">::</span><span class="kw">desc_get_deps</span>(<span class="st">&quot;golex/DESCRIPTION&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">desc<span class="op">::</span><span class="kw">desc_get_deps</span>(<span class="st">&quot;golex/DESCRIPTION&quot;</span>)</a></code></pre></div>
 <pre><code>     type package version
 1 Imports   shiny       *
 2 Imports   golem       *</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="successfulshinyapp.html#cb24-1"></a><span class="co"># See also </span></span>
-<span id="cb24-2"><a href="successfulshinyapp.html#cb24-2"></a>attachment<span class="op">::</span><span class="kw">att_from_description</span>(<span class="st">&quot;golex/DESCRIPTION&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1"><span class="co"># See also </span></a>
+<a class="sourceLine" id="cb24-2" title="2">attachment<span class="op">::</span><span class="kw">att_from_description</span>(<span class="st">&quot;golex/DESCRIPTION&quot;</span>)</a></code></pre></div>
 <pre><code>[1] &quot;golem&quot; &quot;shiny&quot;</code></pre>
 </div>
 </div>
@@ -930,7 +930,7 @@ But there are dozens of reasons why an app can become complex: for example, the 
 The resulting app is rather ambitious and implements a lot of features, etc.
 So yes, there is a chance that if you are reading this page, you are working or are planning to work on a complex Shiny app.
 And this is not necessarily a bad thing!
-Shiny apps can definitely be used to implement production-grade<a href="optimjs.html#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>
+Shiny apps can definitely be used to implement production-grade<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>
 software, but production-grade software implies production-grade software engineering.
 To make your project a success, you need to use tools that reduce the complexity of your app and ensure that your app is resilient to aging.</p>
 <p>In other words, production-grade Shiny apps requires working with a software engineering mindset, which is not always an easy task in the R world.
@@ -985,10 +985,20 @@ And if these people cannot use the app because it is too hard to use, too hard t
 Once the app is out, it is successful if it can exist in the long run, with all the hazards that implies: new package versions that potentially break the code base, implementation of new features in the global interface, changing key features of the UI or the back-end, and not to mention passing the code base along to someone who has not worked on the first version, and who is now in charge of developing the next version.
 And this, again, is hard to do without effective planning and efficient engineering.
 In fact, this new person might simply be you, a month from now.
-And <em>"You’ll be there in the future too, maintaining code you may have half forgotten under the press of more recent projects. When you design for the future, the sanity you save may be your own.</em><a href="optimjs.html#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a></p>
+And <em>&quot;You’ll be there in the future too, maintaining code you may have half forgotten under the press of more recent projects. When you design for the future, the sanity you save may be your own.</em><a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a></p>
 
 </div>
 </div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="3">
+<li id="fn3"><p>from <em>The Art of Unix Programming</em>, “Chapter 13: Speaking of Complexity”<a href="successfulshinyapp.html#fnref3" class="footnote-back">↩</a></p></li>
+<li id="fn4"><p>see <a href="https://github.com/rstudio/shiny/issues/2043#issuecomment-525640738" target="_blank">shiny/issues/2043#issuecomment-525640738</a> for an example<a href="successfulshinyapp.html#fnref4" class="footnote-back">↩</a></p></li>
+<li id="fn6"><p>“Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess.”, from <em>The Art of Unix Programming</em>, “Chapter 13: Speaking of Complexity”<a href="successfulshinyapp.html#fnref6" class="footnote-back">↩</a></p></li>
+<li id="fn9"><p>By production-grade, we mean a software that can be used in a context where people use it for doing their job, and where failures or bugs have real-life consequences<a href="successfulshinyapp.html#fnref9" class="footnote-back">↩</a></p></li>
+<li id="fn10"><p><em>The Art of Unix Programming</em>, Eric Steven Raymond<a href="successfulshinyapp.html#fnref10" class="footnote-back">↩</a></p></li>
+</ol>
 </div>
 <hr/>
 <footer>
@@ -1005,11 +1015,13 @@ And <em>"You’ll be there in the future too, maintaining code you may have half
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -1017,12 +1029,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -1034,6 +1045,10 @@ gitbook.start({
 "text": "Edit"
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -1052,8 +1067,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();

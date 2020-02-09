@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 19 Using JavaScript | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="Chapter 19 Using JavaScript | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 19 Using JavaScript | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -31,7 +31,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="optimizing-shiny-code.html">
+<link rel="prev" href="optimizing-shiny-code.html"/>
 
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -40,6 +40,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -59,28 +62,25 @@
 
 
 <style type="text/css">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -89,9 +89,9 @@ pre.numberSource code > span > a:first-child::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {   }
+  {  }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+a.sourceLine::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -428,19 +428,19 @@ And in the end, this is the case: most of the Shiny apps out there are written w
 <p>In fact, when you are writing UI elements in Shiny, <strong>what you are actually doing is building a series of HTML tags, which are then linked to JavaScript events</strong>.
 Later on, when the app is running, these JavaScript events will communicate with R, in the sense that they will send data to R, and receive data from R.
 Most of the time, when these JavaScript events are receiving data, they modify the page the user sees.
-What happens under the hood is a little bit complex and out of scope for this book, but the general idea is: R talks to your browser through a web socket (that you can imagine as a small “phone line” with both software modules listening at each end<a href="optimjs.html#fn36" class="footnote-ref" id="fnref36"><sup>36</sup></a>), and this browser talks to R through the same web socket.</p>
+What happens under the hood is a little bit complex and out of scope for this book, but the general idea is: R talks to your browser through a web socket (that you can imagine as a small “phone line” with both software modules listening at each end<a href="#fn36" class="footnote-ref" id="fnref36"><sup>36</sup></a>), and this browser talks to R through the same web socket.</p>
 <p>// TODO: create here a simple Flowchart</p>
 <p>// R -&gt; (Web Socket) -&gt; JS</p>
 <p>// R &lt;- (Web Socket) &lt;- JS</p>
 <p>It’s important to note here that the <strong>communication happens in both ways</strong>: from R to JavaScript, and from JavaScript to R.
-In fact, when we write a piece of code like <code>sliderInput("plop", "this", 1, 10, 5)</code>, what we are doing is creating a binding between JavaScript and R, where JavaScript listens to any event happening in the browser on the slider with the id <code>"plop"</code>, and whenever JavaScript detects that something happens to this element, something (most of the time its value) is sent back to R.
-With <code>output$bla &lt;- renderPlot({})</code>, what we are doing is making the two communicate the other way around: we are telling JavaScript to listen to any incoming data from R for the <code>id</code> <code>"bla"</code>, and whenever JavaScript sees incoming data from R, it puts it into the proper HTML tag (here, JavaScript inserts in the page the image received from R).</p>
+In fact, when we write a piece of code like <code>sliderInput(&quot;plop&quot;, &quot;this&quot;, 1, 10, 5)</code>, what we are doing is creating a binding between JavaScript and R, where JavaScript listens to any event happening in the browser on the slider with the id <code>&quot;plop&quot;</code>, and whenever JavaScript detects that something happens to this element, something (most of the time its value) is sent back to R.
+With <code>output$bla &lt;- renderPlot({})</code>, what we are doing is making the two communicate the other way around: we are telling JavaScript to listen to any incoming data from R for the <code>id</code> <code>&quot;bla&quot;</code>, and whenever JavaScript sees incoming data from R, it puts it into the proper HTML tag (here, JavaScript inserts in the page the image received from R).</p>
 <p>So even if everything is written with R, we <strong>are</strong> writing a web application, i.e. HTML, CSS and JavaScript elements.
 Once you’ve realized that, the possibilities are endless: in fact almost anything doable in a “classic” web app can be done in Shiny.
 What this also implies is that getting (even a little bit) better at writing HTML, CSS, and especially JavaScript will make your app better, lighter, and more user-friendly, as JavaScript is a language that has been designed to interact with a web page: change element appearances, hide and show things, click somewhere, show alerts and prompts…
 <strong>Knowing just enough JavaScript can improve the quality of your app</strong>: especially when you’ve been using R to render some complex UIs: think conditional panels, simulating a button click from the server, hide and show elements…
 All these things are good examples of where you should be using JavaScript instead of building more or less complex <code>renderUI</code> or <code>insertUI</code> patterns in your server.</p>
-<p>Moreover, the number of JavaScript libraries available on the web is tremendous ; and the good news is that Shiny has everything it needs to bundle external JavaScript libraries inside your application<a href="optimjs.html#fn37" class="footnote-ref" id="fnref37"><sup>37</sup></a>.</p>
+<p>Moreover, the number of JavaScript libraries available on the web is tremendous ; and the good news is that Shiny has everything it needs to bundle external JavaScript libraries inside your application<a href="#fn37" class="footnote-ref" id="fnref37"><sup>37</sup></a>.</p>
 <p>This is what this section of the book aims at: giving you just enough JavaScript knowledge to lighten your Shiny App, in order to improve the global user and developer experience.
 In this part, we’ll first review some JavaScript basics which can be used “client-side” only, i.e. only in your browser, or by making R &amp; JS communicate with each other.
 In this section, we’ll also explore common patterns for JavaScript in Shiny.
@@ -451,7 +451,7 @@ External resources are linked all throughout this chapter and at the end if you 
 </blockquote>
 <div id="a-quick-introduction-to-javascript" class="section level2">
 <h2><span class="header-section-number">19.1</span> A quick introduction to JavaScript</h2>
-<p>JavaScript is a programming language which has been designed to work in the browser<a href="optimjs.html#fn38" class="footnote-ref" id="fnref38"><sup>38</sup></a>.
+<p>JavaScript is a programming language which has been designed to work in the browser<a href="#fn38" class="footnote-ref" id="fnref38"><sup>38</sup></a>.
 There are three ways to include the JavaScript code inside your web app:</p>
 <ul>
 <li>As an external file, which is served to the browser alongside your main application page</li>
@@ -463,9 +463,9 @@ There are three ways to include the JavaScript code inside your web app:</p>
 </blockquote>
 <p>If you’re working with <code>{golem}</code>, including a JavaScript file is achieved via two functions:</p>
 <ul>
-<li><code>golem::add_js_file("name")</code>, which adds a standard JavaScript file, i.e. one which is not meant to be used to communicate with R.
+<li><code>golem::add_js_file(&quot;name&quot;)</code>, which adds a standard JavaScript file, i.e. one which is not meant to be used to communicate with R.
 We’ll see in the first part of this chapter how to add JavaScript code there.</li>
-<li><code>golem::add_js_handler("name")</code>, which creates a file with a skeleton for Shiny handlers.
+<li><code>golem::add_js_handler(&quot;name&quot;)</code>, which creates a file with a skeleton for Shiny handlers.
 We’ll see this second type of elements in the <code>JavaScript &lt;-&gt; Shiny communication</code> part.</li>
 </ul>
 <p>OK, good, but what do we do now?</p>
@@ -476,11 +476,11 @@ We’ll see this second type of elements in the <code>JavaScript &lt;-&gt; Shiny
 But first, <strong>you have to find a way to identify these elements</strong>: either as a group of elements or as a unique element inside the whole tree.
 That’s what html semantic elements, classes, and ids are made for.
 Consider this piece of code:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="optimjs.html#cb157-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb157-2"><a href="optimjs.html#cb157-2"></a><span class="kw">fluidPage</span>(</span>
-<span id="cb157-3"><a href="optimjs.html#cb157-3"></a>  <span class="kw">titlePanel</span>(<span class="st">&quot;Hello Shiny&quot;</span>), </span>
-<span id="cb157-4"><a href="optimjs.html#cb157-4"></a>  <span class="kw">actionButton</span>(<span class="st">&quot;go&quot;</span>, <span class="st">&quot;go&quot;</span>)</span>
-<span id="cb157-5"><a href="optimjs.html#cb157-5"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb157-1" title="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb157-2" title="2"><span class="kw">fluidPage</span>(</a>
+<a class="sourceLine" id="cb157-3" title="3">  <span class="kw">titlePanel</span>(<span class="st">&quot;Hello Shiny&quot;</span>), </a>
+<a class="sourceLine" id="cb157-4" title="4">  <span class="kw">actionButton</span>(<span class="st">&quot;go&quot;</span>, <span class="st">&quot;go&quot;</span>)</a>
+<a class="sourceLine" id="cb157-5" title="5">)</a></code></pre></div>
 <pre><code>&lt;div class=&quot;container-fluid&quot;&gt;
   &lt;h2&gt;Hello Shiny&lt;/h2&gt;
   &lt;button id=&quot;go&quot; type=&quot;button&quot; class=&quot;btn btn-default action-button&quot;&gt;go&lt;/button&gt;
@@ -513,18 +513,18 @@ It can be used to do a lot of things, like hide and show, change class, click so
 And to be able to do that, it comes with the notion of selectors, which will be put between <code>$()</code>.
 You can use, for example:</p>
 <ul>
-<li><p><code>$("#plop")</code> to refer to the element with the id <code>plop</code></p></li>
-<li><p><code>$(".pouet")</code> to refer to element(s) of class <code>pouet</code></p></li>
-<li><p><code>$("button:contains('this')")</code> to refer to the buttons with a text containing <code>'this'</code></p></li>
+<li><p><code>$(&quot;#plop&quot;)</code> to refer to the element with the id <code>plop</code></p></li>
+<li><p><code>$(&quot;.pouet&quot;)</code> to refer to element(s) of class <code>pouet</code></p></li>
+<li><p><code>$(&quot;button:contains('this')&quot;)</code> to refer to the buttons with a text containing <code>'this'</code></p></li>
 </ul>
 <p>You can also use special HTML attributes, which are specific to a tag.
 For example, the following HTML code:</p>
-<pre class="sourceCode html"><code class="sourceCode html"><span id="cb159-1"><a href="optimjs.html#cb159-1"></a><span class="kw">&lt;a</span><span class="ot"> href</span> <span class="ot">=</span> <span class="st">&quot;https://thinkr.fr&quot;</span><span class="ot"> data-value</span> <span class="ot">=</span> <span class="st">&quot;panel2&quot;</span><span class="kw">&gt;</span>ThinkR<span class="kw">&lt;/a&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb159"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb159-1" title="1"><span class="kw">&lt;a</span><span class="ot"> href</span> <span class="ot">=</span> <span class="st">&quot;https://thinkr.fr&quot;</span><span class="ot"> data-value</span> <span class="ot">=</span> <span class="st">&quot;panel2&quot;</span><span class="kw">&gt;</span>ThinkR<span class="kw">&lt;/a&gt;</span></a></code></pre></div>
 <p>contains the <code>href</code> &amp; <code>data-value</code> attributes.
 You can refer to these with <code>[]</code> after the tag name.</p>
 <ul>
-<li><p><code>$("a[href = 'https://thinkr.fr'])</code> refers to link(s) with <code>href</code> being <code>https://thinkr.fr</code></p></li>
-<li><p><code>$('a[data-value="panel2"]')</code> refers to link(s) with <code>data-value</code> being <code>"panel2"</code></p></li>
+<li><p><code>$(&quot;a[href = 'https://thinkr.fr'])</code> refers to link(s) with <code>href</code> being <code>https://thinkr.fr</code></p></li>
+<li><p><code>$('a[data-value=&quot;panel2&quot;]')</code> refers to link(s) with <code>data-value</code> being <code>&quot;panel2&quot;</code></p></li>
 </ul>
 <p>These and other selectors are <strong>used to identify one or more node(s) in the big tree which is a web page</strong>.
 Once we’ve identified these elements, we can either extract or change data contained in these nodes, or invoke methods contained within these nodes.
@@ -546,54 +546,54 @@ That being said, a few common things can be done that would allow you to immedia
 <li><code>$('#id').show();</code> and <code>$('#id').hide();</code> show and hide one or more elements that match the given selector.
 For example, this can be use to replace:</li>
 </ul>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="optimjs.html#cb160-1"></a>output<span class="op">$</span>ui &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
-<span id="cb160-2"><a href="optimjs.html#cb160-2"></a>  <span class="cf">if</span> (this){</span>
-<span id="cb160-3"><a href="optimjs.html#cb160-3"></a>    <span class="kw">tags</span>(...)</span>
-<span id="cb160-4"><a href="optimjs.html#cb160-4"></a>  } <span class="cf">else</span> {</span>
-<span id="cb160-5"><a href="optimjs.html#cb160-5"></a>    <span class="ot">NULL</span></span>
-<span id="cb160-6"><a href="optimjs.html#cb160-6"></a>  }</span>
-<span id="cb160-7"><a href="optimjs.html#cb160-7"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb160-1" title="1">output<span class="op">$</span>ui &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</a>
+<a class="sourceLine" id="cb160-2" title="2">  <span class="cf">if</span> (this){</a>
+<a class="sourceLine" id="cb160-3" title="3">    <span class="kw">tags</span>(...)</a>
+<a class="sourceLine" id="cb160-4" title="4">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb160-5" title="5">    <span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb160-6" title="6">  }</a>
+<a class="sourceLine" id="cb160-7" title="7">})</a></code></pre></div>
 <ul>
-<li><p><code>alert("message")</code> uses the built-in alert-box mechanism from the user’s browser (i.e., the <code>alert()</code> function is not part of jQuery but it’s built inside the user’s browser).
+<li><p><code>alert(&quot;message&quot;)</code> uses the built-in alert-box mechanism from the user’s browser (i.e., the <code>alert()</code> function is not part of jQuery but it’s built inside the user’s browser).
 It works well as it relies on the browser instead of relying on R or on a specific JavaScript library.
 You can use this functionality to replace a call to <code>{shinyalert}</code>: the result is a little less aesthetically pleasing, but that’s easier to implement and maintain.</p></li>
-<li><p><code>var x = prompt("this", "that");</code> this function opens the built-in prompt, which is a text area where the user can input text.
+<li><p><code>var x = prompt(&quot;this&quot;, &quot;that&quot;);</code> this function opens the built-in prompt, which is a text area where the user can input text.
 With this code, when the user clicks “OK”, the text is stored in the <code>x</code> variable, which you can then send back to R (see further part down this chapter for more info on how to do that).
 This can replace something like the following:</p></li>
 </ul>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="optimjs.html#cb161-1"></a>mod &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
-<span id="cb161-2"><a href="optimjs.html#cb161-2"></a>  <span class="kw">modalDialog</span>(</span>
-<span id="cb161-3"><a href="optimjs.html#cb161-3"></a>    <span class="kw">tagList</span>(</span>
-<span id="cb161-4"><a href="optimjs.html#cb161-4"></a>      <span class="kw">textInput</span>(<span class="kw">ns</span>(<span class="st">&quot;info&quot;</span>), <span class="st">&quot;Your info here&quot;</span>)</span>
-<span id="cb161-5"><a href="optimjs.html#cb161-5"></a>    ),</span>
-<span id="cb161-6"><a href="optimjs.html#cb161-6"></a>    <span class="dt">footer =</span> <span class="kw">tagList</span>(</span>
-<span id="cb161-7"><a href="optimjs.html#cb161-7"></a>      <span class="kw">modalButton</span>(<span class="st">&quot;Cancel&quot;</span>),</span>
-<span id="cb161-8"><a href="optimjs.html#cb161-8"></a>      <span class="kw">actionButton</span>(<span class="kw">ns</span>(<span class="st">&quot;ok&quot;</span>), <span class="st">&quot;OK&quot;</span>)</span>
-<span id="cb161-9"><a href="optimjs.html#cb161-9"></a>    )</span>
-<span id="cb161-10"><a href="optimjs.html#cb161-10"></a>  )</span>
-<span id="cb161-11"><a href="optimjs.html#cb161-11"></a>}</span>
-<span id="cb161-12"><a href="optimjs.html#cb161-12"></a></span>
-<span id="cb161-13"><a href="optimjs.html#cb161-13"></a><span class="kw">observeEvent</span>(input<span class="op">$</span>show, {</span>
-<span id="cb161-14"><a href="optimjs.html#cb161-14"></a>  <span class="kw">showModal</span>(<span class="kw">mod</span>())</span>
-<span id="cb161-15"><a href="optimjs.html#cb161-15"></a>})</span>
-<span id="cb161-16"><a href="optimjs.html#cb161-16"></a><span class="kw">observeEvent</span>(input<span class="op">$</span>ok, {</span>
-<span id="cb161-17"><a href="optimjs.html#cb161-17"></a>  <span class="kw">removeModal</span>()</span>
-<span id="cb161-18"><a href="optimjs.html#cb161-18"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb161-1" title="1">mod &lt;-<span class="st"> </span><span class="cf">function</span>() {</a>
+<a class="sourceLine" id="cb161-2" title="2">  <span class="kw">modalDialog</span>(</a>
+<a class="sourceLine" id="cb161-3" title="3">    <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb161-4" title="4">      <span class="kw">textInput</span>(<span class="kw">ns</span>(<span class="st">&quot;info&quot;</span>), <span class="st">&quot;Your info here&quot;</span>)</a>
+<a class="sourceLine" id="cb161-5" title="5">    ),</a>
+<a class="sourceLine" id="cb161-6" title="6">    <span class="dt">footer =</span> <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb161-7" title="7">      <span class="kw">modalButton</span>(<span class="st">&quot;Cancel&quot;</span>),</a>
+<a class="sourceLine" id="cb161-8" title="8">      <span class="kw">actionButton</span>(<span class="kw">ns</span>(<span class="st">&quot;ok&quot;</span>), <span class="st">&quot;OK&quot;</span>)</a>
+<a class="sourceLine" id="cb161-9" title="9">    )</a>
+<a class="sourceLine" id="cb161-10" title="10">  )</a>
+<a class="sourceLine" id="cb161-11" title="11">}</a>
+<a class="sourceLine" id="cb161-12" title="12"></a>
+<a class="sourceLine" id="cb161-13" title="13"><span class="kw">observeEvent</span>(input<span class="op">$</span>show, {</a>
+<a class="sourceLine" id="cb161-14" title="14">  <span class="kw">showModal</span>(<span class="kw">mod</span>())</a>
+<a class="sourceLine" id="cb161-15" title="15">})</a>
+<a class="sourceLine" id="cb161-16" title="16"><span class="kw">observeEvent</span>(input<span class="op">$</span>ok, {</a>
+<a class="sourceLine" id="cb161-17" title="17">  <span class="kw">removeModal</span>()</a>
+<a class="sourceLine" id="cb161-18" title="18">})</a></code></pre></div>
 <ul>
 <li><p><code>$('#id').css('color', 'green');</code> changes the CSS attributes of the selected element(s).
 Here, we’re switching to green on the <code>#id</code> element.</p></li>
-<li><p><code>$("#id").text( "this" );</code> changes the text content to “this”.
+<li><p><code>$(&quot;#id&quot;).text( &quot;this&quot; );</code> changes the text content to “this”.
 This can be used to replace</p></li>
 </ul>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="optimjs.html#cb162-1"></a>output<span class="op">$</span>ui &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
-<span id="cb162-2"><a href="optimjs.html#cb162-2"></a>  <span class="cf">if</span> (this){</span>
-<span id="cb162-3"><a href="optimjs.html#cb162-3"></a>    tags<span class="op">$</span><span class="kw">p</span>(<span class="st">&quot;First&quot;</span>)</span>
-<span id="cb162-4"><a href="optimjs.html#cb162-4"></a>  } <span class="cf">else</span> {</span>
-<span id="cb162-5"><a href="optimjs.html#cb162-5"></a>    tags<span class="op">$</span><span class="kw">p</span>(<span class="st">&quot;Second&quot;</span>)</span>
-<span id="cb162-6"><a href="optimjs.html#cb162-6"></a>  }</span>
-<span id="cb162-7"><a href="optimjs.html#cb162-7"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb162-1" title="1">output<span class="op">$</span>ui &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</a>
+<a class="sourceLine" id="cb162-2" title="2">  <span class="cf">if</span> (this){</a>
+<a class="sourceLine" id="cb162-3" title="3">    tags<span class="op">$</span><span class="kw">p</span>(<span class="st">&quot;First&quot;</span>)</a>
+<a class="sourceLine" id="cb162-4" title="4">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb162-5" title="5">    tags<span class="op">$</span><span class="kw">p</span>(<span class="st">&quot;Second&quot;</span>)</a>
+<a class="sourceLine" id="cb162-6" title="6">  }</a>
+<a class="sourceLine" id="cb162-7" title="7">})</a></code></pre></div>
 <ul>
-<li><code>$("#id").remove();</code> completely removes the element from the DOM.
+<li><code>$(&quot;#id&quot;).remove();</code> completely removes the element from the DOM.
 IT can be used as a replacement for <code>shiny::removeUI()</code>, or as a conditional UI.</li>
 </ul>
 </div>
@@ -605,90 +605,90 @@ All these events can be used to trigger a JavaScript function.</p>
 <p>Here are some examples of adding JavaScript functions to DOM events:</p>
 <p>+<code>onclick</code></p>
 <p>The <code>onclick</code> attribute can be added straight inside the HTML tag when possible:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="optimjs.html#cb163-1"></a>tags<span class="op">$</span><span class="kw">button</span>(</span>
-<span id="cb163-2"><a href="optimjs.html#cb163-2"></a>  <span class="st">&quot;Show&quot;</span></span>
-<span id="cb163-3"><a href="optimjs.html#cb163-3"></a>  <span class="dt">onclick =</span> <span class="st">&quot;$(&#39;#plot&#39;).show()&quot;</span></span>
-<span id="cb163-4"><a href="optimjs.html#cb163-4"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb163-1" title="1">tags<span class="op">$</span><span class="kw">button</span>(</a>
+<a class="sourceLine" id="cb163-2" title="2">  <span class="st">&quot;Show&quot;</span></a>
+<a class="sourceLine" id="cb163-3" title="3">  <span class="dt">onclick =</span> <span class="st">&quot;$(&#39;#plot&#39;).show()&quot;</span></a>
+<a class="sourceLine" id="cb163-4" title="4">)</a></code></pre></div>
 <p>Or with <code>shiny::tagAppendAttributes</code>:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="optimjs.html#cb164-1"></a><span class="kw">plotOutput</span>(</span>
-<span id="cb164-2"><a href="optimjs.html#cb164-2"></a>  <span class="st">&quot;plot&quot;</span></span>
-<span id="cb164-3"><a href="optimjs.html#cb164-3"></a>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tagAppendAttributes</span>(</span>
-<span id="cb164-4"><a href="optimjs.html#cb164-4"></a>  <span class="dt">onclick =</span> <span class="st">&quot;alert(&#39;hello world&#39;)&quot;</span></span>
-<span id="cb164-5"><a href="optimjs.html#cb164-5"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb164-1" title="1"><span class="kw">plotOutput</span>(</a>
+<a class="sourceLine" id="cb164-2" title="2">  <span class="st">&quot;plot&quot;</span></a>
+<a class="sourceLine" id="cb164-3" title="3">) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tagAppendAttributes</span>(</a>
+<a class="sourceLine" id="cb164-4" title="4">  <span class="dt">onclick =</span> <span class="st">&quot;alert(&#39;hello world&#39;)&quot;</span></a>
+<a class="sourceLine" id="cb164-5" title="5">)</a></code></pre></div>
 <p>Here is for example a small Shiny app that implements this behavior:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="optimjs.html#cb165-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb165-2"><a href="optimjs.html#cb165-2"></a><span class="kw">library</span>(magrittr)</span>
-<span id="cb165-3"><a href="optimjs.html#cb165-3"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
-<span id="cb165-4"><a href="optimjs.html#cb165-4"></a>  <span class="kw">fluidPage</span>(</span>
-<span id="cb165-5"><a href="optimjs.html#cb165-5"></a>    <span class="kw">plotOutput</span>(</span>
-<span id="cb165-6"><a href="optimjs.html#cb165-6"></a>      <span class="st">&quot;plot&quot;</span></span>
-<span id="cb165-7"><a href="optimjs.html#cb165-7"></a>    ) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tagAppendAttributes</span>(</span>
-<span id="cb165-8"><a href="optimjs.html#cb165-8"></a>      <span class="dt">onclick =</span> <span class="st">&quot;alert(&#39;iris plot!&#39;)&quot;</span></span>
-<span id="cb165-9"><a href="optimjs.html#cb165-9"></a>    )</span>
-<span id="cb165-10"><a href="optimjs.html#cb165-10"></a>  )</span>
-<span id="cb165-11"><a href="optimjs.html#cb165-11"></a>}</span>
-<span id="cb165-12"><a href="optimjs.html#cb165-12"></a></span>
-<span id="cb165-13"><a href="optimjs.html#cb165-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb165-14"><a href="optimjs.html#cb165-14"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb165-15"><a href="optimjs.html#cb165-15"></a>    <span class="kw">plot</span>(iris)</span>
-<span id="cb165-16"><a href="optimjs.html#cb165-16"></a>  })</span>
-<span id="cb165-17"><a href="optimjs.html#cb165-17"></a>}</span>
-<span id="cb165-18"><a href="optimjs.html#cb165-18"></a></span>
-<span id="cb165-19"><a href="optimjs.html#cb165-19"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb165-1" title="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb165-2" title="2"><span class="kw">library</span>(magrittr)</a>
+<a class="sourceLine" id="cb165-3" title="3">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb165-4" title="4">  <span class="kw">fluidPage</span>(</a>
+<a class="sourceLine" id="cb165-5" title="5">    <span class="kw">plotOutput</span>(</a>
+<a class="sourceLine" id="cb165-6" title="6">      <span class="st">&quot;plot&quot;</span></a>
+<a class="sourceLine" id="cb165-7" title="7">    ) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tagAppendAttributes</span>(</a>
+<a class="sourceLine" id="cb165-8" title="8">      <span class="dt">onclick =</span> <span class="st">&quot;alert(&#39;iris plot!&#39;)&quot;</span></a>
+<a class="sourceLine" id="cb165-9" title="9">    )</a>
+<a class="sourceLine" id="cb165-10" title="10">  )</a>
+<a class="sourceLine" id="cb165-11" title="11">}</a>
+<a class="sourceLine" id="cb165-12" title="12"></a>
+<a class="sourceLine" id="cb165-13" title="13">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</a>
+<a class="sourceLine" id="cb165-14" title="14">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</a>
+<a class="sourceLine" id="cb165-15" title="15">    <span class="kw">plot</span>(iris)</a>
+<a class="sourceLine" id="cb165-16" title="16">  })</a>
+<a class="sourceLine" id="cb165-17" title="17">}</a>
+<a class="sourceLine" id="cb165-18" title="18"></a>
+<a class="sourceLine" id="cb165-19" title="19"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p>You can find a real Life example of this <code>tagAppendAttributes</code> in the <code>{tidytuesday201942}</code> app:</p>
 <ul>
 <li><a href="https://github.com/ColinFay/tidytuesday201942/blob/master/R/mod_dataviz.R#L109">R/mod_dataviz.R#L109</a>, where the click on the plot generates the creation of a Shiny input (we’ll see this below)</li>
 </ul>
 <p>That, of course, works well with very small JavaScript code.
 For longer JavaScript code, you can write a function inside and external file, and add it to your app.
-In <code>{golem}</code>, this works by launching the <code>add_js_file("name")</code>, which will create a <code>.js</code> file.
-You’ll then need to add this function using <code>tags$script(src="www/name.js")</code> inside <code>golem_add_external_resources()</code> in <code>R/app_ui.R</code> file.</p>
+In <code>{golem}</code>, this works by launching the <code>add_js_file(&quot;name&quot;)</code>, which will create a <code>.js</code> file.
+You’ll then need to add this function using <code>tags$script(src=&quot;www/name.js&quot;)</code> inside <code>golem_add_external_resources()</code> in <code>R/app_ui.R</code> file.</p>
 <p>This, for example, could be:</p>
 <blockquote>
 <p>inst/app/www/script.js</p>
 </blockquote>
-<pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb166-1"><a href="optimjs.html#cb166-1"></a><span class="kw">function</span> <span class="at">alertme</span>(id)<span class="op">{</span></span>
-<span id="cb166-2"><a href="optimjs.html#cb166-2"></a>  <span class="co">// Asking information</span></span>
-<span id="cb166-3"><a href="optimjs.html#cb166-3"></a>  <span class="kw">var</span> name <span class="op">=</span> <span class="at">prompt</span>(<span class="st">&quot;Who are you?&quot;</span>)<span class="op">;</span></span>
-<span id="cb166-4"><a href="optimjs.html#cb166-4"></a>  <span class="co">// Showing an alert</span></span>
-<span id="cb166-5"><a href="optimjs.html#cb166-5"></a>  <span class="at">alert</span>(<span class="st">&quot;Hello &quot;</span> <span class="op">+</span> name <span class="op">+</span> <span class="st">&quot;! You&#39;re seeing &quot;</span> <span class="op">+</span> id)<span class="op">;</span></span>
-<span id="cb166-6"><a href="optimjs.html#cb166-6"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb166"><pre class="sourceCode js"><code class="sourceCode javascript"><a class="sourceLine" id="cb166-1" title="1"><span class="kw">function</span> <span class="at">alertme</span>(id)<span class="op">{</span></a>
+<a class="sourceLine" id="cb166-2" title="2">  <span class="co">// Asking information</span></a>
+<a class="sourceLine" id="cb166-3" title="3">  <span class="kw">var</span> name <span class="op">=</span> <span class="at">prompt</span>(<span class="st">&quot;Who are you?&quot;</span>)<span class="op">;</span></a>
+<a class="sourceLine" id="cb166-4" title="4">  <span class="co">// Showing an alert</span></a>
+<a class="sourceLine" id="cb166-5" title="5">  <span class="at">alert</span>(<span class="st">&quot;Hello &quot;</span> <span class="op">+</span> name <span class="op">+</span> <span class="st">&quot;! You&#39;re seeing &quot;</span> <span class="op">+</span> id)<span class="op">;</span></a>
+<a class="sourceLine" id="cb166-6" title="6"><span class="op">}</span></a></code></pre></div>
 <p>Then:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="optimjs.html#cb167-1"></a><span class="kw">plotOutput</span>(</span>
-<span id="cb167-2"><a href="optimjs.html#cb167-2"></a>  <span class="st">&quot;plot&quot;</span></span>
-<span id="cb167-3"><a href="optimjs.html#cb167-3"></a>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tagAppendAttributes</span>(</span>
-<span id="cb167-4"><a href="optimjs.html#cb167-4"></a>  <span class="dt">onclick =</span> <span class="st">&quot;alertme(&#39;plot&#39;)&quot;</span></span>
-<span id="cb167-5"><a href="optimjs.html#cb167-5"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb167-1" title="1"><span class="kw">plotOutput</span>(</a>
+<a class="sourceLine" id="cb167-2" title="2">  <span class="st">&quot;plot&quot;</span></a>
+<a class="sourceLine" id="cb167-3" title="3">) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tagAppendAttributes</span>(</a>
+<a class="sourceLine" id="cb167-4" title="4">  <span class="dt">onclick =</span> <span class="st">&quot;alertme(&#39;plot&#39;)&quot;</span></a>
+<a class="sourceLine" id="cb167-5" title="5">)</a></code></pre></div>
 <p>Inside this <code>inst/app/www/script.js</code>, you can also attach a new behavior with jQuery to one or several elements.
 For example, you can add this <code>alertme</code> / <code>onclick</code> behavior to all plots of the app:</p>
-<pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb168-1"><a href="optimjs.html#cb168-1"></a><span class="kw">function</span> <span class="at">alertme</span>(id)<span class="op">{</span></span>
-<span id="cb168-2"><a href="optimjs.html#cb168-2"></a>  <span class="kw">var</span> name <span class="op">=</span> <span class="at">prompt</span>(<span class="st">&quot;Who are you?&quot;</span>)<span class="op">;</span></span>
-<span id="cb168-3"><a href="optimjs.html#cb168-3"></a>  <span class="at">alert</span>(<span class="st">&quot;Hello &quot;</span> <span class="op">+</span> name <span class="op">+</span> <span class="st">&quot;! You&#39;re seeing &quot;</span> <span class="op">+</span> id)<span class="op">;</span></span>
-<span id="cb168-4"><a href="optimjs.html#cb168-4"></a><span class="op">}</span></span>
-<span id="cb168-5"><a href="optimjs.html#cb168-5"></a></span>
-<span id="cb168-6"><a href="optimjs.html#cb168-6"></a><span class="co">/* We&#39;re adding this so that the function is launched only</span></span>
-<span id="cb168-7"><a href="optimjs.html#cb168-7"></a><span class="co">when the document is ready */</span></span>
-<span id="cb168-8"><a href="optimjs.html#cb168-8"></a><span class="at">$</span>(<span class="kw">function</span>()<span class="op">{</span> </span>
-<span id="cb168-9"><a href="optimjs.html#cb168-9"></a>  <span class="co">// Selecting all Shiny plots</span></span>
-<span id="cb168-10"><a href="optimjs.html#cb168-10"></a>  <span class="at">$</span>(<span class="st">&quot;.shiny-plot-output&quot;</span>).<span class="at">on</span>(<span class="st">&quot;click&quot;</span><span class="op">,</span> <span class="kw">function</span>()<span class="op">{</span></span>
-<span id="cb168-11"><a href="optimjs.html#cb168-11"></a>    <span class="co">/* Calling the alertme function with the id </span></span>
-<span id="cb168-12"><a href="optimjs.html#cb168-12"></a><span class="co">    of the clicked plot */</span></span>
-<span id="cb168-13"><a href="optimjs.html#cb168-13"></a>    <span class="at">alertme</span>(<span class="kw">this</span>.<span class="at">id</span>)<span class="op">;</span></span>
-<span id="cb168-14"><a href="optimjs.html#cb168-14"></a>  <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb168-15"><a href="optimjs.html#cb168-15"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
-<p>Then, all the plots from your app will receive this on-click event<a href="optimjs.html#fn39" class="footnote-ref" id="fnref39"><sup>39</sup></a>.</p>
+<div class="sourceCode" id="cb168"><pre class="sourceCode js"><code class="sourceCode javascript"><a class="sourceLine" id="cb168-1" title="1"><span class="kw">function</span> <span class="at">alertme</span>(id)<span class="op">{</span></a>
+<a class="sourceLine" id="cb168-2" title="2">  <span class="kw">var</span> name <span class="op">=</span> <span class="at">prompt</span>(<span class="st">&quot;Who are you?&quot;</span>)<span class="op">;</span></a>
+<a class="sourceLine" id="cb168-3" title="3">  <span class="at">alert</span>(<span class="st">&quot;Hello &quot;</span> <span class="op">+</span> name <span class="op">+</span> <span class="st">&quot;! You&#39;re seeing &quot;</span> <span class="op">+</span> id)<span class="op">;</span></a>
+<a class="sourceLine" id="cb168-4" title="4"><span class="op">}</span></a>
+<a class="sourceLine" id="cb168-5" title="5"></a>
+<a class="sourceLine" id="cb168-6" title="6"><span class="co">/* We&#39;re adding this so that the function is launched only</span></a>
+<a class="sourceLine" id="cb168-7" title="7"><span class="co">when the document is ready */</span></a>
+<a class="sourceLine" id="cb168-8" title="8"><span class="at">$</span>(<span class="kw">function</span>()<span class="op">{</span> </a>
+<a class="sourceLine" id="cb168-9" title="9">  <span class="co">// Selecting all Shiny plots</span></a>
+<a class="sourceLine" id="cb168-10" title="10">  <span class="at">$</span>(<span class="st">&quot;.shiny-plot-output&quot;</span>).<span class="at">on</span>(<span class="st">&quot;click&quot;</span><span class="op">,</span> <span class="kw">function</span>()<span class="op">{</span></a>
+<a class="sourceLine" id="cb168-11" title="11">    <span class="co">/* Calling the alertme function with the id </span></a>
+<a class="sourceLine" id="cb168-12" title="12"><span class="co">    of the clicked plot */</span></a>
+<a class="sourceLine" id="cb168-13" title="13">    <span class="at">alertme</span>(<span class="kw">this</span>.<span class="at">id</span>)<span class="op">;</span></a>
+<a class="sourceLine" id="cb168-14" title="14">  <span class="op">}</span>)<span class="op">;</span></a>
+<a class="sourceLine" id="cb168-15" title="15"><span class="op">}</span>)<span class="op">;</span></a></code></pre></div>
+<p>Then, all the plots from your app will receive this on-click event<a href="#fn39" class="footnote-ref" id="fnref39"><sup>39</sup></a>.</p>
 <p>Note that there is a series of <code>Shiny events</code> which are specific to Shiny but that can be used just like the one we’ve just seen:</p>
-<pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb169-1"><a href="optimjs.html#cb169-1"></a><span class="kw">function</span> <span class="at">alertme</span>()<span class="op">{</span></span>
-<span id="cb169-2"><a href="optimjs.html#cb169-2"></a>  <span class="kw">var</span> name <span class="op">=</span> <span class="at">prompt</span>(<span class="st">&quot;Who are you?&quot;</span>)<span class="op">;</span></span>
-<span id="cb169-3"><a href="optimjs.html#cb169-3"></a>  <span class="at">alert</span>(<span class="st">&quot;Hello &quot;</span> <span class="op">+</span> name <span class="op">+</span> <span class="st">&quot;! Welcome to my app&quot;</span>)<span class="op">;</span></span>
-<span id="cb169-4"><a href="optimjs.html#cb169-4"></a><span class="op">}</span></span>
-<span id="cb169-5"><a href="optimjs.html#cb169-5"></a></span>
-<span id="cb169-6"><a href="optimjs.html#cb169-6"></a><span class="at">$</span>(<span class="kw">function</span>()<span class="op">{</span> </span>
-<span id="cb169-7"><a href="optimjs.html#cb169-7"></a>  <span class="co">// Waiting for Shiny to be connected</span></span>
-<span id="cb169-8"><a href="optimjs.html#cb169-8"></a>  <span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:connected&#39;</span><span class="op">,</span> <span class="kw">function</span>(event) <span class="op">{</span></span>
-<span id="cb169-9"><a href="optimjs.html#cb169-9"></a>    <span class="at">alertme</span>()<span class="op">;</span></span>
-<span id="cb169-10"><a href="optimjs.html#cb169-10"></a>  <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb169-11"><a href="optimjs.html#cb169-11"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb169"><pre class="sourceCode js"><code class="sourceCode javascript"><a class="sourceLine" id="cb169-1" title="1"><span class="kw">function</span> <span class="at">alertme</span>()<span class="op">{</span></a>
+<a class="sourceLine" id="cb169-2" title="2">  <span class="kw">var</span> name <span class="op">=</span> <span class="at">prompt</span>(<span class="st">&quot;Who are you?&quot;</span>)<span class="op">;</span></a>
+<a class="sourceLine" id="cb169-3" title="3">  <span class="at">alert</span>(<span class="st">&quot;Hello &quot;</span> <span class="op">+</span> name <span class="op">+</span> <span class="st">&quot;! Welcome to my app&quot;</span>)<span class="op">;</span></a>
+<a class="sourceLine" id="cb169-4" title="4"><span class="op">}</span></a>
+<a class="sourceLine" id="cb169-5" title="5"></a>
+<a class="sourceLine" id="cb169-6" title="6"><span class="at">$</span>(<span class="kw">function</span>()<span class="op">{</span> </a>
+<a class="sourceLine" id="cb169-7" title="7">  <span class="co">// Waiting for Shiny to be connected</span></a>
+<a class="sourceLine" id="cb169-8" title="8">  <span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:connected&#39;</span><span class="op">,</span> <span class="kw">function</span>(event) <span class="op">{</span></a>
+<a class="sourceLine" id="cb169-9" title="9">    <span class="at">alertme</span>()<span class="op">;</span></a>
+<a class="sourceLine" id="cb169-10" title="10">  <span class="op">}</span>)<span class="op">;</span></a>
+<a class="sourceLine" id="cb169-11" title="11"><span class="op">}</span>)<span class="op">;</span></a></code></pre></div>
 <p>See <a href="https://shiny.rstudio.com/articles/js-events.html">JavaScript Events in Shiny</a> for the full list of JavaScript events available in Shiny.</p>
 </div>
 </div>
@@ -704,77 +704,77 @@ For example, you can add this <code>alertme</code> / <code>onclick</code> behavi
   
   })
 });</code></pre>
-<p>This skeleton is the one generated by <code>golem::add_js_handler("plop")</code>.</p>
+<p>This skeleton is the one generated by <code>golem::add_js_handler(&quot;plop&quot;)</code>.</p>
 <p>Then, it can be called from server-side with:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="optimjs.html#cb171-1"></a>session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;fun&quot;</span>, <span class="kw">list</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb171-1" title="1">session<span class="op">$</span><span class="kw">sendCustomMessage</span>(<span class="st">&quot;fun&quot;</span>, <span class="kw">list</span>())</a></code></pre></div>
 <p>Note that the <code>list()</code> argument from your function will be converted to JSON, and read as such from JS.
 In other words, if your have an argument called <code>x</code>, and you call the function with <code>list(a = 1, b = 12)</code>, then in JS you’ll be able to use <code>x.a</code> and <code>x.b</code>.</p>
 <p>For example:</p>
 <blockquote>
 <p>In <code>inst/app/www/script.js</code></p>
 </blockquote>
-<pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb172-1"><a href="optimjs.html#cb172-1"></a><span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;computed&#39;</span><span class="op">,</span> <span class="kw">function</span>(mess) <span class="op">{</span></span>
-<span id="cb172-2"><a href="optimjs.html#cb172-2"></a>  <span class="at">alert</span>(<span class="st">&quot;Computed &quot;</span> <span class="op">+</span> <span class="va">mess</span>.<span class="at">what</span> <span class="op">+</span> <span class="st">&quot; in &quot;</span> <span class="op">+</span> <span class="va">mess</span>.<span class="at">sec</span> <span class="op">+</span> <span class="st">&quot; secs&quot;</span>)<span class="op">;</span></span>
-<span id="cb172-3"><a href="optimjs.html#cb172-3"></a><span class="op">}</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb172"><pre class="sourceCode js"><code class="sourceCode javascript"><a class="sourceLine" id="cb172-1" title="1"><span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;computed&#39;</span><span class="op">,</span> <span class="kw">function</span>(mess) <span class="op">{</span></a>
+<a class="sourceLine" id="cb172-2" title="2">  <span class="at">alert</span>(<span class="st">&quot;Computed &quot;</span> <span class="op">+</span> <span class="va">mess</span>.<span class="at">what</span> <span class="op">+</span> <span class="st">&quot; in &quot;</span> <span class="op">+</span> <span class="va">mess</span>.<span class="at">sec</span> <span class="op">+</span> <span class="st">&quot; secs&quot;</span>)<span class="op">;</span></a>
+<a class="sourceLine" id="cb172-3" title="3"><span class="op">}</span>)</a></code></pre></div>
 <p>Then in R:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="optimjs.html#cb173-1"></a><span class="kw">observe</span>({</span>
-<span id="cb173-2"><a href="optimjs.html#cb173-2"></a>  deb &lt;-<span class="st"> </span><span class="kw">Sys.time</span>()</span>
-<span id="cb173-3"><a href="optimjs.html#cb173-3"></a>  <span class="co"># Do the computation for id</span></span>
-<span id="cb173-4"><a href="optimjs.html#cb173-4"></a>  <span class="kw">Sys.sleep</span>(</span>
-<span id="cb173-5"><a href="optimjs.html#cb173-5"></a>    <span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dv">1</span>)</span>
-<span id="cb173-6"><a href="optimjs.html#cb173-6"></a>  )</span>
-<span id="cb173-7"><a href="optimjs.html#cb173-7"></a>  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
-<span id="cb173-8"><a href="optimjs.html#cb173-8"></a>    <span class="st">&quot;computed&quot;</span>, </span>
-<span id="cb173-9"><a href="optimjs.html#cb173-9"></a>    <span class="kw">list</span>(</span>
-<span id="cb173-10"><a href="optimjs.html#cb173-10"></a>      <span class="dt">what =</span> <span class="st">&quot;plop&quot;</span>, </span>
-<span id="cb173-11"><a href="optimjs.html#cb173-11"></a>      <span class="dt">sec =</span> <span class="kw">round</span>(<span class="kw">Sys.time</span>() <span class="op">-</span><span class="st"> </span>deb)</span>
-<span id="cb173-12"><a href="optimjs.html#cb173-12"></a>    )</span>
-<span id="cb173-13"><a href="optimjs.html#cb173-13"></a>  )</span>
-<span id="cb173-14"><a href="optimjs.html#cb173-14"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb173-1" title="1"><span class="kw">observe</span>({</a>
+<a class="sourceLine" id="cb173-2" title="2">  deb &lt;-<span class="st"> </span><span class="kw">Sys.time</span>()</a>
+<a class="sourceLine" id="cb173-3" title="3">  <span class="co"># Do the computation for id</span></a>
+<a class="sourceLine" id="cb173-4" title="4">  <span class="kw">Sys.sleep</span>(</a>
+<a class="sourceLine" id="cb173-5" title="5">    <span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb173-6" title="6">  )</a>
+<a class="sourceLine" id="cb173-7" title="7">  session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</a>
+<a class="sourceLine" id="cb173-8" title="8">    <span class="st">&quot;computed&quot;</span>, </a>
+<a class="sourceLine" id="cb173-9" title="9">    <span class="kw">list</span>(</a>
+<a class="sourceLine" id="cb173-10" title="10">      <span class="dt">what =</span> <span class="st">&quot;plop&quot;</span>, </a>
+<a class="sourceLine" id="cb173-11" title="11">      <span class="dt">sec =</span> <span class="kw">round</span>(<span class="kw">Sys.time</span>() <span class="op">-</span><span class="st"> </span>deb)</a>
+<a class="sourceLine" id="cb173-12" title="12">    )</a>
+<a class="sourceLine" id="cb173-13" title="13">  )</a>
+<a class="sourceLine" id="cb173-14" title="14">})</a></code></pre></div>
 </div>
 <div id="from-javascript-to-r" class="section level3">
 <h3><span class="header-section-number">19.3.2</span> From JavaScript to R</h3>
 <p>How to do the other way around (from JS to R)?
 Shiny apps, in the browser, contain an object called <code>Shiny</code>, which can be used to send values to R, by creating an <code>IputValue</code>.
 For example, with:</p>
-<pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb174-1"><a href="optimjs.html#cb174-1"></a><span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="st">&quot;rand&quot;</span><span class="op">,</span> <span class="va">Math</span>.<span class="at">random</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb174"><pre class="sourceCode js"><code class="sourceCode javascript"><a class="sourceLine" id="cb174-1" title="1"><span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="st">&quot;rand&quot;</span><span class="op">,</span> <span class="va">Math</span>.<span class="at">random</span>())</a></code></pre></div>
 <p>you’ll bind an input that can be caught from the server side with:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="optimjs.html#cb175-1"></a><span class="kw">observeEvent</span>( input<span class="op">$</span>rand , {</span>
-<span id="cb175-2"><a href="optimjs.html#cb175-2"></a>  <span class="kw">print</span>( input<span class="op">$</span>rand )</span>
-<span id="cb175-3"><a href="optimjs.html#cb175-3"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb175-1" title="1"><span class="kw">observeEvent</span>( input<span class="op">$</span>rand , {</a>
+<a class="sourceLine" id="cb175-2" title="2">  <span class="kw">print</span>( input<span class="op">$</span>rand )</a>
+<a class="sourceLine" id="cb175-3" title="3">})</a></code></pre></div>
 <p>This <code>Shiny.setInputValue</code> can of course be used inside any JavaScript function.
 Here is a small example wrapping some of the things we’ve seen previously:</p>
 <blockquote>
 <p>In <code>inst/app/www/script.js</code></p>
 </blockquote>
-<pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb176-1"><a href="optimjs.html#cb176-1"></a><span class="kw">function</span> <span class="at">alertme</span>()<span class="op">{</span></span>
-<span id="cb176-2"><a href="optimjs.html#cb176-2"></a>  <span class="kw">var</span> name <span class="op">=</span> <span class="at">prompt</span>(<span class="st">&quot;Who are you?&quot;</span>)<span class="op">;</span></span>
-<span id="cb176-3"><a href="optimjs.html#cb176-3"></a>  <span class="at">alert</span>(<span class="st">&quot;Hello &quot;</span> <span class="op">+</span> name <span class="op">+</span> <span class="st">&quot;! Welcome to my app&quot;</span>)<span class="op">;</span></span>
-<span id="cb176-4"><a href="optimjs.html#cb176-4"></a>  <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="st">&quot;username&quot;</span><span class="op">,</span> name)</span>
-<span id="cb176-5"><a href="optimjs.html#cb176-5"></a><span class="op">}</span></span>
-<span id="cb176-6"><a href="optimjs.html#cb176-6"></a></span>
-<span id="cb176-7"><a href="optimjs.html#cb176-7"></a><span class="at">$</span>(<span class="kw">function</span>()<span class="op">{</span> </span>
-<span id="cb176-8"><a href="optimjs.html#cb176-8"></a>  <span class="co">// Waiting for Shiny to be connected</span></span>
-<span id="cb176-9"><a href="optimjs.html#cb176-9"></a>  <span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:connected&#39;</span><span class="op">,</span> <span class="kw">function</span>(event) <span class="op">{</span></span>
-<span id="cb176-10"><a href="optimjs.html#cb176-10"></a>    <span class="at">alertme</span>()<span class="op">;</span></span>
-<span id="cb176-11"><a href="optimjs.html#cb176-11"></a>  <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb176-12"><a href="optimjs.html#cb176-12"></a>  </span>
-<span id="cb176-13"><a href="optimjs.html#cb176-13"></a>  <span class="at">$</span>(<span class="st">&quot;.shiny-plot-output&quot;</span>).<span class="at">on</span>(<span class="st">&quot;click&quot;</span><span class="op">,</span> <span class="kw">function</span>()<span class="op">{</span></span>
-<span id="cb176-14"><a href="optimjs.html#cb176-14"></a>    <span class="co">/* Calling the alertme function with the id </span></span>
-<span id="cb176-15"><a href="optimjs.html#cb176-15"></a><span class="co">    of the clicked plot */</span></span>
-<span id="cb176-16"><a href="optimjs.html#cb176-16"></a>    <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="st">&quot;last_plot_clicked&quot;</span><span class="op">,</span> <span class="kw">this</span>.<span class="at">id</span>)<span class="op">;</span></span>
-<span id="cb176-17"><a href="optimjs.html#cb176-17"></a>  <span class="op">}</span>)<span class="op">;</span></span>
-<span id="cb176-18"><a href="optimjs.html#cb176-18"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb176"><pre class="sourceCode js"><code class="sourceCode javascript"><a class="sourceLine" id="cb176-1" title="1"><span class="kw">function</span> <span class="at">alertme</span>()<span class="op">{</span></a>
+<a class="sourceLine" id="cb176-2" title="2">  <span class="kw">var</span> name <span class="op">=</span> <span class="at">prompt</span>(<span class="st">&quot;Who are you?&quot;</span>)<span class="op">;</span></a>
+<a class="sourceLine" id="cb176-3" title="3">  <span class="at">alert</span>(<span class="st">&quot;Hello &quot;</span> <span class="op">+</span> name <span class="op">+</span> <span class="st">&quot;! Welcome to my app&quot;</span>)<span class="op">;</span></a>
+<a class="sourceLine" id="cb176-4" title="4">  <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="st">&quot;username&quot;</span><span class="op">,</span> name)</a>
+<a class="sourceLine" id="cb176-5" title="5"><span class="op">}</span></a>
+<a class="sourceLine" id="cb176-6" title="6"></a>
+<a class="sourceLine" id="cb176-7" title="7"><span class="at">$</span>(<span class="kw">function</span>()<span class="op">{</span> </a>
+<a class="sourceLine" id="cb176-8" title="8">  <span class="co">// Waiting for Shiny to be connected</span></a>
+<a class="sourceLine" id="cb176-9" title="9">  <span class="at">$</span>(document).<span class="at">on</span>(<span class="st">&#39;shiny:connected&#39;</span><span class="op">,</span> <span class="kw">function</span>(event) <span class="op">{</span></a>
+<a class="sourceLine" id="cb176-10" title="10">    <span class="at">alertme</span>()<span class="op">;</span></a>
+<a class="sourceLine" id="cb176-11" title="11">  <span class="op">}</span>)<span class="op">;</span></a>
+<a class="sourceLine" id="cb176-12" title="12">  </a>
+<a class="sourceLine" id="cb176-13" title="13">  <span class="at">$</span>(<span class="st">&quot;.shiny-plot-output&quot;</span>).<span class="at">on</span>(<span class="st">&quot;click&quot;</span><span class="op">,</span> <span class="kw">function</span>()<span class="op">{</span></a>
+<a class="sourceLine" id="cb176-14" title="14">    <span class="co">/* Calling the alertme function with the id </span></a>
+<a class="sourceLine" id="cb176-15" title="15"><span class="co">    of the clicked plot */</span></a>
+<a class="sourceLine" id="cb176-16" title="16">    <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="st">&quot;last_plot_clicked&quot;</span><span class="op">,</span> <span class="kw">this</span>.<span class="at">id</span>)<span class="op">;</span></a>
+<a class="sourceLine" id="cb176-17" title="17">  <span class="op">}</span>)<span class="op">;</span></a>
+<a class="sourceLine" id="cb176-18" title="18"><span class="op">}</span>)<span class="op">;</span></a></code></pre></div>
 <p>These events (getting the user name and the last plot clicked), can then be caught from the server side with:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="optimjs.html#cb177-1"></a><span class="kw">observeEvent</span>( input<span class="op">$</span>username , {</span>
-<span id="cb177-2"><a href="optimjs.html#cb177-2"></a>  cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;User name:&quot;</span>)</span>
-<span id="cb177-3"><a href="optimjs.html#cb177-3"></a>  <span class="kw">print</span>(input<span class="op">$</span>username)</span>
-<span id="cb177-4"><a href="optimjs.html#cb177-4"></a>})</span>
-<span id="cb177-5"><a href="optimjs.html#cb177-5"></a></span>
-<span id="cb177-6"><a href="optimjs.html#cb177-6"></a><span class="kw">observeEvent</span>( input<span class="op">$</span>last_plot_clicked , {</span>
-<span id="cb177-7"><a href="optimjs.html#cb177-7"></a>  cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;Last plot clicked:&quot;</span>)</span>
-<span id="cb177-8"><a href="optimjs.html#cb177-8"></a>  <span class="kw">print</span>(input<span class="op">$</span>last_plot_clicked)</span>
-<span id="cb177-9"><a href="optimjs.html#cb177-9"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb177-1" title="1"><span class="kw">observeEvent</span>( input<span class="op">$</span>username , {</a>
+<a class="sourceLine" id="cb177-2" title="2">  cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;User name:&quot;</span>)</a>
+<a class="sourceLine" id="cb177-3" title="3">  <span class="kw">print</span>(input<span class="op">$</span>username)</a>
+<a class="sourceLine" id="cb177-4" title="4">})</a>
+<a class="sourceLine" id="cb177-5" title="5"></a>
+<a class="sourceLine" id="cb177-6" title="6"><span class="kw">observeEvent</span>( input<span class="op">$</span>last_plot_clicked , {</a>
+<a class="sourceLine" id="cb177-7" title="7">  cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;Last plot clicked:&quot;</span>)</a>
+<a class="sourceLine" id="cb177-8" title="8">  <span class="kw">print</span>(input<span class="op">$</span>last_plot_clicked)</a>
+<a class="sourceLine" id="cb177-9" title="9">})</a></code></pre></div>
 <p>Which will give:</p>
 <pre><code>&gt; golex::run_app()
 Loading required package: shiny
@@ -789,44 +789,44 @@ Listening on http://127.0.0.1:5495
 <p><strong>Important note</strong>: if you’re using modules, you’ll need to pass the namespacing of the <code>id</code> to be able to get it back from the server.
 This can be done using the <code>session$ns</code> function, which comes by default in any golem-generated module.
 In other words, you’ll need to write something like:</p>
-<pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb179-1"><a href="optimjs.html#cb179-1"></a><span class="at">$</span>( document ).<span class="at">ready</span>(<span class="kw">function</span>() <span class="op">{</span></span>
-<span id="cb179-2"><a href="optimjs.html#cb179-2"></a>  <span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;whoareyou&#39;</span><span class="op">,</span> <span class="kw">function</span>(arg) <span class="op">{</span></span>
-<span id="cb179-3"><a href="optimjs.html#cb179-3"></a>    <span class="kw">var</span> name <span class="op">=</span> <span class="at">prompt</span>(<span class="st">&quot;Who are you?&quot;</span>)</span>
-<span id="cb179-4"><a href="optimjs.html#cb179-4"></a>    <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">arg</span>.<span class="at">id</span><span class="op">,</span> name)<span class="op">;</span></span>
-<span id="cb179-5"><a href="optimjs.html#cb179-5"></a>  <span class="op">}</span>)</span>
-<span id="cb179-6"><a href="optimjs.html#cb179-6"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="optimjs.html#cb180-1"></a>mod_my_first_module_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
-<span id="cb180-2"><a href="optimjs.html#cb180-2"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
-<span id="cb180-3"><a href="optimjs.html#cb180-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb180-4"><a href="optimjs.html#cb180-4"></a>    <span class="kw">actionButton</span>(</span>
-<span id="cb180-5"><a href="optimjs.html#cb180-5"></a>      <span class="kw">ns</span>(<span class="st">&quot;showname&quot;</span>), <span class="st">&quot;Enter your name&quot;</span></span>
-<span id="cb180-6"><a href="optimjs.html#cb180-6"></a>    )</span>
-<span id="cb180-7"><a href="optimjs.html#cb180-7"></a>  )</span>
-<span id="cb180-8"><a href="optimjs.html#cb180-8"></a>}</span>
-<span id="cb180-9"><a href="optimjs.html#cb180-9"></a></span>
-<span id="cb180-10"><a href="optimjs.html#cb180-10"></a>mod_my_first_module_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb180-11"><a href="optimjs.html#cb180-11"></a>  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</span>
-<span id="cb180-12"><a href="optimjs.html#cb180-12"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>showname , {</span>
-<span id="cb180-13"><a href="optimjs.html#cb180-13"></a>    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</span>
-<span id="cb180-14"><a href="optimjs.html#cb180-14"></a>      <span class="st">&quot;whoareyou&quot;</span>, </span>
-<span id="cb180-15"><a href="optimjs.html#cb180-15"></a>      <span class="kw">list</span>(</span>
-<span id="cb180-16"><a href="optimjs.html#cb180-16"></a>        <span class="dt">id =</span> <span class="kw">ns</span>(<span class="st">&quot;name&quot;</span>)</span>
-<span id="cb180-17"><a href="optimjs.html#cb180-17"></a>      )</span>
-<span id="cb180-18"><a href="optimjs.html#cb180-18"></a>    )</span>
-<span id="cb180-19"><a href="optimjs.html#cb180-19"></a>  })</span>
-<span id="cb180-20"><a href="optimjs.html#cb180-20"></a>  </span>
-<span id="cb180-21"><a href="optimjs.html#cb180-21"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>name , {</span>
-<span id="cb180-22"><a href="optimjs.html#cb180-22"></a>    cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;Username is:&quot;</span>)</span>
-<span id="cb180-23"><a href="optimjs.html#cb180-23"></a>    <span class="kw">print</span>(input<span class="op">$</span>name)</span>
-<span id="cb180-24"><a href="optimjs.html#cb180-24"></a>  })</span>
-<span id="cb180-25"><a href="optimjs.html#cb180-25"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb179"><pre class="sourceCode js"><code class="sourceCode javascript"><a class="sourceLine" id="cb179-1" title="1"><span class="at">$</span>( document ).<span class="at">ready</span>(<span class="kw">function</span>() <span class="op">{</span></a>
+<a class="sourceLine" id="cb179-2" title="2">  <span class="va">Shiny</span>.<span class="at">addCustomMessageHandler</span>(<span class="st">&#39;whoareyou&#39;</span><span class="op">,</span> <span class="kw">function</span>(arg) <span class="op">{</span></a>
+<a class="sourceLine" id="cb179-3" title="3">    <span class="kw">var</span> name <span class="op">=</span> <span class="at">prompt</span>(<span class="st">&quot;Who are you?&quot;</span>)</a>
+<a class="sourceLine" id="cb179-4" title="4">    <span class="va">Shiny</span>.<span class="at">setInputValue</span>(<span class="va">arg</span>.<span class="at">id</span><span class="op">,</span> name)<span class="op">;</span></a>
+<a class="sourceLine" id="cb179-5" title="5">  <span class="op">}</span>)</a>
+<a class="sourceLine" id="cb179-6" title="6"><span class="op">}</span>)<span class="op">;</span></a></code></pre></div>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb180-1" title="1">mod_my_first_module_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</a>
+<a class="sourceLine" id="cb180-2" title="2">  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</a>
+<a class="sourceLine" id="cb180-3" title="3">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb180-4" title="4">    <span class="kw">actionButton</span>(</a>
+<a class="sourceLine" id="cb180-5" title="5">      <span class="kw">ns</span>(<span class="st">&quot;showname&quot;</span>), <span class="st">&quot;Enter your name&quot;</span></a>
+<a class="sourceLine" id="cb180-6" title="6">    )</a>
+<a class="sourceLine" id="cb180-7" title="7">  )</a>
+<a class="sourceLine" id="cb180-8" title="8">}</a>
+<a class="sourceLine" id="cb180-9" title="9"></a>
+<a class="sourceLine" id="cb180-10" title="10">mod_my_first_module_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</a>
+<a class="sourceLine" id="cb180-11" title="11">  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</a>
+<a class="sourceLine" id="cb180-12" title="12">  <span class="kw">observeEvent</span>( input<span class="op">$</span>showname , {</a>
+<a class="sourceLine" id="cb180-13" title="13">    session<span class="op">$</span><span class="kw">sendCustomMessage</span>(</a>
+<a class="sourceLine" id="cb180-14" title="14">      <span class="st">&quot;whoareyou&quot;</span>, </a>
+<a class="sourceLine" id="cb180-15" title="15">      <span class="kw">list</span>(</a>
+<a class="sourceLine" id="cb180-16" title="16">        <span class="dt">id =</span> <span class="kw">ns</span>(<span class="st">&quot;name&quot;</span>)</a>
+<a class="sourceLine" id="cb180-17" title="17">      )</a>
+<a class="sourceLine" id="cb180-18" title="18">    )</a>
+<a class="sourceLine" id="cb180-19" title="19">  })</a>
+<a class="sourceLine" id="cb180-20" title="20">  </a>
+<a class="sourceLine" id="cb180-21" title="21">  <span class="kw">observeEvent</span>( input<span class="op">$</span>name , {</a>
+<a class="sourceLine" id="cb180-22" title="22">    cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;Username is:&quot;</span>)</a>
+<a class="sourceLine" id="cb180-23" title="23">    <span class="kw">print</span>(input<span class="op">$</span>name)</a>
+<a class="sourceLine" id="cb180-24" title="24">  })</a>
+<a class="sourceLine" id="cb180-25" title="25">}</a></code></pre></div>
 </div>
 </div>
 <div id="about-golem-js-functions" class="section level2">
 <h2><span class="header-section-number">19.4</span> About <code>{golem}</code> js functions</h2>
 <p><code>{golem}</code> comes with a series of JavaScript functions that you can call from the server.
 These functions are added by default with <code>golem::activate_js()</code> in <code>app_ui</code>.</p>
-<p>Then they are called with <code>golem::invoke_js("function", "element")</code>.</p>
+<p>Then they are called with <code>golem::invoke_js(&quot;function&quot;, &quot;element&quot;)</code>.</p>
 <p>This <code>element</code> can be one of a series of elements (most of the time scalar elements) which can be used to select the DOM node you want to interact with.
 It can be a full jQuery selector, an id or a class.
 Note that you can pass multiple elements, with <code>invoke_js</code> <code>...</code> parameters</p>
@@ -835,11 +835,11 @@ Note that you can pass multiple elements, with <code>invoke_js</code> <code>...<
 <ul>
 <li><code>showid</code> &amp; <code>hideid</code>, <code>showclass</code> &amp; <code>hideclass</code> show and hide elements through their id or class.</li>
 </ul>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="optimjs.html#cb181-1"></a>golem<span class="op">::</span><span class="kw">invoke_js</span>(<span class="st">&quot;showid&quot;</span>, <span class="kw">ns</span>(<span class="st">&quot;plot&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb181-1" title="1">golem<span class="op">::</span><span class="kw">invoke_js</span>(<span class="st">&quot;showid&quot;</span>, <span class="kw">ns</span>(<span class="st">&quot;plot&quot;</span>))</a></code></pre></div>
 <ul>
 <li><code>showhref</code> &amp; <code>hidehref</code> hide and show a link by trying to match the <code>href</code> content.</li>
 </ul>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="optimjs.html#cb182-1"></a>golem<span class="op">::</span><span class="kw">invoke_js</span>(<span class="st">&quot;showhref&quot;</span>, <span class="st">&quot;panel2&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb182-1" title="1">golem<span class="op">::</span><span class="kw">invoke_js</span>(<span class="st">&quot;showhref&quot;</span>, <span class="st">&quot;panel2&quot;</span>)</a></code></pre></div>
 <ul>
 <li><p><code>clickon</code> click on the element. You have to use the full jQuery selector.</p></li>
 <li><p><code>show</code> &amp; <code>hide</code> show and hide elements, using the full jQuery selector.</p></li>
@@ -879,88 +879,88 @@ You’ll find it at <a href="http://connect.thinkr.fr/js4shinyfieldnotes/" class
 </div>
 </div>
 </div>
-<div class="footnotes">
-<hr />
-<ol>
-<li id="fn1"><p>
-We borrow this term from Charity Major, as heard in <em>Test in Production with Charity Majors</em>, <a href="https://corecursive.com/019-test-in-production-with-charity-majors/" target="_blank">CoRecursive</a><a href="successfulshinyapp.html#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>
-Ironic right?<a href="successfulshinyapp.html#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p>from <em>The Art of Unix Programming</em>, “Chapter 13: Speaking of Complexity”<a href="successfulshinyapp.html#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>see <a href="https://github.com/rstudio/shiny/issues/2043#issuecomment-525640738" target="_blank">shiny/issues/2043#issuecomment-525640738</a> for an example<a href="successfulshinyapp.html#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p>
-The minification process is the process of removing all blank characters and put everything on one line so that the file in the output is much smaller.<a href="successfulshinyapp.html#fnref5" class="footnote-back">↩︎</a></p></li>
-<li id="fn6"><p>“Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess.”, from <em>The Art of Unix Programming</em>, “Chapter 13: Speaking of Complexity”<a href="successfulshinyapp.html#fnref6" class="footnote-back">↩︎</a></p></li>
-<li id="fn7"><p>
-“<em><code>%&gt;%</code> should always have a space before it, and should usually be followed by a new line.</em>”, <a href="https://style.tidyverse.org/pipes.html" target="_blank">tidyverse style guide</a><a href="successfulshinyapp.html#fnref7" class="footnote-back">↩︎</a></p></li>
-<li id="fn8"><p>
-A control flow graph is a graph representing all the possible paths a piece of code can take while it is executed.<a href="successfulshinyapp.html#fnref8" class="footnote-back">↩︎</a></p></li>
-<li id="fn9"><p>By production-grade, we mean a software that can be used in a context where people use it for doing their job, and where failures or bugs have real-life consequences<a href="successfulshinyapp.html#fnref9" class="footnote-back">↩︎</a></p></li>
-<li id="fn10"><p><em>The Art of Unix Programming</em>, Eric Steven Raymond<a href="successfulshinyapp.html#fnref10" class="footnote-back">↩︎</a></p></li>
-<li id="fn11"><p>
-Which might not be the most “elegant” solution, but production code requires pragmatism.<a href="planning.html#fnref11" class="footnote-back">↩︎</a></p></li>
-<li id="fn12"><p>
-Relying on automatic tooling for monitoring code base is way safer than relying on developers to do manual checks every time they commit code.<a href="planning.html#fnref12" class="footnote-back">↩︎</a></p></li>
-<li id="fn13"><p>
-Most of the time, pieces / panels of the app are to unique too be reused elsewhere.<a href="structure.html#fnref13" class="footnote-back">↩︎</a></p></li>
-<li id="fn14"><p>
-Well, of course you can still have inner module id conflicts, but they are easier to avoid, detect, and fix. <a href="structure.html#fnref14" class="footnote-back">↩︎</a></p></li>
-<li id="fn15"><p>
-Same goes for the dependencies: you’ll never have to call <code>library()</code> in an app built with <code>{golem}</code>.<a href="golem.html#fnref15" class="footnote-back">↩︎</a></p></li>
-<li id="fn16"><p>
-Very technically speaking, it’s the <code>print()</code> from the object outputted by <code>run_app()</code> that launches the app, but that’s another story. <a href="golem.html#fnref16" class="footnote-back">↩︎</a></p></li>
-<li id="fn17"><p>
-Some webpages don’t need any external sources, as they don’t have any design and are plain HTML, but generally speaking we won’t call this format a web app. <a href="golem.html#fnref17" class="footnote-back">↩︎</a></p></li>
-<li id="fn18"><p>aka what happens in the server side of a Shiny App<a href="matters.html#fnref18" class="footnote-back">↩︎</a></p></li>
-<li id="fn19"><p>Front-end are the visual parts of your application, the one your user interacts with, as opposed to the back-end, which is what is installed on the server, the part the end user doesn’t see.
-In Shiny, front-end is what correspond to the UI, back-end to the server.<a href="matters.html#fnref19" class="footnote-back">↩︎</a></p></li>
-<li id="fn20"><p>
-For a good summary of these, see <a href="https://www.ibm.com/developerworks/web/library/us-cranky10/us-cranky10-pdf.pdf">The cranky user: The Principle of Least Astonishment</a><a href="matters.html#fnref20" class="footnote-back">↩︎</a></p></li>
-<li id="fn21"><p>
-<code>{shiny}</code> is built on top of Bootstrap 3, and the action buttons are of class <code>btn-default</code>, which was removed in Bootstrap 4.<a href="matters.html#fnref21" class="footnote-back">↩︎</a></p></li>
-<li id="fn22"><p>
-Well, maybe the native <code>{plotly}</code> implementation is faster, but you get the spirit.<a href="matters.html#fnref22" class="footnote-back">↩︎</a></p></li>
-<li id="fn23"><p>
-And of course, other type of disabilities.<a href="matters.html#fnref23" class="footnote-back">↩︎</a></p></li>
-<li id="fn24"><p>
-See the JavaScript chapter.<a href="matters.html#fnref24" class="footnote-back">↩︎</a></p></li>
-<li id="fn25"><p>
-For developing an app that is mobile first, you can have a look at the great <a href="https://rinterface.github.io/shinyMobile/"><code>{shinyMobile}</code></a> package, made by the amazing Rinterface team.<a href="step-design.html#fnref25" class="footnote-back">↩︎</a></p></li>
-<li id="fn26"><p>
-Of course, this part will not make you an expert CSS programmer, but we hope you will get an idea of how it works, enough to get you started and want to learn more!<a href="css.html#fnref26" class="footnote-back">↩︎</a></p></li>
-<li id="fn27"><p>
-Note that in HTML, id must be unique, but class must not.<a href="css.html#fnref27" class="footnote-back">↩︎</a></p></li>
-<li id="fn28"><p>
-Based on the number of Reverse dependencies &amp; suggests at <a href="https://cran.r-project.org/web/packages/testthat/index.html" class="uri">https://cran.r-project.org/web/packages/testthat/index.html</a><a href="step-secure.html#fnref28" class="footnote-back">↩︎</a></p></li>
-<li id="fn29"><p>
-It was first developed by Linus Torvalds, the very same man behind Linux<a href="secure.html#fnref29" class="footnote-back">↩︎</a></p></li>
-<li id="fn30"><p>
-For example: “Added a graph in the analysis tab”, or “Fixed the docx export bug”<a href="secure.html#fnref30" class="footnote-back">↩︎</a></p></li>
-<li id="fn31"><p>
-Well, it’s technically possible to erase things from the server history, but it’s dangerous to do so and generally accepted as a bad practice.<a href="secure.html#fnref31" class="footnote-back">↩︎</a></p></li>
-<li id="fn32"><p>
-<code>{utils}</code> also comes with a function call <code>Rprof()</code>, but we won’t be examining this one here.<a href="when-optimize.html#fnref32" class="footnote-back">↩︎</a></p></li>
-<li id="fn33"><p>
-Human memory is a form of caching<a href="optimizing-shiny-code.html#fnref33" class="footnote-back">↩︎</a></p></li>
-<li id="fn34"><p>
-In that case, you can either hide pre-existing sticky notes, or buy a bigger screen.
-But we are not here to talk about cache management theory.
-// TODO REFERENCE TO “Algorithm to live by”<a href="optimizing-shiny-code.html#fnref34" class="footnote-back">↩︎</a></p></li>
-<li id="fn35"><p>
-In some cases you’ll have to configure the size policy, but in most cases the default value work just well. <a href="optimizing-shiny-code.html#fnref35" class="footnote-back">↩︎</a></p></li>
-<li id="fn36"><p>
-See this <a href="https://dev.to/buzzingbuzzer/comment/g0g">dev.to</a> post for a quick introduction to the general concept of web socket<a href="optimjs.html#fnref36" class="footnote-back">↩︎</a></p></li>
-<li id="fn37"><p>
-This can also be done by wrapping a JS libraries inside a package, which will later be used inside an application.
-See for example <a href="https://github.com/ColinFay/glouton"><code>{glouton}</code></a>, which is a wrapper around the <a href="https://github.com/js-cookie/js-cookie"><code>js-cookie</code></a> JavaScript library.<a href="optimjs.html#fnref37" class="footnote-back">↩︎</a></p></li>
-<li id="fn38"><p>
-You can now work with JavaScript in a server with Node.JS, but this is out of scope of this book.
-See linked resources to learn more.<a href="optimjs.html#fnref38" class="footnote-back">↩︎</a></p></li>
-<li id="fn39"><p>
-This <code>click</code> behavior can also be done through <code>$(".shiny-plot-output").click(...)</code>.
-We chose to display the <code>on("click")</code> pattern as it can be generalized to all DOM events.<a href="optimjs.html#fnref39" class="footnote-back">↩︎</a></p></li>
-</ol>
-</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <hr/>
 <footer>
 <a href="rtask.thinkr.fr"><img src="img/logo400_129.png" alt="ThinkR Website"/></a>
@@ -976,11 +976,13 @@ We chose to display the <code>on("click")</code> pattern as it can be generalize
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -988,12 +990,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -1005,6 +1006,10 @@ gitbook.start({
 "text": "Edit"
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -1023,8 +1028,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();

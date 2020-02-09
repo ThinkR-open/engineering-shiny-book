@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 8 A Gentle Introduction to CSS | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="Chapter 8 A Gentle Introduction to CSS | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 8 A Gentle Introduction to CSS | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="step-design.html">
-<link rel="next" href="stepprotopype.html">
+<link rel="prev" href="step-design.html"/>
+<link rel="next" href="stepprotopype.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -40,6 +40,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -59,28 +62,25 @@
 
 
 <style type="text/css">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -89,9 +89,9 @@ pre.numberSource code > span > a:first-child::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {   }
+  {  }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+a.sourceLine::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -446,48 +446,48 @@ Then, if you go on the extension and choose CSS, click “Disable All Style”, 
 As you can see if you have created a <code>fluidPage()</code> before, there is already styling applied.</p>
 <p>Compare:</p>
 <p>(no <code>fluidPage</code>)</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="css.html#cb80-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb80-2"><a href="css.html#cb80-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
-<span id="cb80-3"><a href="css.html#cb80-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb80-4"><a href="css.html#cb80-4"></a>    <span class="kw">h1</span>(<span class="st">&quot;Hey&quot;</span>), </span>
-<span id="cb80-5"><a href="css.html#cb80-5"></a>    <span class="kw">h2</span>(<span class="st">&quot;You&quot;</span>), </span>
-<span id="cb80-6"><a href="css.html#cb80-6"></a>    <span class="kw">p</span>(<span class="st">&quot;You rock!&quot;</span>), </span>
-<span id="cb80-7"><a href="css.html#cb80-7"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;what&quot;</span>, <span class="st">&quot;Do you&quot;</span>, <span class="kw">unique</span>(iris<span class="op">$</span>Species))</span>
-<span id="cb80-8"><a href="css.html#cb80-8"></a>  )</span>
-<span id="cb80-9"><a href="css.html#cb80-9"></a>}</span>
-<span id="cb80-10"><a href="css.html#cb80-10"></a></span>
-<span id="cb80-11"><a href="css.html#cb80-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb80-12"><a href="css.html#cb80-12"></a>  input, </span>
-<span id="cb80-13"><a href="css.html#cb80-13"></a>  output, </span>
-<span id="cb80-14"><a href="css.html#cb80-14"></a>  session</span>
-<span id="cb80-15"><a href="css.html#cb80-15"></a>){</span>
-<span id="cb80-16"><a href="css.html#cb80-16"></a></span>
-<span id="cb80-17"><a href="css.html#cb80-17"></a>}</span>
-<span id="cb80-18"><a href="css.html#cb80-18"></a></span>
-<span id="cb80-19"><a href="css.html#cb80-19"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" title="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb80-2" title="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb80-3" title="3">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb80-4" title="4">    <span class="kw">h1</span>(<span class="st">&quot;Hey&quot;</span>), </a>
+<a class="sourceLine" id="cb80-5" title="5">    <span class="kw">h2</span>(<span class="st">&quot;You&quot;</span>), </a>
+<a class="sourceLine" id="cb80-6" title="6">    <span class="kw">p</span>(<span class="st">&quot;You rock!&quot;</span>), </a>
+<a class="sourceLine" id="cb80-7" title="7">    <span class="kw">selectInput</span>(<span class="st">&quot;what&quot;</span>, <span class="st">&quot;Do you&quot;</span>, <span class="kw">unique</span>(iris<span class="op">$</span>Species))</a>
+<a class="sourceLine" id="cb80-8" title="8">  )</a>
+<a class="sourceLine" id="cb80-9" title="9">}</a>
+<a class="sourceLine" id="cb80-10" title="10"></a>
+<a class="sourceLine" id="cb80-11" title="11">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb80-12" title="12">  input, </a>
+<a class="sourceLine" id="cb80-13" title="13">  output, </a>
+<a class="sourceLine" id="cb80-14" title="14">  session</a>
+<a class="sourceLine" id="cb80-15" title="15">){</a>
+<a class="sourceLine" id="cb80-16" title="16"></a>
+<a class="sourceLine" id="cb80-17" title="17">}</a>
+<a class="sourceLine" id="cb80-18" title="18"></a>
+<a class="sourceLine" id="cb80-19" title="19"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <pre><code>
 Listening on http://127.0.0.1:3102</code></pre>
 <p><img src="building-shiny-apps-workflow_files/figure-html/css-1-1.png" width="672" /></p>
 <p>to (with <code>fluidPage</code>):</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="css.html#cb82-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb82-2"><a href="css.html#cb82-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
-<span id="cb82-3"><a href="css.html#cb82-3"></a>  <span class="kw">fluidPage</span>(</span>
-<span id="cb82-4"><a href="css.html#cb82-4"></a>    <span class="kw">h1</span>(<span class="st">&quot;Hey&quot;</span>), </span>
-<span id="cb82-5"><a href="css.html#cb82-5"></a>    <span class="kw">h2</span>(<span class="st">&quot;You&quot;</span>), </span>
-<span id="cb82-6"><a href="css.html#cb82-6"></a>    <span class="kw">p</span>(<span class="st">&quot;You rock!&quot;</span>), </span>
-<span id="cb82-7"><a href="css.html#cb82-7"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;what&quot;</span>, <span class="st">&quot;Do you&quot;</span>, <span class="kw">unique</span>(iris<span class="op">$</span>Species))</span>
-<span id="cb82-8"><a href="css.html#cb82-8"></a>  )</span>
-<span id="cb82-9"><a href="css.html#cb82-9"></a>}</span>
-<span id="cb82-10"><a href="css.html#cb82-10"></a></span>
-<span id="cb82-11"><a href="css.html#cb82-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb82-12"><a href="css.html#cb82-12"></a>  input, </span>
-<span id="cb82-13"><a href="css.html#cb82-13"></a>  output, </span>
-<span id="cb82-14"><a href="css.html#cb82-14"></a>  session</span>
-<span id="cb82-15"><a href="css.html#cb82-15"></a>){</span>
-<span id="cb82-16"><a href="css.html#cb82-16"></a></span>
-<span id="cb82-17"><a href="css.html#cb82-17"></a>}</span>
-<span id="cb82-18"><a href="css.html#cb82-18"></a></span>
-<span id="cb82-19"><a href="css.html#cb82-19"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb82-1" title="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb82-2" title="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb82-3" title="3">  <span class="kw">fluidPage</span>(</a>
+<a class="sourceLine" id="cb82-4" title="4">    <span class="kw">h1</span>(<span class="st">&quot;Hey&quot;</span>), </a>
+<a class="sourceLine" id="cb82-5" title="5">    <span class="kw">h2</span>(<span class="st">&quot;You&quot;</span>), </a>
+<a class="sourceLine" id="cb82-6" title="6">    <span class="kw">p</span>(<span class="st">&quot;You rock!&quot;</span>), </a>
+<a class="sourceLine" id="cb82-7" title="7">    <span class="kw">selectInput</span>(<span class="st">&quot;what&quot;</span>, <span class="st">&quot;Do you&quot;</span>, <span class="kw">unique</span>(iris<span class="op">$</span>Species))</a>
+<a class="sourceLine" id="cb82-8" title="8">  )</a>
+<a class="sourceLine" id="cb82-9" title="9">}</a>
+<a class="sourceLine" id="cb82-10" title="10"></a>
+<a class="sourceLine" id="cb82-11" title="11">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb82-12" title="12">  input, </a>
+<a class="sourceLine" id="cb82-13" title="13">  output, </a>
+<a class="sourceLine" id="cb82-14" title="14">  session</a>
+<a class="sourceLine" id="cb82-15" title="15">){</a>
+<a class="sourceLine" id="cb82-16" title="16"></a>
+<a class="sourceLine" id="cb82-17" title="17">}</a>
+<a class="sourceLine" id="cb82-18" title="18"></a>
+<a class="sourceLine" id="cb82-19" title="19"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <pre><code>
 Listening on http://127.0.0.1:4017</code></pre>
 <p><img src="building-shiny-apps-workflow_files/figure-html/css-2-1.png" width="672" /></p>
@@ -497,15 +497,15 @@ Listening on http://127.0.0.1:4017</code></pre>
 <div id="getting-started-with-css" class="section level2">
 <h2><span class="header-section-number">8.2</span> Getting started with CSS</h2>
 <p>CSS is a descriptive language, meaning that you will have to declare the style either on a tag or inside an external file.
-We will see how to integrate CSS inside your Shiny application in the next section, but before that, let’s start with a short introduction to CSS<a href="optimjs.html#fn26" class="footnote-ref" id="fnref26"><sup>26</sup></a>.</p>
+We will see how to integrate CSS inside your Shiny application in the next section, but before that, let’s start with a short introduction to CSS<a href="#fn26" class="footnote-ref" id="fnref26"><sup>26</sup></a>.</p>
 <div id="about-css-syntax" class="section level3">
 <h3><span class="header-section-number">8.2.1</span> About CSS syntax</h3>
 <p>CSS syntax is composed of two elements: a selector, and a declaration block.
 The CSS selector describes how to identify the HTML tags that will be affected by the style declared with key-value pairs in the declaration block that follows.
 And because an example will be easier to understand, here is a simple CSS rule:</p>
-<pre class="sourceCode css"><code class="sourceCode css"><span id="cb84-1"><a href="css.html#cb84-1"></a>h2 {</span>
-<span id="cb84-2"><a href="css.html#cb84-2"></a>  <span class="kw">color</span>:<span class="cn">red</span><span class="op">;</span></span>
-<span id="cb84-3"><a href="css.html#cb84-3"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb84"><pre class="sourceCode css"><code class="sourceCode css"><a class="sourceLine" id="cb84-1" title="1">h2 {</a>
+<a class="sourceLine" id="cb84-2" title="2">  <span class="kw">color</span>:<span class="cn">red</span><span class="op">;</span></a>
+<a class="sourceLine" id="cb84-3" title="3">}</a></code></pre></div>
 <p>Here, the selector is <code>h2</code>, meaning that the HTML tags aimed by the style are the <code>&lt;h2&gt;</code> tags.
 The declaration block contains the key-value pair telling that the <code>color</code> will be <code>red</code>.
 Note that each key-value pair must end with a semicolon.</p>
@@ -513,7 +513,7 @@ Note that each key-value pair must end with a semicolon.</p>
 <div id="css-selectors" class="section level3">
 <h3><span class="header-section-number">8.2.2</span> CSS selectors</h3>
 <p>CSS selectors are a wide topic, as there are many combinations of things you might want to select inside an HTML page.</p>
-<p>The first type of selectors are the “standard” ones <code>name</code>, <code>id</code>, or <code>class</code>. These refer to the elements composing an HTML tag: for example, with <code>&lt;h2 id = "tileone" class = "standard"&gt;One&lt;/h2&gt;</code>, the name is <code>h2</code>, the id <code>tileone</code>, and the class <code>standard</code><a href="optimjs.html#fn27" class="footnote-ref" id="fnref27"><sup>27</sup></a>.</p>
+<p>The first type of selectors are the “standard” ones <code>name</code>, <code>id</code>, or <code>class</code>. These refer to the elements composing an HTML tag: for example, with <code>&lt;h2 id = &quot;tileone&quot; class = &quot;standard&quot;&gt;One&lt;/h2&gt;</code>, the name is <code>h2</code>, the id <code>tileone</code>, and the class <code>standard</code><a href="#fn27" class="footnote-ref" id="fnref27"><sup>27</sup></a>.</p>
 <p>To select these three elements in CSS:</p>
 <ul>
 <li>Write the name as-is: <code>h2</code></li>
@@ -521,7 +521,7 @@ Note that each key-value pair must end with a semicolon.</p>
 <li>Prefix the class with <code>.</code>: <code>.standard</code></li>
 </ul>
 <p>You can also combine these elements, for example <code>h2.standard</code> will select all the <code>h2</code> tags with a class <code>standard</code>, and <code>h2,h3</code> will select the <code>h2</code> and the <code>h3</code>.</p>
-<p>You can build more complex selectors: for example <code>div.standard &gt; p</code> will select all the <code>&lt;p&gt;</code> tags that are contained inside a <code>div</code> of class <code>standard</code> (CSS combinator), or <code>a:hover</code>, which dictates the style of the <code>a</code> tags when they are hovered by the mouse (CSS pseudo-class), <code>div.standard::first-letter</code>, that select the first letter of the <code>div</code> of class <code>standard</code> (CSS pseudo-elements), and <code>h2[data-value="hey"]</code>, which selects all the <code>h2</code> with a <code>data-value</code> attribute set to <code>"hey"</code> (CSS attribute selector).</p>
+<p>You can build more complex selectors: for example <code>div.standard &gt; p</code> will select all the <code>&lt;p&gt;</code> tags that are contained inside a <code>div</code> of class <code>standard</code> (CSS combinator), or <code>a:hover</code>, which dictates the style of the <code>a</code> tags when they are hovered by the mouse (CSS pseudo-class), <code>div.standard::first-letter</code>, that select the first letter of the <code>div</code> of class <code>standard</code> (CSS pseudo-elements), and <code>h2[data-value=&quot;hey&quot;]</code>, which selects all the <code>h2</code> with a <code>data-value</code> attribute set to <code>&quot;hey&quot;</code> (CSS attribute selector).</p>
 <p>As you can see, lots of complex selectors can be built with CSS, to target very specific elements of your UI.
 But mastering these complex selectors is not the main goal of this chapter, hence we will just be using standard selectors in the rest of the examples in this book.</p>
 </div>
@@ -542,22 +542,22 @@ Note that the good practice is considered to be the integration of an external f
 <div id="inline-css" class="section level3">
 <h3><span class="header-section-number">8.3.1</span> Inline CSS</h3>
 <p>If you need to add style to one specific element, you can write it straight inside the HTML tag:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="css.html#cb85-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb85-2"><a href="css.html#cb85-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
-<span id="cb85-3"><a href="css.html#cb85-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb85-4"><a href="css.html#cb85-4"></a>    <span class="kw">h2</span>(<span class="dt">style =</span> <span class="st">&quot;color:red;&quot;</span>, <span class="st">&quot;This is red&quot;</span>)</span>
-<span id="cb85-5"><a href="css.html#cb85-5"></a>  )</span>
-<span id="cb85-6"><a href="css.html#cb85-6"></a>}</span>
-<span id="cb85-7"><a href="css.html#cb85-7"></a></span>
-<span id="cb85-8"><a href="css.html#cb85-8"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb85-9"><a href="css.html#cb85-9"></a>  input, </span>
-<span id="cb85-10"><a href="css.html#cb85-10"></a>  output, </span>
-<span id="cb85-11"><a href="css.html#cb85-11"></a>  session</span>
-<span id="cb85-12"><a href="css.html#cb85-12"></a>){</span>
-<span id="cb85-13"><a href="css.html#cb85-13"></a></span>
-<span id="cb85-14"><a href="css.html#cb85-14"></a>}</span>
-<span id="cb85-15"><a href="css.html#cb85-15"></a></span>
-<span id="cb85-16"><a href="css.html#cb85-16"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb85-1" title="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb85-2" title="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb85-3" title="3">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb85-4" title="4">    <span class="kw">h2</span>(<span class="dt">style =</span> <span class="st">&quot;color:red;&quot;</span>, <span class="st">&quot;This is red&quot;</span>)</a>
+<a class="sourceLine" id="cb85-5" title="5">  )</a>
+<a class="sourceLine" id="cb85-6" title="6">}</a>
+<a class="sourceLine" id="cb85-7" title="7"></a>
+<a class="sourceLine" id="cb85-8" title="8">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb85-9" title="9">  input, </a>
+<a class="sourceLine" id="cb85-10" title="10">  output, </a>
+<a class="sourceLine" id="cb85-11" title="11">  session</a>
+<a class="sourceLine" id="cb85-12" title="12">){</a>
+<a class="sourceLine" id="cb85-13" title="13"></a>
+<a class="sourceLine" id="cb85-14" title="14">}</a>
+<a class="sourceLine" id="cb85-15" title="15"></a>
+<a class="sourceLine" id="cb85-16" title="16"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <pre><code>
 Listening on http://127.0.0.1:3790</code></pre>
 <p><img src="building-shiny-apps-workflow_files/figure-html/css-1-bis-1.png" width="672" /></p>
@@ -568,27 +568,27 @@ Use it with caution.</p>
 <h3><span class="header-section-number">8.3.2</span> Writing in a <code>tags$style()</code></h3>
 <p>If you had a <code>tags$style()</code> somewhere inside your UI code (generally at the very beginning of your UI), you can then add CSS code straight to your application.</p>
 <p>Here is an example:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="css.html#cb87-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb87-2"><a href="css.html#cb87-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
-<span id="cb87-3"><a href="css.html#cb87-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb87-4"><a href="css.html#cb87-4"></a>    tags<span class="op">$</span><span class="kw">style</span>(</span>
-<span id="cb87-5"><a href="css.html#cb87-5"></a>      <span class="st">&quot;h2{</span></span>
-<span id="cb87-6"><a href="css.html#cb87-6"></a><span class="st">        color:red;</span></span>
-<span id="cb87-7"><a href="css.html#cb87-7"></a><span class="st">      }&quot;</span></span>
-<span id="cb87-8"><a href="css.html#cb87-8"></a>    ), </span>
-<span id="cb87-9"><a href="css.html#cb87-9"></a>    <span class="kw">h2</span>(<span class="st">&quot;This is red&quot;</span>)</span>
-<span id="cb87-10"><a href="css.html#cb87-10"></a>  )</span>
-<span id="cb87-11"><a href="css.html#cb87-11"></a>}</span>
-<span id="cb87-12"><a href="css.html#cb87-12"></a></span>
-<span id="cb87-13"><a href="css.html#cb87-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb87-14"><a href="css.html#cb87-14"></a>  input, </span>
-<span id="cb87-15"><a href="css.html#cb87-15"></a>  output, </span>
-<span id="cb87-16"><a href="css.html#cb87-16"></a>  session</span>
-<span id="cb87-17"><a href="css.html#cb87-17"></a>){</span>
-<span id="cb87-18"><a href="css.html#cb87-18"></a></span>
-<span id="cb87-19"><a href="css.html#cb87-19"></a>}</span>
-<span id="cb87-20"><a href="css.html#cb87-20"></a></span>
-<span id="cb87-21"><a href="css.html#cb87-21"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb87-1" title="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb87-2" title="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb87-3" title="3">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb87-4" title="4">    tags<span class="op">$</span><span class="kw">style</span>(</a>
+<a class="sourceLine" id="cb87-5" title="5">      <span class="st">&quot;h2{</span></a>
+<a class="sourceLine" id="cb87-6" title="6"><span class="st">        color:red;</span></a>
+<a class="sourceLine" id="cb87-7" title="7"><span class="st">      }&quot;</span></a>
+<a class="sourceLine" id="cb87-8" title="8">    ), </a>
+<a class="sourceLine" id="cb87-9" title="9">    <span class="kw">h2</span>(<span class="st">&quot;This is red&quot;</span>)</a>
+<a class="sourceLine" id="cb87-10" title="10">  )</a>
+<a class="sourceLine" id="cb87-11" title="11">}</a>
+<a class="sourceLine" id="cb87-12" title="12"></a>
+<a class="sourceLine" id="cb87-13" title="13">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb87-14" title="14">  input, </a>
+<a class="sourceLine" id="cb87-15" title="15">  output, </a>
+<a class="sourceLine" id="cb87-16" title="16">  session</a>
+<a class="sourceLine" id="cb87-17" title="17">){</a>
+<a class="sourceLine" id="cb87-18" title="18"></a>
+<a class="sourceLine" id="cb87-19" title="19">}</a>
+<a class="sourceLine" id="cb87-20" title="20"></a>
+<a class="sourceLine" id="cb87-21" title="21"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <pre><code>
 Listening on http://127.0.0.1:8158</code></pre>
 <p><img src="building-shiny-apps-workflow_files/figure-html/css-2-bis-1.png" width="672" /></p>
@@ -600,13 +600,13 @@ That’s why it’s best to go with the alternative of writing the CSS inside a 
 <p>To include an external CSS file, you will have to use another tags: <code>tags$link()</code>.
 What this tag will contain is these three elements:</p>
 <ul>
-<li><code>rel="stylesheet"</code></li>
-<li><code>type="text/css"</code></li>
-<li><code>href="www/custom.css"</code></li>
+<li><code>rel=&quot;stylesheet&quot;</code></li>
+<li><code>type=&quot;text/css&quot;</code></li>
+<li><code>href=&quot;www/custom.css&quot;</code></li>
 </ul>
 <p>The first two are standard: you do not need to change them, they are necessary to indicate to the HTML page that you are creating a stylesheet, with the type being text/css.
 The <code>href</code> is the one you will need to change: this path points to where your style file is located.</p>
-<p>If you are building your application with <code>{golem}</code>, the good news is that this file creation and linking is transparent: if you call <code>golem::add_css_file("name")</code>, a file will be created at <code>inst/app/www</code>, and this file will be automatically linked inside your UI thanks to the <code>bundle_resouces()</code> function.</p>
+<p>If you are building your application with <code>{golem}</code>, the good news is that this file creation and linking is transparent: if you call <code>golem::add_css_file(&quot;name&quot;)</code>, a file will be created at <code>inst/app/www</code>, and this file will be automatically linked inside your UI thanks to the <code>bundle_resouces()</code> function.</p>
 </div>
 <div id="using-r-packages" class="section level3">
 <h3><span class="header-section-number">8.3.4</span> Using R packages</h3>
@@ -637,11 +637,13 @@ The <code>href</code> is the one you will need to change: this path points to wh
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -649,12 +651,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -666,6 +667,10 @@ gitbook.start({
 "text": "Edit"
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -684,8 +689,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
