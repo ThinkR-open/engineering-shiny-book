@@ -1,4 +1,5 @@
 html_wip:
+	Rscript -e 'if(!dir.exists("docs/wip")){dir.create("docs/wip", recursive = TRUE)}'
 	Rscript -e 'bookdown::render_book("index.Rmd", output_format = "bookdown::gitbook", clean = FALSE, output_dir = "docs/wip")'
 	cp -fvr css/style.css docs/wip/
 	cp -fvr css/thinkr.css docs/wip/
@@ -7,6 +8,7 @@ html_wip:
 	# cp -fvr _main.utf8.md docs/wip/main.md
 	
 html_master:
+	Rscript -e 'if(!dir.exists("docs")){dir.create("docs", recursive = TRUE)}'
 	Rscript -e 'bookdown::render_book("index.Rmd", output_format = "bookdown::gitbook", clean = FALSE, output_dir = "docs")'
 	cp -fvr css/style.css docs/
 	cp -fvr css/thinkr.css docs/
