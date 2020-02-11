@@ -141,7 +141,7 @@ server <- function(
   }, cacheKeyExpr = {
     input$tbl
   })
-
+  
 }
 
 shinyApp(ui, server)
@@ -193,7 +193,7 @@ server <- function(
   output$tbl <- renderTable({
     fct_sql(input$cut, con)
   })
-
+  
 }
 
 shinyApp(ui, server)
@@ -227,7 +227,189 @@ res_a <- mfct("SELECT * FROM diams WHERE cut = 'Ideal'", con)
 fs::dir_info(tpd)[, "access_time"]
 ```
 
-## Paralellizing Shiny 
+## Asynchronous in Shiny 
 
-// TODO 
+One of the drawbacks of Shiny is that as it's running on top of R, it's single threaded: meaning that each computation is run in sequence, one after the other. 
+Well, at least natively, as methods have emerged to run pieces of code in parallel. 
 
+### How to
+
+To launch code blocks in parallel, we will use a combination of two packages, `{future}` and `{promises}`, and a `reactiveVal()`. 
+`{future}` is an R package which main purporse is to allow users to send code to be run elsewhere, i.e in another session, thread, or even in another machine. 
+`{promises}`, on the other hand, is a package providing structure for handling asynchronous programming in R.
+
+#### Asynchronous for Cross-sessions Availability
+
+The first type of asynchronous programming in Shiny is the one that allow non-blocking programming in a cross-session context. 
+In other words, it's a programming technic which is useful in the context of running one Shiny session which is accessed by multiple users. 
+Natively, in Shiny, if user1 comes and launches a 15 second computation, then user2 has to wait for this computation to finish, before launching their own 15 second computation, and user 3 has to wait the 15 seconds of user1 plus the 15 seconds for useré, etc. 
+
+With `{future}` and `{promises}`, each long computation is sent to be run somewhere else, so when user1 launches their 15 second computation, they are not blocking the R process for user2 and user3. 
+
+How does it work^[
+We're providing a short introduction with key concepts, but for a more thourough introduction, please refer to the [online documentation](https://rstudio.github.io/promises/index.html)
+]? 
+`{promises}` comes with two operators which will be useful in our case, `%...>%` and `%...!%`: the first being "what happens when the `future()` is solved?" (i.e. when the computation from the `future()` is completed), and the second is "what happens if the `future()` fails?" (i.e. what to do when the `future()` returns an error). 
+Here is an example of using this skeleton: 
+
+```{r}
+library(future)
+library(promises)
+plan(multisession) # We're opening several R session (future specific)
+future({
+  Sys.sleep(3)
+  return(rnorm(5))
+}) %...>% (
+  function(result){
+    print(result)
+  }
+) %...!% (
+  function(error){
+    stop(error)
+  }
+)
+```
+
+If you run this in your console, you will see that you have access to the R console directly after launching the code. 
+And a couple of seconds later (a little bit more than 3), the result of the `rnorm(5)` will be printed to the console. 
+
+Note that you can also one line function with `.` as a parameter, instead of building the full anonymous function (we will use this notation in the rest of the chapter): 
+
+```{r}
+library(future)
+library(promises)
+plan(multisession) # We're opening several R session (future specific)
+future({
+  Sys.sleep(3)
+  return(rnorm(5))
+}) %...>% 
+  print(.) %...!% 
+  stop(.)
+```
+
+Let's port this to Shiny:
+
+```{r}
+library(shiny)
+ui <- function(request){
+  tagList(
+    verbatimTextOutput("pr")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  output$pr <- renderPrint({
+    future({
+      Sys.sleep(3)
+      return(rnorm(5))
+    }) %...>% 
+      print(.) %...!% 
+      stop(.)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+If you have run this, that does not seem like a revolution: but trust us, the `Sys.sleep()` is not blocking as it allows other users to launch the same computation at the same moment.
+
+#### Inner-session Asynchronousity
+
+In the previous section we have implemented cross-session asynchronousity, meaning that the code is non-blocking but for when two or more users access the same app. 
+But the code is still blocking at an inner-session level. 
+Let's have a look at this code:
+
+```{r}
+library(shiny)
+ui <- function(request){
+  tagList(
+    verbatimTextOutput("pr"), 
+    plotOutput("plot")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  output$pr <- renderPrint({
+    future({
+      Sys.sleep(3)
+      return(rnorm(5))
+    }) %...>% 
+      print(.) %...!% 
+      stop(.)
+  })
+  
+  output$plot <- renderPlot({
+    plot(iris)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+Here, you would expect the plot to be avaiable before the `rnorm()`, but it's not: `{promises}` is still blocking at an inner-session level, so elements are still rendered sequentially. 
+To bypass that, we will use a `reactiveVal()` structure. 
+
+```{r}
+library(shiny)
+library(promises)
+library(future)
+plan(multisession)
+
+
+ui <- function(request){
+  tagList(
+    verbatimTextOutput("pr"), 
+    plotOutput("plot")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+) {
+  
+  rv <- reactiveVal()
+  
+  rv(NULL)
+  
+  future({
+    Sys.sleep(5)
+    rnorm(5)
+  }) %...>%
+    rv() %...!%
+    (function(e){
+      rv(NULL)
+      warning(e)
+    })
+  
+  output$pr <- renderPrint({
+    req(rv())
+    rv()
+  })
+  
+  output$plot <- renderPlot({
+    plot(iris)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+Let's detail this step by step: 
+
++ `rv <- reactiveVal()`
+
++ `rv(NULL)`
+
++ `%...>% rv() %...!%`
+
++ `%...!% (function(e){ rv(NULL) ; warning(e) })`
