@@ -15,6 +15,7 @@ attachment::att_to_desc_from_is(path.d = "DESCRIPTION", imports = imports)
 #   attachment::att_from_description() 
 # )
 # ou bien
+remotes::install_github("ThinkR-open/golem")
 remotes::install_local(force = TRUE)
 
 # Test
