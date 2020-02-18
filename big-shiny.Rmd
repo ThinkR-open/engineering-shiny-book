@@ -237,14 +237,18 @@ Here is for example the cyclomatic complexity of the default golem template:
 remotes::install_local("golex", upgrade = "never")
 ```
 
-```{r big-shiny-7, echo=FALSE}
+```{r big-shiny-7, echo=FALSE, eval=FALSE}
 db <- memoise::cache_filesystem(here::here("fcache/"))
 cyclocomp_package <- memoise::memoise(cyclocomp::cyclocomp_package, cache = db)
 ```
 
-```{r big-shiny-8 }
+```{r big-shiny-8, eval=FALSE}
 library(cyclocomp)
 cyclocomp_package("golex") %>% head()
+```
+```{r big-shiny-8-eval, echo=FALSE}
+cyclo_golex <- readr::read_rds(here::here("dataset", "cyclo_golex.rds"))
+head(cyclo_golex)
 ```
 
 ```{r big-shiny-9, include = FALSE}
@@ -260,8 +264,12 @@ if (!requireNamespace("tidytuesday201942")) {
 ```
 
 
-```{r big-shiny-11 }
+```{r big-shiny-11, eval=FALSE}
 cyclocomp_package("tidytuesday201942") %>% head()
+```
+```{r big-shiny-11-eval, echo=FALSE}
+cyclo_tidytuesday <- readr::read_rds(here::here("dataset", "cyclo_tidytuesday.rds"))
+head(cyclo_tidytuesday)
 ```
 
 And, finally, the one for `{shiny}`:
@@ -272,8 +280,12 @@ if (!requireNamespace("shiny")) {
 }
 ```
 
-```{r big-shiny-13 }
+```{r big-shiny-13, eval=FALSE}
 cyclocomp_package("shiny") %>% head()
+```
+```{r big-shiny-13-eval, echo=FALSE}
+cyclo_shiny <- readr::read_rds(here::here("dataset", "cyclo_shiny.rds"))
+head(cyclo_shiny)
 ```
 
 > And, bonus, this `cyclocomp_package()` function can also be used to retrieve the number of functions inside the package.
@@ -312,14 +324,27 @@ frame_metric <- function(pkg){
 }
 ```
 
-```{r big-shiny-16, echo=FALSE}
+```{r big-shiny-16, echo=FALSE, eval=FALSE}
 db <- memoise::cache_filesystem(here::here("fcache/"))
 frame_metric <- memoise::memoise(frame_metric, cache = db)
 ```
 
-```{r big-shiny-17, cache = TRUE, warning = FALSE}
+*{golem}*
+```{r big-shiny-17, cache=TRUE, warning=FALSE, eval=FALSE}
 frame_metric("golem") %>% knitr::kable()
+```
+```{r big-shiny-17-eval, echo=FALSE}
+frame_golem <- readr::read_rds(here::here("dataset", "frame_golem.rds"))
+knitr::kable(frame_golem)
+```
+
+*{shiny}*
+```{r big-shiny-17b, cache=TRUE, warning=FALSE, eval=FALSE}
 frame_metric("shiny") %>% knitr::kable()
+```
+```{r big-shiny-17b-eval, echo=FALSE}
+frame_shiny <- readr::read_rds(here::here("dataset", "frame_shiny.rds"))
+knitr::kable(frame_shiny)
 ```
 
 If you are building you Shiny application with `{golem}`, a framework for building shiny apps, you can use the `DESCRIPTION` file, the one that contains the list of dependencies, as a starting point to explore these metrics for your dependencies: 
