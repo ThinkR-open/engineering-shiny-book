@@ -6,6 +6,8 @@ imports <- unique(c(
   "bookdown", 
   # Calls in `r code`
   "devtools", "knitr", "lubridate", 
+  # Do not know why it is needed...
+  "future",
   attachment::att_from_rmds(".", recursive = FALSE))
 )
 attachment::att_to_desc_from_is(path.d = "DESCRIPTION", imports = imports)
