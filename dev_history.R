@@ -2,7 +2,12 @@ usethis::use_build_ignore("dev_history.R")
 
 # bookdown Imports are in Rmds
 # remotes::install_github("ThinkR-open/attachment")
-imports <- c("bookdown", attachment::att_from_rmds("."))
+imports <- unique(c(
+  "bookdown", 
+  # Calls in `r code`
+  "devtools", "knitr", "lubridate", 
+  attachment::att_from_rmds(".", recursive = FALSE))
+)
 attachment::att_to_desc_from_is(path.d = "DESCRIPTION", imports = imports)
 
 # Install dependencies
