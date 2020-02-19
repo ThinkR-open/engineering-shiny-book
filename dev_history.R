@@ -1,4 +1,8 @@
 usethis::use_build_ignore("dev_history.R")
+usethis::use_git_ignore("building-shiny-apps-workflow.Rmd")
+usethis::use_git_ignore("building-shiny-apps-workflow_*")
+usethis::use_git_ignore("building-shiny-apps-workflow.*.md")
+usethis::use_git_ignore("golex/")
 
 # bookdown Imports are in Rmds
 # remotes::install_github("ThinkR-open/attachment")
@@ -11,6 +15,9 @@ imports <- unique(c(
   attachment::att_from_rmds(".", recursive = FALSE))
 )
 attachment::att_to_desc_from_is(path.d = "DESCRIPTION", imports = imports)
+
+# Name chunks
+namer::name_dir_chunks(".")
 
 # Install dependencies
 # attachment::install_if_missing(
