@@ -1,4 +1,4 @@
-# (PART) Step 4: Secure {-}
+# (PART) Step 4: Strengthen {-}
 
 # Build yourself a safety net {#step-secure}
 
@@ -6,31 +6,78 @@
 
 > JD 
 
-Securing your app means two things: testing, and locking the application environment.
+Strengthening your app means two things: testing, and locking the application environment.
 
 ## Testing your app
 
-// TODO
+### Testing the business logic
 
-So first, be sure to include tests all along the building process — just like any other R code. 
-As the app is contained in a package, you can use standard testing tools for testing the business logic of your app — as said in the first part, it’s important to split the backend functions and algorithm from the user interface. 
-That means that these backend functions can run outside of the application.
-And yes, if they can run outside of the app, they can be tested the standard way, using {testthat}.
+If you have been following the good practices we have listed in previous chapters, your current application has at least these two properties: 
 
-When it comes to testing the front end, you can try the {shinytest} package from RStudio, if you need to be sure there is no visual regression all along the project development. 
-{shinyloadtest}, on the other hand, tests how an application behaves when one, two, three, twenty, one hundred users connect to the app, and gives you a visual report about the connection and response time of each session.
++ The business-logic functions are separated from your interactive-logic functions.
++ Your application is inside a package.
 
-One other tool I like to use is Katalon Studio. 
+On top of being a sane organization approach, using this separation inside a package structure allows to leverage all the tooling that has been built for testing "standard" packages. 
+
+R developers have been developing packages for a long time, and at the time of writing these lines (February 2020), more than 15,000 packages are available on CRAN. 
+To sustain these developments, a lot of tooling has been created to secure the development process, and especially in the field of creating unit tests for your package.
+
+Unit tests are a general concept in software engineering that describes the process of writing a form of assessment of your code validity. 
+A simplified explanation is that if you write a function call `meaning_of_life` that returns `42`, you will expect this function to always return `42`, and to be alerted if ever this value changes. 
+Using unit tests is a way to secure your work in the future, be it from future you or from collaborator: if anyone comes and change the code behind `meaning_of_life` so that the result is no longer `42`, the developer working on this piece of code will be able to catch it. 
+
+There are several packages in R that can be used to implement unit testing, and you can even implement your own tests. 
+One of the most popular right now^[
+Based on the number of Reverse dependencies & suggests at https://cran.r-project.org/web/packages/testthat/index.html
+] is [`{testthat}`](https://testthat.r-lib.org/), by Hadley Wickham.
+This testing framework lets you write a series of tests and expectations, which are then launch when calling `devtools::test()`, either locally or in you CI system. 
+Here is an example of testing that the `meaning_of_life` will alway be `42`.
+
+``` r
+test_that("The meaning of life is 42", {
+  expect_equal(
+    meaning_of_life(), 
+    42
+  )
+})
+```
+
+If you want to learn more about how to use `{testthat}`, you can refer to the following resources: 
+
++ [`{testthat}` online documentation](https://testthat.r-lib.org/)
+
++ [Chapter 10 Testing - R Packages](https://r-pkgs.org/tests.html)
+
++ [Part 5: Test and Code Coverage - Building a package that lasts — eRum 2018 workshop](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107)
+
+
+### Testing the interactive logic
+
+// TO DO
+
++ When it comes to testing the front end, you can try the {shinytest} package from RStudio, if you need to be sure there is no visual regression all along the project development. 
+
++ One other tool I like to use is Katalon Studio. 
 It’s not R related, and can be used with any kind of web app. 
 How it works is quite simple: it opens your browser where the Shiny app runs, and record everything that happens. 
 Once you stop the recording, you can relaunch the app and it will replay all the events it has recorded. 
 And of course, you can specify your own scenario, define your own events, etc. 
 It’s not that straightforward to use, but once you get a good grasp of how it works, it’s a very powerful tool.
 
-## A reproducible environment
+### Testing the app load
 
 // TODO
 
+{shinyloadtest}, on the other hand, tests how an application behaves when one, two, three, twenty, one hundred users connect to the app, and gives you a visual report about the connection and response time of each session.
+
+## A reproducible environment
+
 Secondly, secure your app means that it can be deployed again any time in the future — in other words, you have to ensure you’ve got a proper handle on the required R version, and of the package versions which are required to run your app. 
 That means that you have to be aware that upgrading a package might break your app — so, provide an environment that can prevent your app from breaking when a package gets updated. 
+
+
+### {renv}
+
+### Docker & RStudio Connect
+
 For that, there is, of course, Docker, R specific tools like `{packrat}` or `{renv}`, or deploying custom CRAN repositories or package manager.
