@@ -14,12 +14,15 @@ jobs:
 install:
   - Rscript -e 'if(dir.exists("cache")){unlink("cache")}'
   - Rscript -e 'install.packages("remotes")'
+  - Rscript -e "install.packages('tinytex')"
+  - Rscript -e "tinytex::install_tinytex()"  
   - Rscript -e 'remotes::install_github("ThinkR-open/golem", ref = "dev")'
   - Rscript -e 'remotes::install_local(force = TRUE)'
   
 script:
   - if [ $TRAVIS_BRANCH == "wip" ] ; then make html_wip;  fi
   - if [ $TRAVIS_BRANCH == "master" ] ; then make html_master;  fi
+  - if [ $TRAVIS_BRANCH == "wip" ] ; then make pdf;  fi
 
 after_success:
   - if ([ $TRAVIS_PULL_REQUEST == "false" ] && [ $TRAVIS_BRANCH == "wip" ]) ; then bash deploy.sh;  fi
