@@ -4,6 +4,8 @@ usethis::use_git_ignore("building-shiny-apps-workflow_*")
 usethis::use_git_ignore("building-shiny-apps-workflow.*.md")
 usethis::use_git_ignore("golex/")
 
+usethis::use_mit_license("ThinkR")
+
 # bookdown Imports are in Rmds
 # remotes::install_github("ThinkR-open/attachment")
 imports <- unique(c(
