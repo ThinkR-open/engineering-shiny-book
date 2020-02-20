@@ -23,6 +23,9 @@ build:
 
 pdf:
 	Rscript -e 'bookdown::render_book("index.Rmd", output_format = "bookdown::pdf_book")'
+	
+epub:
+	Rscript -e 'bookdown::render_book("index.Rmd", output_format = "bookdown::epub_book")'
 
 md:
 	Rscript -e 'bookdown::render_book("index.Rmd", output_format = "bookdown::pdf_book", clean = FALSE)'
