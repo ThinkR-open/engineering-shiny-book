@@ -462,14 +462,14 @@ Here is a simple example with <code>{memoise}</code>:</p>
 <a class="sourceLine" id="cb130-7" data-line-number="7">mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct)</a>
 <a class="sourceLine" id="cb130-8" data-line-number="8"><span class="kw">tic</span>()</a>
 <a class="sourceLine" id="cb130-9" data-line-number="9"><span class="kw">mfct</span>(<span class="dv">2</span>)</a></code></pre></div>
-<pre><code>[1] &quot;2020-02-20 13:13:49 UTC&quot;</code></pre>
+<pre><code>[1] &quot;2020-02-20 13:16:43 UTC&quot;</code></pre>
 <div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb132-1" data-line-number="1"><span class="kw">toc</span>()</a></code></pre></div>
 <pre><code>2.005 sec elapsed</code></pre>
 <div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb134-1" data-line-number="1"><span class="kw">tic</span>()</a>
 <a class="sourceLine" id="cb134-2" data-line-number="2"><span class="kw">mfct</span>(<span class="dv">2</span>)</a></code></pre></div>
-<pre><code>[1] &quot;2020-02-20 13:13:49 UTC&quot;</code></pre>
+<pre><code>[1] &quot;2020-02-20 13:16:43 UTC&quot;</code></pre>
 <div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb136-1" data-line-number="1"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>0.018 sec elapsed</code></pre>
+<pre><code>0.019 sec elapsed</code></pre>
 <p>Let’s try with another example that might look more like what we can find in a Shiny App: connecting to a database</p>
 <div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb138-1" data-line-number="1">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</a>
 <a class="sourceLine" id="cb138-2" data-line-number="2">  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </a>
@@ -492,17 +492,17 @@ Here is a simple example with <code>{memoise}</code>:</p>
 <a class="sourceLine" id="cb138-19" data-line-number="19"><span class="kw">tic</span>()</a>
 <a class="sourceLine" id="cb138-20" data-line-number="20">res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
 <a class="sourceLine" id="cb138-21" data-line-number="21"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>0.398 sec elapsed</code></pre>
+<pre><code>0.418 sec elapsed</code></pre>
 <div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb140-1" data-line-number="1"><span class="kw">tic</span>()</a>
 <a class="sourceLine" id="cb140-2" data-line-number="2">res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
 <a class="sourceLine" id="cb140-3" data-line-number="3"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>0.017 sec elapsed</code></pre>
+<pre><code>0.02 sec elapsed</code></pre>
 <div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb142-1" data-line-number="1"><span class="kw">all.equal</span>(res_a, res_b)</a></code></pre></div>
 <pre><code>[1] TRUE</code></pre>
 <div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb144-1" data-line-number="1"><span class="kw">tic</span>()</a>
 <a class="sourceLine" id="cb144-2" data-line-number="2">res_c &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</a>
 <a class="sourceLine" id="cb144-3" data-line-number="3"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>0.121 sec elapsed</code></pre>
+<pre><code>0.128 sec elapsed</code></pre>
 <div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb146-1" data-line-number="1"><span class="kw">setequal</span>(res_a, res_c)</a></code></pre></div>
 <pre><code>[1] FALSE</code></pre>
 <p>Note that you can change where the cache is stored by <code>{memoise}</code>. Here, we’ll save it in the temp directory, but don’t do this in production.</p>
@@ -513,8 +513,8 @@ Here is a simple example with <code>{memoise}</code>:</p>
 <a class="sourceLine" id="cb149-4" data-line-number="4">res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
 <a class="sourceLine" id="cb149-5" data-line-number="5">res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</a>
 <a class="sourceLine" id="cb149-6" data-line-number="6">fs<span class="op">::</span><span class="kw">dir_ls</span>(tpd)</a></code></pre></div>
-<pre><code>/tmp/RtmpdgPy9I/xzdukrlpqa/0f544e647f3e4058
-/tmp/RtmpdgPy9I/xzdukrlpqa/8eab94124b75dcef</code></pre>
+<pre><code>/tmp/RtmpPLR34u/syflpozqki/46c4a5d4841e848f
+/tmp/RtmpPLR34u/syflpozqki/bd38fb5963a28e6d</code></pre>
 <p>As you can see, I now have two cache objects inside the directory I’ve specified as a <code>cache_filesystem</code>.</p>
 </div>
 <div id="caching-shiny" class="section level3">
@@ -616,8 +616,8 @@ The underlying principle of this approach is that users tend to need what they h
 <pre><code># A tibble: 2 x 1
   access_time        
   &lt;dttm&gt;             
-1 2020-02-20 13:13:52
-2 2020-02-20 13:13:57</code></pre>
+1 2020-02-20 13:16:46
+2 2020-02-20 13:16:51</code></pre>
 </div>
 </div>
 <div id="asynchronous-in-shiny" class="section level2">
