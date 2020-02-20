@@ -22,7 +22,7 @@ build:
 	Rscript -e 'browseURL("docs/wip/index.html")'
 
 pdf:
-	Rscript -e 'bookdown::render_book("index.Rmd", output_format = "bookdown::pdf_book")'
+	Rscript -e 'bookdown::render_book("index.Rmd", output_format = "bookdown::pdf_book", output_dir = "test")'
 	
 epub:
 	Rscript -e 'bookdown::render_book("index.Rmd", output_format = "bookdown::epub_book")'
