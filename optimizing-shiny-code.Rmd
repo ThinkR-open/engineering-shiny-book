@@ -2,7 +2,15 @@
 
 ## Optimizing R code 
 
-// TODO 
+In its core, Shiny runs R code. 
+So to be efficient, the R code computing your values and returning results also has to be optimized.
+
+Optimizing R code is such a broad topic that it would be possible to write a full book about it, and a lot of books about R already cover this topic. 
+Instead of re-writting these books, we'll try to point to some crucial resources you can refer to if you want get started optimizing your R code. 
+
++ [Efficient R programming](https://csgillespie.github.io/efficientR/), by Colin Gillespie and Robin Lovelace, has a series of methods you can quickly put into practice for more efficient R code. 
+
++ [Advanced R](https://adv-r.hadley.nz/), by Hadley Wickham, has a chapter about optimizing R code (number 24). 
 
 ## Caching elements
 
@@ -234,7 +242,7 @@ Well, at least natively, as methods have emerged to run pieces of code in parall
 
 ### How to
 
-To launch code blocks in parallel, we will use a combination of two packages, `{future}` and `{promises}`, and a `reactiveVal()`. 
+To launch code blocks in parallel, we will use a combination of two packages, `{future}` and `{promises}`, and a `reactiveValue()`. 
 `{future}` is an R package which main purporse is to allow users to send code to be run elsewhere, i.e in another session, thread, or even in another machine. 
 `{promises}`, on the other hand, is a package providing structure for handling asynchronous programming in R.
 
@@ -252,7 +260,7 @@ We're providing a short introduction with key concepts, but for a more thourough
 `{promises}` comes with two operators which will be useful in our case, `%...>%` and `%...!%`: the first being "what happens when the `future()` is solved?" (i.e. when the computation from the `future()` is completed), and the second is "what happens if the `future()` fails?" (i.e. what to do when the `future()` returns an error). 
 Here is an example of using this skeleton: 
 
-```{r}
+```{r eval = FALSE}
 library(future)
 library(promises)
 plan(multisession) # We're opening several R session (future specific)
@@ -275,7 +283,7 @@ And a couple of seconds later (a little bit more than 3), the result of the `rno
 
 Note that you can also one line function with `.` as a parameter, instead of building the full anonymous function (we will use this notation in the rest of the chapter): 
 
-```{r}
+```{r, eval=FALSE}
 library(future)
 library(promises)
 plan(multisession) # We're opening several R session (future specific)
@@ -289,7 +297,7 @@ future({
 
 Let's port this to Shiny:
 
-```{r}
+```{r eval = FALSE}
 library(shiny)
 ui <- function(request){
   tagList(
@@ -323,7 +331,7 @@ In the previous section we have implemented cross-session asynchronousity, meani
 But the code is still blocking at an inner-session level. 
 Let's have a look at this code:
 
-```{r}
+```{r eval = FALSE}
 library(shiny)
 ui <- function(request){
   tagList(
@@ -355,14 +363,13 @@ shinyApp(ui, server)
 ```
 
 Here, you would expect the plot to be avaiable before the `rnorm()`, but it's not: `{promises}` is still blocking at an inner-session level, so elements are still rendered sequentially. 
-To bypass that, we will use a `reactiveVal()` structure. 
+To bypass that, we will use a `reactiveValue()` structure. 
 
-```{r}
+```{r eval = FALSE}
 library(shiny)
 library(promises)
 library(future)
 plan(multisession)
-
 
 ui <- function(request){
   tagList(
@@ -377,23 +384,24 @@ server <- function(
   session
 ) {
   
-  rv <- reactiveVal()
-  
-  rv(NULL)
+  rv <- reactiveValues(
+    res = NULL
+  )
   
   future({
     Sys.sleep(5)
     rnorm(5)
   }) %...>%
-    rv() %...!%
     (function(e){
-      rv(NULL)
+      rv$res <- e
+    }) %...!%
+    (function(e){
+      rv$res <- NULL
       warning(e)
     })
   
   output$pr <- renderPrint({
-    req(rv())
-    rv()
+    req(rv$res)
   })
   
   output$plot <- renderPlot({
@@ -406,10 +414,96 @@ shinyApp(ui, server)
 
 Let's detail this step by step: 
 
-+ `rv <- reactiveVal()`
++ `rv <- reactiveValues` creates a `reactiveValue()` that will contains the `NULL`, and which will serve  the content of `renderPrint()` when the `future` is resolved. 
+It is initiated as `NULL` so that the `renderPrint()` is silent at launch.
 
-+ `rv(NULL)`
++ `%...>% rv() %...!%` is the `{promises}` structure we've seen before.
 
-+ `%...>% rv() %...!%`
++ `%...!% (function(e){ rv$res <- NULL ; warning(e) })` is what happens when the `future({})` fails: we're setting the `rv$res` value back to `NULL` so that the `renderPrint()` doesn't fails / print an error in case of failure. 
 
-+ `%...!% (function(e){ rv(NULL) ; warning(e) })`
+#### Potential Pitfalls of Asynchronous Shiny
+
+There is one thing to be aware of if you plan on using this asyn methodology: that you're not in a sequential context anymore. 
+What that implies is that the first `future()` you will send is not necessary the first you'll get back. 
+For example, if you send an SQL request to be run asynchronically, and that each takes between 1 an 10 seconds, if you send 3 request in a row, there is a chance that the first to return will be the last one you have sent. 
+The issue here, of course, is that as we treat all the results in the same `reactiveValues()`. 
+
+To handle that, we can adopt two different strategies, depending on what we need to achieve. 
+
++ We need only the last expression sent.
+In other words, if we send three expressions to be evaluated somewhere, we only need to get back the last one.  
+To handle that, the best way is to have an id that is also sent to the future, and when the future comes back, we check that this id is the one we are expecting. 
+If it is, we update the `reactiveValues()`. 
+If it is not, we ignore it. 
+
+```{r, eval = FALSE}
+library(shiny)
+library(promises)
+library(future)
+plan(multisession)
+
+
+ui <- function(request){
+  tagList(
+    actionButton("go", "go"),
+    verbatimTextOutput("pr"), 
+    plotOutput("plot")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+) {
+  
+  rv <- reactiveValues(
+    res = NULL, 
+    last_id = 0
+  )
+  
+  observeEvent( input$go , {
+    rv$last_id <- rv$last_id + 1
+    last_id <- rv$last_id
+    
+    future({
+      if (last_id %% 2 == 0){
+        Sys.sleep(3)
+      }
+      list(
+        id = last_id,
+        res = rnorm(5)
+      )
+    }) %...>%
+      (function(e){
+        cli::cat_rule(
+          sprintf("Back from %s", e$id)
+        )
+        if (e$id == rv$last_id){
+          rv$res <- e
+        }
+      }) %...!%
+      (function(e){
+        rv$res <- NULL
+        warning(e)
+      })
+    cli::cat_rule(
+      sprintf("%s sent", rv$last_id)
+    )
+  })
+  
+  output$pr <- renderPrint({
+    req(rv$res)
+  })
+  
+  output$plot <- renderPlot({
+    plot(iris)
+  })
+}
+
+shinyApp(ui, server)
+```
+
++ We need to treat the outputs in the order they are received. 
+In that case, instead of waiting for the very last input, you'll need to build a structure that will receive the output, check if this output is the "next in line", store it if it's not, or return it if it is and see if there is another output in the queue. 
+
