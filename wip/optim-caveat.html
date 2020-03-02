@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Vincent Guyader, Cervan Girard, Sébastien Rochette" />
 
 
-<meta name="date" content="2020-02-20" />
+<meta name="date" content="2020-03-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -204,12 +204,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="golem.html"><a href="golem.html"><i class="fa fa-check"></i><b>4</b> Introduction to <code>{golem}</code></a><ul>
-<li class="chapter" data-level="4.1" data-path="golem.html"><a href="golem.html#getting-started-with-golem"><i class="fa fa-check"></i><b>4.1</b> Getting started with <code>{golem}</code></a></li>
+<li class="chapter" data-level="4.1" data-path="golem.html"><a href="golem.html#what-is-golem"><i class="fa fa-check"></i><b>4.1</b> What is <code>{golem}</code>?</a></li>
 <li class="chapter" data-level="4.2" data-path="golem.html"><a href="golem.html#understanding-golem-app-structure"><i class="fa fa-check"></i><b>4.2</b> Understanding <code>{golem}</code> app structure</a><ul>
 <li class="chapter" data-level="4.2.1" data-path="golem.html"><a href="golem.html#description-namespace"><i class="fa fa-check"></i><b>4.2.1</b> <code>DESCRIPTION</code> &amp; <code>NAMESPACE</code></a></li>
 <li class="chapter" data-level="4.2.2" data-path="golem.html"><a href="golem.html#r"><i class="fa fa-check"></i><b>4.2.2</b> R/</a></li>
 <li class="chapter" data-level="4.2.3" data-path="golem.html"><a href="golem.html#instappwww"><i class="fa fa-check"></i><b>4.2.3</b> <code>inst/app/www/</code></a></li>
-<li class="chapter" data-level="4.2.4" data-path="golem.html"><a href="golem.html#man"><i class="fa fa-check"></i><b>4.2.4</b> <code>man/</code></a></li>
+<li class="chapter" data-level="4.2.4" data-path="golem.html"><a href="golem.html#dev"><i class="fa fa-check"></i><b>4.2.4</b> <code>dev/</code></a></li>
+<li class="chapter" data-level="4.2.5" data-path="golem.html"><a href="golem.html#man"><i class="fa fa-check"></i><b>4.2.5</b> <code>man/</code></a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="workflow.html"><a href="workflow.html"><i class="fa fa-check"></i><b>5</b> The workflow</a><ul>
@@ -451,33 +452,13 @@ This function updates <strong>every time a reactive object it contains is invali
 es, this works well if you have a small amount of reactive objects in the observer, but that gets tricky whenever you start adding things inside your <code>observe()</code>, as you might be launching a computation 10 times if your reactive scope contains 10 reactive objects that are somehow invalidated in chain.
 And believe me, we’ve seen pieces of code where the <code>observe()</code> contains hundreds of lines of code, with reactives objects all over the place.</p>
 <p>For example, let’s start with that:</p>
-<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb124-1" data-line-number="1">## DON&#39;T DO GLOBAL VARIABLES, IT&#39;S JUST TO SIMPLIFY THE EXAMPLE</a>
-<a class="sourceLine" id="cb124-2" data-line-number="2">i &lt;-<span class="st"> </span><span class="dv">0</span></a>
-<a class="sourceLine" id="cb124-3" data-line-number="3"><span class="kw">library</span>(shiny)</a>
-<a class="sourceLine" id="cb124-4" data-line-number="4"><span class="kw">library</span>(cli)</a>
-<a class="sourceLine" id="cb124-5" data-line-number="5">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb124-6" data-line-number="6">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb124-7" data-line-number="7">    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;txt&quot;</span>)</a>
-<a class="sourceLine" id="cb124-8" data-line-number="8">  )</a>
-<a class="sourceLine" id="cb124-9" data-line-number="9">}</a>
-<a class="sourceLine" id="cb124-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb124-11" data-line-number="11">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</a>
-<a class="sourceLine" id="cb124-12" data-line-number="12">  <span class="kw">observe</span>({</a>
-<a class="sourceLine" id="cb124-13" data-line-number="13">    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb124-14" data-line-number="14">    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</a>
-<a class="sourceLine" id="cb124-15" data-line-number="15">    <span class="kw">print</span>(input<span class="op">$</span>txt)</a>
-<a class="sourceLine" id="cb124-16" data-line-number="16">  })</a>
-<a class="sourceLine" id="cb124-17" data-line-number="17">}</a>
-<a class="sourceLine" id="cb124-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb124-19" data-line-number="19"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
-<p>Oh, and then, let’s add a small selectInput</p>
-<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb125-1" data-line-number="1">i &lt;-<span class="st"> </span><span class="dv">0</span></a>
-<a class="sourceLine" id="cb125-2" data-line-number="2"><span class="kw">library</span>(shiny)</a>
-<a class="sourceLine" id="cb125-3" data-line-number="3"><span class="kw">library</span>(cli)</a>
-<a class="sourceLine" id="cb125-4" data-line-number="4">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb125-5" data-line-number="5">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb125-6" data-line-number="6">    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;txt&quot;</span>), </a>
-<a class="sourceLine" id="cb125-7" data-line-number="7">    <span class="kw">selectInput</span>(<span class="st">&quot;tolower&quot;</span>, <span class="st">&quot;casse&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>))</a>
+<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb125-1" data-line-number="1">## DON&#39;T DO GLOBAL VARIABLES, IT&#39;S JUST TO SIMPLIFY THE EXAMPLE</a>
+<a class="sourceLine" id="cb125-2" data-line-number="2">i &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb125-3" data-line-number="3"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb125-4" data-line-number="4"><span class="kw">library</span>(cli)</a>
+<a class="sourceLine" id="cb125-5" data-line-number="5">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb125-6" data-line-number="6">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb125-7" data-line-number="7">    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;txt&quot;</span>)</a>
 <a class="sourceLine" id="cb125-8" data-line-number="8">  )</a>
 <a class="sourceLine" id="cb125-9" data-line-number="9">}</a>
 <a class="sourceLine" id="cb125-10" data-line-number="10"></a>
@@ -485,48 +466,36 @@ And believe me, we’ve seen pieces of code where the <code>observe()</code> con
 <a class="sourceLine" id="cb125-12" data-line-number="12">  <span class="kw">observe</span>({</a>
 <a class="sourceLine" id="cb125-13" data-line-number="13">    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
 <a class="sourceLine" id="cb125-14" data-line-number="14">    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</a>
-<a class="sourceLine" id="cb125-15" data-line-number="15">    <span class="cf">if</span> (input<span class="op">$</span>tolower <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</a>
-<a class="sourceLine" id="cb125-16" data-line-number="16">      <span class="kw">print</span>(<span class="kw">tolower</span>(input<span class="op">$</span>txt))</a>
-<a class="sourceLine" id="cb125-17" data-line-number="17">    } <span class="cf">else</span>  {</a>
-<a class="sourceLine" id="cb125-18" data-line-number="18">      <span class="kw">print</span>(<span class="kw">tolower</span>(input<span class="op">$</span>txt))</a>
-<a class="sourceLine" id="cb125-19" data-line-number="19">    }</a>
-<a class="sourceLine" id="cb125-20" data-line-number="20">  })</a>
-<a class="sourceLine" id="cb125-21" data-line-number="21">}</a>
-<a class="sourceLine" id="cb125-22" data-line-number="22"></a>
-<a class="sourceLine" id="cb125-23" data-line-number="23"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
-<p>And, as time goes by, we add another control flow to our <code>observe()</code>:</p>
+<a class="sourceLine" id="cb125-15" data-line-number="15">    <span class="kw">print</span>(input<span class="op">$</span>txt)</a>
+<a class="sourceLine" id="cb125-16" data-line-number="16">  })</a>
+<a class="sourceLine" id="cb125-17" data-line-number="17">}</a>
+<a class="sourceLine" id="cb125-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb125-19" data-line-number="19"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<p>Oh, and then, let’s add a small selectInput</p>
 <div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb126-1" data-line-number="1">i &lt;-<span class="st"> </span><span class="dv">0</span></a>
 <a class="sourceLine" id="cb126-2" data-line-number="2"><span class="kw">library</span>(shiny)</a>
 <a class="sourceLine" id="cb126-3" data-line-number="3"><span class="kw">library</span>(cli)</a>
-<a class="sourceLine" id="cb126-4" data-line-number="4"><span class="kw">library</span>(stringi)</a>
-<a class="sourceLine" id="cb126-5" data-line-number="5">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb126-6" data-line-number="6">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb126-7" data-line-number="7">    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;txt&quot;</span>), </a>
-<a class="sourceLine" id="cb126-8" data-line-number="8">    <span class="kw">selectInput</span>(<span class="st">&quot;tolower&quot;</span>, <span class="st">&quot;casse&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)), </a>
-<a class="sourceLine" id="cb126-9" data-line-number="9">    <span class="kw">checkboxInput</span>(<span class="st">&quot;rev&quot;</span>, <span class="st">&quot;reverse&quot;</span>)</a>
-<a class="sourceLine" id="cb126-10" data-line-number="10">  )</a>
-<a class="sourceLine" id="cb126-11" data-line-number="11">}</a>
-<a class="sourceLine" id="cb126-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb126-13" data-line-number="13">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</a>
-<a class="sourceLine" id="cb126-14" data-line-number="14">  <span class="kw">observe</span>({</a>
-<a class="sourceLine" id="cb126-15" data-line-number="15">    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb126-16" data-line-number="16">    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</a>
-<a class="sourceLine" id="cb126-17" data-line-number="17">    <span class="cf">if</span> (input<span class="op">$</span>rev){</a>
-<a class="sourceLine" id="cb126-18" data-line-number="18">      x &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(input<span class="op">$</span>txt)</a>
-<a class="sourceLine" id="cb126-19" data-line-number="19">    } <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb126-20" data-line-number="20">      x &lt;-<span class="st"> </span>input<span class="op">$</span>txt</a>
-<a class="sourceLine" id="cb126-21" data-line-number="21">    }</a>
-<a class="sourceLine" id="cb126-22" data-line-number="22">    <span class="cf">if</span> (input<span class="op">$</span>tolower <span class="op">==</span><span class="st"> &quot;lower&quot;</span>){</a>
-<a class="sourceLine" id="cb126-23" data-line-number="23">      <span class="kw">print</span>(<span class="kw">tolower</span>(x))</a>
-<a class="sourceLine" id="cb126-24" data-line-number="24">    } <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb126-25" data-line-number="25">      <span class="kw">print</span>(<span class="kw">tolower</span>(x))</a>
-<a class="sourceLine" id="cb126-26" data-line-number="26">    }</a>
-<a class="sourceLine" id="cb126-27" data-line-number="27">  })</a>
-<a class="sourceLine" id="cb126-28" data-line-number="28">}</a>
-<a class="sourceLine" id="cb126-29" data-line-number="29"></a>
-<a class="sourceLine" id="cb126-30" data-line-number="30"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
-<p>And it would be nice to keep the selected values into a reactive list, so that we can reuse it elsewhere.
-And maybe you would like to add a checkbox so that the logs are printed to the console only if checked.</p>
+<a class="sourceLine" id="cb126-4" data-line-number="4">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb126-5" data-line-number="5">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb126-6" data-line-number="6">    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;txt&quot;</span>), </a>
+<a class="sourceLine" id="cb126-7" data-line-number="7">    <span class="kw">selectInput</span>(<span class="st">&quot;tolower&quot;</span>, <span class="st">&quot;casse&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>))</a>
+<a class="sourceLine" id="cb126-8" data-line-number="8">  )</a>
+<a class="sourceLine" id="cb126-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb126-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb126-11" data-line-number="11">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</a>
+<a class="sourceLine" id="cb126-12" data-line-number="12">  <span class="kw">observe</span>({</a>
+<a class="sourceLine" id="cb126-13" data-line-number="13">    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb126-14" data-line-number="14">    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</a>
+<a class="sourceLine" id="cb126-15" data-line-number="15">    <span class="cf">if</span> (input<span class="op">$</span>tolower <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</a>
+<a class="sourceLine" id="cb126-16" data-line-number="16">      <span class="kw">print</span>(<span class="kw">tolower</span>(input<span class="op">$</span>txt))</a>
+<a class="sourceLine" id="cb126-17" data-line-number="17">    } <span class="cf">else</span>  {</a>
+<a class="sourceLine" id="cb126-18" data-line-number="18">      <span class="kw">print</span>(<span class="kw">tolower</span>(input<span class="op">$</span>txt))</a>
+<a class="sourceLine" id="cb126-19" data-line-number="19">    }</a>
+<a class="sourceLine" id="cb126-20" data-line-number="20">  })</a>
+<a class="sourceLine" id="cb126-21" data-line-number="21">}</a>
+<a class="sourceLine" id="cb126-22" data-line-number="22"></a>
+<a class="sourceLine" id="cb126-23" data-line-number="23"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<p>And, as time goes by, we add another control flow to our <code>observe()</code>:</p>
 <div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb127-1" data-line-number="1">i &lt;-<span class="st"> </span><span class="dv">0</span></a>
 <a class="sourceLine" id="cb127-2" data-line-number="2"><span class="kw">library</span>(shiny)</a>
 <a class="sourceLine" id="cb127-3" data-line-number="3"><span class="kw">library</span>(cli)</a>
@@ -540,24 +509,56 @@ And maybe you would like to add a checkbox so that the logs are printed to the c
 <a class="sourceLine" id="cb127-11" data-line-number="11">}</a>
 <a class="sourceLine" id="cb127-12" data-line-number="12"></a>
 <a class="sourceLine" id="cb127-13" data-line-number="13">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</a>
-<a class="sourceLine" id="cb127-14" data-line-number="14">  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>()</a>
-<a class="sourceLine" id="cb127-15" data-line-number="15">  <span class="kw">observe</span>({</a>
-<a class="sourceLine" id="cb127-16" data-line-number="16">    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb127-17" data-line-number="17">    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</a>
-<a class="sourceLine" id="cb127-18" data-line-number="18">    <span class="cf">if</span> (input<span class="op">$</span>rev) {</a>
-<a class="sourceLine" id="cb127-19" data-line-number="19">      r<span class="op">$</span>x &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(input<span class="op">$</span>txt) </a>
-<a class="sourceLine" id="cb127-20" data-line-number="20">    } <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb127-21" data-line-number="21">      r<span class="op">$</span>x &lt;-<span class="st"> </span>input<span class="op">$</span>txt</a>
-<a class="sourceLine" id="cb127-22" data-line-number="22">    }</a>
-<a class="sourceLine" id="cb127-23" data-line-number="23">    <span class="cf">if</span> (input<span class="op">$</span>tolower <span class="op">==</span><span class="st"> &quot;lower&quot;</span>){</a>
-<a class="sourceLine" id="cb127-24" data-line-number="24">      r<span class="op">$</span>x &lt;-<span class="st"> </span><span class="kw">tolower</span>(r<span class="op">$</span>x)</a>
-<a class="sourceLine" id="cb127-25" data-line-number="25">    } <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb127-26" data-line-number="26">      r<span class="op">$</span>x &lt;-<span class="st"> </span><span class="kw">toupper</span>(r<span class="op">$</span>x)</a>
-<a class="sourceLine" id="cb127-27" data-line-number="27">    }</a>
-<a class="sourceLine" id="cb127-28" data-line-number="28">  })</a>
-<a class="sourceLine" id="cb127-29" data-line-number="29">}</a>
-<a class="sourceLine" id="cb127-30" data-line-number="30"></a>
-<a class="sourceLine" id="cb127-31" data-line-number="31"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<a class="sourceLine" id="cb127-14" data-line-number="14">  <span class="kw">observe</span>({</a>
+<a class="sourceLine" id="cb127-15" data-line-number="15">    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb127-16" data-line-number="16">    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</a>
+<a class="sourceLine" id="cb127-17" data-line-number="17">    <span class="cf">if</span> (input<span class="op">$</span>rev){</a>
+<a class="sourceLine" id="cb127-18" data-line-number="18">      x &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(input<span class="op">$</span>txt)</a>
+<a class="sourceLine" id="cb127-19" data-line-number="19">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb127-20" data-line-number="20">      x &lt;-<span class="st"> </span>input<span class="op">$</span>txt</a>
+<a class="sourceLine" id="cb127-21" data-line-number="21">    }</a>
+<a class="sourceLine" id="cb127-22" data-line-number="22">    <span class="cf">if</span> (input<span class="op">$</span>tolower <span class="op">==</span><span class="st"> &quot;lower&quot;</span>){</a>
+<a class="sourceLine" id="cb127-23" data-line-number="23">      <span class="kw">print</span>(<span class="kw">tolower</span>(x))</a>
+<a class="sourceLine" id="cb127-24" data-line-number="24">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb127-25" data-line-number="25">      <span class="kw">print</span>(<span class="kw">tolower</span>(x))</a>
+<a class="sourceLine" id="cb127-26" data-line-number="26">    }</a>
+<a class="sourceLine" id="cb127-27" data-line-number="27">  })</a>
+<a class="sourceLine" id="cb127-28" data-line-number="28">}</a>
+<a class="sourceLine" id="cb127-29" data-line-number="29"></a>
+<a class="sourceLine" id="cb127-30" data-line-number="30"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<p>And it would be nice to keep the selected values into a reactive list, so that we can reuse it elsewhere.
+And maybe you would like to add a checkbox so that the logs are printed to the console only if checked.</p>
+<div class="sourceCode" id="cb128"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb128-1" data-line-number="1">i &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb128-2" data-line-number="2"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb128-3" data-line-number="3"><span class="kw">library</span>(cli)</a>
+<a class="sourceLine" id="cb128-4" data-line-number="4"><span class="kw">library</span>(stringi)</a>
+<a class="sourceLine" id="cb128-5" data-line-number="5">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb128-6" data-line-number="6">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb128-7" data-line-number="7">    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;txt&quot;</span>), </a>
+<a class="sourceLine" id="cb128-8" data-line-number="8">    <span class="kw">selectInput</span>(<span class="st">&quot;tolower&quot;</span>, <span class="st">&quot;casse&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)), </a>
+<a class="sourceLine" id="cb128-9" data-line-number="9">    <span class="kw">checkboxInput</span>(<span class="st">&quot;rev&quot;</span>, <span class="st">&quot;reverse&quot;</span>)</a>
+<a class="sourceLine" id="cb128-10" data-line-number="10">  )</a>
+<a class="sourceLine" id="cb128-11" data-line-number="11">}</a>
+<a class="sourceLine" id="cb128-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb128-13" data-line-number="13">server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</a>
+<a class="sourceLine" id="cb128-14" data-line-number="14">  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>()</a>
+<a class="sourceLine" id="cb128-15" data-line-number="15">  <span class="kw">observe</span>({</a>
+<a class="sourceLine" id="cb128-16" data-line-number="16">    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb128-17" data-line-number="17">    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</a>
+<a class="sourceLine" id="cb128-18" data-line-number="18">    <span class="cf">if</span> (input<span class="op">$</span>rev) {</a>
+<a class="sourceLine" id="cb128-19" data-line-number="19">      r<span class="op">$</span>x &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(input<span class="op">$</span>txt) </a>
+<a class="sourceLine" id="cb128-20" data-line-number="20">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb128-21" data-line-number="21">      r<span class="op">$</span>x &lt;-<span class="st"> </span>input<span class="op">$</span>txt</a>
+<a class="sourceLine" id="cb128-22" data-line-number="22">    }</a>
+<a class="sourceLine" id="cb128-23" data-line-number="23">    <span class="cf">if</span> (input<span class="op">$</span>tolower <span class="op">==</span><span class="st"> &quot;lower&quot;</span>){</a>
+<a class="sourceLine" id="cb128-24" data-line-number="24">      r<span class="op">$</span>x &lt;-<span class="st"> </span><span class="kw">tolower</span>(r<span class="op">$</span>x)</a>
+<a class="sourceLine" id="cb128-25" data-line-number="25">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb128-26" data-line-number="26">      r<span class="op">$</span>x &lt;-<span class="st"> </span><span class="kw">toupper</span>(r<span class="op">$</span>x)</a>
+<a class="sourceLine" id="cb128-27" data-line-number="27">    }</a>
+<a class="sourceLine" id="cb128-28" data-line-number="28">  })</a>
+<a class="sourceLine" id="cb128-29" data-line-number="29">}</a>
+<a class="sourceLine" id="cb128-30" data-line-number="30"></a>
+<a class="sourceLine" id="cb128-31" data-line-number="31"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p>Ok, now can you tell how many potential invalidation points we’ve got here?
 Three: whenever <code>input$txt</code>, <code>input$rev</code> or <code>input$tolower</code> change.
 Of course, three is not that much, but you get the idea.</p>
@@ -576,19 +577,19 @@ Then, if a reactive context is invalidated, <strong>you know why</strong>.</p>
 <p>// TODO</p>
 <p>So the general pattern is that one: we create “flags” with an <code>init</code> function, trigger these “flags” with <code>trigger()</code>, and wherever we want these flags to invalidate the reactive context, we <code>watch()</code> these flags.</p>
 <p>The idea here is to get a full control over the reactive flow: we only invalidate contexts when we want, making the general flow of the app more predictable.</p>
-<div class="sourceCode" id="cb128"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb128-1" data-line-number="1">init &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">session =</span> <span class="kw">getDefaultReactiveDomain</span>()){</a>
-<a class="sourceLine" id="cb128-2" data-line-number="2">  session<span class="op">$</span>userData[[name]] &lt;-<span class="st"> </span><span class="kw">reactiveVal</span>(<span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb128-3" data-line-number="3">}</a>
-<a class="sourceLine" id="cb128-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb128-5" data-line-number="5">trigger &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">session =</span> <span class="kw">getDefaultReactiveDomain</span>()){</a>
-<a class="sourceLine" id="cb128-6" data-line-number="6">  session<span class="op">$</span>userData[[name]](</a>
-<a class="sourceLine" id="cb128-7" data-line-number="7">    session<span class="op">$</span>userData[[name]]() <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb128-8" data-line-number="8">  )</a>
-<a class="sourceLine" id="cb128-9" data-line-number="9">}</a>
-<a class="sourceLine" id="cb128-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb128-11" data-line-number="11">watch &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">session =</span> <span class="kw">getDefaultReactiveDomain</span>()){</a>
-<a class="sourceLine" id="cb128-12" data-line-number="12">  session<span class="op">$</span>userData[[name]]()</a>
-<a class="sourceLine" id="cb128-13" data-line-number="13">}</a></code></pre></div>
+<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb129-1" data-line-number="1">init &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">session =</span> <span class="kw">getDefaultReactiveDomain</span>()){</a>
+<a class="sourceLine" id="cb129-2" data-line-number="2">  session<span class="op">$</span>userData[[name]] &lt;-<span class="st"> </span><span class="kw">reactiveVal</span>(<span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb129-3" data-line-number="3">}</a>
+<a class="sourceLine" id="cb129-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb129-5" data-line-number="5">trigger &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">session =</span> <span class="kw">getDefaultReactiveDomain</span>()){</a>
+<a class="sourceLine" id="cb129-6" data-line-number="6">  session<span class="op">$</span>userData[[name]](</a>
+<a class="sourceLine" id="cb129-7" data-line-number="7">    session<span class="op">$</span>userData[[name]]() <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb129-8" data-line-number="8">  )</a>
+<a class="sourceLine" id="cb129-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb129-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb129-11" data-line-number="11">watch &lt;-<span class="st"> </span><span class="cf">function</span>(name, <span class="dt">session =</span> <span class="kw">getDefaultReactiveDomain</span>()){</a>
+<a class="sourceLine" id="cb129-12" data-line-number="12">  session<span class="op">$</span>userData[[name]]()</a>
+<a class="sourceLine" id="cb129-13" data-line-number="13">}</a></code></pre></div>
 <p>And, bonus, as these functions use the <code>session</code> object, they are available across all modules. That also means that you can easily trigger an event inside a model from another one.</p>
 </div>
 <div id="using-r6-as-a-data-storage" class="section level3">
@@ -600,38 +601,38 @@ Why would we want to do that?</p>
 <p>Sharing an R6 object makes it simpler but without the complexity of sharing &amp; handling reactive objects.</p>
 <p>So basically, the idea is to hold the whole logic of your data reading / cleaning / processing / outputing inside an R6 class.
 You’ll then initiate an instance of this class, then pass this object through your modules and submodules.</p>
-<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb129-1" data-line-number="1">nameui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</a>
-<a class="sourceLine" id="cb129-2" data-line-number="2">  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</a>
-<a class="sourceLine" id="cb129-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb129-4" data-line-number="4">    <span class="co"># [...]</span></a>
-<a class="sourceLine" id="cb129-5" data-line-number="5">  )</a>
-<a class="sourceLine" id="cb129-6" data-line-number="6">}</a>
-<a class="sourceLine" id="cb129-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb129-8" data-line-number="8">name &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, obj){</a>
-<a class="sourceLine" id="cb129-9" data-line-number="9">  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</a>
-<a class="sourceLine" id="cb129-10" data-line-number="10">  output<span class="op">$</span>that &lt;-<span class="st"> </span><span class="kw">renderThis</span>({</a>
-<a class="sourceLine" id="cb129-11" data-line-number="11">    obj<span class="op">$</span><span class="kw">compute</span>()</a>
-<a class="sourceLine" id="cb129-12" data-line-number="12">  })</a>
-<a class="sourceLine" id="cb129-13" data-line-number="13">}</a>
-<a class="sourceLine" id="cb129-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb129-15" data-line-number="15"><span class="kw">library</span>(shiny)</a>
-<a class="sourceLine" id="cb129-16" data-line-number="16">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb129-17" data-line-number="17">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb129-18" data-line-number="18">    <span class="kw">nameui</span>(<span class="st">&quot;nameui&quot;</span>)</a>
-<a class="sourceLine" id="cb129-19" data-line-number="19">  )</a>
-<a class="sourceLine" id="cb129-20" data-line-number="20">}</a>
-<a class="sourceLine" id="cb129-21" data-line-number="21"></a>
-<a class="sourceLine" id="cb129-22" data-line-number="22">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
-<a class="sourceLine" id="cb129-23" data-line-number="23">  input, </a>
-<a class="sourceLine" id="cb129-24" data-line-number="24">  output, </a>
-<a class="sourceLine" id="cb129-25" data-line-number="25">  session</a>
-<a class="sourceLine" id="cb129-26" data-line-number="26">){</a>
-<a class="sourceLine" id="cb129-27" data-line-number="27">  obj &lt;-<span class="st"> </span>MyDataProcess<span class="op">$</span><span class="kw">new</span>()</a>
-<a class="sourceLine" id="cb129-28" data-line-number="28">  <span class="kw">callModule</span>(name, <span class="st">&quot;nameui&quot;</span>, obj)</a>
-<a class="sourceLine" id="cb129-29" data-line-number="29">  </a>
-<a class="sourceLine" id="cb129-30" data-line-number="30">}</a>
-<a class="sourceLine" id="cb129-31" data-line-number="31"></a>
-<a class="sourceLine" id="cb129-32" data-line-number="32"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb130-1" data-line-number="1">nameui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</a>
+<a class="sourceLine" id="cb130-2" data-line-number="2">  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</a>
+<a class="sourceLine" id="cb130-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb130-4" data-line-number="4">    <span class="co"># [...]</span></a>
+<a class="sourceLine" id="cb130-5" data-line-number="5">  )</a>
+<a class="sourceLine" id="cb130-6" data-line-number="6">}</a>
+<a class="sourceLine" id="cb130-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb130-8" data-line-number="8">name &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, obj){</a>
+<a class="sourceLine" id="cb130-9" data-line-number="9">  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</a>
+<a class="sourceLine" id="cb130-10" data-line-number="10">  output<span class="op">$</span>that &lt;-<span class="st"> </span><span class="kw">renderThis</span>({</a>
+<a class="sourceLine" id="cb130-11" data-line-number="11">    obj<span class="op">$</span><span class="kw">compute</span>()</a>
+<a class="sourceLine" id="cb130-12" data-line-number="12">  })</a>
+<a class="sourceLine" id="cb130-13" data-line-number="13">}</a>
+<a class="sourceLine" id="cb130-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb130-15" data-line-number="15"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb130-16" data-line-number="16">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb130-17" data-line-number="17">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb130-18" data-line-number="18">    <span class="kw">nameui</span>(<span class="st">&quot;nameui&quot;</span>)</a>
+<a class="sourceLine" id="cb130-19" data-line-number="19">  )</a>
+<a class="sourceLine" id="cb130-20" data-line-number="20">}</a>
+<a class="sourceLine" id="cb130-21" data-line-number="21"></a>
+<a class="sourceLine" id="cb130-22" data-line-number="22">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb130-23" data-line-number="23">  input, </a>
+<a class="sourceLine" id="cb130-24" data-line-number="24">  output, </a>
+<a class="sourceLine" id="cb130-25" data-line-number="25">  session</a>
+<a class="sourceLine" id="cb130-26" data-line-number="26">){</a>
+<a class="sourceLine" id="cb130-27" data-line-number="27">  obj &lt;-<span class="st"> </span>MyDataProcess<span class="op">$</span><span class="kw">new</span>()</a>
+<a class="sourceLine" id="cb130-28" data-line-number="28">  <span class="kw">callModule</span>(name, <span class="st">&quot;nameui&quot;</span>, obj)</a>
+<a class="sourceLine" id="cb130-29" data-line-number="29">  </a>
+<a class="sourceLine" id="cb130-30" data-line-number="30">}</a>
+<a class="sourceLine" id="cb130-31" data-line-number="31"></a>
+<a class="sourceLine" id="cb130-32" data-line-number="32"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p>Of course, this makes sense if you’re combining it with the trigger / watch from before :)</p>
 </div>
 <div id="get-sure-its-tested" class="section level4">
