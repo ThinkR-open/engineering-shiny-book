@@ -249,7 +249,149 @@ This is where using an R6 for your business logic of your app makes sense: this 
 
 ## R does too much 
 
-// TODO 
+### Rendering UI from server side 
+
+There are many reasons we would want to change things on the UI based on what happens in the server: changing the choices of a `selectInput()` based on the columns of a table which is uploaded by the user, showing and hidding pieces of the app according to an environment variable, allow the user to create an undeterminate amount of inputs, etc. 
+
+Chances are that to do that, you've been using the `uiOutput()` & `renderUI()` functions from `{shiny}`.
+Even if convenient, and the functions of choice in some specific context, this couple makes R do a little bit too much: you're making R regenerate the whole UI component instead of changing only what you need. 
+Plus, you'll create a code that is harder to reason about, as we are used to have the UI parts in the UI functions (but that's not related to performance).
+
+Here are three strategies to code without `uiOutput()` & `renderUI()`.
+
+#### Implement UI events in JavaScript
+
+> Mixing languages is better than writing everything in one, if and only if using only that one is likely to overcomplicate the program.
+
+`r right_link("Applying the Unix Philosophy - The Art of Unix Programming", "http://www.catb.org/~esr/writings/taoup/html/ch01s08.html")`
+
+We'll see in the last chapter of this book how you can integrate JS inside your Shiny app, and how event basic functions can be useful in making your app server lighter. 
+For example, compare: 
+
+```{r}
+library(shiny)
+ui <- function(){
+  tagList(
+    actionButton("change", "show/hide graph", onclick = "$('#plot').toggle()"), 
+    plotOutput("plot")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  output$plot <- renderPlot({
+    cli::cat_rule("Rendering plot")
+    plot(iris)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+to
+
+```{r}
+library(shiny)
+ui <- function(){
+  tagList(
+    actionButton("change", "show/hide graph"), 
+    plotOutput("plot")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  
+  r <- reactiveValues(plot = iris)
+  
+  observeEvent( input$change , {
+    if (input$change %% 2 == 0){
+      r$plot <- iris
+    } else {
+      r$plot <- NULL
+    }
+  })
+  
+  output$plot <- renderPlot({
+    cli::cat_rule("Rendering plot")
+    req(r$plot)
+    plot(r$plot)
+  })
+  
+}
+
+shinyApp(ui, server)
+```
+
+The result is the same, but the first version is shorter and easier to reason about: we have one bouton, and the behavior of the button is contained into itself. 
+And, on top of being harder to maintain, the second solution redraws the plot everytime the `reactiveValues` is updated, making R compute way more than it should. 
+
+#### `update*` inputs
+
+Almost every Shiny inputs, even the custom ones from packages, come with an `update` function that allows to change the input content from the server side, instead of recreating entirely. 
+For example, here is a way to update the content of a `selectInput` from the server side:
+
+```{r}
+library(shiny)
+ui <- function(){
+  tagList(
+    selectInput("species", "Species", choices = NULL), 
+    actionButton("update", "Update")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  observeEvent( input$update , {
+    spc <- unique(iris$Species)
+    updateSelectInput(
+      session, 
+      "species", 
+      choices = spc, 
+      selected = spc[1]
+    )
+  })
+  
+}
+
+shinyApp(ui, server)
+```
+
+Here, this makes the code easier to reason about as the `selectInput` is where it should be: inside the UI. 
+Plus, with the `update` method, we are only changing what is needed, not re-generating the whole input. 
+ 
+#### `insertUI` and `removeUI` 
+
+Another way to dynamically change what is in the UI is with `insertUI()` and `removeUI()`. 
+It's more global than the solution we've seen before with setting the `reactiveValue` to `NULL` or to a value, as it allows to target a larger UI element: we can insert or remove the whole input, instead of having the DOM element present but empty. 
+This technic allows to have a lighter DOM: div which are not rendered are not generated empty, they are simply not there. 
+
+Two things to note concerning this method, though: 
+
++ Removing an element from the app will not delete the input from the input list. 
+In other word, if you have `selectInput("x", "x")`, and that you remove this input using `removeUI()`, you will still have `input$x` in the server. 
+
++ Both these functions take a `jQuery` selector to select the element in the UI. 
+We will introduce these selectors in the last chapter of this book.
+
+### Too Much Data in Memory
+
+If you are building a Shiny application, there is a great chance you are building it to analyse data. 
+If you are dealing with large datasets, you should consider deporting the data handling and computation to an external database system: for example to an SQL database. 
+Why? Because these system has been created to handle and manipulate data on disk: in other words it will allow you to perform operation on your data without having to clutter R memory with large dataset. 
+For example, if you have a `selectInput()` that is used to perform a filter on a dataset, you can do that straight inside SQL. 
+Well, almost any operation you can do today in `{dplyr}` would be doable with an SQL backend, and that's the purpose of the `{dbplyr}` package: translate `{dplyr}` code into SQL.
+
+If using a database as a backend seems a little bit far-fetched to you, that's how it's done in most programming languages: if you are building a web app with NodeJS or Python and need to interact with data, nothing will be stored in RAM: you will be relying on an external database to store your data.  
 
 ## Reading data
 
