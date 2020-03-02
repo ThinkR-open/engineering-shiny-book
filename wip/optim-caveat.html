@@ -217,7 +217,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.1" data-path="workflow.html"><a href="workflow.html#part-1-design"><i class="fa fa-check"></i><b>5.1</b> Part 1: Design</a></li>
 <li class="chapter" data-level="5.2" data-path="workflow.html"><a href="workflow.html#part-2-prototype"><i class="fa fa-check"></i><b>5.2</b> Part 2: Prototype</a></li>
 <li class="chapter" data-level="5.3" data-path="workflow.html"><a href="workflow.html#part-3-build"><i class="fa fa-check"></i><b>5.3</b> Part 3: Build</a></li>
-<li class="chapter" data-level="5.4" data-path="workflow.html"><a href="workflow.html#part-4-secure"><i class="fa fa-check"></i><b>5.4</b> Part 4: Secure</a></li>
+<li class="chapter" data-level="5.4" data-path="workflow.html"><a href="workflow.html#part-4-strengthen"><i class="fa fa-check"></i><b>5.4</b> Part 4: Strengthen</a></li>
 <li class="chapter" data-level="5.5" data-path="workflow.html"><a href="workflow.html#part-5-deploy"><i class="fa fa-check"></i><b>5.5</b> Part 5: Deploy</a></li>
 </ul></li>
 <li class="part"><span><b>II Step 1: Design</b></span></li>
@@ -371,7 +371,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="17.1.3" data-path="optim-caveat.html"><a href="optim-caveat.html#building-triggers-and-watchers"><i class="fa fa-check"></i><b>17.1.3</b> Building triggers and watchers</a></li>
 <li class="chapter" data-level="17.1.4" data-path="optim-caveat.html"><a href="optim-caveat.html#using-r6-as-a-data-storage"><i class="fa fa-check"></i><b>17.1.4</b> Using R6 as a data storage</a></li>
 </ul></li>
-<li class="chapter" data-level="17.2" data-path="optim-caveat.html"><a href="optim-caveat.html#r-does-too-much"><i class="fa fa-check"></i><b>17.2</b> R does too much</a></li>
+<li class="chapter" data-level="17.2" data-path="optim-caveat.html"><a href="optim-caveat.html#r-does-too-much"><i class="fa fa-check"></i><b>17.2</b> R does too much</a><ul>
+<li class="chapter" data-level="17.2.1" data-path="optim-caveat.html"><a href="optim-caveat.html#rendering-ui-from-server-side"><i class="fa fa-check"></i><b>17.2.1</b> Rendering UI from server side</a></li>
+<li class="chapter" data-level="17.2.2" data-path="optim-caveat.html"><a href="optim-caveat.html#too-much-data-in-memory"><i class="fa fa-check"></i><b>17.2.2</b> Too Much Data in Memory</a></li>
+</ul></li>
 <li class="chapter" data-level="17.3" data-path="optim-caveat.html"><a href="optim-caveat.html#reading-data"><i class="fa fa-check"></i><b>17.3</b> Reading data</a></li>
 </ul></li>
 <li class="chapter" data-level="18" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html"><i class="fa fa-check"></i><b>18</b> Optimizing Shiny Code</a><ul>
@@ -644,7 +647,142 @@ This is where using an R6 for your business logic of your app makes sense: this 
 </div>
 <div id="r-does-too-much" class="section level2">
 <h2><span class="header-section-number">17.2</span> R does too much</h2>
-<p>// TODO</p>
+<div id="rendering-ui-from-server-side" class="section level3">
+<h3><span class="header-section-number">17.2.1</span> Rendering UI from server side</h3>
+<p>There are many reasons we would want to change things on the UI based on what happens in the server: changing the choices of a <code>selectInput()</code> based on the columns of a table which is uploaded by the user, showing and hidding pieces of the app according to an environment variable, allow the user to create an undeterminate amount of inputs, etc.</p>
+<p>Chances are that to do that, you’ve been using the <code>uiOutput()</code> &amp; <code>renderUI()</code> functions from <code>{shiny}</code>.
+Even if convenient, and the functions of choice in some specific context, this couple makes R do a little bit too much: you’re making R regenerate the whole UI component instead of changing only what you need.
+Plus, you’ll create a code that is harder to reason about, as we are used to have the UI parts in the UI functions (but that’s not related to performance).</p>
+<p>Here are three strategies to code without <code>uiOutput()</code> &amp; <code>renderUI()</code>.</p>
+<div id="implement-ui-events-in-javascript" class="section level4">
+<h4><span class="header-section-number">17.2.1.1</span> Implement UI events in JavaScript</h4>
+<blockquote>
+<p>Mixing languages is better than writing everything in one, if and only if using only that one is likely to overcomplicate the program.</p>
+</blockquote>
+<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<style>.right{ text-align: right;}</style>
+<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<div class="right">
+<a href="http://www.catb.org/~esr/writings/taoup/html/ch01s08.html">Applying the Unix Philosophy - The Art of Unix Programming</a>
+</div>
+<p>We’ll see in the last chapter of this book how you can integrate JS inside your Shiny app, and how event basic functions can be useful in making your app server lighter.
+For example, compare:</p>
+<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb131-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb131-2" data-line-number="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb131-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb131-4" data-line-number="4">    <span class="kw">actionButton</span>(<span class="st">&quot;change&quot;</span>, <span class="st">&quot;show/hide graph&quot;</span>, <span class="dt">onclick =</span> <span class="st">&quot;$(&#39;#plot&#39;).toggle()&quot;</span>), </a>
+<a class="sourceLine" id="cb131-5" data-line-number="5">    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</a>
+<a class="sourceLine" id="cb131-6" data-line-number="6">  )</a>
+<a class="sourceLine" id="cb131-7" data-line-number="7">}</a>
+<a class="sourceLine" id="cb131-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb131-9" data-line-number="9">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb131-10" data-line-number="10">  input, </a>
+<a class="sourceLine" id="cb131-11" data-line-number="11">  output, </a>
+<a class="sourceLine" id="cb131-12" data-line-number="12">  session</a>
+<a class="sourceLine" id="cb131-13" data-line-number="13">){</a>
+<a class="sourceLine" id="cb131-14" data-line-number="14">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</a>
+<a class="sourceLine" id="cb131-15" data-line-number="15">    cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;Rendering plot&quot;</span>)</a>
+<a class="sourceLine" id="cb131-16" data-line-number="16">    <span class="kw">plot</span>(iris)</a>
+<a class="sourceLine" id="cb131-17" data-line-number="17">  })</a>
+<a class="sourceLine" id="cb131-18" data-line-number="18">}</a>
+<a class="sourceLine" id="cb131-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb131-20" data-line-number="20"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<div style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;" class="muted well">Shiny applications not supported in static R Markdown documents</div>
+<p>to</p>
+<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb132-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb132-2" data-line-number="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb132-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb132-4" data-line-number="4">    <span class="kw">actionButton</span>(<span class="st">&quot;change&quot;</span>, <span class="st">&quot;show/hide graph&quot;</span>), </a>
+<a class="sourceLine" id="cb132-5" data-line-number="5">    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</a>
+<a class="sourceLine" id="cb132-6" data-line-number="6">  )</a>
+<a class="sourceLine" id="cb132-7" data-line-number="7">}</a>
+<a class="sourceLine" id="cb132-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb132-9" data-line-number="9">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb132-10" data-line-number="10">  input, </a>
+<a class="sourceLine" id="cb132-11" data-line-number="11">  output, </a>
+<a class="sourceLine" id="cb132-12" data-line-number="12">  session</a>
+<a class="sourceLine" id="cb132-13" data-line-number="13">){</a>
+<a class="sourceLine" id="cb132-14" data-line-number="14">  </a>
+<a class="sourceLine" id="cb132-15" data-line-number="15">  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>(<span class="dt">plot =</span> iris)</a>
+<a class="sourceLine" id="cb132-16" data-line-number="16">  </a>
+<a class="sourceLine" id="cb132-17" data-line-number="17">  <span class="kw">observeEvent</span>( input<span class="op">$</span>change , {</a>
+<a class="sourceLine" id="cb132-18" data-line-number="18">    <span class="cf">if</span> (input<span class="op">$</span>change <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb132-19" data-line-number="19">      r<span class="op">$</span>plot &lt;-<span class="st"> </span>iris</a>
+<a class="sourceLine" id="cb132-20" data-line-number="20">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb132-21" data-line-number="21">      r<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb132-22" data-line-number="22">    }</a>
+<a class="sourceLine" id="cb132-23" data-line-number="23">  })</a>
+<a class="sourceLine" id="cb132-24" data-line-number="24">  </a>
+<a class="sourceLine" id="cb132-25" data-line-number="25">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</a>
+<a class="sourceLine" id="cb132-26" data-line-number="26">    cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;Rendering plot&quot;</span>)</a>
+<a class="sourceLine" id="cb132-27" data-line-number="27">    <span class="kw">req</span>(r<span class="op">$</span>plot)</a>
+<a class="sourceLine" id="cb132-28" data-line-number="28">    <span class="kw">plot</span>(r<span class="op">$</span>plot)</a>
+<a class="sourceLine" id="cb132-29" data-line-number="29">  })</a>
+<a class="sourceLine" id="cb132-30" data-line-number="30">  </a>
+<a class="sourceLine" id="cb132-31" data-line-number="31">}</a>
+<a class="sourceLine" id="cb132-32" data-line-number="32"></a>
+<a class="sourceLine" id="cb132-33" data-line-number="33"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<div style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;" class="muted well">Shiny applications not supported in static R Markdown documents</div>
+<p>The result is the same, but the first version is shorter and easier to reason about: we have one bouton, and the behavior of the button is contained into itself.
+And, on top of being harder to maintain, the second solution redraws the plot everytime the <code>reactiveValues</code> is updated, making R compute way more than it should.</p>
+</div>
+<div id="update-inputs" class="section level4">
+<h4><span class="header-section-number">17.2.1.2</span> <code>update*</code> inputs</h4>
+<p>Almost every Shiny inputs, even the custom ones from packages, come with an <code>update</code> function that allows to change the input content from the server side, instead of recreating entirely.
+For example, here is a way to update the content of a <code>selectInput</code> from the server side:</p>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb133-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb133-2" data-line-number="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb133-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb133-4" data-line-number="4">    <span class="kw">selectInput</span>(<span class="st">&quot;species&quot;</span>, <span class="st">&quot;Species&quot;</span>, <span class="dt">choices =</span> <span class="ot">NULL</span>), </a>
+<a class="sourceLine" id="cb133-5" data-line-number="5">    <span class="kw">actionButton</span>(<span class="st">&quot;update&quot;</span>, <span class="st">&quot;Update&quot;</span>)</a>
+<a class="sourceLine" id="cb133-6" data-line-number="6">  )</a>
+<a class="sourceLine" id="cb133-7" data-line-number="7">}</a>
+<a class="sourceLine" id="cb133-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb133-9" data-line-number="9">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb133-10" data-line-number="10">  input, </a>
+<a class="sourceLine" id="cb133-11" data-line-number="11">  output, </a>
+<a class="sourceLine" id="cb133-12" data-line-number="12">  session</a>
+<a class="sourceLine" id="cb133-13" data-line-number="13">){</a>
+<a class="sourceLine" id="cb133-14" data-line-number="14">  <span class="kw">observeEvent</span>( input<span class="op">$</span>update , {</a>
+<a class="sourceLine" id="cb133-15" data-line-number="15">    spc &lt;-<span class="st"> </span><span class="kw">unique</span>(iris<span class="op">$</span>Species)</a>
+<a class="sourceLine" id="cb133-16" data-line-number="16">    <span class="kw">updateSelectInput</span>(</a>
+<a class="sourceLine" id="cb133-17" data-line-number="17">      session, </a>
+<a class="sourceLine" id="cb133-18" data-line-number="18">      <span class="st">&quot;species&quot;</span>, </a>
+<a class="sourceLine" id="cb133-19" data-line-number="19">      <span class="dt">choices =</span> spc, </a>
+<a class="sourceLine" id="cb133-20" data-line-number="20">      <span class="dt">selected =</span> spc[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb133-21" data-line-number="21">    )</a>
+<a class="sourceLine" id="cb133-22" data-line-number="22">  })</a>
+<a class="sourceLine" id="cb133-23" data-line-number="23">  </a>
+<a class="sourceLine" id="cb133-24" data-line-number="24">}</a>
+<a class="sourceLine" id="cb133-25" data-line-number="25"></a>
+<a class="sourceLine" id="cb133-26" data-line-number="26"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<div style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;" class="muted well">Shiny applications not supported in static R Markdown documents</div>
+<p>Here, this makes the code easier to reason about as the <code>selectInput</code> is where it should be: inside the UI.
+Plus, with the <code>update</code> method, we are only changing what is needed, not re-generating the whole input.</p>
+</div>
+<div id="insertui-and-removeui" class="section level4">
+<h4><span class="header-section-number">17.2.1.3</span> <code>insertUI</code> and <code>removeUI</code></h4>
+<p>Another way to dynamically change what is in the UI is with <code>insertUI()</code> and <code>removeUI()</code>.
+It’s more global than the solution we’ve seen before with setting the <code>reactiveValue</code> to <code>NULL</code> or to a value, as it allows to target a larger UI element: we can insert or remove the whole input, instead of having the DOM element present but empty.
+This technic allows to have a lighter DOM: div which are not rendered are not generated empty, they are simply not there.</p>
+<p>Two things to note concerning this method, though:</p>
+<ul>
+<li><p>Removing an element from the app will not delete the input from the input list.
+In other word, if you have <code>selectInput(&quot;x&quot;, &quot;x&quot;)</code>, and that you remove this input using <code>removeUI()</code>, you will still have <code>input$x</code> in the server.</p></li>
+<li><p>Both these functions take a <code>jQuery</code> selector to select the element in the UI.
+We will introduce these selectors in the last chapter of this book.</p></li>
+</ul>
+</div>
+</div>
+<div id="too-much-data-in-memory" class="section level3">
+<h3><span class="header-section-number">17.2.2</span> Too Much Data in Memory</h3>
+<p>If you are building a Shiny application, there is a great chance you are building it to analyse data.
+If you are dealing with large datasets, you should consider deporting the data handling and computation to an external database system: for example to an SQL database.
+Why? Because these system has been created to handle and manipulate data on disk: in other words it will allow you to perform operation on your data without having to clutter R memory with large dataset.
+For example, if you have a <code>selectInput()</code> that is used to perform a filter on a dataset, you can do that straight inside SQL.
+Well, almost any operation you can do today in <code>{dplyr}</code> would be doable with an SQL backend, and that’s the purpose of the <code>{dbplyr}</code> package: translate <code>{dplyr}</code> code into SQL.</p>
+<p>If using a database as a backend seems a little bit far-fetched to you, that’s how it’s done in most programming languages: if you are building a web app with NodeJS or Python and need to interact with data, nothing will be stored in RAM: you will be relying on an external database to store your data.</p>
+</div>
 </div>
 <div id="reading-data" class="section level2">
 <h2><span class="header-section-number">17.3</span> Reading data</h2>
