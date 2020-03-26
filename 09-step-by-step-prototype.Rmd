@@ -1,0 +1,104 @@
+# (PART) Step 2: Prototype {-}
+
+# Building an "ipsum-app" {#stepprotopype} 
+
+## Prototyping is crucial
+
+### Prototype, then polish
+
+// TODO
+
+> Prototyping first may help keep you from investing far too much time for marginal gains.
+
+http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#rule_of_optimization
+
+And yet another Rule from the Art of Unix Programming: "Rule of Optimization: Prototype before polishing. Get it working before you optimize it."
+
+
+### The "UI first" approach
+
+Now that we are set for prototyping first, where should we start? 
+
+Using what can be called a "UI first" approach when building an app is in most cases the safest way to fo. 
+And for two main reasons.
+
+#### Agreeing on specification
+
+First of all, it helps everybody involved in the application to agree on what the app is supposed to do, and once the UI is set, there should be no "surprise implementation". 
+Well, at least, this is the best way to reduce the number of changes in the app, as the sooner we have a global idea of the app the better: it is often hard to implement a core new feature once the app is 90% finished when thinking of it from the very start.
+Indeed, implementing core feature once the app is very advanced can be critical, as our application might not have been thought to work the way it now needs to work, so adding certain elements might lead to a need for change in the core architecture of the app.
+
+Once we agree on what elements there are in the app, there is no sudden “oh the app needs to do that thing now, sorry I hadn't realized that before”.
+And we can't blame the person ordering the app for not realizing everything needed: it's really hard to have a mental model of the whole app when we are reading specifications. 
+On the other hand, having a mock application with the UI really helps realising what the app is doing and how it works, and to agree with the developer that this is actually what we want our application to do. 
+
+Prototyping the UI first should require the least possible calculations from the server part of your application. 
+You focus on the appearance of the app: buttons, figures, tables, graphs... and how they interact with each other. 
+At that stage of the design process, you will not be focusing on correctness of the results or graph: you will be placing elements on the front-end so that you can be sure that everything is there, even if some buttons do not trigger anything. 
+At that point, the idea is to get the people ordering the app think about what they actually need, and there might be some question rising like "oh, where is the button to do that download that results in pdf?". 
+And now is the best moment for a change in specification. 
+
+#### Organising work
+
+A pre-defined UI allows every person involved in the coding to know which part of the app they are working on, and to be sure that you do not forget anything. 
+As you might be working on the app as a team, you will need to find a strategy for efficiently splitting the work between every coder. 
+And it’s much easier to work on a piece of the app you can visually identify and integrate in a complete app scenario. 
+In other words, it's easier to be told "you will be working on the 'Summary' panel" than "you will be working on bullet poing 45 to 78 of the specifications". 
+
+## Prototyping Shiny
+
+### Fast prototyping with `{shinipsum}`
+
+The goal of {shinipsum} is to provide random shiny elements to simulate interface outputs.
+Use `lorem`, the long "Lorem Ipsum" text to fill in text parts.
+Use the `random_*` functions in the `server` part of your application in combination with the appropriate `render*()`.
+This will fill the corresponding call to `*Output()` in the `UI`.  
+For instance:  
+
+- `random_DT()` renders a `DT::datatable()` output with one of existing R internal datasets.  
+- `random_ggplot(type = "point")` renders a random {ggplot2} graph with the selected `type` (corresponding to `geom()` in {ggplot2}).  
+- `random_text(nwords = 10)` renders a text with the defined number of words.  
+
+```r
+library(shiny)
+library(shinipsum)
+library(DT)
+ui <- fluidPage(
+  h2("A Random DT"),
+  DTOutput("data_table"),
+  h2("A Random Plot"),
+  plotOutput("plot"),
+  h2("A Random Text"),
+  tableOutput("text")
+)
+
+server <- function(input, output, session) {
+  output$data_table <- DT::renderDT({
+    random_DT(5, 5)
+  })
+  output$plot <- renderPlot({
+    random_ggplot()
+  })
+  output$text <- renderText({
+    random_text(nwords = 50)
+  })
+}
+shinyApp(ui, server)
+```
+```{r prototyping-fakir-shinipsum-1, echo=FALSE, out.width="90%"}
+knitr::include_graphics("img/shinipsum.png")
+```
+
+Find out more in the corresponding website: https://thinkr-open.github.io/shinipsum/
+
+### Using `{fakir}` for fake data generation
+
+`{fakir}` was primarily created to provide fake datasets for R tutorials and exercises. 
+"Fake support ticket dataset" is built using `fake_ticket_client()` and "Fake questionnaire on mean of transport / goal dataset" is built using `fake_sondage_answers()`.
+They contain dates, numeric and character variables, with missing values allowing multiple exercises on data cleaning and graph building. 
+They can also be joined with the included {sf} geographical dataset `fra_sf` allowing for maps creation.  
+Fake datasets created with {fakir} can be used to build light examples on the use of the inputs, for filters or interactive maps for instance. 
+When building your application inside a R package, as recommended in this book using {golem}, you may want to build small reproducible examples of your functions, to be presented in the vignettes and tested in the unit tests, prior to building the Shiny Apps itself. 
+You can create these examples using {fakir}.  
+
+Find out more in the corresponding website: https://thinkr-open.github.io/fakir/
