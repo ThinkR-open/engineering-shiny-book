@@ -1,0 +1,298 @@
+# (PART) Step 4: Strengthen {-}
+
+# Build yourself a safety net {#step-secure}
+
+> "Don't fuck over Future You"
+
+> JD 
+
+Strengthening your app means two things: testing, and locking the application environment.
+
+## Testing your app
+
+### Testing the business logic
+
+If you have been following the good practices we have listed in previous chapters, your current application has at least these two properties: 
+
++ The business-logic functions are separated from your interactive-logic functions.
++ Your application is inside a package.
+
+On top of being a sane organization approach, using this separation inside a package structure allows to leverage all the tooling that has been built for testing "standard" packages. 
+
+R developers have been developing packages for a long time, and at the time of writing these lines (February 2020), more than 15,000 packages are available on CRAN. 
+To sustain these developments, a lot of tooling has been created to secure the development process, and especially in the field of creating unit tests for your package.
+
+Unit tests are a general concept in software engineering that describes the process of writing a form of assessment of your code validity. 
+A simplified explanation is that if you write a function call `meaning_of_life` that returns `42`, you will expect this function to always return `42`, and to be alerted if ever this value changes. 
+Using unit tests is a way to secure your work in the future, be it from future you or from collaborator: if anyone comes and change the code behind `meaning_of_life` so that the result is no longer `42`, the developer working on this piece of code will be able to catch it. 
+
+There are several packages in R that can be used to implement unit testing, and you can even implement your own tests. 
+One of the most popular right now^[
+Based on the number of Reverse dependencies & suggests at https://cran.r-project.org/web/packages/testthat/index.html
+] is [`{testthat}`](https://testthat.r-lib.org/), by Hadley Wickham.
+This testing framework lets you write a series of tests and expectations, which are then launch when calling `devtools::test()`, either locally or in you CI system. 
+Here is an example of testing that the `meaning_of_life` will always be `42`.
+
+``` r
+test_that("The meaning of life is 42", {
+  expect_equal(
+    meaning_of_life(), 
+    42
+  )
+})
+```
+
+If you want to learn more about how to use `{testthat}`, you can refer to the following resources: 
+
++ [`{testthat}` online documentation](https://testthat.r-lib.org/)
+
++ [Chapter 10 Testing - R Packages](https://r-pkgs.org/tests.html)
+
++ [Part 5: Test and Code Coverage - Building a package that lasts — eRum 2018 workshop](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107)
+
+
+### Testing the interactive logic
+
+// TO DO
+
++ When it comes to testing the front end, you can try the {shinytest} package from RStudio, if you need to be sure there is no visual regression all along the project development. 
+
++ One other tool I like to use is Katalon Studio. 
+It’s not R related, and can be used with any kind of web app. 
+How it works is quite simple: it opens your browser where the Shiny app runs, and record everything that happens. 
+Once you stop the recording, you can relaunch the app and it will replay all the events it has recorded. 
+And of course, you can specify your own scenario, define your own events, etc. 
+It’s not that straightforward to use, but once you get a good grasp of how it works, it’s a very powerful tool.
+
+### Testing the app load
+
+// TODO
+
+{shinyloadtest}, on the other hand, tests how an application behaves when one, two, three, twenty, one hundred users connect to the app, and gives you a visual report about the connection and response time of each session.
+
+## A reproducible environment
+
+One of the challenges of building an app that needs to be sent to production is that you will need to work in a reproducible environment. 
+What does that mean?
+That you are building an application that is to be deployed in another "computer" than yours. 
+Indeed, once your app is built, there are few chances that you will launch it on your computer and that external user will connect to your computer. 
+What will happen is that you will either give your user a package (which will be the simplest way to share it: bundle the app into a package, then let people install it either manually or from a package repository), or a url where they can connect and use your app. 
+
+In that second case, you will have to think about how you can create your app in a reproducible environment: in other words, be sure that the app is deployed under the same configuration as your local application—R version, package versions, system requirements, environment variables...
+
+To achieve that, we will introduce you to two tools to do that: `{renv}`, and Docker.
+
+### {renv} 
+
+#### About {renv} 
+
+How do we make sure the package versions we have installed on our machine stays the same in the production environment? 
+And also, how can we be sure that, working as a team, we'll be able to work together using the same package version? 
+
+From one version to another, functions and behaviors change. 
+Most of the time, new version means new functions, and new features. 
+But from time to time, a new version means breaking changes. 
+And of course, catching that these new versions cause breaking changes can be hard to catch: either because we do not realize that the version is different, or because debugging the error is difficult, especially in Shiny where the trace-back is very deep. 
+For example, here is an error from a real life error when pushing an app on a shiny-server: 
+
+``` bash
+root@westeros-vm:/var/log/shiny-server# cat thewall(...).log
+ *** caught segfault ***
+  [...]
+address 0x5100004d, cause 'memory not mapped'
+
+Traceback:
+ 1: rcpp_sf_to_geojson(sf, digits, factors_as_string)
+ 2: sf_geojson.sf(data)
+ 3: geojsonsf::sf_geojson(data)
+ 4: addGlifyPolygons(., data = pol_V1, color = les_couleurs, popup = "val", opacity = 1)
+ 5: function_list[[i]](value)
+ 6: freduce(value, `_function_list`)
+ 7: `_fseq`(`_lhs`)
+ 8: eval(quote(`_fseq`(`_lhs`)), env, env)
+  [...]
+105: captureStackTraces({    while (!.globals$stopped) {        ..stacktracefloor..(serviceApp())        Sys.sleep(0.001)    }})
+106: ..stacktraceoff..(captureStackTraces({    while (!.globals$stopped) {        ..stacktracefloor..(serviceApp())        Sys.sleep(0.001)    }}))
+107: runApp(Sys.getenv("SHINY_APP"), port = port, launch.browser = FALSE)
+An irrecoverable exception occurred. R is aborting now ...
+```
+
+Pretty hard to debug, isn't it? 
+So, what has actually happened? 
+It turned out that the package version from `{geojsonsf}` was `1.2.1`, and the one on the Shiny server was `1.3.0`. 
+And there was a breaking change in the package. 
+
+![](img/geojson.png)
+
+The same thing could have happen if working as a team: one of the computer has an old version, when another one has updated to a more recent one. 
+How do we prevent that? 
+This is where the `{renv}` package comes into play: this package allows to have a project-based library, instead of a global one. 
+In other words, instead of having a library that is global to your machine, `{renv}` allows to specify packages with fixed version for a project. 
+That means that you can have `{geojsonsf}` version `1.2.1` in one of your project, and the `1.3.0` in another, with the two not conflicting with each other. 
+
+#### Using {renv} 
+
+> Underlying the philosophy of renv is that any of your existing workflows should just work as they did before
+
+`r right_link("Introduction to renv", "https://rstudio.github.io/renv/articles/renv.html")`
+
+The first thing to do with `{renv}` is initiating it with the `init()` function. 
+
+```{r eval = FALSE}
+renv::init()
+```
+
+
+```{r eval = FALSE}
+renv::init(here::here("golex"), restart = FALSE)
+```
+
+What this does is initiating a new `Lockfile` inside your project, listing the packages versions and linking it to your computer cache.
+Note that these packages can come from CRAN, Bioconductor, GitHub, Gitlab, 
+Bitbucket, and even local repositories.
+
+And now, when you need a new package, you will need to install it in your local library.
+The fastest way to install new packages is by using the `install.packages` function, which is shimmed by `{renv}`. 
+This shim will search into the local cache to see if the package has already been cached.
+
+```{r eval = FALSE}
+install.packages("dplyr")
+```
+
+```{r eval = FALSE}
+withr::with_dir(
+  "golex", {
+    install.packages("dplyr")
+  }
+)
+```
+
+Once you want to update your `{renv}` `Lockfile`, call `snapshot()`
+
+```{r eval = FALSE}
+renv::snapshot()
+```
+
+
+```{r eval = FALSE}
+renv::snapshot(here::here("golex"), restart = FALSE)
+```
+
+And now that you have a reproducible `{renv}` library, what is next? 
+Of course, if you are either working as a team or deploying to a server, you will have to restore the state of your project, which is now living somewhere else, inside your current project / deployment. 
+And to do that, the function to call is `env::restore()`, which will update your local project with the dependencies listed inside your `Lockfile`. 
+
+So, to sum up, here are the step to follow: 
+
++ Init the project with `renv::init()`
++ Install / remove packages 
++ Take a `snapshot()` of the state of your project 
++ `restore()` the state of your project using the `Lockfile`
+
+Of course, `renv::restore()` comes with another superpower: time travelling! 
+If you work on a project and decide to update a package you have been using, and realize that this package makes the application crash (for example, as the update to `{geojsonsf}` made our application crash), you can go back in time to a previous version of your library by calling the `restore()` function. 
+
+There are more things you can do with `{renv}`. 
+If you want to know more, feel free to refer to the [official website](https://rstudio.github.io/renv).
+
+### Docker 
+
+#### R, Docker, Shiny
+
+Docker is a program that allows to download, install, create, launch and stop multiple operating systems, called containers, on a machine, which will be called the host.
+This host can be your local computer, or the server where you are deploying your application. 
+
+Docker was designed for enclosing software environments inside an image that can later be launch. 
+The general idea is that with Docker, you're defining in a `Dockerfile` all the "rules" that are used to create a given environment, and then you can use this file (and the linked files, for example the R package containing your app) to deploy your application on any giver server that can run Docker. 
+That way, if the `Dockerfile` can compile on your machine and if you can run it, it should work everywhere (of course, it's a little bit more complex than that, but you have got the idea). 
+
+So, why Docker in the context of Shiny apps? 
+Because Docker allows you to abstract away the complexity of managing multiple versions of R and multiple version of the same package, or even different versions of the same system requirement. 
+By using Docker for your deployment, you can build and deploy an application with the very same version of packages and R as the one from your computer. 
+That way, if your are building your application with an older version of `{shiny}`, you are sure that sending it to production won't break everything: the version inside the Docker is the same as the one from your machine. 
+And later, if you update `{shiny}` and start a new project, you can deploy your app with another version of the package. 
+Same goes for your version of R. 
+
+#### Building a Dockerfile for your app
+
+Good news! 
+If you are building your app with `{golem}`, the creation of the `Dockerfile` is just one function away! 
+If you have a look at the `03_deploy.R` file in the `dev` folder, you will find a series of functions that can create the `Dockerfile` for your project. 
+
+Let's take some time to understand what this file contains, or how we could be building it from scratch.
+
+
+1. `FROM`
+
+```{r echo = FALSE}
+readLines("Dockerfile")[1] %>% 
+  glue::as_glue()
+```
+
+This line defines what version of R to use for deploying your application. 
+This `FROM` line is the one that sets an image to start from: you rarely (if ever) build a Docker image from nothing, but instead you use an existing image on top of which you build your own image.
+Here, we choose one of the [r-ver](https://hub.docker.com/r/rocker/r-ver/) docker images, based on the output of:
+
+```{r}
+R.Version()$version.string
+```
+
+2. `RUN`
+
+The `RUN` calls in the file refers to bash calls we are making to build the image. 
+For example, the second line of the `Dockerfile` installs all the system requirements needed to your application.
+
+```{r echo = FALSE}
+readLines("Dockerfile")[2] %>% 
+  glue::as_glue()
+```
+
+In the subsequent `RUN` calls, we are using `remotes::install_version()` to be sure we install the version that matches the one from your machine. 
+
+```{r echo = FALSE}
+readLines("Dockerfile")[6] %>% 
+  glue::as_glue()
+```
+
+As you can see, it matches the local version: 
+
+```{r}
+packageVersion("config")
+```
+
+3. `ADD`
+
+This Docker entry takes a folder or a file, and copies it inside the image. 
+With `{golem}`, we are adding the current project, containing the app, to a folder called `/build_zone`. 
+
+```{r echo = FALSE}
+readLines("Dockerfile")[13] %>% 
+  glue::as_glue()
+```
+
+4. `EXPOSE`
+
+This command defines which port of the container will be available from the outside of the container.
+
+```{r echo = FALSE}
+readLines("Dockerfile")[16] %>% 
+  glue::as_glue()
+```
+
+5. `CMD`
+
+This final command is the one that is launched when you run a container. 
+With a `{shiny}` app, this command is the one that launches the application.  
+
+```{r echo = FALSE}
+readLines("Dockerfile")[16] %>% 
+  glue::as_glue()
+```
+
+#### Read more about Docker 
+
++ [An Introduction to Docker for R Users](https://colinfay.me/docker-r-reproducibility/)
+
++ [An Introduction to Rocker: Docker Containers for R](https://journal.r-project.org/archive/2017/RJ-2017-065/RJ-2017-065.pdf)
+
++ [The Rockerverse: Packages and Applications for Containerization with R](https://arxiv.org/abs/2001.10641)
