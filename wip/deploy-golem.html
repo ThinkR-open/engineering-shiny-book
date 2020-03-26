@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 15 Deploy with {golem} | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="Chapter 15 Deploy with {golem} | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 15 Deploy with {golem} | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Vincent Guyader, Cervan Girard, Sébastien Rochette" />
 
 
-<meta name="date" content="2020-03-02" />
+<meta name="date" content="2020-03-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -432,21 +432,46 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="deploy-golem" class="section level1">
 <h1><span class="header-section-number">Chapter 15</span> Deploy with <code>{golem}</code></h1>
+<p>It is essential to visualize its application very regularly during the development phase, and if possible under the same conditions as the production phase.</p>
 <div id="local-deployment-1" class="section level2">
 <h2><span class="header-section-number">15.1</span> Local deployment</h2>
-<p>// TODO</p>
+<p>A shiny application built from golem is <em>by definition</em> encapsulated as an R package. To install your application on a computer with R, you “just” need to install the package you built.
+From Rstudio in the project corresponding to the golem you built, the instruction <code>remotes::install_local()</code> will install your package on your computer. This corresponds to clicking on Build &gt; Install Restart in the IDE.
+To install your package on another computer, in a more conventional way, you will need to create a bundled version of you package. To do this <code>devtools:build()</code> will generate a .tar.gz file like <code>mygolem_0.0.1.tar.gz</code> you can share with others.</p>
 </div>
 <div id="deploying-apps-with-golem" class="section level2">
 <h2><span class="header-section-number">15.2</span> Deploying Apps with <code>{golem}</code></h2>
 <p>The <code>dev/03_deploy.R</code> file contains function for deploying on various plateforms.</p>
+<p>they are two main way to deploy a shiny app:
++ the Rstudio’s solutions
++ the docker based solutions</p>
 </div>
 <div id="rstudio-environments" class="section level2">
 <h2><span class="header-section-number">15.3</span> RStudio Environments</h2>
-<p>// TODO</p>
+<p>Rstudio propose 3 ways to deploy your shiny application, you can use :
++ shinyapps.io, this website will host your application
++ Shiny server is a software you have to install on your own server
++ Rstudio connect is a convenient way to deploy your application simply by clickin on the “blue button” from your Rstudio IDE. Rstudio connect is a software you have to install on your own server</p>
+<p>This 3 functions are respectivly dedicated to deploy on each solution</p>
+<p>golem::add_rstudioconnect_file()
+golem::add_shinyappsio_file()
+golem::add_shinyserver_file()</p>
+<p>This function create an <code>app.R</code> file you can use to deploy your app.</p>
 </div>
 <div id="docker" class="section level2">
 <h2><span class="header-section-number">15.4</span> Docker</h2>
-<p>// TODO</p>
+<p>Docker is an open source and mainly free software that allows you to easily launch applications in software containers. Docker has become an essential solution in the devops world and a lots of solution are based on it.</p>
+<p>To enjoy Docker, you can use the golem::add_dockerfile() function this will create a file called <code>Dockerfile</code> this is the recepie of a docker image that contains every instruction needed to run your application. It’s mimic your developpement context ( R version, R package version…), and this allow you to create docker containers with your application.</p>
+<p>One one the famous way to deploy shiny app using docker is to use ShinProxy, ShinyProxy is an open source solution wich will launch a new container for eahc new shiny user.</p>
+<p>to have a shinyproxy-ready docker image, use the golem:add_dockerfile_shinyproxy().
+Heroku is another platform to deploy your application, if you use this you can use golem::add_dockerfile_heroku()</p>
+<p>this 3 functions contains somes parameters to tweak the Dockerfile you create. by default it use the sysreqs api (on sysreqs.r-hub.io) to detect the system dependencies needed to install R packag</p>
+<p>Ressources :</p>
+<ul>
+<li><a href="https://docs.docker.com/get-started/" class="uri">https://docs.docker.com/get-started/</a></li>
+<li><a href="https://www.shinyproxy.io/" class="uri">https://www.shinyproxy.io/</a></li>
+<li><a href="https://www.heroku.com/" class="uri">https://www.heroku.com/</a></li>
+</ul>
 
 </div>
 </div>

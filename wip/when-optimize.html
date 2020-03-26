@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 16 The Need for Optimization | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="Chapter 16 The Need for Optimization | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 16 The Need for Optimization | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Vincent Guyader, Cervan Girard, Sébastien Rochette" />
 
 
-<meta name="date" content="2020-03-02" />
+<meta name="date" content="2020-03-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -475,28 +475,28 @@ So think about it: is local optimization worth the extra hours you’ll have to 
 Of course, the C++ function is faster than the R one—this is the very reason of using C++ with R.
 Though, how much faster is worth the trade-off of being sure you’ll get someone in your team to take over the maintenance if needed?
 Using external languages or complex data structures implies that from the start, you’ll need to think about who and how your code base will be maintain over the years.</p>
-<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb120-1" data-line-number="1"><span class="kw">library</span>(<span class="st">&quot;Rcpp&quot;</span>)</a>
-<a class="sourceLine" id="cb120-2" data-line-number="2"><span class="kw">cppFunction</span>(<span class="st">&quot;</span></a>
-<a class="sourceLine" id="cb120-3" data-line-number="3"><span class="st">double mean_cpp(NumericVector x) {</span></a>
-<a class="sourceLine" id="cb120-4" data-line-number="4"><span class="st">  int j;</span></a>
-<a class="sourceLine" id="cb120-5" data-line-number="5"><span class="st">  int size = x.size();</span></a>
-<a class="sourceLine" id="cb120-6" data-line-number="6"><span class="st">  double res = 0;</span></a>
-<a class="sourceLine" id="cb120-7" data-line-number="7"><span class="st">  for (j = 0; j &lt; size; j++){</span></a>
-<a class="sourceLine" id="cb120-8" data-line-number="8"><span class="st">    res = res + x[j];</span></a>
-<a class="sourceLine" id="cb120-9" data-line-number="9"><span class="st">  }</span></a>
-<a class="sourceLine" id="cb120-10" data-line-number="10"><span class="st">  return res / size;</span></a>
-<a class="sourceLine" id="cb120-11" data-line-number="11"><span class="st">}&quot;</span>)</a>
-<a class="sourceLine" id="cb120-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb120-13" data-line-number="13">bench<span class="op">::</span><span class="kw">mark</span>(</a>
-<a class="sourceLine" id="cb120-14" data-line-number="14">  <span class="dt">cpp =</span> <span class="kw">mean_cpp</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>),</a>
-<a class="sourceLine" id="cb120-15" data-line-number="15">  <span class="dt">native =</span> <span class="kw">mean</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>), </a>
-<a class="sourceLine" id="cb120-16" data-line-number="16">  <span class="dt">iterations =</span> <span class="dv">1000</span></a>
-<a class="sourceLine" id="cb120-17" data-line-number="17">)</a></code></pre></div>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1"><span class="kw">library</span>(<span class="st">&quot;Rcpp&quot;</span>)</a>
+<a class="sourceLine" id="cb119-2" data-line-number="2"><span class="kw">cppFunction</span>(<span class="st">&quot;</span></a>
+<a class="sourceLine" id="cb119-3" data-line-number="3"><span class="st">double mean_cpp(NumericVector x) {</span></a>
+<a class="sourceLine" id="cb119-4" data-line-number="4"><span class="st">  int j;</span></a>
+<a class="sourceLine" id="cb119-5" data-line-number="5"><span class="st">  int size = x.size();</span></a>
+<a class="sourceLine" id="cb119-6" data-line-number="6"><span class="st">  double res = 0;</span></a>
+<a class="sourceLine" id="cb119-7" data-line-number="7"><span class="st">  for (j = 0; j &lt; size; j++){</span></a>
+<a class="sourceLine" id="cb119-8" data-line-number="8"><span class="st">    res = res + x[j];</span></a>
+<a class="sourceLine" id="cb119-9" data-line-number="9"><span class="st">  }</span></a>
+<a class="sourceLine" id="cb119-10" data-line-number="10"><span class="st">  return res / size;</span></a>
+<a class="sourceLine" id="cb119-11" data-line-number="11"><span class="st">}&quot;</span>)</a>
+<a class="sourceLine" id="cb119-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb119-13" data-line-number="13">bench<span class="op">::</span><span class="kw">mark</span>(</a>
+<a class="sourceLine" id="cb119-14" data-line-number="14">  <span class="dt">cpp =</span> <span class="kw">mean_cpp</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>),</a>
+<a class="sourceLine" id="cb119-15" data-line-number="15">  <span class="dt">native =</span> <span class="kw">mean</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>), </a>
+<a class="sourceLine" id="cb119-16" data-line-number="16">  <span class="dt">iterations =</span> <span class="dv">1000</span></a>
+<a class="sourceLine" id="cb119-17" data-line-number="17">)</a></code></pre></div>
 <pre><code># A tibble: 2 x 6
   expression    min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:&gt; &lt;bch:&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 cpp         1.9µs 2.81µs   253424.    3.32KB        0
-2 native      2.9µs 3.73µs   248116.   22.76KB        0</code></pre>
+1 cpp         2.3µs 3.52µs   200510.    3.32KB     201.
+2 native     3.56µs 4.72µs   205225.   22.76KB       0 </code></pre>
 <p>(Note: we’ll come back on <code>bench::mark</code> in the next chapter)</p>
 <p>So, to sum up, there are three ways to optimize your application &amp; R code, and the bad news is that you’ can’t optimize for all of them:</p>
 <ul>
@@ -526,27 +526,27 @@ That way, you can spot the bottleneck of your function, a task which would have 
 </div>
 <p>Using a tool like <code>{profvis}</code> allows to have a details view of what takes a long time to run in your R code.
 Here is how it works:</p>
-<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb122-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
-<a class="sourceLine" id="cb122-2" data-line-number="2">  profvis<span class="op">::</span><span class="kw">pause</span>(<span class="fl">0.1</span>)</a>
-<a class="sourceLine" id="cb122-3" data-line-number="3">  <span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="cf">function</span>(x){</a>
-<a class="sourceLine" id="cb122-4" data-line-number="4">    x <span class="op">*</span><span class="st"> </span><span class="dv">10</span></a>
-<a class="sourceLine" id="cb122-5" data-line-number="5">  })</a>
-<a class="sourceLine" id="cb122-6" data-line-number="6">  <span class="kw">y</span>()</a>
-<a class="sourceLine" id="cb122-7" data-line-number="7">}</a>
-<a class="sourceLine" id="cb122-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb122-9" data-line-number="9">y &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
-<a class="sourceLine" id="cb122-10" data-line-number="10">  profvis<span class="op">::</span><span class="kw">pause</span>(<span class="fl">0.2</span>)</a>
-<a class="sourceLine" id="cb122-11" data-line-number="11">  <span class="fl">1e4</span> <span class="op">*</span><span class="st"> </span><span class="dv">9</span></a>
-<a class="sourceLine" id="cb122-12" data-line-number="12">  <span class="kw">z</span>()</a>
-<a class="sourceLine" id="cb122-13" data-line-number="13">}</a>
-<a class="sourceLine" id="cb122-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb122-15" data-line-number="15">z &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
-<a class="sourceLine" id="cb122-16" data-line-number="16">  profvis<span class="op">::</span><span class="kw">pause</span>(<span class="fl">0.3</span>)</a>
-<a class="sourceLine" id="cb122-17" data-line-number="17">  <span class="kw">print</span>(<span class="st">&quot;hey&quot;</span>)</a>
-<a class="sourceLine" id="cb122-18" data-line-number="18">}</a>
-<a class="sourceLine" id="cb122-19" data-line-number="19">profvis<span class="op">::</span><span class="kw">profvis</span>({</a>
-<a class="sourceLine" id="cb122-20" data-line-number="20">  <span class="kw">x</span>()</a>
-<a class="sourceLine" id="cb122-21" data-line-number="21">})</a></code></pre></div>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb121-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb121-2" data-line-number="2">  profvis<span class="op">::</span><span class="kw">pause</span>(<span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb121-3" data-line-number="3">  <span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="cf">function</span>(x){</a>
+<a class="sourceLine" id="cb121-4" data-line-number="4">    x <span class="op">*</span><span class="st"> </span><span class="dv">10</span></a>
+<a class="sourceLine" id="cb121-5" data-line-number="5">  })</a>
+<a class="sourceLine" id="cb121-6" data-line-number="6">  <span class="kw">y</span>()</a>
+<a class="sourceLine" id="cb121-7" data-line-number="7">}</a>
+<a class="sourceLine" id="cb121-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb121-9" data-line-number="9">y &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb121-10" data-line-number="10">  profvis<span class="op">::</span><span class="kw">pause</span>(<span class="fl">0.2</span>)</a>
+<a class="sourceLine" id="cb121-11" data-line-number="11">  <span class="fl">1e4</span> <span class="op">*</span><span class="st"> </span><span class="dv">9</span></a>
+<a class="sourceLine" id="cb121-12" data-line-number="12">  <span class="kw">z</span>()</a>
+<a class="sourceLine" id="cb121-13" data-line-number="13">}</a>
+<a class="sourceLine" id="cb121-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb121-15" data-line-number="15">z &lt;-<span class="st"> </span><span class="cf">function</span>(){</a>
+<a class="sourceLine" id="cb121-16" data-line-number="16">  profvis<span class="op">::</span><span class="kw">pause</span>(<span class="fl">0.3</span>)</a>
+<a class="sourceLine" id="cb121-17" data-line-number="17">  <span class="kw">print</span>(<span class="st">&quot;hey&quot;</span>)</a>
+<a class="sourceLine" id="cb121-18" data-line-number="18">}</a>
+<a class="sourceLine" id="cb121-19" data-line-number="19">profvis<span class="op">::</span><span class="kw">profvis</span>({</a>
+<a class="sourceLine" id="cb121-20" data-line-number="20">  <span class="kw">x</span>()</a>
+<a class="sourceLine" id="cb121-21" data-line-number="21">})</a></code></pre></div>
 <p><img src="img/profviz_out.png" /></p>
 <p>What you see now is what is called a <code>flame graph</code>: it’s a detailled timing of how your function has run.
 What you see on top is the expression evaluated, and on the bottom a detail of the call stack, with what looks like a Gantt diagram.
@@ -569,26 +569,26 @@ One thing that can be done is to keep an RMarkdown file with your starting point
 By using an Rmd, you can also document the strategies you’ve been using to optimize the code: “switched from for loop to vectorize function”, “changed from x to y”, etc.</p>
 <p>And of course, you will need to time things.
 To do that, you can use the <code>{bench}</code> package, which compares the execution time (and other metrics) of two functions.</p>
-<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb123-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="cf">function</span>(size){</a>
-<a class="sourceLine" id="cb123-2" data-line-number="2">  res &lt;-<span class="st"> </span><span class="kw">numeric</span>(size)</a>
-<a class="sourceLine" id="cb123-3" data-line-number="3">  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>size){</a>
-<a class="sourceLine" id="cb123-4" data-line-number="4">    res[i] &lt;-<span class="st"> </span>i <span class="op">*</span><span class="st"> </span><span class="dv">10</span></a>
-<a class="sourceLine" id="cb123-5" data-line-number="5">  }</a>
-<a class="sourceLine" id="cb123-6" data-line-number="6">  <span class="kw">return</span>(res)</a>
-<a class="sourceLine" id="cb123-7" data-line-number="7">}</a>
-<a class="sourceLine" id="cb123-8" data-line-number="8">y &lt;-<span class="st"> </span><span class="cf">function</span>(size){</a>
-<a class="sourceLine" id="cb123-9" data-line-number="9">  (<span class="dv">1</span><span class="op">:</span>size) <span class="op">*</span><span class="st"> </span><span class="dv">10</span></a>
-<a class="sourceLine" id="cb123-10" data-line-number="10">}</a>
-<a class="sourceLine" id="cb123-11" data-line-number="11">bench<span class="op">::</span><span class="kw">mark</span>(</a>
-<a class="sourceLine" id="cb123-12" data-line-number="12">  <span class="st">`</span><span class="dt">for</span><span class="st">`</span> =<span class="st"> </span><span class="kw">x</span>(<span class="dv">1000</span>), </a>
-<a class="sourceLine" id="cb123-13" data-line-number="13">  <span class="dt">vectorized =</span> <span class="kw">y</span>(<span class="dv">1000</span>), </a>
-<a class="sourceLine" id="cb123-14" data-line-number="14">  <span class="dt">iterations =</span> <span class="dv">1000</span></a>
-<a class="sourceLine" id="cb123-15" data-line-number="15">)</a></code></pre></div>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb122-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="cf">function</span>(size){</a>
+<a class="sourceLine" id="cb122-2" data-line-number="2">  res &lt;-<span class="st"> </span><span class="kw">numeric</span>(size)</a>
+<a class="sourceLine" id="cb122-3" data-line-number="3">  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>size){</a>
+<a class="sourceLine" id="cb122-4" data-line-number="4">    res[i] &lt;-<span class="st"> </span>i <span class="op">*</span><span class="st"> </span><span class="dv">10</span></a>
+<a class="sourceLine" id="cb122-5" data-line-number="5">  }</a>
+<a class="sourceLine" id="cb122-6" data-line-number="6">  <span class="kw">return</span>(res)</a>
+<a class="sourceLine" id="cb122-7" data-line-number="7">}</a>
+<a class="sourceLine" id="cb122-8" data-line-number="8">y &lt;-<span class="st"> </span><span class="cf">function</span>(size){</a>
+<a class="sourceLine" id="cb122-9" data-line-number="9">  (<span class="dv">1</span><span class="op">:</span>size) <span class="op">*</span><span class="st"> </span><span class="dv">10</span></a>
+<a class="sourceLine" id="cb122-10" data-line-number="10">}</a>
+<a class="sourceLine" id="cb122-11" data-line-number="11">bench<span class="op">::</span><span class="kw">mark</span>(</a>
+<a class="sourceLine" id="cb122-12" data-line-number="12">  <span class="st">`</span><span class="dt">for</span><span class="st">`</span> =<span class="st"> </span><span class="kw">x</span>(<span class="dv">1000</span>), </a>
+<a class="sourceLine" id="cb122-13" data-line-number="13">  <span class="dt">vectorized =</span> <span class="kw">y</span>(<span class="dv">1000</span>), </a>
+<a class="sourceLine" id="cb122-14" data-line-number="14">  <span class="dt">iterations =</span> <span class="dv">1000</span></a>
+<a class="sourceLine" id="cb122-15" data-line-number="15">)</a></code></pre></div>
 <pre><code># A tibble: 2 x 6
   expression     min  median `itr/sec` mem_alloc
   &lt;bch:expr&gt; &lt;bch:t&gt; &lt;bch:t&gt;     &lt;dbl&gt; &lt;bch:byt&gt;
-1 for        43.62µs 45.83µs    21519.   298.9KB
-2 vectorized  3.57µs  6.47µs   124411.    11.8KB
+1 for        50.09µs  52.4µs    18830.   298.9KB
+2 vectorized  3.67µs  6.99µs   109811.    11.8KB
 # … with 1 more variable: `gc/sec` &lt;dbl&gt;</code></pre>
 <p>Here, we have an empiric evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest.
 And, bonus point, <code>{bench}</code> takes time to check that the two outputs are the same, so that you’re sure that you’re not comparing apple and oranges!</p>

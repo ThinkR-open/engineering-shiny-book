@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 18 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="Chapter 18 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 18 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Vincent Guyader, Cervan Girard, Sébastien Rochette" />
 
 
-<meta name="date" content="2020-03-02" />
+<meta name="date" content="2020-03-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -464,68 +464,68 @@ Same goes for queries to a database: if a query is done with the same parameters
 They both more or less work the same way: you’ll call a memoization function on another function, and cache is created for this function.
 Then everytime you call this function again with the same parameters, the cache is returned instead of computing again.
 Here is a simple example with <code>{memoise}</code>:</p>
-<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb134-1" data-line-number="1"><span class="kw">library</span>(memoise)</a>
-<a class="sourceLine" id="cb134-2" data-line-number="2"><span class="kw">library</span>(tictoc)</a>
-<a class="sourceLine" id="cb134-3" data-line-number="3">fct &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">sleep =</span> <span class="dv">1</span>){</a>
-<a class="sourceLine" id="cb134-4" data-line-number="4">  <span class="kw">Sys.sleep</span>(sleep)</a>
-<a class="sourceLine" id="cb134-5" data-line-number="5">  <span class="kw">return</span>(<span class="kw">Sys.time</span>())</a>
-<a class="sourceLine" id="cb134-6" data-line-number="6">}</a>
-<a class="sourceLine" id="cb134-7" data-line-number="7">mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct)</a>
-<a class="sourceLine" id="cb134-8" data-line-number="8"><span class="kw">tic</span>()</a>
-<a class="sourceLine" id="cb134-9" data-line-number="9"><span class="kw">mfct</span>(<span class="dv">2</span>)</a></code></pre></div>
-<pre><code>[1] &quot;2020-03-02 22:03:43 UTC&quot;</code></pre>
-<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb136-1" data-line-number="1"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>2.005 sec elapsed</code></pre>
-<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb138-1" data-line-number="1"><span class="kw">tic</span>()</a>
-<a class="sourceLine" id="cb138-2" data-line-number="2"><span class="kw">mfct</span>(<span class="dv">2</span>)</a></code></pre></div>
-<pre><code>[1] &quot;2020-03-02 22:03:43 UTC&quot;</code></pre>
-<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb140-1" data-line-number="1"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>0.032 sec elapsed</code></pre>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb133-1" data-line-number="1"><span class="kw">library</span>(memoise)</a>
+<a class="sourceLine" id="cb133-2" data-line-number="2"><span class="kw">library</span>(tictoc)</a>
+<a class="sourceLine" id="cb133-3" data-line-number="3">fct &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">sleep =</span> <span class="dv">1</span>){</a>
+<a class="sourceLine" id="cb133-4" data-line-number="4">  <span class="kw">Sys.sleep</span>(sleep)</a>
+<a class="sourceLine" id="cb133-5" data-line-number="5">  <span class="kw">return</span>(<span class="kw">Sys.time</span>())</a>
+<a class="sourceLine" id="cb133-6" data-line-number="6">}</a>
+<a class="sourceLine" id="cb133-7" data-line-number="7">mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct)</a>
+<a class="sourceLine" id="cb133-8" data-line-number="8"><span class="kw">tic</span>()</a>
+<a class="sourceLine" id="cb133-9" data-line-number="9"><span class="kw">mfct</span>(<span class="dv">2</span>)</a></code></pre></div>
+<pre><code>[1] &quot;2020-03-26 08:59:12 UTC&quot;</code></pre>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb135-1" data-line-number="1"><span class="kw">toc</span>()</a></code></pre></div>
+<pre><code>2.006 sec elapsed</code></pre>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb137-1" data-line-number="1"><span class="kw">tic</span>()</a>
+<a class="sourceLine" id="cb137-2" data-line-number="2"><span class="kw">mfct</span>(<span class="dv">2</span>)</a></code></pre></div>
+<pre><code>[1] &quot;2020-03-26 08:59:12 UTC&quot;</code></pre>
+<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb139-1" data-line-number="1"><span class="kw">toc</span>()</a></code></pre></div>
+<pre><code>0.019 sec elapsed</code></pre>
 <p>Let’s try with another example that might look more like what we can find in a Shiny App: connecting to a database</p>
-<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb142-1" data-line-number="1">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</a>
-<a class="sourceLine" id="cb142-2" data-line-number="2">  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </a>
-<a class="sourceLine" id="cb142-3" data-line-number="3">  <span class="dt">dbname =</span> <span class="st">&quot;:memory:&quot;</span></a>
-<a class="sourceLine" id="cb142-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb142-5" data-line-number="5">DBI<span class="op">::</span><span class="kw">dbWriteTable</span>(</a>
-<a class="sourceLine" id="cb142-6" data-line-number="6">  con, </a>
-<a class="sourceLine" id="cb142-7" data-line-number="7">  <span class="st">&quot;diams&quot;</span>, </a>
-<a class="sourceLine" id="cb142-8" data-line-number="8">  dplyr<span class="op">::</span><span class="kw">bind_rows</span>(</a>
-<a class="sourceLine" id="cb142-9" data-line-number="9">    purrr<span class="op">::</span><span class="kw">rerun</span>(<span class="dv">10</span>, ggplot2<span class="op">::</span>diamonds)</a>
-<a class="sourceLine" id="cb142-10" data-line-number="10">  )</a>
-<a class="sourceLine" id="cb142-11" data-line-number="11">)</a>
-<a class="sourceLine" id="cb142-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb142-13" data-line-number="13">fct_sql &lt;-<span class="st"> </span><span class="cf">function</span>(SQL, con){</a>
-<a class="sourceLine" id="cb142-14" data-line-number="14">  DBI<span class="op">::</span><span class="kw">dbGetQuery</span>(</a>
-<a class="sourceLine" id="cb142-15" data-line-number="15">    con, SQL</a>
-<a class="sourceLine" id="cb142-16" data-line-number="16">  ) </a>
-<a class="sourceLine" id="cb142-17" data-line-number="17">}</a>
-<a class="sourceLine" id="cb142-18" data-line-number="18">mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql)</a>
-<a class="sourceLine" id="cb142-19" data-line-number="19"><span class="kw">tic</span>()</a>
-<a class="sourceLine" id="cb142-20" data-line-number="20">res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
-<a class="sourceLine" id="cb142-21" data-line-number="21"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>0.413 sec elapsed</code></pre>
-<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb144-1" data-line-number="1"><span class="kw">tic</span>()</a>
-<a class="sourceLine" id="cb144-2" data-line-number="2">res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
-<a class="sourceLine" id="cb144-3" data-line-number="3"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>0.017 sec elapsed</code></pre>
-<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb146-1" data-line-number="1"><span class="kw">all.equal</span>(res_a, res_b)</a></code></pre></div>
+<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb141-1" data-line-number="1">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</a>
+<a class="sourceLine" id="cb141-2" data-line-number="2">  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </a>
+<a class="sourceLine" id="cb141-3" data-line-number="3">  <span class="dt">dbname =</span> <span class="st">&quot;:memory:&quot;</span></a>
+<a class="sourceLine" id="cb141-4" data-line-number="4">)</a>
+<a class="sourceLine" id="cb141-5" data-line-number="5">DBI<span class="op">::</span><span class="kw">dbWriteTable</span>(</a>
+<a class="sourceLine" id="cb141-6" data-line-number="6">  con, </a>
+<a class="sourceLine" id="cb141-7" data-line-number="7">  <span class="st">&quot;diams&quot;</span>, </a>
+<a class="sourceLine" id="cb141-8" data-line-number="8">  dplyr<span class="op">::</span><span class="kw">bind_rows</span>(</a>
+<a class="sourceLine" id="cb141-9" data-line-number="9">    purrr<span class="op">::</span><span class="kw">rerun</span>(<span class="dv">10</span>, ggplot2<span class="op">::</span>diamonds)</a>
+<a class="sourceLine" id="cb141-10" data-line-number="10">  )</a>
+<a class="sourceLine" id="cb141-11" data-line-number="11">)</a>
+<a class="sourceLine" id="cb141-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb141-13" data-line-number="13">fct_sql &lt;-<span class="st"> </span><span class="cf">function</span>(SQL, con){</a>
+<a class="sourceLine" id="cb141-14" data-line-number="14">  DBI<span class="op">::</span><span class="kw">dbGetQuery</span>(</a>
+<a class="sourceLine" id="cb141-15" data-line-number="15">    con, SQL</a>
+<a class="sourceLine" id="cb141-16" data-line-number="16">  ) </a>
+<a class="sourceLine" id="cb141-17" data-line-number="17">}</a>
+<a class="sourceLine" id="cb141-18" data-line-number="18">mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql)</a>
+<a class="sourceLine" id="cb141-19" data-line-number="19"><span class="kw">tic</span>()</a>
+<a class="sourceLine" id="cb141-20" data-line-number="20">res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
+<a class="sourceLine" id="cb141-21" data-line-number="21"><span class="kw">toc</span>()</a></code></pre></div>
+<pre><code>0.575 sec elapsed</code></pre>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb143-1" data-line-number="1"><span class="kw">tic</span>()</a>
+<a class="sourceLine" id="cb143-2" data-line-number="2">res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
+<a class="sourceLine" id="cb143-3" data-line-number="3"><span class="kw">toc</span>()</a></code></pre></div>
+<pre><code>0.018 sec elapsed</code></pre>
+<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb145-1" data-line-number="1"><span class="kw">all.equal</span>(res_a, res_b)</a></code></pre></div>
 <pre><code>[1] TRUE</code></pre>
-<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb148-1" data-line-number="1"><span class="kw">tic</span>()</a>
-<a class="sourceLine" id="cb148-2" data-line-number="2">res_c &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</a>
-<a class="sourceLine" id="cb148-3" data-line-number="3"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>0.121 sec elapsed</code></pre>
-<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb150-1" data-line-number="1"><span class="kw">setequal</span>(res_a, res_c)</a></code></pre></div>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb147-1" data-line-number="1"><span class="kw">tic</span>()</a>
+<a class="sourceLine" id="cb147-2" data-line-number="2">res_c &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</a>
+<a class="sourceLine" id="cb147-3" data-line-number="3"><span class="kw">toc</span>()</a></code></pre></div>
+<pre><code>0.125 sec elapsed</code></pre>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb149-1" data-line-number="1"><span class="kw">setequal</span>(res_a, res_c)</a></code></pre></div>
 <pre><code>[1] FALSE</code></pre>
 <p>Note that you can change where the cache is stored by <code>{memoise}</code>. Here, we’ll save it in the temp directory, but don’t do this in production.</p>
-<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb152-1" data-line-number="1">tpd &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">path</span>(<span class="kw">tempdir</span>(), <span class="kw">paste</span>(<span class="kw">sample</span>(letters, <span class="dv">10</span>), <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span>))</a></code></pre></div>
-<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb153-1" data-line-number="1">tpd &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">dir_create</span>(tpd)</a>
-<a class="sourceLine" id="cb153-2" data-line-number="2">dfs &lt;-<span class="st"> </span><span class="kw">cache_filesystem</span>(tpd)</a>
-<a class="sourceLine" id="cb153-3" data-line-number="3">mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql, <span class="dt">cache =</span> dfs)</a>
-<a class="sourceLine" id="cb153-4" data-line-number="4">res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
-<a class="sourceLine" id="cb153-5" data-line-number="5">res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</a>
-<a class="sourceLine" id="cb153-6" data-line-number="6">fs<span class="op">::</span><span class="kw">dir_ls</span>(tpd)</a></code></pre></div>
-<pre><code>/tmp/Rtmpemia7n/xgomipqkrn/49a2b8dad2a2087a
-/tmp/Rtmpemia7n/xgomipqkrn/4d9c45f0601ea45f</code></pre>
+<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb151-1" data-line-number="1">tpd &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">path</span>(<span class="kw">tempdir</span>(), <span class="kw">paste</span>(<span class="kw">sample</span>(letters, <span class="dv">10</span>), <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb152-1" data-line-number="1">tpd &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">dir_create</span>(tpd)</a>
+<a class="sourceLine" id="cb152-2" data-line-number="2">dfs &lt;-<span class="st"> </span><span class="kw">cache_filesystem</span>(tpd)</a>
+<a class="sourceLine" id="cb152-3" data-line-number="3">mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql, <span class="dt">cache =</span> dfs)</a>
+<a class="sourceLine" id="cb152-4" data-line-number="4">res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
+<a class="sourceLine" id="cb152-5" data-line-number="5">res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</a>
+<a class="sourceLine" id="cb152-6" data-line-number="6">fs<span class="op">::</span><span class="kw">dir_ls</span>(tpd)</a></code></pre></div>
+<pre><code>/tmp/Rtmpo0Y5Q3/gcbotypmuz/3fed25417d433485
+/tmp/Rtmpo0Y5Q3/gcbotypmuz/b40072d0f8c46ec6</code></pre>
 <p>As you can see, I now have two cache objects inside the directory I’ve specified as a <code>cache_filesystem</code>.</p>
 </div>
 <div id="caching-shiny" class="section level3">
@@ -536,99 +536,91 @@ The extra arguments you’ll find are <code>cacheKeyExpr</code> and <code>sizePo
 <code>sizePolicy</code> is a function that returns a <code>width</code> and an <code>height</code>, and which are used to round the plot dimension in pixels, so that not every pixel combination are generated in the cache.</p>
 <p>The good news is that converting existing <code>renderPlot()</code> functions to <code>renderCachedPlot()</code> is pretty straightforward in most cases: take your current <code>renderPlot()</code>, and add the cache keys<a href="#fn35" class="footnote-ref" id="fnref35"><sup>35</sup></a>.</p>
 <p>Here is an example:</p>
-<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb155-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
-<a class="sourceLine" id="cb155-2" data-line-number="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb155-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb155-4" data-line-number="4">    <span class="kw">selectInput</span>(<span class="st">&quot;tbl&quot;</span>, <span class="st">&quot;Table&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;iris&quot;</span>, <span class="st">&quot;mtcars&quot;</span>, <span class="st">&quot;airquality&quot;</span>)),</a>
-<a class="sourceLine" id="cb155-5" data-line-number="5">    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</a>
-<a class="sourceLine" id="cb155-6" data-line-number="6">  )</a>
-<a class="sourceLine" id="cb155-7" data-line-number="7">}</a>
-<a class="sourceLine" id="cb155-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb155-9" data-line-number="9">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
-<a class="sourceLine" id="cb155-10" data-line-number="10">  input, </a>
-<a class="sourceLine" id="cb155-11" data-line-number="11">  output, </a>
-<a class="sourceLine" id="cb155-12" data-line-number="12">  session</a>
-<a class="sourceLine" id="cb155-13" data-line-number="13">){</a>
-<a class="sourceLine" id="cb155-14" data-line-number="14">  </a>
-<a class="sourceLine" id="cb155-15" data-line-number="15">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderCachedPlot</span>({</a>
-<a class="sourceLine" id="cb155-16" data-line-number="16">    <span class="kw">plot</span>(</a>
-<a class="sourceLine" id="cb155-17" data-line-number="17">      <span class="kw">get</span>(input<span class="op">$</span>tbl)</a>
-<a class="sourceLine" id="cb155-18" data-line-number="18">    )</a>
-<a class="sourceLine" id="cb155-19" data-line-number="19">  }, <span class="dt">cacheKeyExpr =</span> {</a>
-<a class="sourceLine" id="cb155-20" data-line-number="20">    input<span class="op">$</span>tbl</a>
-<a class="sourceLine" id="cb155-21" data-line-number="21">  })</a>
-<a class="sourceLine" id="cb155-22" data-line-number="22">  </a>
-<a class="sourceLine" id="cb155-23" data-line-number="23">}</a>
-<a class="sourceLine" id="cb155-24" data-line-number="24"></a>
-<a class="sourceLine" id="cb155-25" data-line-number="25"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb154-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb154-2" data-line-number="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb154-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb154-4" data-line-number="4">    <span class="kw">selectInput</span>(<span class="st">&quot;tbl&quot;</span>, <span class="st">&quot;Table&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;iris&quot;</span>, <span class="st">&quot;mtcars&quot;</span>, <span class="st">&quot;airquality&quot;</span>)),</a>
+<a class="sourceLine" id="cb154-5" data-line-number="5">    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</a>
+<a class="sourceLine" id="cb154-6" data-line-number="6">  )</a>
+<a class="sourceLine" id="cb154-7" data-line-number="7">}</a>
+<a class="sourceLine" id="cb154-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb154-9" data-line-number="9">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb154-10" data-line-number="10">  input, </a>
+<a class="sourceLine" id="cb154-11" data-line-number="11">  output, </a>
+<a class="sourceLine" id="cb154-12" data-line-number="12">  session</a>
+<a class="sourceLine" id="cb154-13" data-line-number="13">){</a>
+<a class="sourceLine" id="cb154-14" data-line-number="14">  </a>
+<a class="sourceLine" id="cb154-15" data-line-number="15">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderCachedPlot</span>({</a>
+<a class="sourceLine" id="cb154-16" data-line-number="16">    <span class="kw">plot</span>(</a>
+<a class="sourceLine" id="cb154-17" data-line-number="17">      <span class="kw">get</span>(input<span class="op">$</span>tbl)</a>
+<a class="sourceLine" id="cb154-18" data-line-number="18">    )</a>
+<a class="sourceLine" id="cb154-19" data-line-number="19">  }, <span class="dt">cacheKeyExpr =</span> {</a>
+<a class="sourceLine" id="cb154-20" data-line-number="20">    input<span class="op">$</span>tbl</a>
+<a class="sourceLine" id="cb154-21" data-line-number="21">  })</a>
+<a class="sourceLine" id="cb154-22" data-line-number="22">  </a>
+<a class="sourceLine" id="cb154-23" data-line-number="23">}</a>
+<a class="sourceLine" id="cb154-24" data-line-number="24"></a>
+<a class="sourceLine" id="cb154-25" data-line-number="25"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p>If you try this app, the first rendering of the three plots will take a little bit of time, but every subsequent rendering of the plot is almost instantaneous.</p>
 <p>And if we apply what we’ve just sen with <code>{memoise}</code>:</p>
-<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb156-1" data-line-number="1">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</a>
-<a class="sourceLine" id="cb156-2" data-line-number="2">  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </a>
-<a class="sourceLine" id="cb156-3" data-line-number="3">  <span class="dt">dbname =</span> <span class="st">&quot;:memory:&quot;</span></a>
-<a class="sourceLine" id="cb156-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb156-5" data-line-number="5">DBI<span class="op">::</span><span class="kw">dbWriteTable</span>(</a>
-<a class="sourceLine" id="cb156-6" data-line-number="6">  con, </a>
-<a class="sourceLine" id="cb156-7" data-line-number="7">  <span class="st">&quot;diams&quot;</span>, </a>
-<a class="sourceLine" id="cb156-8" data-line-number="8">  dplyr<span class="op">::</span><span class="kw">bind_rows</span>(</a>
-<a class="sourceLine" id="cb156-9" data-line-number="9">    purrr<span class="op">::</span><span class="kw">rerun</span>(<span class="dv">100</span>, ggplot2<span class="op">::</span>diamonds)</a>
-<a class="sourceLine" id="cb156-10" data-line-number="10">  )</a>
-<a class="sourceLine" id="cb156-11" data-line-number="11">)</a>
-<a class="sourceLine" id="cb156-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb156-13" data-line-number="13">fct_sql &lt;-<span class="st"> </span><span class="cf">function</span>(cut, con){</a>
-<a class="sourceLine" id="cb156-14" data-line-number="14">  <span class="co"># NEVER EVER SPRINTF AN SQL CODE LIKE THAT</span></a>
-<a class="sourceLine" id="cb156-15" data-line-number="15">  <span class="co"># IT&#39;S SENSITIVE TO SQL INJECTIONS, WE&#39;RE</span></a>
-<a class="sourceLine" id="cb156-16" data-line-number="16">  <span class="co"># DOING IT FOR THE EXAMPLE</span></a>
-<a class="sourceLine" id="cb156-17" data-line-number="17">  DBI<span class="op">::</span><span class="kw">dbGetQuery</span>(</a>
-<a class="sourceLine" id="cb156-18" data-line-number="18">    con, <span class="kw">sprintf</span>(</a>
-<a class="sourceLine" id="cb156-19" data-line-number="19">      <span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;%s&#39;&quot;</span>, </a>
-<a class="sourceLine" id="cb156-20" data-line-number="20">      cut</a>
-<a class="sourceLine" id="cb156-21" data-line-number="21">    )</a>
-<a class="sourceLine" id="cb156-22" data-line-number="22">  )  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a>
-<a class="sourceLine" id="cb156-23" data-line-number="23">}</a>
-<a class="sourceLine" id="cb156-24" data-line-number="24">db &lt;-<span class="st"> </span><span class="kw">cache_filesystem</span>(<span class="st">&quot;cache/&quot;</span>)</a>
-<a class="sourceLine" id="cb156-25" data-line-number="25">fct_sql &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql, <span class="dt">cache =</span> db)</a>
-<a class="sourceLine" id="cb156-26" data-line-number="26">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb156-27" data-line-number="27">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb156-28" data-line-number="28">    <span class="kw">selectInput</span>(<span class="st">&quot;cut&quot;</span>, <span class="st">&quot;cut&quot;</span>, <span class="kw">unique</span>(ggplot2<span class="op">::</span>diamonds<span class="op">$</span>cut)),</a>
-<a class="sourceLine" id="cb156-29" data-line-number="29">    <span class="kw">tableOutput</span>(<span class="st">&quot;tbl&quot;</span>)</a>
-<a class="sourceLine" id="cb156-30" data-line-number="30">  )</a>
-<a class="sourceLine" id="cb156-31" data-line-number="31">}</a>
-<a class="sourceLine" id="cb156-32" data-line-number="32"></a>
-<a class="sourceLine" id="cb156-33" data-line-number="33">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
-<a class="sourceLine" id="cb156-34" data-line-number="34">  input, </a>
-<a class="sourceLine" id="cb156-35" data-line-number="35">  output, </a>
-<a class="sourceLine" id="cb156-36" data-line-number="36">  session</a>
-<a class="sourceLine" id="cb156-37" data-line-number="37">){</a>
-<a class="sourceLine" id="cb156-38" data-line-number="38">  </a>
-<a class="sourceLine" id="cb156-39" data-line-number="39">  output<span class="op">$</span>tbl &lt;-<span class="st"> </span><span class="kw">renderTable</span>({</a>
-<a class="sourceLine" id="cb156-40" data-line-number="40">    <span class="kw">fct_sql</span>(input<span class="op">$</span>cut, con)</a>
-<a class="sourceLine" id="cb156-41" data-line-number="41">  })</a>
-<a class="sourceLine" id="cb156-42" data-line-number="42">  </a>
-<a class="sourceLine" id="cb156-43" data-line-number="43">}</a>
-<a class="sourceLine" id="cb156-44" data-line-number="44"></a>
-<a class="sourceLine" id="cb156-45" data-line-number="45"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb155-1" data-line-number="1">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</a>
+<a class="sourceLine" id="cb155-2" data-line-number="2">  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </a>
+<a class="sourceLine" id="cb155-3" data-line-number="3">  <span class="dt">dbname =</span> <span class="st">&quot;:memory:&quot;</span></a>
+<a class="sourceLine" id="cb155-4" data-line-number="4">)</a>
+<a class="sourceLine" id="cb155-5" data-line-number="5">DBI<span class="op">::</span><span class="kw">dbWriteTable</span>(</a>
+<a class="sourceLine" id="cb155-6" data-line-number="6">  con, </a>
+<a class="sourceLine" id="cb155-7" data-line-number="7">  <span class="st">&quot;diams&quot;</span>, </a>
+<a class="sourceLine" id="cb155-8" data-line-number="8">  dplyr<span class="op">::</span><span class="kw">bind_rows</span>(</a>
+<a class="sourceLine" id="cb155-9" data-line-number="9">    purrr<span class="op">::</span><span class="kw">rerun</span>(<span class="dv">100</span>, ggplot2<span class="op">::</span>diamonds)</a>
+<a class="sourceLine" id="cb155-10" data-line-number="10">  )</a>
+<a class="sourceLine" id="cb155-11" data-line-number="11">)</a>
+<a class="sourceLine" id="cb155-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb155-13" data-line-number="13">fct_sql &lt;-<span class="st"> </span><span class="cf">function</span>(cut, con){</a>
+<a class="sourceLine" id="cb155-14" data-line-number="14">  <span class="co"># NEVER EVER SPRINTF AN SQL CODE LIKE THAT</span></a>
+<a class="sourceLine" id="cb155-15" data-line-number="15">  <span class="co"># IT&#39;S SENSITIVE TO SQL INJECTIONS, WE&#39;RE</span></a>
+<a class="sourceLine" id="cb155-16" data-line-number="16">  <span class="co"># DOING IT FOR THE EXAMPLE</span></a>
+<a class="sourceLine" id="cb155-17" data-line-number="17">  DBI<span class="op">::</span><span class="kw">dbGetQuery</span>(</a>
+<a class="sourceLine" id="cb155-18" data-line-number="18">    con, <span class="kw">sprintf</span>(</a>
+<a class="sourceLine" id="cb155-19" data-line-number="19">      <span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;%s&#39;&quot;</span>, </a>
+<a class="sourceLine" id="cb155-20" data-line-number="20">      cut</a>
+<a class="sourceLine" id="cb155-21" data-line-number="21">    )</a>
+<a class="sourceLine" id="cb155-22" data-line-number="22">  )  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a>
+<a class="sourceLine" id="cb155-23" data-line-number="23">}</a>
+<a class="sourceLine" id="cb155-24" data-line-number="24">db &lt;-<span class="st"> </span><span class="kw">cache_filesystem</span>(<span class="st">&quot;cache/&quot;</span>)</a>
+<a class="sourceLine" id="cb155-25" data-line-number="25">fct_sql &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql, <span class="dt">cache =</span> db)</a>
+<a class="sourceLine" id="cb155-26" data-line-number="26">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb155-27" data-line-number="27">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb155-28" data-line-number="28">    <span class="kw">selectInput</span>(<span class="st">&quot;cut&quot;</span>, <span class="st">&quot;cut&quot;</span>, <span class="kw">unique</span>(ggplot2<span class="op">::</span>diamonds<span class="op">$</span>cut)),</a>
+<a class="sourceLine" id="cb155-29" data-line-number="29">    <span class="kw">tableOutput</span>(<span class="st">&quot;tbl&quot;</span>)</a>
+<a class="sourceLine" id="cb155-30" data-line-number="30">  )</a>
+<a class="sourceLine" id="cb155-31" data-line-number="31">}</a>
+<a class="sourceLine" id="cb155-32" data-line-number="32"></a>
+<a class="sourceLine" id="cb155-33" data-line-number="33">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb155-34" data-line-number="34">  input, </a>
+<a class="sourceLine" id="cb155-35" data-line-number="35">  output, </a>
+<a class="sourceLine" id="cb155-36" data-line-number="36">  session</a>
+<a class="sourceLine" id="cb155-37" data-line-number="37">){</a>
+<a class="sourceLine" id="cb155-38" data-line-number="38">  </a>
+<a class="sourceLine" id="cb155-39" data-line-number="39">  output<span class="op">$</span>tbl &lt;-<span class="st"> </span><span class="kw">renderTable</span>({</a>
+<a class="sourceLine" id="cb155-40" data-line-number="40">    <span class="kw">fct_sql</span>(input<span class="op">$</span>cut, con)</a>
+<a class="sourceLine" id="cb155-41" data-line-number="41">  })</a>
+<a class="sourceLine" id="cb155-42" data-line-number="42">  </a>
+<a class="sourceLine" id="cb155-43" data-line-number="43">}</a>
+<a class="sourceLine" id="cb155-44" data-line-number="44"></a>
+<a class="sourceLine" id="cb155-45" data-line-number="45"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p>You’ll see that the first time you run this piece of code, it will take a couple of seconds to render the table for a new <code>input$cut</code> value.
 But if you re-select this input a second time, the output will show instantaneously.</p>
 <p>Caching is a nice way to make your app faster: even more if you expect your output to be stable over time: if the plot created by a series of inputs stays the same all along your app lifecycle, it’s worth thinking about implementing an on-disk caching.
 If your application needs “fresh” data every time it is used, for example because data in the SQL database are updated every hour, cache won’t help you here, on the contrary: the same inputs on the function will render different output.</p>
 <p>Note thought that, just like our computer screen from before, you don’t have unlimited space when it come to storing cache:storing a large amount of cache will take space on your disk.</p>
 <p>For example, from our stored cache from before:</p>
-<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb157-1" data-line-number="1">fs<span class="op">::</span><span class="kw">dir_info</span>(tpd)[, <span class="st">&quot;size&quot;</span>]</a></code></pre></div>
-<pre><code># A tibble: 2 x 1
-         size
-  &lt;fs::bytes&gt;
-1     462.31K
-2       1.86M</code></pre>
+<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb156-1" data-line-number="1">fs<span class="op">::</span><span class="kw">dir_info</span>(tpd)[, <span class="st">&quot;size&quot;</span>]</a></code></pre></div>
+<pre><code>462.31K   1.86M</code></pre>
 <p>Managing cache at a system level is out of scope for this book, but note that the most commonly accepted rule for deleting cache is called <strong>LRU</strong>, for <strong>Least Recently Used</strong>.
 The underlying principle of this approach is that users tend to need what they have needed recently: hence the more a piece of data has been used recently, the more likely it is that it will be needed soon.</p>
 <p>And this can be seen with:</p>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb159-1" data-line-number="1">fs<span class="op">::</span><span class="kw">dir_info</span>(tpd)[, <span class="st">&quot;access_time&quot;</span>]</a></code></pre></div>
-<pre><code># A tibble: 2 x 1
-  access_time        
-  &lt;dttm&gt;             
-1 2020-03-02 22:03:47
-2 2020-03-02 22:03:52</code></pre>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb158-1" data-line-number="1">fs<span class="op">::</span><span class="kw">dir_info</span>(tpd)[, <span class="st">&quot;access_time&quot;</span>]</a></code></pre></div>
+<pre><code>[1] &quot;2020-03-26 08:59:15 UTC&quot; &quot;2020-03-26 08:59:21 UTC&quot;</code></pre>
 </div>
 </div>
 <div id="asynchronous-in-shiny" class="section level2">
@@ -649,57 +641,57 @@ Natively, in Shiny, if user1 comes and launches a 15 second computation, then us
 <p>How does it work<a href="#fn36" class="footnote-ref" id="fnref36"><sup>36</sup></a>?
 <code>{promises}</code> comes with two operators which will be useful in our case, <code>%...&gt;%</code> and <code>%...!%</code>: the first being “what happens when the <code>future()</code> is solved?” (i.e. when the computation from the <code>future()</code> is completed), and the second is “what happens if the <code>future()</code> fails?” (i.e. what to do when the <code>future()</code> returns an error).
 Here is an example of using this skeleton:</p>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb160-1" data-line-number="1"><span class="kw">library</span>(future)</a>
+<a class="sourceLine" id="cb160-2" data-line-number="2"><span class="kw">library</span>(promises)</a>
+<a class="sourceLine" id="cb160-3" data-line-number="3"><span class="kw">plan</span>(multisession) <span class="co"># We&#39;re opening several R session (future specific)</span></a>
+<a class="sourceLine" id="cb160-4" data-line-number="4"><span class="kw">future</span>({</a>
+<a class="sourceLine" id="cb160-5" data-line-number="5">  <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb160-6" data-line-number="6">  <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb160-7" data-line-number="7">}) <span class="op">%...&gt;%</span><span class="st"> </span>(</a>
+<a class="sourceLine" id="cb160-8" data-line-number="8">  <span class="cf">function</span>(result){</a>
+<a class="sourceLine" id="cb160-9" data-line-number="9">    <span class="kw">print</span>(result)</a>
+<a class="sourceLine" id="cb160-10" data-line-number="10">  }</a>
+<a class="sourceLine" id="cb160-11" data-line-number="11">) <span class="op">%...!%</span><span class="st"> </span>(</a>
+<a class="sourceLine" id="cb160-12" data-line-number="12">  <span class="cf">function</span>(error){</a>
+<a class="sourceLine" id="cb160-13" data-line-number="13">    <span class="kw">stop</span>(error)</a>
+<a class="sourceLine" id="cb160-14" data-line-number="14">  }</a>
+<a class="sourceLine" id="cb160-15" data-line-number="15">)</a></code></pre></div>
+<p>If you run this in your console, you will see that you have access to the R console directly after launching the code.
+And a couple of seconds later (a little bit more than 3), the result of the <code>rnorm(5)</code> will be printed to the console.</p>
+<p>Note that you can also one line function with <code>.</code> as a parameter, instead of building the full anonymous function (we will use this notation in the rest of the chapter):</p>
 <div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb161-1" data-line-number="1"><span class="kw">library</span>(future)</a>
 <a class="sourceLine" id="cb161-2" data-line-number="2"><span class="kw">library</span>(promises)</a>
 <a class="sourceLine" id="cb161-3" data-line-number="3"><span class="kw">plan</span>(multisession) <span class="co"># We&#39;re opening several R session (future specific)</span></a>
 <a class="sourceLine" id="cb161-4" data-line-number="4"><span class="kw">future</span>({</a>
 <a class="sourceLine" id="cb161-5" data-line-number="5">  <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</a>
 <a class="sourceLine" id="cb161-6" data-line-number="6">  <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</a>
-<a class="sourceLine" id="cb161-7" data-line-number="7">}) <span class="op">%...&gt;%</span><span class="st"> </span>(</a>
-<a class="sourceLine" id="cb161-8" data-line-number="8">  <span class="cf">function</span>(result){</a>
-<a class="sourceLine" id="cb161-9" data-line-number="9">    <span class="kw">print</span>(result)</a>
-<a class="sourceLine" id="cb161-10" data-line-number="10">  }</a>
-<a class="sourceLine" id="cb161-11" data-line-number="11">) <span class="op">%...!%</span><span class="st"> </span>(</a>
-<a class="sourceLine" id="cb161-12" data-line-number="12">  <span class="cf">function</span>(error){</a>
-<a class="sourceLine" id="cb161-13" data-line-number="13">    <span class="kw">stop</span>(error)</a>
-<a class="sourceLine" id="cb161-14" data-line-number="14">  }</a>
-<a class="sourceLine" id="cb161-15" data-line-number="15">)</a></code></pre></div>
-<p>If you run this in your console, you will see that you have access to the R console directly after launching the code.
-And a couple of seconds later (a little bit more than 3), the result of the <code>rnorm(5)</code> will be printed to the console.</p>
-<p>Note that you can also one line function with <code>.</code> as a parameter, instead of building the full anonymous function (we will use this notation in the rest of the chapter):</p>
-<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb162-1" data-line-number="1"><span class="kw">library</span>(future)</a>
-<a class="sourceLine" id="cb162-2" data-line-number="2"><span class="kw">library</span>(promises)</a>
-<a class="sourceLine" id="cb162-3" data-line-number="3"><span class="kw">plan</span>(multisession) <span class="co"># We&#39;re opening several R session (future specific)</span></a>
-<a class="sourceLine" id="cb162-4" data-line-number="4"><span class="kw">future</span>({</a>
-<a class="sourceLine" id="cb162-5" data-line-number="5">  <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb162-6" data-line-number="6">  <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</a>
-<a class="sourceLine" id="cb162-7" data-line-number="7">}) <span class="op">%...&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb162-8" data-line-number="8"><span class="st">  </span><span class="kw">print</span>(.) <span class="op">%...!%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb162-9" data-line-number="9"><span class="st">  </span><span class="kw">stop</span>(.)</a></code></pre></div>
+<a class="sourceLine" id="cb161-7" data-line-number="7">}) <span class="op">%...&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb161-8" data-line-number="8"><span class="st">  </span><span class="kw">print</span>(.) <span class="op">%...!%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb161-9" data-line-number="9"><span class="st">  </span><span class="kw">stop</span>(.)</a></code></pre></div>
 <p>Let’s port this to Shiny:</p>
-<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb163-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
-<a class="sourceLine" id="cb163-2" data-line-number="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb163-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb163-4" data-line-number="4">    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>)</a>
-<a class="sourceLine" id="cb163-5" data-line-number="5">  )</a>
-<a class="sourceLine" id="cb163-6" data-line-number="6">}</a>
-<a class="sourceLine" id="cb163-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb163-8" data-line-number="8">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
-<a class="sourceLine" id="cb163-9" data-line-number="9">  input, </a>
-<a class="sourceLine" id="cb163-10" data-line-number="10">  output, </a>
-<a class="sourceLine" id="cb163-11" data-line-number="11">  session</a>
-<a class="sourceLine" id="cb163-12" data-line-number="12">){</a>
-<a class="sourceLine" id="cb163-13" data-line-number="13">  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</a>
-<a class="sourceLine" id="cb163-14" data-line-number="14">    <span class="kw">future</span>({</a>
-<a class="sourceLine" id="cb163-15" data-line-number="15">      <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb163-16" data-line-number="16">      <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</a>
-<a class="sourceLine" id="cb163-17" data-line-number="17">    }) <span class="op">%...&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb163-18" data-line-number="18"><span class="st">      </span><span class="kw">print</span>(.) <span class="op">%...!%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb163-19" data-line-number="19"><span class="st">      </span><span class="kw">stop</span>(.)</a>
-<a class="sourceLine" id="cb163-20" data-line-number="20">  })</a>
-<a class="sourceLine" id="cb163-21" data-line-number="21">}</a>
-<a class="sourceLine" id="cb163-22" data-line-number="22"></a>
-<a class="sourceLine" id="cb163-23" data-line-number="23"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb162-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb162-2" data-line-number="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb162-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb162-4" data-line-number="4">    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>)</a>
+<a class="sourceLine" id="cb162-5" data-line-number="5">  )</a>
+<a class="sourceLine" id="cb162-6" data-line-number="6">}</a>
+<a class="sourceLine" id="cb162-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb162-8" data-line-number="8">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb162-9" data-line-number="9">  input, </a>
+<a class="sourceLine" id="cb162-10" data-line-number="10">  output, </a>
+<a class="sourceLine" id="cb162-11" data-line-number="11">  session</a>
+<a class="sourceLine" id="cb162-12" data-line-number="12">){</a>
+<a class="sourceLine" id="cb162-13" data-line-number="13">  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</a>
+<a class="sourceLine" id="cb162-14" data-line-number="14">    <span class="kw">future</span>({</a>
+<a class="sourceLine" id="cb162-15" data-line-number="15">      <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb162-16" data-line-number="16">      <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb162-17" data-line-number="17">    }) <span class="op">%...&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb162-18" data-line-number="18"><span class="st">      </span><span class="kw">print</span>(.) <span class="op">%...!%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb162-19" data-line-number="19"><span class="st">      </span><span class="kw">stop</span>(.)</a>
+<a class="sourceLine" id="cb162-20" data-line-number="20">  })</a>
+<a class="sourceLine" id="cb162-21" data-line-number="21">}</a>
+<a class="sourceLine" id="cb162-22" data-line-number="22"></a>
+<a class="sourceLine" id="cb162-23" data-line-number="23"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p>If you have run this, that does not seem like a revolution: but trust us, the <code>Sys.sleep()</code> is not blocking as it allows other users to launch the same computation at the same moment.</p>
 </div>
 <div id="inner-session-asynchronousity" class="section level4">
@@ -707,80 +699,80 @@ And a couple of seconds later (a little bit more than 3), the result of the <cod
 <p>In the previous section we have implemented cross-session asynchronousity, meaning that the code is non-blocking but for when two or more users access the same app.
 But the code is still blocking at an inner-session level.
 Let’s have a look at this code:</p>
-<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb164-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
-<a class="sourceLine" id="cb164-2" data-line-number="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb164-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb164-4" data-line-number="4">    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>), </a>
-<a class="sourceLine" id="cb164-5" data-line-number="5">    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</a>
-<a class="sourceLine" id="cb164-6" data-line-number="6">  )</a>
-<a class="sourceLine" id="cb164-7" data-line-number="7">}</a>
-<a class="sourceLine" id="cb164-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb164-9" data-line-number="9">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
-<a class="sourceLine" id="cb164-10" data-line-number="10">  input, </a>
-<a class="sourceLine" id="cb164-11" data-line-number="11">  output, </a>
-<a class="sourceLine" id="cb164-12" data-line-number="12">  session</a>
-<a class="sourceLine" id="cb164-13" data-line-number="13">){</a>
-<a class="sourceLine" id="cb164-14" data-line-number="14">  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</a>
-<a class="sourceLine" id="cb164-15" data-line-number="15">    <span class="kw">future</span>({</a>
-<a class="sourceLine" id="cb164-16" data-line-number="16">      <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb164-17" data-line-number="17">      <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</a>
-<a class="sourceLine" id="cb164-18" data-line-number="18">    }) <span class="op">%...&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb164-19" data-line-number="19"><span class="st">      </span><span class="kw">print</span>(.) <span class="op">%...!%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb164-20" data-line-number="20"><span class="st">      </span><span class="kw">stop</span>(.)</a>
-<a class="sourceLine" id="cb164-21" data-line-number="21">  })</a>
-<a class="sourceLine" id="cb164-22" data-line-number="22">  </a>
-<a class="sourceLine" id="cb164-23" data-line-number="23">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</a>
-<a class="sourceLine" id="cb164-24" data-line-number="24">    <span class="kw">plot</span>(iris)</a>
-<a class="sourceLine" id="cb164-25" data-line-number="25">  })</a>
-<a class="sourceLine" id="cb164-26" data-line-number="26">}</a>
-<a class="sourceLine" id="cb164-27" data-line-number="27"></a>
-<a class="sourceLine" id="cb164-28" data-line-number="28"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb163-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb163-2" data-line-number="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb163-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb163-4" data-line-number="4">    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>), </a>
+<a class="sourceLine" id="cb163-5" data-line-number="5">    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</a>
+<a class="sourceLine" id="cb163-6" data-line-number="6">  )</a>
+<a class="sourceLine" id="cb163-7" data-line-number="7">}</a>
+<a class="sourceLine" id="cb163-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb163-9" data-line-number="9">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb163-10" data-line-number="10">  input, </a>
+<a class="sourceLine" id="cb163-11" data-line-number="11">  output, </a>
+<a class="sourceLine" id="cb163-12" data-line-number="12">  session</a>
+<a class="sourceLine" id="cb163-13" data-line-number="13">){</a>
+<a class="sourceLine" id="cb163-14" data-line-number="14">  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</a>
+<a class="sourceLine" id="cb163-15" data-line-number="15">    <span class="kw">future</span>({</a>
+<a class="sourceLine" id="cb163-16" data-line-number="16">      <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb163-17" data-line-number="17">      <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb163-18" data-line-number="18">    }) <span class="op">%...&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb163-19" data-line-number="19"><span class="st">      </span><span class="kw">print</span>(.) <span class="op">%...!%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb163-20" data-line-number="20"><span class="st">      </span><span class="kw">stop</span>(.)</a>
+<a class="sourceLine" id="cb163-21" data-line-number="21">  })</a>
+<a class="sourceLine" id="cb163-22" data-line-number="22">  </a>
+<a class="sourceLine" id="cb163-23" data-line-number="23">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</a>
+<a class="sourceLine" id="cb163-24" data-line-number="24">    <span class="kw">plot</span>(iris)</a>
+<a class="sourceLine" id="cb163-25" data-line-number="25">  })</a>
+<a class="sourceLine" id="cb163-26" data-line-number="26">}</a>
+<a class="sourceLine" id="cb163-27" data-line-number="27"></a>
+<a class="sourceLine" id="cb163-28" data-line-number="28"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p>Here, you would expect the plot to be avaiable before the <code>rnorm()</code>, but it’s not: <code>{promises}</code> is still blocking at an inner-session level, so elements are still rendered sequentially.
 To bypass that, we will use a <code>reactiveValue()</code> structure.</p>
-<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb165-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
-<a class="sourceLine" id="cb165-2" data-line-number="2"><span class="kw">library</span>(promises)</a>
-<a class="sourceLine" id="cb165-3" data-line-number="3"><span class="kw">library</span>(future)</a>
-<a class="sourceLine" id="cb165-4" data-line-number="4"><span class="kw">plan</span>(multisession)</a>
-<a class="sourceLine" id="cb165-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb165-6" data-line-number="6">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb165-7" data-line-number="7">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb165-8" data-line-number="8">    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>), </a>
-<a class="sourceLine" id="cb165-9" data-line-number="9">    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</a>
-<a class="sourceLine" id="cb165-10" data-line-number="10">  )</a>
-<a class="sourceLine" id="cb165-11" data-line-number="11">}</a>
-<a class="sourceLine" id="cb165-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb165-13" data-line-number="13">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
-<a class="sourceLine" id="cb165-14" data-line-number="14">  input, </a>
-<a class="sourceLine" id="cb165-15" data-line-number="15">  output, </a>
-<a class="sourceLine" id="cb165-16" data-line-number="16">  session</a>
-<a class="sourceLine" id="cb165-17" data-line-number="17">) {</a>
-<a class="sourceLine" id="cb165-18" data-line-number="18">  </a>
-<a class="sourceLine" id="cb165-19" data-line-number="19">  rv &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>(</a>
-<a class="sourceLine" id="cb165-20" data-line-number="20">    <span class="dt">res =</span> <span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb165-21" data-line-number="21">  )</a>
-<a class="sourceLine" id="cb165-22" data-line-number="22">  </a>
-<a class="sourceLine" id="cb165-23" data-line-number="23">  <span class="kw">future</span>({</a>
-<a class="sourceLine" id="cb165-24" data-line-number="24">    <span class="kw">Sys.sleep</span>(<span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb165-25" data-line-number="25">    <span class="kw">rnorm</span>(<span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb165-26" data-line-number="26">  }) <span class="op">%...&gt;%</span></a>
-<a class="sourceLine" id="cb165-27" data-line-number="27"><span class="st">    </span>(<span class="cf">function</span>(e){</a>
-<a class="sourceLine" id="cb165-28" data-line-number="28">      rv<span class="op">$</span>res &lt;-<span class="st"> </span>e</a>
-<a class="sourceLine" id="cb165-29" data-line-number="29">    }) <span class="op">%...!%</span></a>
-<a class="sourceLine" id="cb165-30" data-line-number="30"><span class="st">    </span>(<span class="cf">function</span>(e){</a>
-<a class="sourceLine" id="cb165-31" data-line-number="31">      rv<span class="op">$</span>res &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb165-32" data-line-number="32">      <span class="kw">warning</span>(e)</a>
-<a class="sourceLine" id="cb165-33" data-line-number="33">    })</a>
-<a class="sourceLine" id="cb165-34" data-line-number="34">  </a>
-<a class="sourceLine" id="cb165-35" data-line-number="35">  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</a>
-<a class="sourceLine" id="cb165-36" data-line-number="36">    <span class="kw">req</span>(rv<span class="op">$</span>res)</a>
-<a class="sourceLine" id="cb165-37" data-line-number="37">  })</a>
-<a class="sourceLine" id="cb165-38" data-line-number="38">  </a>
-<a class="sourceLine" id="cb165-39" data-line-number="39">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</a>
-<a class="sourceLine" id="cb165-40" data-line-number="40">    <span class="kw">plot</span>(iris)</a>
-<a class="sourceLine" id="cb165-41" data-line-number="41">  })</a>
-<a class="sourceLine" id="cb165-42" data-line-number="42">}</a>
-<a class="sourceLine" id="cb165-43" data-line-number="43"></a>
-<a class="sourceLine" id="cb165-44" data-line-number="44"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb164-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb164-2" data-line-number="2"><span class="kw">library</span>(promises)</a>
+<a class="sourceLine" id="cb164-3" data-line-number="3"><span class="kw">library</span>(future)</a>
+<a class="sourceLine" id="cb164-4" data-line-number="4"><span class="kw">plan</span>(multisession)</a>
+<a class="sourceLine" id="cb164-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb164-6" data-line-number="6">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb164-7" data-line-number="7">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb164-8" data-line-number="8">    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>), </a>
+<a class="sourceLine" id="cb164-9" data-line-number="9">    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</a>
+<a class="sourceLine" id="cb164-10" data-line-number="10">  )</a>
+<a class="sourceLine" id="cb164-11" data-line-number="11">}</a>
+<a class="sourceLine" id="cb164-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb164-13" data-line-number="13">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb164-14" data-line-number="14">  input, </a>
+<a class="sourceLine" id="cb164-15" data-line-number="15">  output, </a>
+<a class="sourceLine" id="cb164-16" data-line-number="16">  session</a>
+<a class="sourceLine" id="cb164-17" data-line-number="17">) {</a>
+<a class="sourceLine" id="cb164-18" data-line-number="18">  </a>
+<a class="sourceLine" id="cb164-19" data-line-number="19">  rv &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>(</a>
+<a class="sourceLine" id="cb164-20" data-line-number="20">    <span class="dt">res =</span> <span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb164-21" data-line-number="21">  )</a>
+<a class="sourceLine" id="cb164-22" data-line-number="22">  </a>
+<a class="sourceLine" id="cb164-23" data-line-number="23">  <span class="kw">future</span>({</a>
+<a class="sourceLine" id="cb164-24" data-line-number="24">    <span class="kw">Sys.sleep</span>(<span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb164-25" data-line-number="25">    <span class="kw">rnorm</span>(<span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb164-26" data-line-number="26">  }) <span class="op">%...&gt;%</span></a>
+<a class="sourceLine" id="cb164-27" data-line-number="27"><span class="st">    </span>(<span class="cf">function</span>(e){</a>
+<a class="sourceLine" id="cb164-28" data-line-number="28">      rv<span class="op">$</span>res &lt;-<span class="st"> </span>e</a>
+<a class="sourceLine" id="cb164-29" data-line-number="29">    }) <span class="op">%...!%</span></a>
+<a class="sourceLine" id="cb164-30" data-line-number="30"><span class="st">    </span>(<span class="cf">function</span>(e){</a>
+<a class="sourceLine" id="cb164-31" data-line-number="31">      rv<span class="op">$</span>res &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb164-32" data-line-number="32">      <span class="kw">warning</span>(e)</a>
+<a class="sourceLine" id="cb164-33" data-line-number="33">    })</a>
+<a class="sourceLine" id="cb164-34" data-line-number="34">  </a>
+<a class="sourceLine" id="cb164-35" data-line-number="35">  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</a>
+<a class="sourceLine" id="cb164-36" data-line-number="36">    <span class="kw">req</span>(rv<span class="op">$</span>res)</a>
+<a class="sourceLine" id="cb164-37" data-line-number="37">  })</a>
+<a class="sourceLine" id="cb164-38" data-line-number="38">  </a>
+<a class="sourceLine" id="cb164-39" data-line-number="39">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</a>
+<a class="sourceLine" id="cb164-40" data-line-number="40">    <span class="kw">plot</span>(iris)</a>
+<a class="sourceLine" id="cb164-41" data-line-number="41">  })</a>
+<a class="sourceLine" id="cb164-42" data-line-number="42">}</a>
+<a class="sourceLine" id="cb164-43" data-line-number="43"></a>
+<a class="sourceLine" id="cb164-44" data-line-number="44"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <p>Let’s detail this step by step:</p>
 <ul>
 <li><p><code>rv &lt;- reactiveValues</code> creates a <code>reactiveValue()</code> that will contains the <code>NULL</code>, and which will serve the content of <code>renderPrint()</code> when the <code>future</code> is resolved.
@@ -803,71 +795,71 @@ To handle that, the best way is to have an id that is also sent to the future, a
 If it is, we update the <code>reactiveValues()</code>.
 If it is not, we ignore it.</li>
 </ul>
-<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb166-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
-<a class="sourceLine" id="cb166-2" data-line-number="2"><span class="kw">library</span>(promises)</a>
-<a class="sourceLine" id="cb166-3" data-line-number="3"><span class="kw">library</span>(future)</a>
-<a class="sourceLine" id="cb166-4" data-line-number="4"><span class="kw">plan</span>(multisession)</a>
-<a class="sourceLine" id="cb166-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb166-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb166-7" data-line-number="7">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb166-8" data-line-number="8">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb166-9" data-line-number="9">    <span class="kw">actionButton</span>(<span class="st">&quot;go&quot;</span>, <span class="st">&quot;go&quot;</span>),</a>
-<a class="sourceLine" id="cb166-10" data-line-number="10">    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>), </a>
-<a class="sourceLine" id="cb166-11" data-line-number="11">    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</a>
-<a class="sourceLine" id="cb166-12" data-line-number="12">  )</a>
-<a class="sourceLine" id="cb166-13" data-line-number="13">}</a>
-<a class="sourceLine" id="cb166-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb166-15" data-line-number="15">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
-<a class="sourceLine" id="cb166-16" data-line-number="16">  input, </a>
-<a class="sourceLine" id="cb166-17" data-line-number="17">  output, </a>
-<a class="sourceLine" id="cb166-18" data-line-number="18">  session</a>
-<a class="sourceLine" id="cb166-19" data-line-number="19">) {</a>
-<a class="sourceLine" id="cb166-20" data-line-number="20">  </a>
-<a class="sourceLine" id="cb166-21" data-line-number="21">  rv &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>(</a>
-<a class="sourceLine" id="cb166-22" data-line-number="22">    <span class="dt">res =</span> <span class="ot">NULL</span>, </a>
-<a class="sourceLine" id="cb166-23" data-line-number="23">    <span class="dt">last_id =</span> <span class="dv">0</span></a>
-<a class="sourceLine" id="cb166-24" data-line-number="24">  )</a>
-<a class="sourceLine" id="cb166-25" data-line-number="25">  </a>
-<a class="sourceLine" id="cb166-26" data-line-number="26">  <span class="kw">observeEvent</span>( input<span class="op">$</span>go , {</a>
-<a class="sourceLine" id="cb166-27" data-line-number="27">    rv<span class="op">$</span>last_id &lt;-<span class="st"> </span>rv<span class="op">$</span>last_id <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb166-28" data-line-number="28">    last_id &lt;-<span class="st"> </span>rv<span class="op">$</span>last_id</a>
-<a class="sourceLine" id="cb166-29" data-line-number="29">    </a>
-<a class="sourceLine" id="cb166-30" data-line-number="30">    <span class="kw">future</span>({</a>
-<a class="sourceLine" id="cb166-31" data-line-number="31">      <span class="cf">if</span> (last_id <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
-<a class="sourceLine" id="cb166-32" data-line-number="32">        <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb166-33" data-line-number="33">      }</a>
-<a class="sourceLine" id="cb166-34" data-line-number="34">      <span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb166-35" data-line-number="35">        <span class="dt">id =</span> last_id,</a>
-<a class="sourceLine" id="cb166-36" data-line-number="36">        <span class="dt">res =</span> <span class="kw">rnorm</span>(<span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb166-37" data-line-number="37">      )</a>
-<a class="sourceLine" id="cb166-38" data-line-number="38">    }) <span class="op">%...&gt;%</span></a>
-<a class="sourceLine" id="cb166-39" data-line-number="39"><span class="st">      </span>(<span class="cf">function</span>(e){</a>
-<a class="sourceLine" id="cb166-40" data-line-number="40">        cli<span class="op">::</span><span class="kw">cat_rule</span>(</a>
-<a class="sourceLine" id="cb166-41" data-line-number="41">          <span class="kw">sprintf</span>(<span class="st">&quot;Back from %s&quot;</span>, e<span class="op">$</span>id)</a>
-<a class="sourceLine" id="cb166-42" data-line-number="42">        )</a>
-<a class="sourceLine" id="cb166-43" data-line-number="43">        <span class="cf">if</span> (e<span class="op">$</span>id <span class="op">==</span><span class="st"> </span>rv<span class="op">$</span>last_id){</a>
-<a class="sourceLine" id="cb166-44" data-line-number="44">          rv<span class="op">$</span>res &lt;-<span class="st"> </span>e</a>
-<a class="sourceLine" id="cb166-45" data-line-number="45">        }</a>
-<a class="sourceLine" id="cb166-46" data-line-number="46">      }) <span class="op">%...!%</span></a>
-<a class="sourceLine" id="cb166-47" data-line-number="47"><span class="st">      </span>(<span class="cf">function</span>(e){</a>
-<a class="sourceLine" id="cb166-48" data-line-number="48">        rv<span class="op">$</span>res &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb166-49" data-line-number="49">        <span class="kw">warning</span>(e)</a>
-<a class="sourceLine" id="cb166-50" data-line-number="50">      })</a>
-<a class="sourceLine" id="cb166-51" data-line-number="51">    cli<span class="op">::</span><span class="kw">cat_rule</span>(</a>
-<a class="sourceLine" id="cb166-52" data-line-number="52">      <span class="kw">sprintf</span>(<span class="st">&quot;%s sent&quot;</span>, rv<span class="op">$</span>last_id)</a>
-<a class="sourceLine" id="cb166-53" data-line-number="53">    )</a>
-<a class="sourceLine" id="cb166-54" data-line-number="54">  })</a>
-<a class="sourceLine" id="cb166-55" data-line-number="55">  </a>
-<a class="sourceLine" id="cb166-56" data-line-number="56">  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</a>
-<a class="sourceLine" id="cb166-57" data-line-number="57">    <span class="kw">req</span>(rv<span class="op">$</span>res)</a>
-<a class="sourceLine" id="cb166-58" data-line-number="58">  })</a>
-<a class="sourceLine" id="cb166-59" data-line-number="59">  </a>
-<a class="sourceLine" id="cb166-60" data-line-number="60">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</a>
-<a class="sourceLine" id="cb166-61" data-line-number="61">    <span class="kw">plot</span>(iris)</a>
-<a class="sourceLine" id="cb166-62" data-line-number="62">  })</a>
-<a class="sourceLine" id="cb166-63" data-line-number="63">}</a>
-<a class="sourceLine" id="cb166-64" data-line-number="64"></a>
-<a class="sourceLine" id="cb166-65" data-line-number="65"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb165-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
+<a class="sourceLine" id="cb165-2" data-line-number="2"><span class="kw">library</span>(promises)</a>
+<a class="sourceLine" id="cb165-3" data-line-number="3"><span class="kw">library</span>(future)</a>
+<a class="sourceLine" id="cb165-4" data-line-number="4"><span class="kw">plan</span>(multisession)</a>
+<a class="sourceLine" id="cb165-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb165-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb165-7" data-line-number="7">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
+<a class="sourceLine" id="cb165-8" data-line-number="8">  <span class="kw">tagList</span>(</a>
+<a class="sourceLine" id="cb165-9" data-line-number="9">    <span class="kw">actionButton</span>(<span class="st">&quot;go&quot;</span>, <span class="st">&quot;go&quot;</span>),</a>
+<a class="sourceLine" id="cb165-10" data-line-number="10">    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>), </a>
+<a class="sourceLine" id="cb165-11" data-line-number="11">    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</a>
+<a class="sourceLine" id="cb165-12" data-line-number="12">  )</a>
+<a class="sourceLine" id="cb165-13" data-line-number="13">}</a>
+<a class="sourceLine" id="cb165-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb165-15" data-line-number="15">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
+<a class="sourceLine" id="cb165-16" data-line-number="16">  input, </a>
+<a class="sourceLine" id="cb165-17" data-line-number="17">  output, </a>
+<a class="sourceLine" id="cb165-18" data-line-number="18">  session</a>
+<a class="sourceLine" id="cb165-19" data-line-number="19">) {</a>
+<a class="sourceLine" id="cb165-20" data-line-number="20">  </a>
+<a class="sourceLine" id="cb165-21" data-line-number="21">  rv &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>(</a>
+<a class="sourceLine" id="cb165-22" data-line-number="22">    <span class="dt">res =</span> <span class="ot">NULL</span>, </a>
+<a class="sourceLine" id="cb165-23" data-line-number="23">    <span class="dt">last_id =</span> <span class="dv">0</span></a>
+<a class="sourceLine" id="cb165-24" data-line-number="24">  )</a>
+<a class="sourceLine" id="cb165-25" data-line-number="25">  </a>
+<a class="sourceLine" id="cb165-26" data-line-number="26">  <span class="kw">observeEvent</span>( input<span class="op">$</span>go , {</a>
+<a class="sourceLine" id="cb165-27" data-line-number="27">    rv<span class="op">$</span>last_id &lt;-<span class="st"> </span>rv<span class="op">$</span>last_id <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb165-28" data-line-number="28">    last_id &lt;-<span class="st"> </span>rv<span class="op">$</span>last_id</a>
+<a class="sourceLine" id="cb165-29" data-line-number="29">    </a>
+<a class="sourceLine" id="cb165-30" data-line-number="30">    <span class="kw">future</span>({</a>
+<a class="sourceLine" id="cb165-31" data-line-number="31">      <span class="cf">if</span> (last_id <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</a>
+<a class="sourceLine" id="cb165-32" data-line-number="32">        <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb165-33" data-line-number="33">      }</a>
+<a class="sourceLine" id="cb165-34" data-line-number="34">      <span class="kw">list</span>(</a>
+<a class="sourceLine" id="cb165-35" data-line-number="35">        <span class="dt">id =</span> last_id,</a>
+<a class="sourceLine" id="cb165-36" data-line-number="36">        <span class="dt">res =</span> <span class="kw">rnorm</span>(<span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb165-37" data-line-number="37">      )</a>
+<a class="sourceLine" id="cb165-38" data-line-number="38">    }) <span class="op">%...&gt;%</span></a>
+<a class="sourceLine" id="cb165-39" data-line-number="39"><span class="st">      </span>(<span class="cf">function</span>(e){</a>
+<a class="sourceLine" id="cb165-40" data-line-number="40">        cli<span class="op">::</span><span class="kw">cat_rule</span>(</a>
+<a class="sourceLine" id="cb165-41" data-line-number="41">          <span class="kw">sprintf</span>(<span class="st">&quot;Back from %s&quot;</span>, e<span class="op">$</span>id)</a>
+<a class="sourceLine" id="cb165-42" data-line-number="42">        )</a>
+<a class="sourceLine" id="cb165-43" data-line-number="43">        <span class="cf">if</span> (e<span class="op">$</span>id <span class="op">==</span><span class="st"> </span>rv<span class="op">$</span>last_id){</a>
+<a class="sourceLine" id="cb165-44" data-line-number="44">          rv<span class="op">$</span>res &lt;-<span class="st"> </span>e</a>
+<a class="sourceLine" id="cb165-45" data-line-number="45">        }</a>
+<a class="sourceLine" id="cb165-46" data-line-number="46">      }) <span class="op">%...!%</span></a>
+<a class="sourceLine" id="cb165-47" data-line-number="47"><span class="st">      </span>(<span class="cf">function</span>(e){</a>
+<a class="sourceLine" id="cb165-48" data-line-number="48">        rv<span class="op">$</span>res &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb165-49" data-line-number="49">        <span class="kw">warning</span>(e)</a>
+<a class="sourceLine" id="cb165-50" data-line-number="50">      })</a>
+<a class="sourceLine" id="cb165-51" data-line-number="51">    cli<span class="op">::</span><span class="kw">cat_rule</span>(</a>
+<a class="sourceLine" id="cb165-52" data-line-number="52">      <span class="kw">sprintf</span>(<span class="st">&quot;%s sent&quot;</span>, rv<span class="op">$</span>last_id)</a>
+<a class="sourceLine" id="cb165-53" data-line-number="53">    )</a>
+<a class="sourceLine" id="cb165-54" data-line-number="54">  })</a>
+<a class="sourceLine" id="cb165-55" data-line-number="55">  </a>
+<a class="sourceLine" id="cb165-56" data-line-number="56">  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</a>
+<a class="sourceLine" id="cb165-57" data-line-number="57">    <span class="kw">req</span>(rv<span class="op">$</span>res)</a>
+<a class="sourceLine" id="cb165-58" data-line-number="58">  })</a>
+<a class="sourceLine" id="cb165-59" data-line-number="59">  </a>
+<a class="sourceLine" id="cb165-60" data-line-number="60">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</a>
+<a class="sourceLine" id="cb165-61" data-line-number="61">    <span class="kw">plot</span>(iris)</a>
+<a class="sourceLine" id="cb165-62" data-line-number="62">  })</a>
+<a class="sourceLine" id="cb165-63" data-line-number="63">}</a>
+<a class="sourceLine" id="cb165-64" data-line-number="64"></a>
+<a class="sourceLine" id="cb165-65" data-line-number="65"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
 <ul>
 <li>We need to treat the outputs in the order they are received.
 In that case, instead of waiting for the very last input, you’ll need to build a structure that will receive the output, check if this output is the “next in line”, store it if it’s not, or return it if it is and see if there is another output in the queue.</li>
