@@ -330,6 +330,7 @@ For example, here is an error from a real life error when pushing an app on a sh
 
 ``` bash
 root@westeros-vm:/var/log/shiny-server# cat thewall(...).log
+<<<<<<< HEAD
 *** caught segfault ***
 [...]
 address 0x5100004d, cause 'memory not mapped'
@@ -344,6 +345,22 @@ Traceback:
 7: `_fseq`(`_lhs`)
 8: eval(quote(`_fseq`(`_lhs`)), env, env)
 [...]
+=======
+ *** caught segfault ***
+  [...]
+address 0x5100004d, cause 'memory not mapped'
+
+Traceback:
+ 1: rcpp_sf_to_geojson(sf, digits, factors_as_string)
+ 2: sf_geojson.sf(data)
+ 3: geojsonsf::sf_geojson(data)
+ 4: addGlifyPolygons(., data = pol_V1, color = les_couleurs, popup = "val", opacity = 1)
+ 5: function_list[[i]](value)
+ 6: freduce(value, `_function_list`)
+ 7: `_fseq`(`_lhs`)
+ 8: eval(quote(`_fseq`(`_lhs`)), env, env)
+  [...]
+>>>>>>> a85bd2fe5fa65dc964bfaef536a18960b40c7c3d
 105: captureStackTraces({    while (!.globals$stopped) {        ..stacktracefloor..(serviceApp())        Sys.sleep(0.001)    }})
 106: ..stacktraceoff..(captureStackTraces({    while (!.globals$stopped) {        ..stacktracefloor..(serviceApp())        Sys.sleep(0.001)    }}))
 107: runApp(Sys.getenv("SHINY_APP"), port = port, launch.browser = FALSE)
@@ -371,12 +388,20 @@ That means that you can have `{geojsonsf}` version `1.2.1` in one of your projec
 
 The first thing to do with `{renv}` is initiating it with the `init()` function. 
 
+<<<<<<< HEAD
 ```{r 12-step-by-step-secure-22, eval = FALSE}
+=======
+```{r eval = FALSE}
+>>>>>>> a85bd2fe5fa65dc964bfaef536a18960b40c7c3d
 renv::init()
 ```
 
 
+<<<<<<< HEAD
 ```{r 12-step-by-step-secure-23, eval = FALSE}
+=======
+```{r eval = FALSE}
+>>>>>>> a85bd2fe5fa65dc964bfaef536a18960b40c7c3d
 renv::init(here::here("golex"), restart = FALSE)
 ```
 
@@ -388,11 +413,19 @@ And now, when you need a new package, you will need to install it in your local 
 The fastest way to install new packages is by using the `install.packages` function, which is shimmed by `{renv}`. 
 This shim will search into the local cache to see if the package has already been cached.
 
+<<<<<<< HEAD
 ```{r 12-step-by-step-secure-24, eval = FALSE}
 install.packages("dplyr")
 ```
 
 ```{r 12-step-by-step-secure-25, eval = FALSE}
+=======
+```{r eval = FALSE}
+install.packages("dplyr")
+```
+
+```{r eval = FALSE}
+>>>>>>> a85bd2fe5fa65dc964bfaef536a18960b40c7c3d
 withr::with_dir(
   "golex", {
     install.packages("dplyr")
@@ -402,12 +435,20 @@ withr::with_dir(
 
 Once you want to update your `{renv}` `Lockfile`, call `snapshot()`
 
+<<<<<<< HEAD
 ```{r 12-step-by-step-secure-26, eval = FALSE}
+=======
+```{r eval = FALSE}
+>>>>>>> a85bd2fe5fa65dc964bfaef536a18960b40c7c3d
 renv::snapshot()
 ```
 
 
+<<<<<<< HEAD
 ```{r 12-step-by-step-secure-27, eval = FALSE}
+=======
+```{r eval = FALSE}
+>>>>>>> a85bd2fe5fa65dc964bfaef536a18960b40c7c3d
 renv::snapshot(here::here("golex"), restart = FALSE)
 ```
 
@@ -457,7 +498,11 @@ Let's take some time to understand what this file contains, or how we could be b
 
 1. `FROM`
 
+<<<<<<< HEAD
 ```{r 12-step-by-step-secure-28, echo = FALSE}
+=======
+```{r echo = FALSE}
+>>>>>>> a85bd2fe5fa65dc964bfaef536a18960b40c7c3d
 readLines("Dockerfile")[1] %>% 
   glue::as_glue()
 ```
@@ -466,7 +511,11 @@ This line defines what version of R to use for deploying your application.
 This `FROM` line is the one that sets an image to start from: you rarely (if ever) build a Docker image from nothing, but instead you use an existing image on top of which you build your own image.
 Here, we choose one of the [r-ver](https://hub.docker.com/r/rocker/r-ver/) docker images, based on the output of:
 
+<<<<<<< HEAD
 ```{r 12-step-by-step-secure-29}
+=======
+```{r}
+>>>>>>> a85bd2fe5fa65dc964bfaef536a18960b40c7c3d
 R.Version()$version.string
 ```
 
@@ -475,21 +524,33 @@ R.Version()$version.string
 The `RUN` calls in the file refers to bash calls we are making to build the image. 
 For example, the second line of the `Dockerfile` installs all the system requirements needed to your application.
 
+<<<<<<< HEAD
 ```{r 12-step-by-step-secure-30, echo = FALSE}
+=======
+```{r echo = FALSE}
+>>>>>>> a85bd2fe5fa65dc964bfaef536a18960b40c7c3d
 readLines("Dockerfile")[2] %>% 
   glue::as_glue()
 ```
 
 In the subsequent `RUN` calls, we are using `remotes::install_version()` to be sure we install the version that matches the one from your machine. 
 
+<<<<<<< HEAD
 ```{r 12-step-by-step-secure-31, echo = FALSE}
+=======
+```{r echo = FALSE}
+>>>>>>> a85bd2fe5fa65dc964bfaef536a18960b40c7c3d
 readLines("Dockerfile")[6] %>% 
   glue::as_glue()
 ```
 
 As you can see, it matches the local version: 
 
+<<<<<<< HEAD
 ```{r 12-step-by-step-secure-32}
+=======
+```{r}
+>>>>>>> a85bd2fe5fa65dc964bfaef536a18960b40c7c3d
 packageVersion("config")
 ```
 
@@ -498,7 +559,11 @@ packageVersion("config")
 This Docker entry takes a folder or a file, and copies it inside the image. 
 With `{golem}`, we are adding the current project, containing the app, to a folder called `/build_zone`. 
 
+<<<<<<< HEAD
 ```{r 12-step-by-step-secure-33, echo = FALSE}
+=======
+```{r echo = FALSE}
+>>>>>>> a85bd2fe5fa65dc964bfaef536a18960b40c7c3d
 readLines("Dockerfile")[13] %>% 
   glue::as_glue()
 ```
@@ -507,7 +572,11 @@ readLines("Dockerfile")[13] %>%
 
 This command defines which port of the container will be available from the outside of the container.
 
+<<<<<<< HEAD
 ```{r 12-step-by-step-secure-34, echo = FALSE}
+=======
+```{r echo = FALSE}
+>>>>>>> a85bd2fe5fa65dc964bfaef536a18960b40c7c3d
 readLines("Dockerfile")[16] %>% 
   glue::as_glue()
 ```
@@ -517,7 +586,11 @@ readLines("Dockerfile")[16] %>%
 This final command is the one that is launched when you run a container. 
 With a `{shiny}` app, this command is the one that launches the application.  
 
+<<<<<<< HEAD
 ```{r 12-step-by-step-secure-35, echo = FALSE}
+=======
+```{r echo = FALSE}
+>>>>>>> a85bd2fe5fa65dc964bfaef536a18960b40c7c3d
 readLines("Dockerfile")[16] %>% 
   glue::as_glue()
 ```
