@@ -12,8 +12,37 @@
 
 http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#rule_of_optimization
 
-And yet another Rule from the Art of Unix Programming: "Rule of Optimization: Prototype before polishing. Get it working before you optimize it."
+And yet another Rule from the Art of Unix Programming: "Rule of Optimization: Prototype before polishing. __Get it working before you optimize it__."
 
+Getting things work before trying to optimize the app is always a good approach: 
+
++ Making things work before working on low level optimization makes the whole engineering process easier: having a "minimal viable product" that works, even if slowly and not perfectly, gives a stronger sense of success to the project. 
+If you are building an vehicule, it feels more of a success to start with a skateboard than with a wheel.
+
+![](img/mvp.png)
+
++ Abstraction is hard, and makes the code base harder to work with. 
+You've heard a lot that if you are copying and pasting something more than twice, you should write a function. 
+And with Shiny, if you are writing a piece of the app more than twice, you should write modules. 
+But while these kind of abstractions are elegant and optimized, they can make the software harder to work on while building it. 
+So before focusing on turning something into a function, make it work first. 
+As said in [R for Data Science]() about abstraction with `{purrr}`: 
+
+> Once you master these functions, you’ll find it takes much less time to solve iteration problems. But you should never feel bad about using a for loop instead of a map function. The map functions are a step up a tower of abstraction, and it can take a long time to get your head around how they work. The important thing is that you solve the problem that you’re working on, not write the most concise and elegant code (although that’s definitely something you want to strive towards!).
+
+`r right_link("R for Data Science - 21.5 The map functions", "https://r4ds.had.co.nz/iteration.html")`
+
+As a small example, we can refer to the binding module from `{hexmake}`: this module manipulates namespace, inputs and session to automatically bind inputs to the R6 object containing the image (see implementation [here](https://github.com/ColinFay/hexmake/blob/master/R/mod_binder.R#L29), [here](https://github.com/ColinFay/hexmake/blob/master/R/utils_server.R#L2) and [here](https://github.com/ColinFay/hexmake/blob/master/R/mod_left.R#L60)). 
+That's an elegant solution: instead of duplicating content, we use functions to automatically bind events.
+But that's a highter level of abstraction: we manipulate different levels of namespacing and inputs, making it harder to reason about when you have to change the code base a lot. 
+
++ It's hard to identify upfront the real bottlenecks of the app. 
+As long as the app is not in a working state, it's very hard to identify the real pieces of code that need to be optimized. 
+Chances are that if you ask yourself upfront what the app bottlenecks will be, you won't aim right. 
+So instead of losing time focusing on specific pieces of code you think need to be optimized, start by having something that works, then optimize the code. 
+
++ It's easier to spot mistakes when you have something the can run. 
+If a piece of software runs, it's straightforward to check if a change in the codebase break the software or not: it either still run or not. 
 
 ### The "UI first" approach
 
