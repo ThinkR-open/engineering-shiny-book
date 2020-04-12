@@ -15,7 +15,14 @@ What does that means?
 That focusing on optimizing small portions of your app before making it work fully is the best way to lose time along the way. 
 Even more if you're not carefully using profiling tools: say your application is a little bit slow, or using too many memory, and you've got a specific bottleneck in your app. 
 
-// TODO: diagram of an application bottleneck
+Here is the general idea: 
+
+![](img/bottleneck.png)
+
+> Adapted from [WikiMedia](https://commons.wikimedia.org/wiki/File:Effects_of_a_bottleneck_on_virus_populations.png)
+
+You can make the circles travel to the bottleneck as fast as you want, the circles will still be slowed by the narrow bottleneck. 
+So focus on making the bottlenck larger, before focusing on making the circle travel fast. 
 
 This is the very thing you should be optimizing: having faster code anywhere else expect this bottleneck won't make your app faster—you'll just make your app reach the bottleneck faster, but there will still be this part of your app that slows everything down. 
 But it's something you might only realize when the app is fully built: pieces might be fast together, but slow when put together. 
@@ -166,5 +173,58 @@ And, bonus point, `{bench}` takes time to check that the two outputs are the sam
 
 ### Profiling Shiny
 
-// TODO
+You can profile Shiny application using the `{profvis}` package, just as any other piece of R code. 
+The only thing to note if you want to use this function on an app built with `{golem}`, you will have to wrap the `run_app()` function in a `print()` function. 
+Long story short, what make the app run is not the function itself, but the printing of the function, so the object returned by `run_app()` itself can not be profiled. 
+
+One other thing that can be optimized when it comes to the user interface is the webpage rendering performance. 
+To do that, we can use standard, web development tools: as said several times, a Shiny application IS a web application, so tools that are language agnostic will work with Shiny. 
+There are thousands of tools available to do exactly that, and going through all of them would probably not make any sense. 
+So, let's focus getting started with a basic but powerful tool, that comes bundle inside your browser: Google Lighthouse, one of the famous tool for profiling web application, which is bundled into recent versions of Google Chrome. 
+The nice thing is that this tool not only cover what you see, but also audits your app with various configuration, notably on mobile and with low bandwidth and/or mimic 3G connection, and can perform it on locally run applications.
+Each result from the audit comes with a series of advices and changes you can make on your app to make it better for each indicator.
+And of course, last but not least, you also got the results of the metrics you've "passed", and it's always a good mood booster to see our app passing some audited points!
+
+Here is a quick introduction to this tool: 
+
++ Open Chrome in icognito mode, so that the page performance is not influenced by any of the installed extensions
++ Open your developer console, and go to the "Audit" tab. 
+You can also install a command line tool with `npm install -g lighthouse`, then run `lighthouse http://urlto.audit`.
++ Click on "Generate Report"
+
+![](img/lighthouse-audit.png)
+
+Now, Google Lighthouse is computing a series of analysis about your webpage.
+
+![](img/lighthouse-audit-results.png) 
+
+Now, you have some basic but useful indications about your application:
+
++ Performance. This metric mostly computes the rendering time of the page: how many time does it take to load the app in full, that is to say how many time it takes from the first byte received to the app fully ready.
+With Shiny, you will probably get low performance here, notably due to the fact that `{shiny}` is serving external dependencies that you might not be able to control. 
+For example, the report from `{hexmake}` advices to "Eliminate render-blocking resources", and most of them are not controled by you. 
+
++ Accessibility. Google Lighthouse performs a series of tests about accessibility (see our chapter about accessibility for more information).
+
++ Best practices bundles a list of "misc" best practices around web applications. 
+
++ SEO: search engine optimization, or how will your app perform when it comes to search engine indexation. 
+
++ Progressive Web App (PWA): a PWA is an app that can run on any device, _" reaching anyone, anywhere, on any device with a single codebase"_. 
+Google audit your application to see if your application fits with this idea.
+
+Profiling web page is a wide topic and a lot of things can be done to enhance the global page performance. 
+That being said, if you have a limited time to invest in optimizing the front-end performance of the application, Google Lighthouse is a perfect tool, and can be your go-to audit tool for your application. 
+
+And if you want to do if from R, the npm lighthouse module allows to output the audit in JSON, which can then be brought back to R!
+
+```bash
+lighthouse --output json --output-path data-raw/output.json http://localhost:2811
+```
+
+
+```{r}
+lighthouse_report <- jsonlite::read_json("data-raw/output.json")
+lighthouse_report[["audits"]][["speed-index"]][["displayValue"]]
+```
 
