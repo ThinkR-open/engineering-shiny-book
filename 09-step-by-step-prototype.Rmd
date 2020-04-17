@@ -1,227 +1,219 @@
 # (PART) Step 2: Prototype {-}
 
-# Building an "ipsum-app" {#stepprotopype} 
+# Setting up for success with `{golem}`
 
-## Prototyping is crucial
+Before starting to prototype and build anything, initialize a `{golem}` project! 
+This will help you put your application on solid ground, and once the project is ready to be filled, you can start prototyping right inside it!
 
-### Prototype, then polish
+The general workflow for "prototype and build" is the following: the project manager sets up a `{golem}` project, where the first steps are filled, the general structure, with Shiny module, is set, and then the project is registered to the version control system. 
+Once we have this structure, package and modules combined, we can start prototyping the UI inside the module, work on the CSS and JavaScript elements that might be needed, and prototyping the back-end functionalities inside Rmarkdown files. 
+And then, once this two prototyping sides are finished, we work on the integration of everything inside the reactive context.
 
-> Prototyping first may help keep you from investing far too much time for marginal gains.
+In this chapter and in chapter 11, we will be presenting the `{golem}` package in more depth.
+`{golem}` is a framework that standardize the process of building production-ready Shiny Applications. 
 
-http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#rule_of_optimization
+## Create a `{golem}`
 
-And yet another Rule from the Art of Unix Programming: "Rule of Optimization: Prototype before polishing. __Get it working before you optimize it__."
+Once `{golem}` is installed and available on your computer, you can got to File > New Project... in RStudio, and choose "Package for Shiny App Using golem" input. 
 
-Getting things to work before trying to optimize the app is always a good approach: 
+If you want to do it through command line, you can use:
 
-+ Making things work before working on low level optimization makes the whole engineering process easier: having a "minimal viable product" that works, even if slowly and not perfectly, gives a stronger sense of success to the project. 
-For example if you are building a vehicle, it feels more of a success to start with a skateboard than with a wheel: you quickly have a product that can be used to move, not waiting for the end of the project before finally having something useful.
-
-![](img/mvp.png)
-
-+ Abstraction is hard, and makes the code base harder to work with. 
-You have heard a lot that if you are copying and pasting something more than twice, you should write a function. 
-And with Shiny, if you are writing a piece of the app more than twice, you should write modules. 
-But while these kind of abstractions are elegant and optimized, they can make the software harder to work on while building it. 
-So before focusing on turning something into a function, make it work first. 
-As said in [R for Data Science](https://r4ds.had.co.nz/) about abstraction with `{purrr}`: 
-
-> Once you master these functions, you’ll find it takes much less time to solve iteration problems. But you should never feel bad about using a for loop instead of a map function. The map functions are a step up a tower of abstraction, and it can take a long time to get your head around how they work. The important thing is that you solve the problem that you’re working on, not write the most concise and elegant code (although that’s definitely something you want to strive towards!).
-
-`r right_link("R for Data Science - 21.5 The map functions", "https://r4ds.had.co.nz/iteration.html")`
-
-As a small example, we can refer to the binding module from `{hexmake}`: this module manipulates namespaces, inputs and `session` to automatically bind inputs to the R6 object containing the image (see implementation [here](https://github.com/ColinFay/hexmake/blob/master/R/mod_binder.R#L29), [here](https://github.com/ColinFay/hexmake/blob/master/R/utils_server.R#L2) and [here](https://github.com/ColinFay/hexmake/blob/master/R/mod_left.R#L60)). 
-That's an elegant solution: instead of duplicating content, we use functions to automatically bind events.
-But that is a higher level of abstraction: we manipulate different levels of namespacing and inputs, making it harder to reason about when you have to change the code base. 
-
-+ It's hard to identify upfront the real bottlenecks of the app. 
-As long as the app is not in a working state, it is very hard to identify the real pieces of code that need to be optimized. 
-Chances are that if you ask yourself upfront what the app bottlenecks will be, you will not aim right. 
-So instead of losing time focusing on specific pieces of code you think need to be optimized, start by having something that works, then optimize the code. 
-In other words, "_Make It Work. Make It Right. Make It Fast_", ([KentBeck](https://wiki.c2.com/?MakeItWorkMakeItRightMakeItFast)).
-
-+ It's easier to spot mistakes when you have something the can run. 
-If a piece of software runs, it is straightforward to check if a change in the codebase break the software or not: it either still run or not. 
-
-### The "UI first" approach
-
-Using what can be called a "UI first" approach when building an app is in most cases the safest way to fo. 
-And for two main reasons.
-
-#### Agreeing on specification
-
-First of all, it helps everybody involved in the application to agree on what the app is supposed to do, and once the UI is set, there should be no "surprise implementation". 
-Well, at least, this is the best way to reduce the number of changes in the app, as the sooner we have a global idea of the app the better: it is hard to implement a core new feature once the app is 90% finished, while it would have been way easier to implement it if it has been detected from the very start.
-Indeed, implementing core feature once the app is very advanced can be critical, as our application might not have been thought to work the way it now needs to work, so adding certain elements might lead to a need for change in the core architecture of the app.
-
-Once we agree on what elements compose the app, there should be no sudden "oh the app needs to do that thing now, sorry I hadn't realized that before".
-And we can not blame the person ordering the app for not realizing everything needed: it is really hard to have a mental model of the whole app when we are writing specifications, not to mention when reading them. 
-On the other hand, having a mock application with the UI really helps realizing what the app is doing and how it works, and to agree with the developer that this is actually what we want our application to do (or realizing that this is not something we actually need).
-
-Prototyping the UI first should require the least possible computation from the server-side of your application. 
-You focus on the appearance of the app: buttons, figures, tables, graphs... and how they interact with each other. 
-At that stage of the design process, you will not be focusing on correctness of the results or graphs: you will be placing elements on the front-end so that you can be sure that everything is there, even if some buttons do not trigger anything. 
-At that point, the idea is to get the people ordering the app think about what they actually need, and there might be some question rising like "oh, where is the button to download that results in pdf?". 
-And at that precise moment is the perfect time for a change in specification. 
-
-#### Organising work
-
-A pre-defined UI allows every person involved in the coding process to know which part of the app they are working on, and to be sure that you do not forget anything. 
-As you might be working on the app as a team, you will need to find a strategy for efficiently splitting the work between every coder. 
-And it’s much easier to work on a piece of the app you can visually identify and integrate in a complete app scenario. 
-In other words, it is easier to be told "you will be working on the 'Summary' panel from that mock UI" than "you will be working on bullet point 45 to 78 of the specifications". 
-
-## Prototyping Shiny
-
-In the next section, you will be introduced to two packages that can be used when prototyping user interface: `{shinipsum}` and `{fakir}`.
-
-### Fast UI Prototyping with `{shinipsum}`
-
-When prototyping the UI for an application, we will not be focusing on building the actual computation: what we need is creating a draft with visual components, so that we can have visual clues about the end result. 
-To do that, you can use the `{shinipsum}` package, which has been designed to generate random shiny elements.
-If you are familiar with "lorem ipsum", the fake text generator that is used in software design as a placeholder for text, the idea is the same: generating placeholders for Shiny outputs. 
-
-You can install this package from GitHub with:
-
-```{r eval=FALSE}
-remotes::install_github("Thinkr-open/shinipsum")
+```{r 09-step-by-step-prototype-1, eval = FALSE}
+golem::create_golem(path = "path/to/package")
 ```
 
-In this package, a series of functions that generates random placeholders. 
-For example, `random_ggplot()` generates random `{ggplot2}` elements. 
-If we run this code two time, we should get different results^[
-Well, there is a probability that we will get the same plot twice, and but that is the beauty of randomness.
-]:
+Once you've got that, a new project will be launched. 
+Here is the structure of this project:
 
-```{r}
-library(shinipsum)
-library(ggplot2)
-```
-
-```{r}
-random_ggplot() + 
-  labs(title = "Random plot") 
-```
-
-```{r}
-random_ggplot() + 
-  labs(title = "Random plot") 
-```
-
-Of course, the idea is to combine this with a Shiny interface, for example `random_ggplot()` will be used with a `renderPlot()` and `plotOutput()`.
-And as we want to prototype but still be close to what the app might look like, these functions take arguments that can shape the output: for example, `random_ggplot()` has a `type` parameter that can help you select a specific geom. 
-
-```{r 09-step-by-step-prototype-1}
-library(shiny)
-library(shinipsum)
-library(DT)
-ui <- fluidPage(
-  h2("A Random DT"),
-  DTOutput("data_table"),
-  h2("A Random Plot"),
-  plotOutput("plot"),
-  h2("A Random Text"),
-  tableOutput("text")
+```{r 09-step-by-step-prototype-2, echo=FALSE}
+fs::file_delete(
+  fs::path(
+    here::here("golex"), 
+    "inst/app/www/plop.js"
+  )
 )
-
-server <- function(input, output, session) {
-  output$data_table <- DT::renderDT({
-    random_DT(5, 5)
-  })
-  output$plot <- renderPlot({
-    random_ggplot()
-  })
-  output$text <- renderText({
-    random_text(nwords = 50)
-  })
-}
-shinyApp(ui, server)
+fs::file_delete(
+  fs::path(
+    here::here("golex"), 
+    "inst/app/www/script.js"
+  )
+)
+fs::file_delete(
+  fs::path(
+    here::here("golex"), 
+    "inst/app/www/custom.css"
+  )
+)
+fs::file_delete(
+  fs::path(
+    here::here("golex"), 
+    "R/mod_my_first_module.R"
+  )
+)
 ```
 
-Other `{shinipsum}` functions include: 
 
-+ tables: 
-
-```{r}
-random_table(nrow = 3, ncol = 10)
+```{r 09-step-by-step-prototype-3, comment=""}
+fs::dir_tree("golex")
 ```
 
-+ print outputs:
+If you are already familiar with R packages, most of these files will appear very familiar to you. 
+That's because a `{golem}` app IS a package.
 
-```{r}
-random_print(type = "model")
+For more details about these files, please refer to the [Understanding {golem} app structure]() part of this book. 
+In this part, we will go through the `dev/01_start.R` and `dev/02_dev.R` scripts.
+
+## Setting things up with `dev/01_start.R`
+
+Once you've created your project, the first file that opens is `dev/01_start.R`. 
+This file contains a series of commands to run once, at the start of the project. 
+These are the commands you will be using at 
+
+### Fill the DESCRIPTION and set options
+
+First, fill the DESCRIPTION file by adding information about the package that will contain your app:
+
+```{r 09-step-by-step-prototype-4, eval = FALSE}
+golem::fill_desc(
+  pkg_name = "ipsumapp", # The Name of the package containing the App 
+  pkg_title = "PKG_TITLE", # The Title of the package containing the App 
+  pkg_description = "PKG_DESC.", # The Description of the package containing the App 
+  author_first_name = "AUTHOR_FIRST", # Your First Name
+  author_last_name = "AUTHOR_LAST", # Your Last Name
+  author_email = "AUTHOR@MAIL.COM", # Your Email
+  repo_url = NULL # The URL of the GitHub Repo (optional) 
+)   
 ```
 
-... and text, image, ggplotly, dygraph, and DT.
+Then, call the `golem::set_golem_options()` function, it will add information to the `golem-config.yml` file, and notably set the `{here}` package root sentinel. 
 
-### Using `{fakir}` for fake data generation
+### Set common Files 
 
-Generating random placeholder for Shiny might not be enough: maybe you also need example datasets.
+If you want to use the MIT license, add README, a code of conduct, a lifecycle badge, and NEWS
 
-This can be accomplished using the `{fakir}` package, which was primarily created to provide fake datasets for R tutorials and exercises, but that can easily be used inside a Shiny application. 
-
-At the time of writing these lines, the package is only available on GitHub, and can be installed with:
-
-```{r eval=FALSE}
-remotes::install_github("Thinkr-open/fakir")
+```{r 09-step-by-step-prototype-5, eval = FALSE}
+usethis::use_mit_license( name = "Golem User" )  # You can set another license here
+usethis::use_readme_rmd( open = FALSE )
+usethis::use_code_of_conduct()
+usethis::use_lifecycle_badge( "Experimental" )
+usethis::use_news_md( open = FALSE )
 ```
 
-This package contains three "datasets", that are randomly generated when you call the corresponding functions:
+It's also where you will be invited to use `git`
 
-+ `fake_base_clients()` generates a fake dataset for a ticketing service
-
-+ `fake_sondage_answers()` is a fake survey about transportation
-
-+ `fake_visits()` is a fake dataset for the visits on a website
-
-```{r}
-library(fakir)
-fake_visits(from = "2017-01-01", to = "2017-01-31")
+```{r 09-step-by-step-prototype-6, eval = FALSE}
+usethis::use_git()
 ```
 
-The idea with these datasets is to combine various formats that can reflect "real life" datasets: they contain dates, numeric and character variables, and have missing values. 
-They can also be manipulated with the included `{sf}` geographical dataset `fra_sf` allowing for maps creation.  
 
-Fake datasets created with `{fakir}` can be used to build light examples on the use of the inputs, for filters or interactive map, or as examples for the internal functions and their corresponding documentation. 
+### Init Tests
 
-## Building with RMarkdown {#proto-rmdfirst}
+Create a template for tests:
 
-While on one side you are building the user interface, you (or someone from your team) can start working on the back-end implementation.
-Again, this should be done out of any reactive logic: the back-end should not depend on any reactive context. 
-And because documentation is gold, you should start with writing the back-end documentation straight as package documentation, inside your Vignettes. 
-Or what we call "Rmd-first".
+```{r 09-step-by-step-prototype-7, eval = FALSE}
+golem::use_recommended_tests()
+```
 
-### Define the content of the application
 
-Rmarkdown files are the perfect spot to sandbox the back-end of your application: inside the file, you are not disrupted by any reactive behavior, as you are just working with plain old R code: data wrangling operations, multi-parameters based models, summary tables outputs, graphical outputs...
+### Use Recommended Elements
 
-And the nice thing is that you can share the output of the rendered file as an HTML or PDF to either your client or boss, or anyone ordering the application. 
-That way, you can drive the discussion to be focused on discussing the core algorithm, not some details like "I want the button to be blue" when what you need to know is if the output of the model is correct-in other words, you are again applying the rule of the separation of concerns, i.e. you help focusing on one part of the application without adding any cognitive load to the person "reading" the outputs. 
+`golem::use_recommended_tests()` and `golem::use_recommended_deps()` sets a default testing infrastructure and adds dependencies to the application. 
 
-And also, last but not least, if you have to implement changes to the back-end functions, it is way easier to check and to share in a static file than in an application.
+### Add utilitary functions
 
-When doing that, the best way is again to separate things: do not be afraid of writing multiple RMarkdown files, one for each part of the end application. 
-Again, this will help everybody focus on what matter: be it you, your team, or the person ordering the application. 
+These two functions add a file with various functions that can be used along the process of building your app.
 
-Building the back-end in Rmd files is also a good way to make the back-end "application independent", in the sense that it helps documenting how the algorithms you have been building can be used outside of the application. 
-In many cases, when you are building an application, you are creating functions that contain business logic/domain expertise, and that can in fact be used outside of the application. 
-Writing these functions and how they work together forces you to think about these functions, and also gives a good starting point for anybody familiar with R that would want to start using this back-end toolkit.
-Of course, as you are building your application as a package, it is way easier now: you can share a package with the application inside it, along with a function to launch the app but also functions that can be used outside.
+See each file in details for a description of the functions.
 
-And if you need some data to use as an example, feel free to pick one from `{fakir}`! (See §\@ref(stepprotopype)).
+```{r 09-step-by-step-prototype-8, eval = FALSE}
+golem::use_utils_ui()
+golem::use_utils_server()
+```
 
-### Using the Rmd files as a laboratory notebook 
+### If you want to change the default favicon
 
-Rmd can also be used as the place to keep track of what you have in mind while creating the application: most of the time, you will create the functions inside the `R/` folder, but it might not be the perfect place to document your thought process. 
-On the other hand, using Markdown as a kind of "software laboratory notebook" to keep track of your idea is a good way to document all the choices you have made about your data wrangling, models, visualization, so that you can use it as a common knowledge-base all along the application life: you can share this with your client, with the rest of your team, or with anybody involved in the project.
+```{r 09-step-by-step-prototype-9, eval = FALSE}
+golem::use_favicon( path = "path/to/favicon")
+```
 
-And also, developing in multiple Rmd files helps the separation of work between multiple developers, and will reduce code conflicts during development.
+You're now set! 
+You've successfully initiated the project and can go to `dev/02_dev.R`.
 
-### Rmd, Vignettes, and documentation first
+## Setting infrastructure for prototyping 
 
-Working with the `{golem}` framework implies that you will build the application as an R package. 
-And of course, an R package implies writing documentation: one of the main goals of the Vignettes, in an R package, is to document how to use the package. 
-And the good news is that when checking a package, _i.e_ when running `devtools::check()` or `R CMD check`, the Vignettes are going to be built, and the process will fail if at least one of the Vignette fails to render. 
-That way, you can use the documentation of the back-end as an extra tool for doing unit-testing!
+### Add modules in `dev/02_dev.R`
 
-One radical approach to the "Rmd first" philosophy is to write __everything__ in an Rmd from the very beginning of your project: write the function code, there roxygen tags, their tests, etc, then move everything to the correct spot in the package infrastructure once you are happy with everything. And of course, when you need to add another feature to your app, open a new markdown and start the process of development and documentation again. 
+The `golem::add_module()` functions creates a module in the `R` folder. 
+The file and the modules will be named after the `name` parameter, by adding `mod_` to the R file, and `mod_*_ui` and `mod_*_server` to the UI and server functions.
+
+```{r 09-step-by-step-prototype-10, eval = FALSE}
+golem::add_module(name = "my_first_module") # Name of the module
+```
+
+```{r 09-step-by-step-prototype-11, echo = FALSE}
+golem::add_module(name = "my_first_module", here::here("golex"), open = FALSE) 
+```
+ 
+The new file will contain:
+
+```{r 09-step-by-step-prototype-12, echo = FALSE, comment=""}
+readLines("golex/R/mod_my_first_module.R") %>% 
+  cat(sep = "\n")
+```
+
+Note that in order not to make errors when putting these into your app, the end of the file will contain code that has to be copied and pasted inside your UI and server functions. 
+
+This is where you will be adding the core of your app. 
+In a first time, these modules will contain prototyped UI for the application, and once the application is ready to be integrated, you will add the core logic here.
+
+### Add CSS & JS Files
+
+Adding some infrastructure for JavaScript and CSS file from the very beginning can also formalize the set-up: you are giving the rest of your team a 
+
+```{r 09-step-by-step-prototype-13, eval = FALSE}
+golem::add_js_file( "script" )
+```
+
+
+```{r 09-step-by-step-prototype-14, include = FALSE}
+golem::add_js_file("script", here::here("golex"), open = FALSE)
+```
+
+Will generate the following file:
+
+```{r, comment="", echo=FALSE}
+readLines("golex/inst/app/www/script.js") %>% 
+  cat(sep = "\n")
+```
+
+Here, you will have an infrastructure for launching JavaScript code once the application is ready (this code is standard `jQuery` format: we will be back to JavaScript at the end of this book).
+
+```{r 09-step-by-step-prototype-15, eval = FALSE}
+golem::add_js_handler( "handlers" )
+```
+
+```{r 09-step-by-step-prototype-16, include = FALSE}
+golem::add_js_handler("handlers", here::here("golex"), open = FALSE)
+```
+
+Will generate the following file:
+
+```{r, comment="", echo=FALSE}
+readLines( "golex/inst/app/www/handlers.js" ) %>% 
+  cat(sep = "\n")
+```
+
+As you can see, there is already a skeleton for building Shiny JavaScript handlers. 
+More on that structure in the last chapter of the book!
+
+```{r 09-step-by-step-prototype-17, eval = FALSE}
+golem::add_css_file( "custom" )
+```
+
+```{r 09-step-by-step-prototype-18, include = FALSE}
+golem::add_css_file("custom", here::here("golex"), open = FALSE)
+```
+
+Will create a blank CSS file inside the `inst/app/www` folder.
+
+Note that if you are building your application with `{golem}`, these files will be linked automatically to your application. 
