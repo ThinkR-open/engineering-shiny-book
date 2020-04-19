@@ -1,0 +1,134 @@
+---
+title: "Use renv"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  eval = FALSE
+)
+```
+
+# First time
+
+- Be sure to be inside your Rstudio project
+
+## You may need {renv}
+
+```{r}
+remotes::install_github('rstudio/renv')
+```
+
+## Hide from git
+```{r}
+# Should already be done
+# install.packages("usethis")
+usethis::use_git_ignore("renv_instructions.Rmd")
+usethis::use_build_ignore("renv_instructions.Rmd")
+```
+
+## The first time you launch your project in the Docker container, run :
+```{r}
+renv::consent(TRUE)
+renv::activate()
+```
+
+## Restore the project from the lock file if any problem
+```{r}
+renv::init()
+```
+
+
+
+# Activate cache shared on host
+- Store this code in your *project* `.Rprofile` file
+  `Sys.setenv(RENV_PATHS_CACHE = "/opt/local/renv/cache")`
+- If cache *not* shared with host with option `renv_cache`, then de-activate cache otherwise packages will disappear at next Docker restart
+`renv::settings$use.cache(FALSE)`
+
+## .Rprofile content
+Store this code inside your project `.Rprofile` file to reduce problems with cache.
+
+```r
+source("renv/activate.R")
+renv::activate()
+
+# cache ----
+if (dir.exists("/opt/local/renv/cache")) {
+  # Cache inside the docker container with persistent drive
+  Sys.setenv(RENV_PATHS_CACHE = "/opt/local/renv/cache")
+  renv::settings$use.cache(TRUE)
+} else if (dir.exists("/mnt/Data/renv_cache")) {
+  # Your local path on linux/unix if project used out of Docker
+  Sys.setenv(RENV_PATHS_CACHE = "/mnt/Data/renv_cache")
+  renv::settings$use.cache(TRUE)
+} else if (dir.exists("D:/renv_cache_windows/")) {
+  # Your local path on Windows if project used out of Docker
+  Sys.setenv(RENV_PATHS_CACHE = "D:/renv_cache_windows")
+  renv::settings$use.cache(TRUE)
+} else {
+  # No cache
+  renv::settings$use.cache(FALSE)
+}
+```
+
+# During the dev process
+## After you updated packages, added new ones or removed somes
+If you are satisfied with the effects, run:
+```{r}
+renv::snapshot()
+```
+
+If you are not satisfied, run:
+```{r}
+renv::restore() # instead of snapshot()
+```
+
+## If you are ready to send your modifications to the git server
+And after you ran `devtools::check()`, store your packages list with:
+
+```{r}
+renv::snapshot()
+```
+
+## If you updated your branch from the server
+There may be new packages needed, therefore run:
+```{r}
+renv::restore()
+```
+
+# If you need to upgrade (or otherwise change) the version of renv
+This should normally be automatically done in the `renv/activate.R`, but you can do it with:
+
+```{r}
+renv::upgrade()
+```
+
+
+# Use git inside the Docker container
+## First time
+```{r}
+# project config
+usethis::use_git_config(scope = "project", user.name = "username", user.email = "user@email.fr")
+```
+
+## Use credentials
+Must be done for each session as not stored in the persistent drive
+
+```{r}
+# Store credentials
+my_cred <- git2r::cred_user_pass(
+  username = "username",
+  password = askpass::askpass()
+)
+usethis::use_git_credentials(credentials = my_cred)
+```
+
+# If you mistakenly installed package from github or forced one version
+You may have to be sure to install dependencies from MRAN
+```{r}
+ll <- list.files(.libPaths()[1], full.names = TRUE)
+for (l in ll) {
+  try(remotes::install_cran(l))
+}
+```
+
