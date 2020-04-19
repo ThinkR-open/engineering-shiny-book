@@ -18,6 +18,9 @@ imports <- unique(c(
 )
 attachment::att_to_desc_from_is(path.d = "DESCRIPTION", imports = imports)
 
+remotes::install_deps()
+remotes::install_local(force = TRUE)
+
 # Name chunks
 namer::name_dir_chunks(".")
 
@@ -28,6 +31,7 @@ namer::name_dir_chunks(".")
 # ou bien
 remotes::install_github("ThinkR-open/golem")
 remotes::install_local(force = TRUE)
+remotes::install_github("rlesur/crrri")
 
 # Test
 pid <- rstudioapi::terminalExecute(
