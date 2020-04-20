@@ -13,7 +13,7 @@ Or worse, we generate endless reactive loops, aka "the reactive inferno" where A
 
 Let's take a small example of a reactive inferno: 
 
-```{r eval = FALSE}
+```{r 16-common-app-caveats-1, eval = FALSE}
 library(shiny)
 ui <- function(){
   tagList(
@@ -82,7 +82,7 @@ And believe us, we have seen pieces of code where the `observe()` contains hundr
 
 For example, let's start with that:
 
-```{r 16-common-app-caveats-1, eval = FALSE}
+```{r 16-common-app-caveats-2, eval = FALSE}
 ## DO NOT DO GLOBAL VARIABLES, IT'S JUST TO SIMPLIFY THE EXAMPLE
 i <- 0
 library(shiny)
@@ -106,7 +106,7 @@ shinyApp(ui, server)
 
 Oh, and then, let's add a small `selectInput()`:
 
-```{r 16-common-app-caveats-2, eval = FALSE}
+```{r 16-common-app-caveats-3, eval = FALSE}
 i <- 0
 library(shiny)
 library(cli)
@@ -134,7 +134,7 @@ shinyApp(ui, server)
 
 And, as time goes by, we add another control flow to our `observe()`: 
 
-```{r 16-common-app-caveats-3, eval = FALSE}
+```{r 16-common-app-caveats-4, eval = FALSE}
 i <- 0
 library(shiny)
 library(cli)
@@ -170,7 +170,7 @@ shinyApp(ui, server)
 And it would be nice to keep the selected values into a reactive list, so that we can reuse it elsewhere. 
 And maybe you would like to add a checkbox so that the logs are printed to the console only if checked.
 
-```{r 16-common-app-caveats-4, eval = FALSE}
+```{r 16-common-app-caveats-5, eval = FALSE}
 i <- 0
 library(shiny)
 library(cli)
@@ -271,7 +271,7 @@ These objects are launched with an `init` function, then these flags are trigger
 The idea here is to get a full control over the reactive flow: we only invalidate contexts when we want, making the general flow of the app more predictable.
 These flags are available using the `{gargoyle}` package, that can be installed from GitHub with:
 
-```{r eval = FALSE}
+```{r 16-common-app-caveats-6, eval = FALSE}
 remotes::install_github("ColinFay/gargoyle")
 ```
 
@@ -302,7 +302,7 @@ An object of this class is then initiated at the top level of your application, 
 Of course, this makes even more sense if you are combining it with the trigger/watch pattern from before!
 
 
-```{r 16-common-app-caveats-6, eval = FALSE}
+```{r 16-common-app-caveats-7, eval = FALSE}
 library(shiny)
 nameui <- function(id){
   ns <- NS(id)
@@ -382,7 +382,7 @@ Here are three strategies to code without `uiOutput()` & `renderUI()`.
 We will see in the last chapter of this book how you can integrate JS inside your Shiny app, and how even basic functions can be useful for making your app server lighter. 
 For example, compare: 
 
-```{r 16-common-app-caveats-7 }
+```{r 16-common-app-caveats-8 }
 library(shiny)
 ui <- function(){
   tagList(
@@ -411,7 +411,7 @@ shinyApp(ui, server)
 
 to
 
-```{r 16-common-app-caveats-8 }
+```{r 16-common-app-caveats-9 }
 library(shiny)
 ui <- function(){
   tagList(
@@ -455,7 +455,7 @@ And, on top of being harder to maintain, the second solution redraws the plot ev
 Almost every Shiny inputs, even the custom ones from packages, come with an `update_` function that allows to change the input values from the server side, instead of recreating the UI entirely. 
 For example, here is a way to update the content of a `selectInput` from the server side:
 
-```{r 16-common-app-caveats-9 }
+```{r 16-common-app-caveats-10 }
 library(shiny)
 ui <- function(){
   tagList(
@@ -500,7 +500,7 @@ In other word, if you have `selectInput("x", "x")`, and that you remove this inp
 
 For example, in the following example, the `input$val` value will not be removed once you have called `removeUI(selector = "#val")`.
 
-```{r}
+```{r 16-common-app-caveats-11}
 library(shiny)
 ui <- function(){
   tagList(
@@ -621,7 +621,7 @@ For a more extensive coverage of using databases in R, please follow these resou
 
 How to choose between these three methodologies:
 
-```{r 16-common-app-caveats-10, echo= FALSE}
+```{r 16-common-app-caveats-12, echo= FALSE}
 knitr::kable(
   data.frame(
     Choice = c("Package data", "Reading files", "External DataBase"), 
