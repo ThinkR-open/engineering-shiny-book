@@ -121,7 +121,7 @@ This can be used in JavaScript, but it is also very useful for styling elements 
 
 ### Querying in Vanilla JavaScript
 
-In "Vanilla" JavaScript (i.e without any external plugin installed), you can query these element using methods from the `document` object. 
+In "Vanilla" JavaScript (i.e without any external plugin installed), you can query these elements using methods from the `document` object. 
 For example: 
 
 ``` javascript
@@ -142,6 +142,10 @@ document.getElementsByName("plop")
 // Using the tag name
 document.getElementsByTagName("div")
 ```
+
+Note that some of these methods have been introduced with ES6, which is a version of JavaScript that came out in 2015. 
+This version of JavaScript is supported by most browser since mid-2016 (and June 2017 for Firefox) (see [JavaScript Versions](https://www.w3schools.com/js/js_versions.asp) from W3Schools).
+Most of your users should now be using a browser version that is compatible with ES6, but that is something that you might want to keep in mind: browser version matters when it comes to using JavaScript. 
 
 ### About DOM events 
 
@@ -216,7 +220,7 @@ For example, the following HTML code:
 contains the `href` & `data-value` attributes.
 You can refer to these with `[]` after the tag name.
 
-+ `$("a[href = 'https://thinkr.fr'])` refers to link(s) with `href` being `https://thinkr.fr`
++ `$("a[href = 'https://thinkr.fr']")` refers to link(s) with `href` being `https://thinkr.fr`
 
 + `$('a[data-value="panel2"]')` refers to link(s) with  `data-value` being `"panel2"`
 
@@ -227,7 +231,9 @@ In other words, you will interact with objects from the web page, and these obje
 
 Note that this is not specific to `jQuery`: elements can also be selected with standard JavaScript. 
 `jQuery` has the advantage of simplifying selections and actions and to be cross-platform, making it easier to ship applications that can work on all major browsers. 
-And it comes with Shiny for free! 
+And it comes with Shiny for free!
+
+Choosing `jQuery` or vanilla JavaScript is up to you: and in the rest of this chapter we will try to mix both syntax, and put both when possible, so that you can choose the one you are the most comfortable with.
 
 ## Client-side JavaScript
 
@@ -249,6 +255,9 @@ output$ui <- renderUI({
   }
 })
 ```
+
+Note that this will not drastically improve the performance of your application. 
+Though it will help making it lighter in term of code and easier to grasp in term of readability: everything that can be created in the UI stays in the UI, and everything that needs to be performed by R is in the server.
 
 + `alert("message")` uses the built-in alert-box mechanism from the user's browser (i.e., the `alert()` function is not part of `jQuery` but it is built inside the user's browser).
 It works well as it relies on the browser instead of relying on R or on a specific JavaScript library. 
@@ -279,10 +288,10 @@ observeEvent(input$ok, {
 })
 ```
 
-+ `$('#id').css('color', 'green');` changes the CSS attributes of the selected element(s). 
++ `$('#id').css('color', 'green');` / `document.getElementById("demo").style.color = "green";` changes the CSS attributes of the selected element(s). 
 Here, we are switching to green on the `#id` element.
 
-+ `$("#id").text( "this" );` changes the text content to "this". 
++ `$("#id").text("this)` / `document.getElementById("id").innerText = "this";` changes the text content to "this". 
 This can be used to replace 
 
 ```{r 18-javascript-5, eval = FALSE}
@@ -295,7 +304,7 @@ output$ui <- renderUI({
 })
 ```
 
-+ `$("#id").remove();` completely removes the element from the DOM. 
++ `$("#id").remove();` / `var elem = document.querySelector('#some-element'); elem.parentNode.removeChild(elem);` completely removes the element from the DOM. 
 It can be used as a replacement for `shiny::removeUI()`, or as a conditional UI. 
 
 ### Where to put them - Back to JavaScript Events
@@ -488,7 +497,7 @@ observe({
 ### From JavaScript to R
 
 How to do the other way around (from JavaScript to R)?
-Shiny apps, in the browser, contain an object called `Shiny`, which can be used to send values to R, by creating an `IputValue`. 
+Shiny apps, in the browser, contain an object called `Shiny`, which can be used to send values to R, by creating an `InputValue`. 
 For example, with: 
 
 ```{js 18-javascript-17, eval = FALSE, echo = TRUE}

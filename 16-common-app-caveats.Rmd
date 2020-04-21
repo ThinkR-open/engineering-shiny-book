@@ -450,6 +450,69 @@ shinyApp(ui, server)
 The result is the same, but the first version is shorter and easier to reason about: we have one button, and the behavior of the button is contained into itself. 
 And, on top of being harder to maintain, the second solution redraws the plot every time the `reactiveValues` is updated, making R compute way more than it should, whereas with the JavaScript only solution, the plot is not recomputed every time you need to show it.
 
+At a local level, the improvements described in this section will not make your application way faster: for example, rendering UI elements (let's says rendering a simple title) will not be computationally heavy. 
+But at a global level, lighter UI computation from the server side helps the general rendering of the app: let's say you have an output that takes 3 seconds to run, then if the whole UI + output is to be rendered on the server side, the whole UI stays blank.
+
+Compare:
+
+```{r}
+library(shiny)
+ui <- function(){
+  tagList(
+    uiOutput("caption")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  output$caption <- renderUI({
+    Sys.sleep(3)
+    tagList(
+      h3("test"), 
+      p("caption")
+    )
+    
+  })
+}
+
+shinyApp(ui, server)
+```
+
+to
+
+```{r}
+library(shiny)
+ui <- function(){
+  tagList(
+    h3("test"), 
+    textOutput("caption")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  output$caption <- renderText({
+    Sys.sleep(3)
+    "Lorem ipsum dolor"
+  })
+}
+
+shinyApp(ui, server)
+```
+
+In the first example, the UI will wait for the server to have rendered, while in the second we will first see the title, then the rendered text after a few seconds. 
+That approach makes the user experience better: they know that something is happening, while completely blank page is confusing. 
+
+Also, R being single threaded, manipulating DOM elements from the server side make R busy doing these DOM manipulation while it could be computing something else. 
+And let's imagine it takes a quarter of a second to render the DOM element, that is a full second for rendering four of them, while R should be busy doing something else!
+
+
 #### `update*` inputs
 
 Almost every Shiny inputs, even the custom ones from packages, come with an `update_` function that allows to change the input values from the server side, instead of recreating the UI entirely. 
