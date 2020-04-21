@@ -10,21 +10,24 @@
 
 ## A (very) short introduction to Shiny 
 
-If you are reading this page, chances are you already know what a Shiny application ("Shiny app") is — a web application that communicates with R, built in R, and working with R. 
-The beauty of `{shiny}` is that it makes it easy for anybody to create a small app in a matter of hours.
-With small and minimal Shiny apps, no knowledge of HTML, CSS or JavaScript is required. 
-With very little training, you can rapidly create a proof-of-concept (POC) for a data-product and showcase an algorithm or present your results in an elegant and accessible to build user interface. 
+If you are reading this page, chances are you already know what a Shiny application (shorten "Shiny app") is—a web application that communicates with R, built in R, and working with R. 
+The beauty of `{shiny}` is that it makes it easy for someone already familiar with R to create a small app in a matter of hours.
+With small and minimal Shiny apps, no knowledge of HTML, CSS or JavaScript is required, and you do not have to think about technical elements that usually come with web applications—for example, yodo not't have to think about the port the application is served on: `{shiny}` picks one for you^[
+Of course you can specify one if you need to, but by default the package picks one for you.
+].
+Same goes for serving external dependencies: the application comes with its set of CSS and JavaScript dependencies that a common developer does not need to worry about. 
+And that is probably one of the main reason of the success of the package—with very little training, you can rapidly create a proof-of-concept (POC) for a data-product and showcase an algorithm or present your results in an elegant and accessible user interface. 
 
 The first version of `{shiny}` was published in 2012. 
 Since then, it has been one of the top project of the RStudio team. 
-At the time of writing these lines (January 2020), there are more than 4600 commits in the master branch of the main GitHub repository, made by 46 contributors. 
-It is now downloaded around 400K times a month, according to [cranlogs](https://cranlogs.r-pkg.org/badges/shiny), and has `r length(devtools::revdep("shiny"))` reverse dependencies (package that depends on it) according to `devtools::revdep("shiny")`. 
+At the time of writing these lines (April 2020), there are more than 4700 commits in the master branch of the main GitHub repository, made by 46 contributors. 
+It is now downloaded around 400K times a month, according to [cranlogs](https://cranlogs.r-pkg.org/badges/shiny), and has `r length(devtools::revdep("shiny"))` reverse dependencies (i.e packages that depend on it), according to `devtools::revdep("shiny")`. 
 
-If you are very new to Shiny, this book might feel a little bit complex.
-Indeed, it relies on the assumption that you already know how to build (at least basic) Shiny applications and that you want to push your Shiny skills to the next level. 
+If you are very new to Shiny, this book might feel a little bit overwhelming: we will be discussing some advance `{shiny}` production methods, best practices and structural idea for sending Shiny applications to production. 
+This books relies on the assumption that you already know how to build basic Shiny applications, and that you want to push your Shiny skills to the next level: in other words, you are ready to move from the Proof of Concept to the production-grade application.
 If you are very new to Shiny, we suggest you start with the [Mastering Shiny book](https://mastering-shiny.org/) before reading the present book.
 
-Ready to get started with complex Shiny App?
+Ready to start engineering production-grade Shiny Apps?
 
 ## What is a complex Shiny Application? {#complex-shiny}
 
@@ -44,7 +47,8 @@ Getting a clear definition is not an easy task^[
 Ironic right?
 ]
 as it very much depends on who is concerned and who you are talking to.
-A good definition is the one from [The Art of Unix Programming](http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#id287833): _"Complex software is harder to think about, harder to test, harder to debug, and harder to maintain — and above all, harder to learn and use."_
+A good definition is the one from [The DevOps Handbook](https://itrevolution.com/book/the-devops-handbook/): _"One of the defining characteristics of a complex system is that it __defies any single person's ability to see the system as a whole and understand how all the pieces fit together__. Complex system typically have a high degree of interconnectedness of tightly coupled components, and system-level behavior cannot be explained merely in terms of the behavior of the system components."_ (we underlined).
+
 But let us try to come up with a definition that will serve us in the context of engineering Shiny applications. 
 When building software, we can think of complexity from two points of view: the complexity as it is seen by the coder, and the complexity as it is seen by the customer / end user
 ^[from _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity"].
@@ -137,7 +141,7 @@ Number of lines of code depends on your coding style and the packages you are us
 
 Consider this piece of valid R code:
 
-```{r big-shiny-1 }
+```{r 01-big-shiny-1 }
 iris[
   1
   :
@@ -148,7 +152,7 @@ iris[
 
 Six lines of code for something that could also be written in one line.  
 
-```{r big-shiny-2 }
+```{r 01-big-shiny-2 }
 iris[1:5, "Species"]
 
 ```
@@ -172,7 +176,7 @@ Altough, you can define files that respect the visual structure of the applicati
 
 If you want to use the number of lines metric, you can directly use R with the `{cloc}` package, available at <https://github.com/hrbrmstr/cloc>.
 
-```{r big-shiny-3, eval = TRUE}
+```{r 01-big-shiny-3, eval = TRUE}
 if (!requireNamespace("cloc")){
   remotes::install_github("hrbrmstr/cloc")
 }
@@ -180,7 +184,7 @@ if (!requireNamespace("cloc")){
 
 For example, let us compare a rather big package (`{shiny}`) with a small one (`{attempt}`):
 
-```{r big-shiny-4 }
+```{r 01-big-shiny-4 }
 library(cloc)
 library(dplyr)
 shiny_cloc <- cloc_cran("shiny", .progress = FALSE, repos = "http://cran.irsn.fr/" )
@@ -221,12 +225,12 @@ Please refer to the bibliography for further readings about the theory behind th
 
 In R, the cyclomatic complexity is computed with the `{cyclocomp}` package, which can be installed from `CRAN` with:
 
-```{r big-shiny-1-bis, include=FALSE}
+```{r 01-big-shiny-5, include=FALSE}
 # for writers
 if (!requireNamespace("cyclocomp")) {install.packages("cyclocomp")}
 ```
 
-```{r big-shiny-5, eval = FALSE}
+```{r 01-big-shiny-6, eval = FALSE}
 install.packages("cyclocomp")
 ```
 
@@ -235,57 +239,57 @@ The one we will be interested in is `cyclocomp_package_dir()`: building successf
 You can then use `cyclocomp_package_dir()` to compute the complexity of your app. 
 Here is for example the cyclomatic complexity of the default golem template:
 
-```{r big-shiny-6, include = FALSE}
+```{r 01-big-shiny-7, include = FALSE}
 remotes::install_local("golex", upgrade = "never")
 ```
 
-```{r big-shiny-7, echo=FALSE, eval=FALSE}
+```{r 01-big-shiny-8, echo=FALSE, eval=FALSE}
 db <- memoise::cache_filesystem(here::here("fcache/"))
 cyclocomp_package <- memoise::memoise(cyclocomp::cyclocomp_package, cache = db)
 ```
 
-```{r big-shiny-8, eval=FALSE}
+```{r 01-big-shiny-9, eval=FALSE}
 library(cyclocomp)
 cyclocomp_package("golex") %>% head()
 ```
-```{r big-shiny-8-eval, echo=FALSE}
+```{r 01-big-shiny-10, echo=FALSE}
 cyclo_golex <- readr::read_rds(here::here("dataset", "cyclo_golex.rds"))
 head(cyclo_golex)
 ```
 
-```{r big-shiny-9, include = FALSE}
+```{r 01-big-shiny-11, include = FALSE}
 remove.packages("golex")
 ```
 
 And the one from another small application:
 
-```{r big-shiny-10, include = FALSE}
+```{r 01-big-shiny-12, include = FALSE}
 if (!requireNamespace("tidytuesday201942")) {
   remotes::install_github("ColinFay/tidytuesday201942")
 }
 ```
 
 
-```{r big-shiny-11, eval=FALSE}
+```{r 01-big-shiny-13, eval=FALSE}
 cyclocomp_package("tidytuesday201942") %>% head()
 ```
-```{r big-shiny-11-eval, echo=FALSE}
+```{r 01-big-shiny-14, echo=FALSE}
 cyclo_tidytuesday <- readr::read_rds(here::here("dataset", "cyclo_tidytuesday.rds"))
 head(cyclo_tidytuesday)
 ```
 
 And, finally, the one for `{shiny}`:
 
-```{r big-shiny-12, include = FALSE}
+```{r 01-big-shiny-15, include = FALSE}
 if (!requireNamespace("shiny")) {
   remotes::install_cran("shiny")
 }
 ```
 
-```{r big-shiny-13, eval=FALSE}
+```{r 01-big-shiny-16, eval=FALSE}
 cyclocomp_package("shiny") %>% head()
 ```
-```{r big-shiny-13-eval, echo=FALSE}
+```{r 01-big-shiny-17, echo=FALSE}
 cyclo_shiny <- readr::read_rds(here::here("dataset", "cyclo_shiny.rds"))
 head(cyclo_shiny)
 ```
@@ -303,18 +307,18 @@ But that is not a magic solution: (A) because the global complexity of the app i
 
 #### Other measures for code complexity
 
-Complexity can come from other sources: unsufficient code coverage leading to bugs that are hard to spot, dependencies that breaks the implementation, old package, or a lot of other things. 
+Complexity can come from other sources: insufficient code coverage leading to bugs that are hard to spot, dependencies that breaks the implementation, old package, or a lot of other things. 
 
 We can use the `{packageMetrics2}` package to spot multiple metrics like the number of dependencies, the code coverage, the number of releases. 
 This also includes number of lines of R code and cyclomatic complexity.
 
-```{r big-shiny-14, include = FALSE}
+```{r 01-big-shiny-18, include = FALSE}
 if (!requireNamespace("packageMetrics2")) {
   remotes::install_github("MangoTheCat/packageMetrics2")
 }
 ```
 
-```{r big-shiny-15 }
+```{r 01-big-shiny-19 }
 library(packageMetrics2)
 frame_metric <- function(pkg){
   metrics <- package_metrics(pkg)
@@ -326,32 +330,33 @@ frame_metric <- function(pkg){
 }
 ```
 
-```{r big-shiny-16, echo=FALSE, eval=FALSE}
+```{r 01-big-shiny-20, echo=FALSE, eval=FALSE}
 db <- memoise::cache_filesystem(here::here("fcache/"))
 frame_metric <- memoise::memoise(frame_metric, cache = db)
 ```
 
 *{golem}*
-```{r big-shiny-17, cache=TRUE, warning=FALSE, eval=FALSE}
+```{r 01-big-shiny-21, cache=TRUE, warning=FALSE, eval=FALSE}
 frame_metric("golem") %>% knitr::kable()
 ```
-```{r big-shiny-17-eval, echo=FALSE}
+```{r 01-big-shiny-22, echo=FALSE}
 frame_golem <- readr::read_rds(here::here("dataset", "frame_golem.rds"))
 knitr::kable(frame_golem)
 ```
 
 *{shiny}*
-```{r big-shiny-17b, cache=TRUE, warning=FALSE, eval=FALSE}
+```{r 01-big-shiny-23, cache=TRUE, warning=FALSE, eval=FALSE}
 frame_metric("shiny") %>% knitr::kable()
 ```
-```{r big-shiny-17b-eval, echo=FALSE}
+
+```{r 01-big-shiny-24, echo=FALSE}
 frame_shiny <- readr::read_rds(here::here("dataset", "frame_shiny.rds"))
 knitr::kable(frame_shiny)
 ```
 
 If you are building you Shiny application with `{golem}`, a framework for building shiny apps, you can use the `DESCRIPTION` file, the one that contains the list of dependencies, as a starting point to explore these metrics for your dependencies: 
 
-```{r big-shiny-18 }
+```{r 01-big-shiny-25 }
 desc::desc_get_deps("golex/DESCRIPTION")
 # See also 
 attachment::att_from_description("golex/DESCRIPTION")
