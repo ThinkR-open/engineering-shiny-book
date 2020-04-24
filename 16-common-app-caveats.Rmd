@@ -2,34 +2,88 @@
 
 ## Reactivity anti-patterns
 
-### Reactivity is awesome... until it's not
+### Reactivity is awesome... until it is not
 
-Let's face it, reactivity is awesome... until it's not. 
+Let's face it, reactivity is awesome... until it is not. 
 Reactivity is a common source of confusion for beginners, and a common source of bugs and bottlenecks, even for seasoned Shiny developers. 
-Most of the time, issues come from the fact that __there is too much reactivity__, i.e. we build apps where too much things happen, and some things are updated way more than they should, and computations are performed when they shouldn't. 
+Most of the time, issues come from the fact that __there is too much reactivity__, _i.e._ we build apps where too much things happen, and some things are updated way more often than they should, and computations are performed when they should not. 
 
-Of course, it's a nice feature to make everything react instantly to changes, but when building larger apps it's easy to create monsters, i.e complicated, messy reactive graphs where everything is updated too much and too often. 
-Or worse, we generate endless reactive loops. 
+Of course, it is a nice feature to make everything react instantly to changes, but when building larger apps it is easy to create monsters, i.e complicated, messy reactive graphs where everything is updated too much and too often. 
+Or worse, we generate endless reactive loops, aka "the reactive inferno" where A invalidates B which invalidates C which invalidates A which invalidates B which invalidates C... 
 
-And the more you work on your app, the more complex it gets, and the more you'll be likely to end up in the reactive inferno. 
-In this section, we'll be speaking a little bit about reactivity and how to have more control on it, and about a way to share data across modules without relying on passing along reactive objects.
+Let's take a small example of a reactive inferno: 
+
+```{r 16-common-app-caveats-1, eval = FALSE}
+library(shiny)
+ui <- function(){
+  tagList(
+    dateInput(
+      "date", 
+      "choose a date"
+    ), 
+    selectInput(
+      "year", 
+      "Choose a year", 
+      choices = 2010:2030
+    )
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  observeEvent( input$date , {
+    updateSelectInput(
+      session, 
+      "year", 
+      selected = lubridate::year(input$date)
+    )
+  })
+  
+  observeEvent( input$year , {
+    updateDateInput(
+      session, 
+      "date", 
+      value = lubridate::as_date(
+        sprintf("%s-01-01", input$year)
+      )
+    )
+  })
+  
+}
+
+shinyApp(ui, server)
+```
+
+Here, we want to handle something pretty common: 
+
++ The user can pick a `date` and the `year` input is updated
++ And the other way round: when the `year` input changes, the `date` is updated too
+
+But if you try to run this in your console, it will end as a reactive inferno: date update year that updates date that updates year...
+
+And the more you work on your app, the more complex it gets, and the more you will be likely to end up in the reactive inferno. 
+In this section, we will be speaking a little bit about reactivity and how to have more control on it, and about a way to share data across modules without relying on passing along reactive objects.
 
 ### `observe` vs `observeEvent`
 
 One of the most common feature of reactive inferno is the use of `observe()` in cases where you should use `observeEvent`. 
 Spoiler: you should try to use `observeEvent()` as much as possible, and avoid `observe()`as much as possible. 
-At first, `observe()` seems easier to implement, and feels like a shortcut as you don't have to think about what to react to: everything gets updated without you thinking about it.
-But the truth is that this stairway doesn't lead to heaven. 
+
+At first, `observe()` seems easier to implement, and feels like a shortcut as you do not have to think about what to react to: everything gets updated without you thinking about it.
+But the truth is that this stairway does not lead to heaven. 
 
 Let's stop and think about `observe()` for a minute. 
 This function updates __every time a reactive object it contains is invalidated__. 
-Yes, this works well if you have a small amount of reactive objects in the observer, but that gets tricky whenever you start adding things inside your `observe()`, as you might be launching a computation 10 times if your reactive scope contains 10 reactive objects that are somehow invalidated in chain. 
-And believe me, we've seen pieces of code where the `observe()` contains hundreds of lines of code, with reactives objects all over the place.
+Yes, this works well if you have a small amount of reactive objects in the observer, but that gets tricky whenever you start adding things a long list of things inside your `observe()`, as you might be launching a computation 10 times if your reactive scope contains 10 reactive objects that are somehow invalidated in chain. 
+And believe us, we have seen pieces of code where the `observe()` contains hundreds of lines of code, with reactives objects all over the place, with one `observe()` context being invalited dozens of times when one input changes in the application.
 
 For example, let's start with that:
 
-```{r common-app-caveats-1, eval = FALSE}
-## DON'T DO GLOBAL VARIABLES, IT'S JUST TO SIMPLIFY THE EXAMPLE
+```{r 16-common-app-caveats-2, eval = FALSE}
+## DO NOT DO GLOBAL VARIABLES, IT'S JUST TO SIMPLIFY THE EXAMPLE
 i <- 0
 library(shiny)
 library(cli)
@@ -50,9 +104,9 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-Oh, and then, let's add a small selectInput
+Oh, and then, let's add a small `selectInput()`:
 
-```{r common-app-caveats-2, eval = FALSE}
+```{r 16-common-app-caveats-3, eval = FALSE}
 i <- 0
 library(shiny)
 library(cli)
@@ -80,7 +134,7 @@ shinyApp(ui, server)
 
 And, as time goes by, we add another control flow to our `observe()`: 
 
-```{r common-app-caveats-3, eval = FALSE}
+```{r 16-common-app-caveats-4, eval = FALSE}
 i <- 0
 library(shiny)
 library(cli)
@@ -116,7 +170,7 @@ shinyApp(ui, server)
 And it would be nice to keep the selected values into a reactive list, so that we can reuse it elsewhere. 
 And maybe you would like to add a checkbox so that the logs are printed to the console only if checked.
 
-```{r common-app-caveats-4, eval = FALSE}
+```{r 16-common-app-caveats-5, eval = FALSE}
 i <- 0
 library(shiny)
 library(cli)
@@ -150,61 +204,106 @@ server <- function(input, output, session){
 shinyApp(ui, server)
 ```
 
-Ok, now can you tell how many potential invalidation points we've got here? 
+Ok, now can you tell how many potential invalidation points we have got here? 
 Three: whenever `input$txt`, `input$rev` or `input$tolower` change. 
 Of course, three is not that much, but you get the idea.
 
 Let's pause a minute and think about why we use `observe()` here. 
 To update the values inside `r$x`, yes. 
 But do we need to use `observe()` for, say, updating `r$x` under dozens of conditions, each time the user types a letter? 
-I don't think so. 
+Possibly not.
 
 We generally want our observer to update its content under a small, controlled number of inputs, i.e. with a controlled number of invalidation points. 
-And, what we often forget is that users don't type/select correctly on the first try. 
+And, what we often forget is that users do not type/select correctly on the first try. 
 No, they usually try and miss, restart, change things, amplifying the reactivity "over-happening". 
 
-Moreover, long `observe()` statements are hard to debug, and they make collaboration harder when the trigger to the observe logic can potentially lives anywhere between line one and line 257 of your `observe()`. That's why (well, in 99% of cases), it's safer to go with `observeEvent`, as it allows to see at a glanche what are the condition under which the content is invalidated and re-evalutaed. 
+Moreover, long `observe()` statements are hard to debug, and they make collaboration harder when the trigger to the observe logic can potentially lives anywhere between line one and line 257 of your `observe()`. That's why (well, in 99% of cases), it is safer to go with `observeEvent`, as it allows to see at a glance what are the condition under which the content is invalidated and re-evaluated. 
 Then, if a reactive context is invalidated, __you know why__.
+For example, here is where the reactive invalidation can happen
+
+```r
+observe({
+  i <<- i + 1
+  cat_rule(as.character(i))
+*  if (input$rev) {
+*    r$x <- stri_reverse(input$txt) 
+  } else {
+*    r$x <- input$txt
+  }
+*  if (input$tolower == "lower"){
+    r$x <- tolower(r$x)
+  } else {
+    r$x <- toupper(r$x)
+  }
+})
+```
+
+Whereas in this code, it is easier to identify where the invalidation can happen:
+
+```r
+observeEvent(
+  c(
+*  input$rev, 
+*  input$txt
+  )
+  ,{
+  i <<- i + 1
+  cat_rule(as.character(i))
+  if (input$rev) {
+    r$x <- stri_reverse(input$txt) 
+  } else {
+    r$x <- input$txt
+  }
+  if (input$tolower == "lower"){
+    r$x <- tolower(r$x)
+  } else {
+    r$x <- toupper(r$x)
+  }
+})
+```
 
 ### Building triggers and watchers
 
-// TODO 
+To prevent this, one way to go is to create "flags" objects, which can be thought of as internal buttons to control what you want to invalidate: you create the button, set some places where you want these buttons to invalidate the context, and finally press these 
 
-So the general pattern is that one: we create "flags" with an `init` function, trigger these "flags" with `trigger()`, and wherever we want these flags to invalidate the reactive context, we `watch()` these flags. 
+These objects are launched with an `init` function, then these flags are triggered with `trigger()`, and wherever we want these flags to invalidate a reactive context, we `watch()` these flags. 
 
 The idea here is to get a full control over the reactive flow: we only invalidate contexts when we want, making the general flow of the app more predictable.
+These flags are available using the `{gargoyle}` package, that can be installed from GitHub with:
 
-```{r common-app-caveats-5}
-init <- function(name, session = getDefaultReactiveDomain()){
-  session$userData[[name]] <- reactiveVal(0)
-}
-
-trigger <- function(name, session = getDefaultReactiveDomain()){
-  session$userData[[name]](
-    session$userData[[name]]() + 1
-  )
-}
-
-watch <- function(name, session = getDefaultReactiveDomain()){
-  session$userData[[name]]()
-}
+```{r 16-common-app-caveats-6, eval = FALSE}
+remotes::install_github("ColinFay/gargoyle")
 ```
 
-And, bonus, as these functions use the `session` object, they are available across all modules. That also means that you can easily trigger an event inside a model from another one. 
++ `gargoyle::init("this")` initiate a `"this"` flag: most of the time you will be generating them at the `app_server()` level
+
++ `gargoyle::watch("this")` sets the flag inside a reactive context, so that it will be invalidated every time you `trigger("this")` this flag.
+
++ `gargoyle::trigger("this")` triggers the flags
+
+And, bonus, as these functions use the `session` object, they are available across all modules. 
+That also means that you can easily trigger an event inside a module from another one. 
+
+This pattern is for example implemented into `{hexmake}` (though not with `{gargoyle}`), where the rendering of the image on the right is fully controlled by the [`"render"` flag](https://github.com/ColinFay/hexmake/blob/master/R/mod_right.R#L40). 
+The idea here is to allow a complete control over when the image is recomputed: only when `trigger("render")` is called does the app regenerate the image, helping us lower the reactivity of the application.
+That might seems like a lot of extra work, but that is definitely worth considering on the long  run, as it will help optimizing the rendering (fewer computation) and lowering the number of errors that can result from too much reactivity inside an application. 
 
 ### Using R6 as a data storage
 
-One pattern we've also been playing with is storing the app business logic inside of one or more R6 objects. 
+One pattern we have also been playing with is storing the app business logic inside one or more R6 objects. 
 Why would we want to do that?
 
 #### Sharing data accross module
 
-Sharing an R6 object makes it simpler but without the complexity of sharing & handling reactive objects. 
+Sharing an R6 object makes it simpler to create data that are shared across modules, but without the complexity generated by reactive objects, and the instability of using global variables. 
 
-So basically, the idea is to hold the whole logic of your data reading / cleaning / processing / outputing inside an R6 class. 
-You'll then initiate an instance of this class, then pass this object through your modules and submodules. 
+So basically, the idea is to hold the whole logic of your data reading / cleaning / processing / outputting inside an R6 class. 
+An object of this class is then initiated at the top level of your application, and you can pass this object to the sub-modules.
+Of course, this makes even more sense if you are combining it with the trigger/watch pattern from before!
 
-```{r common-app-caveats-6, eval = FALSE}
+
+```{r 16-common-app-caveats-7, eval = FALSE}
+library(shiny)
 nameui <- function(id){
   ns <- NS(id)
   tagList(
@@ -216,13 +315,30 @@ name <- function(input, output, session, obj){
   ns <- session$ns
   output$that <- renderThis({
     obj$compute()
+    trigger("plot")
   })
 }
 
-library(shiny)
+name2ui <- function(id){
+  ns <- NS(id)
+  tagList(
+    # [...]
+  )
+}
+
+name2 <- function(input, output, session){
+  ns <- session$ns
+  output$plot <- renderThis({
+    watch("plot")
+    obj$plot()
+  })
+}
+
+
 ui <- function(request){
   tagList(
-    nameui("nameui")
+    nameui("nameui"),
+    name2ui("name2ui")
   )
 }
 
@@ -233,29 +349,27 @@ server <- function(
 ){
   obj <- MyDataProcess$new()
   callModule(name, "nameui", obj)
-  
+  callModule(name2, "name2ui", obj)
 }
 
 shinyApp(ui, server)
 
 ```
 
-Of course, this makes sense if you're combining it with the trigger / watch from before :) 
-
-#### Get sure it's tested
+#### Get sure it is tested
 
 During the process of building a robust Shiny app, we strongly suggest that you test as many things as you can. 
-This is where using an R6 for your business logic of your app makes sense: this allows you to build the whole testing of your application logic outside of any reactive context: you simply build unit tests just as any other function. 
+This is where using an R6 for your business logic of your app makes sense: this allows you to build the whole testing of your application data logic outside of any reactive context: you simply build unit tests just as any other function. 
 
 ## R does too much 
 
 ### Rendering UI from server side 
 
-There are many reasons we would want to change things on the UI based on what happens in the server: changing the choices of a `selectInput()` based on the columns of a table which is uploaded by the user, showing and hidding pieces of the app according to an environment variable, allow the user to create an undeterminate amount of inputs, etc. 
+There are many reasons we would want to change things on the UI based on what happens in the server: changing the choices of a `selectInput()` based on the columns of a table which is uploaded by the user, showing and hiding pieces of the app according to an environment variable, allow the user to create an indeterminate amount of inputs, etc. 
 
-Chances are that to do that, you've been using the `uiOutput()` & `renderUI()` functions from `{shiny}`.
-Even if convenient, and the functions of choice in some specific context, this couple makes R do a little bit too much: you're making R regenerate the whole UI component instead of changing only what you need. 
-Plus, you'll create a code that is harder to reason about, as we are used to have the UI parts in the UI functions (but that's not related to performance).
+Chances are that to do that, you have been using the `uiOutput()` & `renderUI()` functions from `{shiny}`.
+Even if convenient, and the functions of choice in some specific context, this couple makes R do a little bit too much: you are making R regenerate the whole UI component instead of changing only what you need. 
+Plus, you will create a code that is harder to reason about, as we are used to have the UI parts in the UI functions (but that is not related to performance).
 
 Here are three strategies to code without `uiOutput()` & `renderUI()`.
 
@@ -265,14 +379,18 @@ Here are three strategies to code without `uiOutput()` & `renderUI()`.
 
 `r right_link("Applying the Unix Philosophy - The Art of Unix Programming", "http://www.catb.org/~esr/writings/taoup/html/ch01s08.html")`
 
-We'll see in the last chapter of this book how you can integrate JS inside your Shiny app, and how event basic functions can be useful in making your app server lighter. 
+We will see in the last chapter of this book how you can integrate JS inside your Shiny app, and how even basic functions can be useful for making your app server lighter. 
 For example, compare: 
 
-```{r}
+```{r 16-common-app-caveats-8 }
 library(shiny)
 ui <- function(){
   tagList(
-    actionButton("change", "show/hide graph", onclick = "$('#plot').toggle()"), 
+    actionButton(
+      "change", 
+      "show/hide graph", 
+      onclick = "$('#plot').toggle()"
+    ), 
     plotOutput("plot")
   )
 }
@@ -288,12 +406,12 @@ server <- function(
   })
 }
 
-shinyApp(ui, server)
+shinyApp(ui, server) 
 ```
 
 to
 
-```{r}
+```{r 16-common-app-caveats-9 }
 library(shiny)
 ui <- function(){
   tagList(
@@ -329,15 +447,78 @@ server <- function(
 shinyApp(ui, server)
 ```
 
-The result is the same, but the first version is shorter and easier to reason about: we have one bouton, and the behavior of the button is contained into itself. 
-And, on top of being harder to maintain, the second solution redraws the plot everytime the `reactiveValues` is updated, making R compute way more than it should. 
+The result is the same, but the first version is shorter and easier to reason about: we have one button, and the behavior of the button is contained into itself. 
+And, on top of being harder to maintain, the second solution redraws the plot every time the `reactiveValues` is updated, making R compute way more than it should, whereas with the JavaScript only solution, the plot is not recomputed every time you need to show it.
+
+At a local level, the improvements described in this section will not make your application way faster: for example, rendering UI elements (let's says rendering a simple title) will not be computationally heavy. 
+But at a global level, lighter UI computation from the server side helps the general rendering of the app: let's say you have an output that takes 3 seconds to run, then if the whole UI + output is to be rendered on the server side, the whole UI stays blank.
+
+Compare:
+
+```{r 16-common-app-caveats-10 }
+library(shiny)
+ui <- function(){
+  tagList(
+    uiOutput("caption")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  output$caption <- renderUI({
+    Sys.sleep(3)
+    tagList(
+      h3("test"), 
+      p("caption")
+    )
+    
+  })
+}
+
+shinyApp(ui, server)
+```
+
+to
+
+```{r 16-common-app-caveats-11 }
+library(shiny)
+ui <- function(){
+  tagList(
+    h3("test"), 
+    textOutput("caption")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  output$caption <- renderText({
+    Sys.sleep(3)
+    "Lorem ipsum dolor"
+  })
+}
+
+shinyApp(ui, server)
+```
+
+In the first example, the UI will wait for the server to have rendered, while in the second we will first see the title, then the rendered text after a few seconds. 
+That approach makes the user experience better: they know that something is happening, while completely blank page is confusing. 
+
+Also, R being single threaded, manipulating DOM elements from the server side make R busy doing these DOM manipulation while it could be computing something else. 
+And let's imagine it takes a quarter of a second to render the DOM element, that is a full second for rendering four of them, while R should be busy doing something else!
+
 
 #### `update*` inputs
 
-Almost every Shiny inputs, even the custom ones from packages, come with an `update` function that allows to change the input content from the server side, instead of recreating entirely. 
+Almost every Shiny inputs, even the custom ones from packages, come with an `update_` function that allows to change the input values from the server side, instead of recreating the UI entirely. 
 For example, here is a way to update the content of a `selectInput` from the server side:
 
-```{r}
+```{r 16-common-app-caveats-12 }
 library(shiny)
 ui <- function(){
   tagList(
@@ -366,33 +547,152 @@ server <- function(
 shinyApp(ui, server)
 ```
 
-Here, this makes the code easier to reason about as the `selectInput` is where it should be: inside the UI. 
+This switch to `updateSelectInput` makes the code easier to reason about as the `selectInput` is where it should be: inside the UI, instead of another pattern where we would use `renderUI()` and `uiOutput()`.
 Plus, with the `update` method, we are only changing what is needed, not re-generating the whole input. 
  
 #### `insertUI` and `removeUI` 
 
 Another way to dynamically change what is in the UI is with `insertUI()` and `removeUI()`. 
-It's more global than the solution we've seen before with setting the `reactiveValue` to `NULL` or to a value, as it allows to target a larger UI element: we can insert or remove the whole input, instead of having the DOM element present but empty. 
-This technic allows to have a lighter DOM: div which are not rendered are not generated empty, they are simply not there. 
+It is more global than the solution we have seen before with setting the `reactiveValue` to `NULL` or to a value, as it allows to target a larger UI element: we can insert or remove the whole input, instead of having the DOM element inserted but empty. 
+This method allows to have a lighter DOM: `<div>` which are not rendered are not generated empty, they are simply not there. 
 
 Two things to note concerning this method, though: 
 
 + Removing an element from the app will not delete the input from the input list. 
 In other word, if you have `selectInput("x", "x")`, and that you remove this input using `removeUI()`, you will still have `input$x` in the server. 
 
+For example, in the following example, the `input$val` value will not be removed once you have called `removeUI(selector = "#val")`.
+
+```{r 16-common-app-caveats-13 }
+library(shiny)
+ui <- function(){
+  tagList(
+    textInput("val", "Value", "place"),
+    actionButton("rm", "Remove UI")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  
+  observeEvent( input$rm , {
+    removeUI(selector = "#val")
+  })
+  
+  observe({
+    invalidateLater(1000)
+    print(input$val)
+  })
+
+}
+
+shinyApp(ui, server)
+```
+
 + Both these functions take a `jQuery` selector to select the element in the UI. 
 We will introduce these selectors in the last chapter of this book.
 
 ### Too Much Data in Memory
 
-If you are building a Shiny application, there is a great chance you are building it to analyse data. 
+If you are building a Shiny application, there is a great chance you are building it to analyze data. 
 If you are dealing with large datasets, you should consider deporting the data handling and computation to an external database system: for example to an SQL database. 
 Why? Because these system has been created to handle and manipulate data on disk: in other words it will allow you to perform operation on your data without having to clutter R memory with large dataset. 
-For example, if you have a `selectInput()` that is used to perform a filter on a dataset, you can do that straight inside SQL. 
-Well, almost any operation you can do today in `{dplyr}` would be doable with an SQL backend, and that's the purpose of the `{dbplyr}` package: translate `{dplyr}` code into SQL.
 
-If using a database as a backend seems a little bit far-fetched to you, that's how it's done in most programming languages: if you are building a web app with NodeJS or Python and need to interact with data, nothing will be stored in RAM: you will be relying on an external database to store your data.  
+For example, if you have a `selectInput()` that is used to perform a filter on a dataset, you can do that filter straight inside SQL, instead of bringing all the data to R and then do the filter.
+That is even more necessary if you are building the app for a large number of users: for example if one Shiny session takes up to 300MB, multiply that by the number of users that will need one session, and you will have a rough estimate of how many RAM you will need.
+On the contrary, if you lighten the data manipulation so that it is done by the back-end, you will have, let's say, one database with 300 mo of data, then the database size will remain (more or less constant), and the only RAM used by Shiny will be the data manipulation, not the data storage. 
+That's even more true now that almost any operation you can do today in `{dplyr}` would be doable with an SQL backend, and that is the purpose of the `{dbplyr}` package: translate `{dplyr}` code into SQL.
+
+If using a database as a back-end seems a little bit far-fetched right now, that is how it is done in most programming languages: if you are building a web app with NodeJS or Python for example, and need to interact with data, nothing will be stored in RAM: you will be relying on an external database to store your data. 
+Then your application will be used to make queries to this database backend.
 
 ## Reading data
 
-// TODO
+Shiny applications are a tool of choice when it comes to analyzing data. 
+But that also means that these data have to be imported/read at some point in time, and reading data can be time consuming. 
+How can we optimize that? 
+In this section, we will have a look at three strategies: including datasets inside your application, using R packages for fast data reading, and when and why you should move to an external database system. 
+
+### Including Data in your Application
+
+If you are building your application using the `{golem}` framework, you are building your application as a package. 
+R packages provide a way to include internal datasets, that can then be used as objects inside your app. 
+This is the solution you should go for if your data are never to rarely updated: the datasets are created during package development, then included inside the build of your package.
+The plus side of this approach is that it makes the data fast to read, as they are serialized as R native objects.
+
+To include data inside your application, you can use the `usethis::use_data_raw( name = "my_dataset", open = FALSE )` command which is inside the `02_dev.R` script inside the `dev/` folder of your source application (if you are building the app with `{golem}`). 
+This will create a folder called `data-raw` at the root of your application folder, with a script to prepare your dataset. 
+Here, you can read the data, modify it if necessary, and then save it with `usethis::use_data(my_dataset)`. 
+Once this is done, you will have access to the `my_dataset` object inside your application. 
+
+This is for example what is done in the `{tidytuesday201942}` application, at [data-raw/big_epa_cars.R](https://github.com/ColinFay/tidytuesday201942/blob/master/data-raw/big_epa_cars.R): the csv is read there, and then used as an internal dataset inside the application. 
+
+### Reading External Datasets
+
+Other applications use data that are not available at build time: they are created to analyse data that are uploaded by users, or maybe they are fetch on an external service while using the app (for example by calling an API).
+When you are building an application for the "user data" use case, the first thing you will need is to provide users a way to upload their dataset: `shiny::fileInput()`.
+
+One crucial thing to keep in mind when it comes to using user-uploaded files is that you have to be (very) strict with the way you handle files: 
+
++ Always specify what type of file you want: `shiny::fileInput()` has an `accept` parameter that allows you to set one or more [MIME types](https://en.wikipedia.org/wiki/Media_type) or extension. 
+When using this argument (for example with `text/csv`, `.csv`, or `.xslx`), the user will only be able to select a subset of files from their computer: the ones that matches the type. 
++ Always perform checks once the file is uploaded, even more if it is tabular data: column type, naming, empty rows...
+The more you check the file for potential errors, the less your application is likely to fail to analyze this uploaded dataset. 
++ If the data reading takes a while, do not forget to add a visual progression cue: be it a `shiny::withProgress()` or tools from the [`{waiter}`](https://github.com/JohnCoene/waiter) package.
+
+Why do we do that? 
+Because whenever you offer a user the possibility to upload anything, you can be sure that at some point, they will upload a file that will make the app crash.
+By setting a specific MIME type and by doing a series of check once the file is uploaded, you will make your application more stable. 
+Finally, having a visual cue that "something is happening" is very important for the user experience, as "something is happening" is better than not knowing what is happening, and it may also prevent the user from clicking again and again on the upload button. 
+
+Now we have our `fileInput()` set, how do we read these data as fast as possible? 
+There are several options depending on the type of data you are reading. 
+Here are some packages that can make the file reading faster: 
+
+- For tabular, flat dataset (typically csv, tsv, or text), [`{vroom}`](https://github.com/r-lib/vroom) can read data at a 1.40 GB/sec/sec speed. 
+[{data.table}](https://github.com/Rdatatable/data.table), and its `fread()` function, is also fast at reading delimited files. 
+- For JSON files, [`{jsonlite}`](https://github.com/jeroen/jsonlite)
+- If you need to read Excel files inside your app, [`{readxl}`](https://github.com/tidyverse/readxl) offers a binding to the [`RapidXML`](http://rapidxml.sourceforge.net/) C++ library, reading Excel files fast. 
+
+### Using External DataBases
+
+Another type of data analysed in a shiny application is one contained inside an external database.
+Database are wildly used in the data science world, and in the software engineering as a whole. 
+Being a widely used source of data, databases come with API and drivers that help retrieving and transferring data: be it SQL, NoSQL, or even graph.
+
+Using a database is one of the solution for making your app lighter, and more efficient in the long run, notably if you need to scale your app to thousands of visitors. 
+Indeed, if you plan on having your app scale to numerous people, that will mean that a lot of R processes will be triggered. 
+And if your data is contained in your app, this will mean that each R process will take a significant amount of RAM if the dataset is large. 
+For example, if your dataset alone takes ~300 mb of RAM, that means that if you want to launch the app 10 times, you will need ~3gb of RAM.
+On the other hand, if you decide to switch these data to an external database, it will lower the global RAM need: the DB will takes these 300mb of data, and each shiny application will make request to the database. 
+So, schematically, if the database needs 300mb, and one shiny app 50mb, then 10 app will be 300mb + 50 * 1b mo. 
+Of course, it is not as simplistic as that, and other things are to be considered: making database requests can be computationally expensive, and might need some network adjustments, but you get the idea. 
+
+Covering all the available type of databases and the packages associated with each is a very, very large topic: there are dozens of database systems, and as many (if not more) packages to interact with them. 
+For a more extensive coverage of using databases in R, please follow these resources: 
+
++ [Databases using R](https://db.rstudio.com/), the official RStudio documentation around databases and R
+
++ [colinfay/r-db](https://colinfay.me/r-db/), a docker image, with an companion guide, that bundles the toolchain for a lot of database systems for R
+
++ [CRAN Task View: Databases with R](https://cran.r-project.org/web/views/Databases.html): the official task view from CRAN with a series of packages for database manipulation
+
+### Reminder
+
+How to choose between these three methodologies:
+
+```{r 16-common-app-caveats-14, echo= FALSE}
+knitr::kable(
+  data.frame(
+    Choice = c("Package data", "Reading files", "External DataBase"), 
+    Update = c("Never to very rare", "Uploaded by Users", "Never to Streaming"), 
+    Size = c("Low to medium", "Preferably low", "Low to Big")
+  )
+)
+```
+
+
+
