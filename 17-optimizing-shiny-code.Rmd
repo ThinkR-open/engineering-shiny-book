@@ -8,10 +8,9 @@ So to be efficient, the R code computing your values and returning results also 
 Optimizing R code is such a broad topic that it would be possible to write a full book about it, and in fact a lot of books about R already cover this topic. 
 Instead of re-writing these books, we will try to point to some crucial resources you can refer to if you want get started optimizing your R code. 
 
-+ [Efficient R programming](https://csgillespie.github.io/efficientR/), by Colin Gillespie and Robin Lovelace, has a series of methods you can quickly put into practice for more efficient R code. 
++ Efficient R programming [@colingillespie2017], has a series of methods you can quickly put into practice for more efficient R code. 
 
-+ [Advanced R](https://adv-r.hadley.nz/), by Hadley Wickham, has a chapter about optimizing R code (number 24). 
-
++ Advanced R [@hadleywickham2019] has a chapter about optimizing R code (number 24). 
 In the rest of this chapter, we will be focusing on how to optimize Shiny specifically. 
 
 ## Caching elements
@@ -36,12 +35,12 @@ If you are interesting in reading more about caching theory, we suggest the exce
 ]. 
 
 In the context of an interactive application in a framework like Shiny, it makes much sense to cache data structures: users tend to repeat what they do, or go back and forth between parameters. 
-For example, if you have a graph that take 2 seconds to render (which is quite common in Shiny, notably when relying on `{ggplot2}`), you do not want these 2 seconds to be repeated over and over again when users switch from one parameter to another and back to the first, as the two graphs will be the same for the same parameter. 
+For example, if you have a graph that take 2 seconds to render (which is quite common in Shiny, notably when relying on `{ggplot2}` [@R-ggplot2]), you do not want these 2 seconds to be repeated over and over again when users switch from one parameter to another and back to the first, as the two graphs will be the same for the same parameter. 
 Same goes for queries to a database: if a query is done with the same parameters, and you know that they will return the same result, there is no need to ask the database again and again—ask the cache to retrieve the data.
 
 ### Native Caching in R
 
-At least two packages in R implement caching of functions (also called memoization): `{memoize}`, and `{memoise}`. 
+At least two packages in R implement caching of functions (also called memoization): `{R.cache}` [@R-R.cache], and `{memoise}` [@R-memoise]. 
 They both more or less work the same way: you will call a memoization function on another function, and cache is created for this function output, based on the arguments value. 
 Then every time you call this function again with the same parameters, the cache is returned instead of computing the function another time.
 So for example, if computing your data once takes 5 seconds with the parameter `n = 50`, the next time you will be calling this function with `n = 50`, instead of recomputing, R will go and fetch the value stored in cache.
@@ -64,7 +63,7 @@ mfct(2)
 toc()
 ```
 
-Let's try with another example that might look more like what we can find in a Shiny App: connecting to a database 
+Let's try with another example that might look more like what we can find in a Shiny App: connecting to a database, using the `{DBI}` [@R-DBI] and `{RSQLite}` [@R-RSQLite] packages
 
 ```{r 17-optimizing-shiny-code-2 }
 con <- DBI::dbConnect(
@@ -126,7 +125,7 @@ As you can see, we now have two cache objects inside the directory we have speci
 
 ### Caching Shiny
 
-At the time of writing this page (April 2020), `{shiny}` has one caching function: `renderCachedPlot()`. 
+At the time of writing this page (April 2020), `{shiny}` [@R-shiny] has one caching function: `renderCachedPlot()`. 
 This function behaves more or less like the `renderPlot()` function, except that it is tailored for caching. 
 The extra arguments you will find are `cacheKeyExpr` and `sizePolicy`: the former is the list of inputs and values that allow to cache the plot—every time these values and inputs are the same, they produce the same graph, so `{shiny}` will be fetching inside the cache instead of computing the value another time. 
 `sizePolicy` is a function that returns a `width` and an `height`, and which are used to round the plot dimension in pixels, so that not every pixel combination are generated in the cache.
@@ -257,7 +256,7 @@ Well, at least natively, as methods have emerged to run pieces of code in parall
 
 ### How to
 
-To launch code blocks in parallel, we will use a combination of two packages, `{future}` and `{promises}`, and a `reactiveValue()`. 
+To launch code blocks in parallel, we will use a combination of two packages, `{future}` [@R-future] and `{promises}` [@R-promises], and a `reactiveValue()`. 
 `{future}` is an R package which main purpose is to allow users to send code to be run elsewhere, i.e in another session, thread, or even on another machine. 
 `{promises}`, on the other hand, is a package providing structure for handling asynchronous programming in R^[
 If you are familiar with promises in JavaScript, `{promises}` is an implementation of this structure into R.
@@ -523,7 +522,7 @@ shinyApp(ui, server)
 
 + We need to treat the outputs in the order they are received. 
 In that case, instead of waiting for the very last input, you will need to build a structure that will receive the output, check if this output is the "next in line", store it if it is not, or return it if it is and see if there is another output in the queue. 
-This type of implementation is a little bit more complex so we will not detail it all inside this chapter, but here is a small implementation  using `{liteq}`. 
+This type of implementation is a little bit more complex so we will not detail it all inside this chapter, but here is a small implementation  using `{liteq}` [@R-liteq]. 
 
 ```{r 17-optimizing-shiny-code-17 }
 library(promises)

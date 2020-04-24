@@ -269,7 +269,7 @@ To prevent this, one way to go is to create "flags" objects, which can be though
 These objects are launched with an `init` function, then these flags are triggered with `trigger()`, and wherever we want these flags to invalidate a reactive context, we `watch()` these flags. 
 
 The idea here is to get a full control over the reactive flow: we only invalidate contexts when we want, making the general flow of the app more predictable.
-These flags are available using the `{gargoyle}` package, that can be installed from GitHub with:
+These flags are available using the `{gargoyle}` [@R-gargoyle] package, that can be installed from GitHub with:
 
 ```{r 16-common-app-caveats-6, eval = FALSE}
 remotes::install_github("ColinFay/gargoyle")
@@ -284,7 +284,7 @@ remotes::install_github("ColinFay/gargoyle")
 And, bonus, as these functions use the `session` object, they are available across all modules. 
 That also means that you can easily trigger an event inside a module from another one. 
 
-This pattern is for example implemented into `{hexmake}` (though not with `{gargoyle}`), where the rendering of the image on the right is fully controlled by the [`"render"` flag](https://github.com/ColinFay/hexmake/blob/master/R/mod_right.R#L40). 
+This pattern is for example implemented into `{hexmake}` [@R-hexmake] (though not with `{gargoyle}`), where the rendering of the image on the right is fully controlled by the [`"render"` flag](https://github.com/ColinFay/hexmake/blob/master/R/mod_right.R#L40). 
 The idea here is to allow a complete control over when the image is recomputed: only when `trigger("render")` is called does the app regenerate the image, helping us lower the reactivity of the application.
 That might seems like a lot of extra work, but that is definitely worth considering on the long  run, as it will help optimizing the rendering (fewer computation) and lowering the number of errors that can result from too much reactivity inside an application. 
 
@@ -367,7 +367,7 @@ This is where using an R6 for your business logic of your app makes sense: this 
 
 There are many reasons we would want to change things on the UI based on what happens in the server: changing the choices of a `selectInput()` based on the columns of a table which is uploaded by the user, showing and hiding pieces of the app according to an environment variable, allow the user to create an indeterminate amount of inputs, etc. 
 
-Chances are that to do that, you have been using the `uiOutput()` & `renderUI()` functions from `{shiny}`.
+Chances are that to do that, you have been using the `uiOutput()` & `renderUI()` functions from `{shiny}` [@R-shiny].
 Even if convenient, and the functions of choice in some specific context, this couple makes R do a little bit too much: you are making R regenerate the whole UI component instead of changing only what you need. 
 Plus, you will create a code that is harder to reason about, as we are used to have the UI parts in the UI functions (but that is not related to performance).
 
@@ -604,7 +604,7 @@ Why? Because these system has been created to handle and manipulate data on disk
 For example, if you have a `selectInput()` that is used to perform a filter on a dataset, you can do that filter straight inside SQL, instead of bringing all the data to R and then do the filter.
 That is even more necessary if you are building the app for a large number of users: for example if one Shiny session takes up to 300MB, multiply that by the number of users that will need one session, and you will have a rough estimate of how many RAM you will need.
 On the contrary, if you lighten the data manipulation so that it is done by the back-end, you will have, let's say, one database with 300 mo of data, then the database size will remain (more or less constant), and the only RAM used by Shiny will be the data manipulation, not the data storage. 
-That's even more true now that almost any operation you can do today in `{dplyr}` would be doable with an SQL backend, and that is the purpose of the `{dbplyr}` package: translate `{dplyr}` code into SQL.
+That's even more true now that almost any operation you can do today in `{dplyr}` [@R-dplyr]  would be doable with an SQL backend, and that is the purpose of the `{dbplyr}` [@R-dbplyr] package: translate `{dplyr}` code into SQL.
 
 If using a database as a back-end seems a little bit far-fetched right now, that is how it is done in most programming languages: if you are building a web app with NodeJS or Python for example, and need to interact with data, nothing will be stored in RAM: you will be relying on an external database to store your data. 
 Then your application will be used to make queries to this database backend.
@@ -618,7 +618,7 @@ In this section, we will have a look at three strategies: including datasets ins
 
 ### Including Data in your Application
 
-If you are building your application using the `{golem}` framework, you are building your application as a package. 
+If you are building your application using the `{golem}` [@R-golem] framework, you are building your application as a package. 
 R packages provide a way to include internal datasets, that can then be used as objects inside your app. 
 This is the solution you should go for if your data are never to rarely updated: the datasets are created during package development, then included inside the build of your package.
 The plus side of this approach is that it makes the data fast to read, as they are serialized as R native objects.
@@ -628,7 +628,7 @@ This will create a folder called `data-raw` at the root of your application fold
 Here, you can read the data, modify it if necessary, and then save it with `usethis::use_data(my_dataset)`. 
 Once this is done, you will have access to the `my_dataset` object inside your application. 
 
-This is for example what is done in the `{tidytuesday201942}` application, at [data-raw/big_epa_cars.R](https://github.com/ColinFay/tidytuesday201942/blob/master/data-raw/big_epa_cars.R): the csv is read there, and then used as an internal dataset inside the application. 
+This is for example what is done in the `{tidytuesday201942}` [@R-tidytuesday201942] application, at [data-raw/big_epa_cars.R](https://github.com/ColinFay/tidytuesday201942/blob/master/data-raw/big_epa_cars.R): the csv is read there, and then used as an internal dataset inside the application. 
 
 ### Reading External Datasets
 
@@ -652,10 +652,10 @@ Now we have our `fileInput()` set, how do we read these data as fast as possible
 There are several options depending on the type of data you are reading. 
 Here are some packages that can make the file reading faster: 
 
-- For tabular, flat dataset (typically csv, tsv, or text), [`{vroom}`](https://github.com/r-lib/vroom) can read data at a 1.40 GB/sec/sec speed. 
-[{data.table}](https://github.com/Rdatatable/data.table), and its `fread()` function, is also fast at reading delimited files. 
-- For JSON files, [`{jsonlite}`](https://github.com/jeroen/jsonlite)
-- If you need to read Excel files inside your app, [`{readxl}`](https://github.com/tidyverse/readxl) offers a binding to the [`RapidXML`](http://rapidxml.sourceforge.net/) C++ library, reading Excel files fast. 
+- For tabular, flat dataset (typically csv, tsv, or text), `{vroom}` [@R-vroom] can read data at a 1.40 GB/sec/sec speed. 
+`{data.table}` [@R-data.table], and its `fread()` function, is also fast at reading delimited files. 
+- For JSON files, `{jsonlite}` [@jsonlite2014]
+- If you need to read Excel files inside your app, `{readxl}` [@R-readxl] offers a binding to the [`RapidXML`](http://rapidxml.sourceforge.net/) C++ library, reading Excel files fast. 
 
 ### Using External DataBases
 
