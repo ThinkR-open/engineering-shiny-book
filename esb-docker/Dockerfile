@@ -18,7 +18,7 @@ RUN Rscript -e 'remotes::install_version("future",upgrade="never", version = "1.
 RUN Rscript -e 'remotes::install_version("ggplot2",upgrade="never", version = "3.3.0")'
 RUN Rscript -e 'remotes::install_version("ggbeeswarm",upgrade="never", version = "0.6.0")'
 RUN Rscript -e 'remotes::install_version("glue",upgrade="never", version = "1.3.2")'
-RUN Rscript -e 'remotes::install_version("golem",upgrade="never", version = "0.2.1.9000")'
+RUN Rscript -e 'remotes::install_version("golem",upgrade="never", version = "0.2.1")'
 RUN Rscript -e 'remotes::install_version("here",upgrade="never", version = "0.1")'
 RUN Rscript -e 'remotes::install_version("htmltools",upgrade="never", version = "0.4.0")'
 RUN Rscript -e 'remotes::install_version("knitr",upgrade="never", version = "1.28")'
