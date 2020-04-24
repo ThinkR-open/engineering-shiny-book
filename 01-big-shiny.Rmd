@@ -11,7 +11,7 @@
 ## A (very) short introduction to Shiny 
 
 If you are reading this page, chances are you already know what a Shiny application (shorten "Shiny app") is—a web application that communicates with R, built in R, and working with R. 
-The beauty of `{shiny}` is that it makes it easy for someone already familiar with R to create a small app in a matter of hours.
+The beauty of `{shiny}` [@R-shiny] is that it makes it easy for someone already familiar with R to create a small app in a matter of hours.
 With small and minimal Shiny apps, no knowledge of HTML, CSS or JavaScript is required, and you do not have to think about technical elements that usually come with web applications—for example, you do not have to think about the port the application is served on: `{shiny}` picks one for you^[
 Of course you can specify one if you need to, but by default the package picks one;
 ].
@@ -46,12 +46,12 @@ Getting a clear definition is not an easy task^[
 Ironic right?
 ]
 as it very much depends on who is concerned and who you are talking to.
-But a good definition can be found in [The DevOps Handbook](https://itrevolution.com/book/the-devops-handbook/): _"One of the defining characteristics of a complex system is that it __defies any single person's ability to see the system as a whole and understand how all the pieces fit together__. Complex system typically have a high degree of interconnectedness of tightly coupled components, and system-level behavior cannot be explained merely in terms of the behavior of the system components."_ (we underlined).
+But a good definition can be found in _The DevOps Handbook_ [@genekim2016] : _"One of the defining characteristics of a complex system is that it __defies any single person's ability to see the system as a whole and understand how all the pieces fit together__. Complex system typically have a high degree of interconnectedness of tightly coupled components, and system-level behavior cannot be explained merely in terms of the behavior of the system components."_ (we underlined).
 
 Building on top of this quote, let's try to come up with a definition that will serve us in the context of engineering Shiny applications. 
 
 When building software, we can think of complexity from two points of view: the complexity as it is seen by the developer, and the complexity as it is seen by the customer/end-user
-^[from _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity"].
+^[from _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity", [@ericraymond2003]].
 
 + For the code, bugs are harder to anticipate: it is hard to think about all the different paths the software can follow and difficult to identify bugs because they are deeply nested in the numerous routines the app is doing. 
 It is also hard to think about what the state of your app is at a given moment because of the numerous inputs and outputs your app contains. 
@@ -125,7 +125,7 @@ R is very permissive when it comes to indentation and line breaks, and, unlike J
 The minification process is the process of removing all blank characters and put everything on one line so that the file in the output is much smaller.
 ].  
 In R, the number of lines of code depends on your coding style and the packages you are using. 
-For example, the [`{tidyverse}`](https://www.tidyverse.org/){target="_blank"} style guide encourage the use of the pipe (`%>%`)	
+For example, the `{tidyverse}` [@tidyverse2019] style guide encourage the use of the pipe (`%>%`)	
 ^[	
 "_`%>%` should always have a space before it, and should usually be followed by a new line._", [tidyverse style guide](https://style.tidyverse.org/pipes.html){target="_blank"}	
 ] 	
@@ -167,7 +167,7 @@ iris[1:5, "Species"]
 In other words, using this kind of writing style can make the code base larger in term of lines, without really adding complexity to the general program. 
 
 Another drawback of this metric is that it focuses on numbers instead of readability, and in the long run, yes, readability matters
-As noted in _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity", "_Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess_".
+As noted in _The Art of Unix Programming_ [@ericraymond2003], "Chapter 13: Speaking of Complexity", "_Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess_".
 
 Still, this metric can be useful to reinforce what you have learned from other metrics.
 It is rather unlikely that you will find this "extreme" coding style we showed above, and even if it might not make sense to compare two code base that just differ by 1 or 2 % of lines of code, it is very likely that a code base which is ten, one hundred, one thousand times larger is a more complex software. 
@@ -179,7 +179,7 @@ This pattern is developed in another part of this book, where we explicit the co
 ]. 
 On the other hand, one big 10.000-lines file which is standing alone in the project is not a good sign either. 
 
-If you want to use the number of lines metric, you can do it from R with the `{cloc}` package, available at <https://github.com/hrbrmstr/cloc>.
+If you want to use the number of lines metric, you can do it from R with the `{cloc}` [@R-cloc] package, available at <https://github.com/hrbrmstr/cloc>.
 
 ```{r 01-big-shiny-4, include = FALSE}
 if (!requireNamespace("cloc")){
@@ -193,7 +193,7 @@ if (!requireNamespace("cloc")){
 }
 ```
 
-For example, let's compare a rather big package (`{shiny}`) with a small one (`{attempt}`):
+For example, let's compare a rather big package (`{shiny}`) with a small one (`{attempt}` [@R-attempt]):
 
 ```{r 01-big-shiny-6 }
 library(cloc)
@@ -240,7 +240,7 @@ The algorithm is then $M = E − N + 2P$, where $M$ is the measure, $E$ the numb
 We will not go deep into this topic, as there are a lot things going on in this computation and you can find many documentation about this online.
 Please refer to the bibliography for further readings about the theory behind this measurement. 
 
-In R, the cyclomatic complexity can be computed using the `{cyclocomp}` package.
+In R, the cyclomatic complexity can be computed using the `{cyclocomp}` [@R-cyclocomp] package.
 You can get it from `CRAN` with:
 
 ```{r 01-big-shiny-7, include=FALSE}
@@ -270,6 +270,7 @@ cyclocomp_package <- memoise::memoise(cyclocomp::cyclocomp_package, cache = db)
 library(cyclocomp)
 cyclocomp_package("golex") %>% head()
 ```
+
 ```{r 01-big-shiny-12, echo=FALSE}
 cyclo_golex <- readr::read_rds(here::here("dataset", "cyclo_golex.rds"))
 head(cyclo_golex)
@@ -291,6 +292,7 @@ if (!requireNamespace("tidytuesday201942")) {
 ```{r 01-big-shiny-15, eval=FALSE}
 cyclocomp_package("tidytuesday201942") %>% head()
 ```
+
 ```{r 01-big-shiny-16, echo=FALSE}
 cyclo_tidytuesday <- readr::read_rds(here::here("dataset", "cyclo_tidytuesday.rds"))
 head(cyclo_tidytuesday)
@@ -326,7 +328,7 @@ But that is not a magic solution: (A) because the global complexity of the app i
 
 Complexity can come from other sources: insufficient code coverage, dependencies that breaks the implementation, relying on old packages, or a lot of other things. 
 
-We can use the `{packageMetrics2}` package to get some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc., ... and the number of lines of code and the cyclomatic complexity.
+We can use the `{packageMetrics2}` [@R-packageMetrics2] package to get some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc., ... and the number of lines of code and the cyclomatic complexity.
 
 ```{r 01-big-shiny-20, include = FALSE}
 if (!requireNamespace("packageMetrics2")) {
@@ -446,7 +448,7 @@ Of course "immortal" is a little bit far fetched, but when designing the applica
 Planning for the future is a very important component of a successful Shiny App project.
 Once the app is out, it is successful if it can exist in the long run, with all the hazards that this implies: new package versions that could potentially break the code base, sudden call for the implementation of new features in the global interface, changing key features of the UI or the back-end, and not to mention passing the code base along to someone who has not worked on the first version, and who is now in charge of developing the next version^[
 In fact, this new person might simply be you, a month from now. 
-And _"You'll be there in the future too, maintaining code you may have half forgotten under the press of more recent projects. When you design for the future, the sanity you save may be your own._ _The Art of Unix Programming_, Eric Steven Raymond
+And _"You'll be there in the future too, maintaining code you may have half forgotten under the press of more recent projects. When you design for the future, the sanity you save may be your own._ _The Art of Unix Programming_, Eric Steven Raymond, _The Art of UNIX Programming_.
 ]. 
 And this, again, is hard to do without effective planning and efficient engineering. 
 
