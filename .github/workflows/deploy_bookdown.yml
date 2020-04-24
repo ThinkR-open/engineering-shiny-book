@@ -9,22 +9,16 @@ name: renderbook
 jobs:
   bookdown:
     name: Render-Book
-    runs-on: ubuntu-18.04
+    runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@v1
       - uses: r-lib/actions/setup-pandoc@v1
       - name: Install docker
         run: |
-          curl -fsSL https://get.docker.com -o get-docker.sh
-          sh get-docker.sh
+          brew install docker-machine docker
       - name: Pull docker image
         run: docker pull colinfay/hexmake:latest
-      - name: deps
-        run: |
-          apt-get update && apt-get install -y  \ 
-          git-core libcairo2-dev libcurl4-openssl-dev \
-          libssh2-1-dev libssl-dev libxml2-dev make pandoc pandoc-citeproc zlib1g-dev
       - name: Install rmarkdown
         run: Rscript -e 'install.packages(c("rmarkdown","bookdown"), Ncpus = 4)'
       - name: Install local deps
