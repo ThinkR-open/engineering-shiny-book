@@ -4,7 +4,7 @@
 
 > The most powerful optimization technique in any programmer’s toolbox is to do nothing.
 
-`r right_link("The Art of Unix Programming", "")`
+`r right_link("The Art of Unix Programming", "http://www.catb.org/~esr/writings/taoup/html/")`
 
 ## Build first, then optimize
 
@@ -59,16 +59,14 @@ Yet you will only realize that once the application is up and running!
 ### Don't sacrifice readability
 
 As said in the last section, every piece of code can be rewritten to be faster, either from R to R or using a lower level language: for example C or C++. 
-You can also rebuild data manipulation code use one package to another^[
-A common case is rewriting `{dplyr}` to `{data.table}`.
-], use complex data structures to optimizing memory usage, etc, etc.
+You can also rebuild data manipulation code use one package to another, use complex data structures to optimizing memory usage, etc, etc.
 But that comes with a price: not keeping thing simple for the sake of local optimization makes maintenance harder, even more if you are using a lesser known language/package. 
 For example, switching some portions of your code to C++ implies that you might be the only person being able to maintain that specific portion of code, or that your colleague taking over the project will have to spend hours learning the tools you have been building, or the language you have chosen to write your functions with. 
 
 Again, optimization is always a matter of trade-off: is the half-second local optimization worth the extra hours you will have to spend correcting bugs when the app will crash and when you will be the only one able to correct it?
 Also, are the extra hours/days spent rewriting a working code-base worth the speed gain of 0.5 seconds on one function? 
 
-For example, let's compare both these implementations of the same function, one in R, and one in C++. 
+For example, let's compare both these implementations of the same function, one in R, and one in C++ via `{Rcpp}` [@R-Rcpp]
 Of course, the C++ function is faster than the R one—this is the very reason of using C++ with R. 
 
 ```{r 15-when-optimize-1 }
@@ -92,7 +90,7 @@ benched <- bench::mark(
 benched
 ```
 
-(Note: we'll come back on `bench::mark` in the next chapter)
+(Note: we will come back to `bench::mark` later)
 
 Though, how much time gain is worth being sure you will get someone in your team to take over the maintenance if needed? 
 In other words, given that (in our example), we are gaining around `r benched$median[1] - benched$median[2]` on the execution time of our function, is it worth switching to C++? 
@@ -113,7 +111,7 @@ Leading a successful project means that you should, as much as possible, find th
 
 #### Identifying bottlenecks
 
-The best way to profile R code is by using the `{profvis}` package^[
+The best way to profile R code is by using the `{profvis}` [@R-profvis] package^[
 `{utils}` also comes with a function call `Rprof()`, but we will not be examining this one here, as `{profvis}` provides a more user-friendly and enhanced interface to this profiling function.
 ], a package designed to evaluate how much time each part of a function call take. 
 With `{profvis}`, you can spot the bottleneck of your function. 
@@ -182,7 +180,7 @@ If you click on the "Data" tab, you will also find another view of the `flame gr
 
 ![](img/profviz_data.png) 
 
-If you are working on profiling the memory usage, you can also use the `{profmem}` package which, instead of focusing on execution time, will record the memory usage of calls. 
+If you are working on profiling the memory usage, you can also use the `{profmem}` [@R-profmem] package which, instead of focusing on execution time, will record the memory usage of calls. 
 
 ```{r 15-when-optimize-3 }
 library(profmem)
@@ -227,7 +225,7 @@ One thing that can be done is to keep an RMarkdown file with your starting point
 By using an Rmd, you can document the strategies you have been using to optimize the code, e.g: "switched from for loop to vectorize function", "changed from x to y", etc. 
 This will also be helpful for the future: either for you in other projects (you can get back to this document), or for other developers, as it will explain why specific decisions have been made.
 
-To do the timing computation, you can use the `{bench}` package, which compares the execution time (and other metrics) of two functions. 
+To do the timing computation, you can use the `{bench}` [@R-bench] package, which compares the execution time (and other metrics) of two functions. 
 This function takes a series of named elements, each containing an R expression that will be timed.
 Note that by default, the `mark()` function compares the output of each function, 
 
@@ -254,7 +252,7 @@ res
 
 Here, we have an empiric evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest. 
 
-If you want a graphical analysis, `{bench}` comes with an `autoplot` method for `{ggplot2}`:
+If you want a graphical analysis, `{bench}` comes with an `autoplot` method for `{ggplot2}` [@R-ggplot2]:
 
 ```{r 15-when-optimize-7 }
 ggplot2::autoplot(res)
@@ -265,7 +263,7 @@ And, bonus point, `{bench}` takes time to check that the two outputs are the sam
 ### Profiling Shiny
 
 You can profile Shiny application using the `{profvis}` package, just as any other piece of R code. 
-The only thing to note if you want to use this function on an app built with `{golem}`, you will have to wrap the `run_app()` function in a `print()` function. 
+The only thing to note if you want to use this function on an app built with `{golem}` [@R-golem], you will have to wrap the `run_app()` function in a `print()` function. 
 Long story short, what make the app run is not the function itself, but the printing of the function, so the object returned by `run_app()` itself can not be profiled. 
 See the discussion on this [issue on {golem}](https://github.com/ThinkR-open/golem/issues/146) to learn more about this.
 
@@ -311,8 +309,8 @@ Google Lighthouse is computing a series of analysis about your webpage.
 Once the audit is finished, you have some basic but useful indications about your application:
 
 + Performance. This metric mostly analyzes the rendering time of the page: for example how many time does it take to load the app in full, that is to say how many time it takes from the first byte received to the app being fully ready to be used, the time between the very first call to the server and the very first response, etc.
-With Shiny, you will probably get low performance here, notably due to the fact that `{shiny}` is serving external dependencies that you might not be able to control. 
-For example, the report from `{hexmake}` suggests to "Eliminate render-blocking resources", and most of them are not controlled by the shiny developer: they come bundled with `shiny::fluidPage` itself.
+With `{shiny}` [@R-shiny], you will probably get low performance here, notably due to the fact that `{shiny}` is serving external dependencies that you might not be able to control. 
+For example, the report from `{hexmake}` [@R-hexmake] suggests to "Eliminate render-blocking resources", and most of them are not controlled by the shiny developer: they come bundled with `shiny::fluidPage` itself.
 
 + Accessibility. Google Lighthouse performs a series of tests about accessibility (see our chapter about accessibility for more information).
 
