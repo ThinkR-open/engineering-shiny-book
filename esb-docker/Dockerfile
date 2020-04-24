@@ -1,8 +1,8 @@
-FROM rocker/shiny-verse:3.6.2
+FROM rocker/shiny-verse:3.6.1
 RUN apt-get update && apt-get install -y  git-core libcairo2-dev libcurl4-openssl-dev libssh2-1-dev libssl-dev libxml2-dev make pandoc pandoc-citeproc zlib1g-dev && rm -rf /var/lib/apt/lists/*
 RUN echo "options(repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl')" >> /usr/local/lib/R/etc/Rprofile.site
 RUN R -e 'install.packages("remotes")'
-RUN R -e 'remotes::install_github("r-lib/remotes", ref = "97bbf81")'
+RUN R -e 'remotes::install_version("remotes", version = "2.1.1")'
 RUN Rscript -e 'remotes::install_version("bookdown",upgrade="never", version = "0.18")'
 RUN Rscript -e 'remotes::install_version("attachment",upgrade="never", version = "0.1.0")'
 RUN Rscript -e 'remotes::install_version("bench",upgrade="never", version = "1.1.1")'
