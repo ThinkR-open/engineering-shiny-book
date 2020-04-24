@@ -4,27 +4,27 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 18 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps</title>
-  <meta name="description" content="Chapter 18 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps" />
-  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
+  <title>Chapter 17 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps</title>
+  <meta name="description" content="Chapter 17 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps" />
+  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 18 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:title" content="Chapter 17 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
   
   
-  <meta property="og:description" content="Chapter 18 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:description" content="Chapter 17 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps" />
   <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 18 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps" />
+  <meta name="twitter:title" content="Chapter 17 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps" />
   
-  <meta name="twitter:description" content="Chapter 18 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps" />
+  <meta name="twitter:description" content="Chapter 17 Optimizing Shiny Code | Engineering Production-Grade Shiny Apps" />
   
 
 <meta name="author" content="Colin Fay, Vincent Guyader, Cervan Girard, Sébastien Rochette" />
 
 
-<meta name="date" content="2020-02-20" />
+<meta name="date" content="2020-04-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -62,9 +62,9 @@
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; position: absolute; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 pre.sourceCode { margin: 0; }
@@ -73,16 +73,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; }
-pre.numberSource a.sourceLine:empty
-  { position: absolute; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all;
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -91,9 +91,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -153,6 +153,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#getting-started-with-shiny"><i class="fa fa-check"></i>Getting started with Shiny</a></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#shiny-into-production"><i class="fa fa-check"></i>Shiny into production</a></li>
 </ul></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i>Disclaimer</a></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information-and-conventions"><i class="fa fa-check"></i>Software information and conventions</a></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a><ul>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#contributors-to-this-book"><i class="fa fa-check"></i>Contributors to this book</a></li>
@@ -164,7 +165,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="1.2" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#complex-shiny"><i class="fa fa-check"></i><b>1.2</b> What is a complex Shiny Application?</a><ul>
 <li class="chapter" data-level="1.2.1" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#reaching-the-cliff-of-complexity"><i class="fa fa-check"></i><b>1.2.1</b> Reaching the cliff of complexity</a></li>
 <li class="chapter" data-level="1.2.2" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#balancing-complexities"><i class="fa fa-check"></i><b>1.2.2</b> Balancing complexities</a></li>
-<li class="chapter" data-level="1.2.3" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#assessing-code-complexity"><i class="fa fa-check"></i><b>1.2.3</b> Assessing code complexity</a></li>
+<li class="chapter" data-level="1.2.3" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#assessing-code-complexity"><i class="fa fa-check"></i><b>1.2.3</b> Assessing Code Complexity</a></li>
 <li class="chapter" data-level="1.2.4" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#production-grade-software-engineering"><i class="fa fa-check"></i><b>1.2.4</b> Production Grade Software Engineering</a></li>
 </ul></li>
 <li class="chapter" data-level="1.3" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#what-is-a-successful-shiny-app"><i class="fa fa-check"></i><b>1.3</b> What is a successful Shiny App?</a><ul>
@@ -186,7 +187,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="3" data-path="structure.html"><a href="structure.html"><i class="fa fa-check"></i><b>3</b> Structuring your Project</a><ul>
 <li class="chapter" data-level="3.1" data-path="structure.html"><a href="structure.html#shiny-app-as-a-package"><i class="fa fa-check"></i><b>3.1</b> Shiny App as a Package</a><ul>
-<li class="chapter" data-level="3.1.1" data-path="structure.html"><a href="structure.html#what-is-your-organisation-for-a-shiny-app-project"><i class="fa fa-check"></i><b>3.1.1</b> What is your organisation for a Shiny App project?</a></li>
+<li class="chapter" data-level="3.1.1" data-path="structure.html"><a href="structure.html#what-is-in-a-production-grade-shiny-app"><i class="fa fa-check"></i><b>3.1.1</b> What is in a production-grade Shiny App?</a></li>
 <li class="chapter" data-level="3.1.2" data-path="structure.html"><a href="structure.html#document-and-test"><i class="fa fa-check"></i><b>3.1.2</b> Document and test</a></li>
 <li class="chapter" data-level="3.1.3" data-path="structure.html"><a href="structure.html#deploy"><i class="fa fa-check"></i><b>3.1.3</b> Deploy</a></li>
 <li class="chapter" data-level="3.1.4" data-path="structure.html"><a href="structure.html#resources"><i class="fa fa-check"></i><b>3.1.4</b> Resources</a></li>
@@ -204,19 +205,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="golem.html"><a href="golem.html"><i class="fa fa-check"></i><b>4</b> Introduction to <code>{golem}</code></a><ul>
-<li class="chapter" data-level="4.1" data-path="golem.html"><a href="golem.html#getting-started-with-golem"><i class="fa fa-check"></i><b>4.1</b> Getting started with <code>{golem}</code></a></li>
+<li class="chapter" data-level="4.1" data-path="golem.html"><a href="golem.html#what-is-golem"><i class="fa fa-check"></i><b>4.1</b> What is <code>{golem}</code>?</a></li>
 <li class="chapter" data-level="4.2" data-path="golem.html"><a href="golem.html#understanding-golem-app-structure"><i class="fa fa-check"></i><b>4.2</b> Understanding <code>{golem}</code> app structure</a><ul>
 <li class="chapter" data-level="4.2.1" data-path="golem.html"><a href="golem.html#description-namespace"><i class="fa fa-check"></i><b>4.2.1</b> <code>DESCRIPTION</code> &amp; <code>NAMESPACE</code></a></li>
 <li class="chapter" data-level="4.2.2" data-path="golem.html"><a href="golem.html#r"><i class="fa fa-check"></i><b>4.2.2</b> R/</a></li>
-<li class="chapter" data-level="4.2.3" data-path="golem.html"><a href="golem.html#instappwww"><i class="fa fa-check"></i><b>4.2.3</b> <code>inst/app/www/</code></a></li>
-<li class="chapter" data-level="4.2.4" data-path="golem.html"><a href="golem.html#man"><i class="fa fa-check"></i><b>4.2.4</b> <code>man/</code></a></li>
+<li class="chapter" data-level="4.2.3" data-path="golem.html"><a href="golem.html#golem-config"><i class="fa fa-check"></i><b>4.2.3</b> <code>golem-config</code></a></li>
+<li class="chapter" data-level="4.2.4" data-path="golem.html"><a href="golem.html#instappwww"><i class="fa fa-check"></i><b>4.2.4</b> <code>inst/app/www/</code></a></li>
+<li class="chapter" data-level="4.2.5" data-path="golem.html"><a href="golem.html#dev"><i class="fa fa-check"></i><b>4.2.5</b> <code>dev/</code></a></li>
+<li class="chapter" data-level="4.2.6" data-path="golem.html"><a href="golem.html#man"><i class="fa fa-check"></i><b>4.2.6</b> <code>man/</code></a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="workflow.html"><a href="workflow.html"><i class="fa fa-check"></i><b>5</b> The workflow</a><ul>
 <li class="chapter" data-level="5.1" data-path="workflow.html"><a href="workflow.html#part-1-design"><i class="fa fa-check"></i><b>5.1</b> Part 1: Design</a></li>
 <li class="chapter" data-level="5.2" data-path="workflow.html"><a href="workflow.html#part-2-prototype"><i class="fa fa-check"></i><b>5.2</b> Part 2: Prototype</a></li>
 <li class="chapter" data-level="5.3" data-path="workflow.html"><a href="workflow.html#part-3-build"><i class="fa fa-check"></i><b>5.3</b> Part 3: Build</a></li>
-<li class="chapter" data-level="5.4" data-path="workflow.html"><a href="workflow.html#part-4-secure"><i class="fa fa-check"></i><b>5.4</b> Part 4: Secure</a></li>
+<li class="chapter" data-level="5.4" data-path="workflow.html"><a href="workflow.html#part-4-strengthen"><i class="fa fa-check"></i><b>5.4</b> Part 4: Strengthen</a></li>
 <li class="chapter" data-level="5.5" data-path="workflow.html"><a href="workflow.html#part-5-deploy"><i class="fa fa-check"></i><b>5.5</b> Part 5: Deploy</a></li>
 </ul></li>
 <li class="part"><span><b>II Step 1: Design</b></span></li>
@@ -226,8 +229,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.1.2" data-path="matters.html"><a href="matters.html#a-self-evident-app-or-at-least-self-explanatory"><i class="fa fa-check"></i><b>6.1.2</b> A self-evident app (or at least self-explanatory)</a></li>
 </ul></li>
 <li class="chapter" data-level="6.2" data-path="matters.html"><a href="matters.html#the-danger-of-feature-creep"><i class="fa fa-check"></i><b>6.2</b> The danger of feature-creep</a><ul>
-<li class="chapter" data-level="6.2.1" data-path="matters.html"><a href="matters.html#whats-feature-creep"><i class="fa fa-check"></i><b>6.2.1</b> What’s feature-creep?</a></li>
-<li class="chapter" data-level="6.2.2" data-path="matters.html"><a href="matters.html#restrain-reactivity"><i class="fa fa-check"></i><b>6.2.2</b> Restrain reactivity</a></li>
+<li class="chapter" data-level="6.2.1" data-path="matters.html"><a href="matters.html#what-is-feature-creep"><i class="fa fa-check"></i><b>6.2.1</b> What is feature-creep?</a></li>
+<li class="chapter" data-level="6.2.2" data-path="matters.html"><a href="matters.html#too-much-reactivity"><i class="fa fa-check"></i><b>6.2.2</b> Too much reactivity</a></li>
 <li class="chapter" data-level="6.2.3" data-path="matters.html"><a href="matters.html#too-much-interactivity"><i class="fa fa-check"></i><b>6.2.3</b> Too much interactivity</a></li>
 </ul></li>
 <li class="chapter" data-level="6.3" data-path="matters.html"><a href="matters.html#web-accessibility"><i class="fa fa-check"></i><b>6.3</b> Web Accessibility</a><ul>
@@ -239,7 +242,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7" data-path="step-design.html"><a href="step-design.html"><i class="fa fa-check"></i><b>7</b> Don’t rush into coding</a><ul>
 <li class="chapter" data-level="7.1" data-path="step-design.html"><a href="step-design.html#designing-before-coding"><i class="fa fa-check"></i><b>7.1</b> Designing before coding</a><ul>
 <li class="chapter" data-level="7.1.1" data-path="step-design.html"><a href="step-design.html#the-urge-to-code"><i class="fa fa-check"></i><b>7.1.1</b> The Urge to Code</a></li>
-<li class="chapter" data-level="7.1.2" data-path="step-design.html"><a href="step-design.html#about-concept-map"><i class="fa fa-check"></i><b>7.1.2</b> About Concept Map</a></li>
+<li class="chapter" data-level="7.1.2" data-path="step-design.html"><a href="step-design.html#knowing-where-to-search"><i class="fa fa-check"></i><b>7.1.2</b> Knowing where to search</a></li>
+<li class="chapter" data-level="7.1.3" data-path="step-design.html"><a href="step-design.html#about-concept-map"><i class="fa fa-check"></i><b>7.1.3</b> About Concept Map</a></li>
 </ul></li>
 <li class="chapter" data-level="7.2" data-path="step-design.html"><a href="step-design.html#ask-questions"><i class="fa fa-check"></i><b>7.2</b> Ask questions</a><ul>
 <li class="chapter" data-level="7.2.1" data-path="step-design.html"><a href="step-design.html#about-the-end-users"><i class="fa fa-check"></i><b>7.2.1</b> About the end users</a></li>
@@ -266,49 +270,46 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="8.4" data-path="css.html"><a href="css.html#external-resources"><i class="fa fa-check"></i><b>8.4</b> External resources</a></li>
 </ul></li>
 <li class="part"><span><b>III Step 2: Prototype</b></span></li>
-<li class="chapter" data-level="9" data-path="stepprotopype.html"><a href="stepprotopype.html"><i class="fa fa-check"></i><b>9</b> Building an “ipsum-app”</a><ul>
-<li class="chapter" data-level="9.1" data-path="stepprotopype.html"><a href="stepprotopype.html#prototyping-is-crucial"><i class="fa fa-check"></i><b>9.1</b> Prototyping is crucial</a><ul>
-<li class="chapter" data-level="9.1.1" data-path="stepprotopype.html"><a href="stepprotopype.html#the-ui-first-approach"><i class="fa fa-check"></i><b>9.1.1</b> The “UI first” approach</a></li>
+<li class="chapter" data-level="9" data-path="setting-up-for-success-with-golem.html"><a href="setting-up-for-success-with-golem.html"><i class="fa fa-check"></i><b>9</b> Setting up for success with <code>{golem}</code></a><ul>
+<li class="chapter" data-level="9.1" data-path="setting-up-for-success-with-golem.html"><a href="setting-up-for-success-with-golem.html#create-a-golem"><i class="fa fa-check"></i><b>9.1</b> Create a <code>{golem}</code></a></li>
+<li class="chapter" data-level="9.2" data-path="setting-up-for-success-with-golem.html"><a href="setting-up-for-success-with-golem.html#setting-things-up-with-dev01_start.r"><i class="fa fa-check"></i><b>9.2</b> Setting things up with <code>dev/01_start.R</code></a><ul>
+<li class="chapter" data-level="9.2.1" data-path="setting-up-for-success-with-golem.html"><a href="setting-up-for-success-with-golem.html#fill-the-description-and-set-options"><i class="fa fa-check"></i><b>9.2.1</b> Fill the DESCRIPTION and set options</a></li>
+<li class="chapter" data-level="9.2.2" data-path="setting-up-for-success-with-golem.html"><a href="setting-up-for-success-with-golem.html#set-common-files"><i class="fa fa-check"></i><b>9.2.2</b> Set common Files</a></li>
+<li class="chapter" data-level="9.2.3" data-path="setting-up-for-success-with-golem.html"><a href="setting-up-for-success-with-golem.html#init-tests"><i class="fa fa-check"></i><b>9.2.3</b> Init Tests</a></li>
+<li class="chapter" data-level="9.2.4" data-path="setting-up-for-success-with-golem.html"><a href="setting-up-for-success-with-golem.html#use-recommended-elements"><i class="fa fa-check"></i><b>9.2.4</b> Use Recommended Elements</a></li>
+<li class="chapter" data-level="9.2.5" data-path="setting-up-for-success-with-golem.html"><a href="setting-up-for-success-with-golem.html#add-utilitary-functions"><i class="fa fa-check"></i><b>9.2.5</b> Add utilitary functions</a></li>
+<li class="chapter" data-level="9.2.6" data-path="setting-up-for-success-with-golem.html"><a href="setting-up-for-success-with-golem.html#if-you-want-to-change-the-default-favicon"><i class="fa fa-check"></i><b>9.2.6</b> If you want to change the default favicon</a></li>
 </ul></li>
-<li class="chapter" data-level="9.2" data-path="stepprotopype.html"><a href="stepprotopype.html#prototyping-shiny"><i class="fa fa-check"></i><b>9.2</b> Prototyping Shiny</a><ul>
-<li class="chapter" data-level="9.2.1" data-path="stepprotopype.html"><a href="stepprotopype.html#fast-prototyping-with-shinipsum"><i class="fa fa-check"></i><b>9.2.1</b> Fast prototyping with <code>{shinipsum}</code></a></li>
-<li class="chapter" data-level="9.2.2" data-path="stepprotopype.html"><a href="stepprotopype.html#using-fakir-for-fake-data-generation"><i class="fa fa-check"></i><b>9.2.2</b> Using <code>{fakir}</code> for fake data generation</a></li>
+<li class="chapter" data-level="9.3" data-path="setting-up-for-success-with-golem.html"><a href="setting-up-for-success-with-golem.html#setting-infrastructure-for-prototyping"><i class="fa fa-check"></i><b>9.3</b> Setting infrastructure for prototyping</a><ul>
+<li class="chapter" data-level="9.3.1" data-path="setting-up-for-success-with-golem.html"><a href="setting-up-for-success-with-golem.html#add-modules-in-dev02_dev.r"><i class="fa fa-check"></i><b>9.3.1</b> Add modules in <code>dev/02_dev.R</code></a></li>
+<li class="chapter" data-level="9.3.2" data-path="setting-up-for-success-with-golem.html"><a href="setting-up-for-success-with-golem.html#add-css-js-files"><i class="fa fa-check"></i><b>9.3.2</b> Add CSS &amp; JS Files</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="10" data-path="proto-rmdfirst.html"><a href="proto-rmdfirst.html"><i class="fa fa-check"></i><b>10</b> Building with RMarkdown</a><ul>
-<li class="chapter" data-level="10.1" data-path="proto-rmdfirst.html"><a href="proto-rmdfirst.html#define-the-content-of-the-application"><i class="fa fa-check"></i><b>10.1</b> Define the content of the application</a></li>
-<li class="chapter" data-level="10.2" data-path="proto-rmdfirst.html"><a href="proto-rmdfirst.html#fill-the-rmd-files"><i class="fa fa-check"></i><b>10.2</b> Fill the Rmd files</a></li>
-<li class="chapter" data-level="10.3" data-path="proto-rmdfirst.html"><a href="proto-rmdfirst.html#use-the-rmd-first-method-to-document-further"><i class="fa fa-check"></i><b>10.3</b> Use the ‘Rmd first’ method to document further</a></li>
+<li class="chapter" data-level="10" data-path="stepprotopype.html"><a href="stepprotopype.html"><i class="fa fa-check"></i><b>10</b> Building an “ipsum-app”</a><ul>
+<li class="chapter" data-level="10.1" data-path="stepprotopype.html"><a href="stepprotopype.html#prototyping-is-crucial"><i class="fa fa-check"></i><b>10.1</b> Prototyping is crucial</a><ul>
+<li class="chapter" data-level="10.1.1" data-path="stepprotopype.html"><a href="stepprotopype.html#prototype-then-polish"><i class="fa fa-check"></i><b>10.1.1</b> Prototype, then polish</a></li>
+<li class="chapter" data-level="10.1.2" data-path="stepprotopype.html"><a href="stepprotopype.html#the-ui-first-approach"><i class="fa fa-check"></i><b>10.1.2</b> The “UI first” approach</a></li>
+</ul></li>
+<li class="chapter" data-level="10.2" data-path="stepprotopype.html"><a href="stepprotopype.html#prototyping-shiny"><i class="fa fa-check"></i><b>10.2</b> Prototyping Shiny</a><ul>
+<li class="chapter" data-level="10.2.1" data-path="stepprotopype.html"><a href="stepprotopype.html#fast-ui-prototyping-with-shinipsum"><i class="fa fa-check"></i><b>10.2.1</b> Fast UI Prototyping with <code>{shinipsum}</code></a></li>
+<li class="chapter" data-level="10.2.2" data-path="stepprotopype.html"><a href="stepprotopype.html#using-fakir-for-fake-data-generation"><i class="fa fa-check"></i><b>10.2.2</b> Using <code>{fakir}</code> for fake data generation</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="stepprotopype.html"><a href="stepprotopype.html#proto-rmdfirst"><i class="fa fa-check"></i><b>10.3</b> Building with RMarkdown</a><ul>
+<li class="chapter" data-level="10.3.1" data-path="stepprotopype.html"><a href="stepprotopype.html#define-the-content-of-the-application"><i class="fa fa-check"></i><b>10.3.1</b> Define the content of the application</a></li>
+<li class="chapter" data-level="10.3.2" data-path="stepprotopype.html"><a href="stepprotopype.html#using-the-rmd-files-as-a-laboratory-notebook"><i class="fa fa-check"></i><b>10.3.2</b> Using the Rmd files as a laboratory notebook</a></li>
+<li class="chapter" data-level="10.3.3" data-path="stepprotopype.html"><a href="stepprotopype.html#rmd-vignettes-and-documentation-first"><i class="fa fa-check"></i><b>10.3.3</b> Rmd, Vignettes, and documentation first</a></li>
+</ul></li>
 </ul></li>
 <li class="part"><span><b>IV Step 3: Build</b></span></li>
 <li class="chapter" data-level="11" data-path="stepbuild.html"><a href="stepbuild.html"><i class="fa fa-check"></i><b>11</b> Building app with <code>{golem}</code></a><ul>
-<li class="chapter" data-level="11.1" data-path="stepbuild.html"><a href="stepbuild.html#using-golem"><i class="fa fa-check"></i><b>11.1</b> Using <code>{golem}</code></a><ul>
-<li class="chapter" data-level="11.1.1" data-path="stepbuild.html"><a href="stepbuild.html#create-a-package"><i class="fa fa-check"></i><b>11.1.1</b> Create a package</a></li>
+<li class="chapter" data-level="11.1" data-path="stepbuild.html"><a href="stepbuild.html#add-dependencies"><i class="fa fa-check"></i><b>11.1</b> Add dependencies</a></li>
+<li class="chapter" data-level="11.2" data-path="stepbuild.html"><a href="stepbuild.html#submodules-and-utility-functions"><i class="fa fa-check"></i><b>11.2</b> Submodules and utility functions</a></li>
+<li class="chapter" data-level="11.3" data-path="stepbuild.html"><a href="stepbuild.html#add-tests"><i class="fa fa-check"></i><b>11.3</b> Add tests</a></li>
+<li class="chapter" data-level="11.4" data-path="stepbuild.html"><a href="stepbuild.html#documentation-and-code-coverage"><i class="fa fa-check"></i><b>11.4</b> Documentation and Code Coverage</a><ul>
+<li class="chapter" data-level="11.4.1" data-path="stepbuild.html"><a href="stepbuild.html#vignette"><i class="fa fa-check"></i><b>11.4.1</b> Vignette</a></li>
+<li class="chapter" data-level="11.4.2" data-path="stepbuild.html"><a href="stepbuild.html#code-coverage"><i class="fa fa-check"></i><b>11.4.2</b> Code coverage</a></li>
 </ul></li>
-<li class="chapter" data-level="11.2" data-path="stepbuild.html"><a href="stepbuild.html#dev01_start.r"><i class="fa fa-check"></i><b>11.2</b> <code>dev/01_start.R</code></a><ul>
-<li class="chapter" data-level="11.2.1" data-path="stepbuild.html"><a href="stepbuild.html#fill-the-desc"><i class="fa fa-check"></i><b>11.2.1</b> Fill the DESC</a></li>
-<li class="chapter" data-level="11.2.2" data-path="stepbuild.html"><a href="stepbuild.html#set-common-files"><i class="fa fa-check"></i><b>11.2.2</b> Set common Files</a></li>
-<li class="chapter" data-level="11.2.3" data-path="stepbuild.html"><a href="stepbuild.html#add-a-data-raw-folder"><i class="fa fa-check"></i><b>11.2.3</b> Add a data-raw folder</a></li>
-<li class="chapter" data-level="11.2.4" data-path="stepbuild.html"><a href="stepbuild.html#init-tests"><i class="fa fa-check"></i><b>11.2.4</b> Init Tests</a></li>
-<li class="chapter" data-level="11.2.5" data-path="stepbuild.html"><a href="stepbuild.html#use-recommended-package"><i class="fa fa-check"></i><b>11.2.5</b> Use Recommended Package</a></li>
-<li class="chapter" data-level="11.2.6" data-path="stepbuild.html"><a href="stepbuild.html#add-various-tools"><i class="fa fa-check"></i><b>11.2.6</b> Add various tools</a></li>
-<li class="chapter" data-level="11.2.7" data-path="stepbuild.html"><a href="stepbuild.html#if-you-want-to-change-the-default-favicon"><i class="fa fa-check"></i><b>11.2.7</b> If you want to change the default favicon</a></li>
-</ul></li>
-<li class="chapter" data-level="11.3" data-path="stepbuild.html"><a href="stepbuild.html#day-to-day-dev-with-golem"><i class="fa fa-check"></i><b>11.3</b> Day to Day Dev with <code>{golem}</code></a></li>
-<li class="chapter" data-level="11.4" data-path="stepbuild.html"><a href="stepbuild.html#launching-the-app"><i class="fa fa-check"></i><b>11.4</b> Launching the app</a></li>
-<li class="chapter" data-level="11.5" data-path="stepbuild.html"><a href="stepbuild.html#dev02_dev.r"><i class="fa fa-check"></i><b>11.5</b> <code>dev/02_dev.R</code></a><ul>
-<li class="chapter" data-level="11.5.1" data-path="stepbuild.html"><a href="stepbuild.html#add-modules"><i class="fa fa-check"></i><b>11.5.1</b> Add modules</a></li>
-<li class="chapter" data-level="11.5.2" data-path="stepbuild.html"><a href="stepbuild.html#add-dependencies"><i class="fa fa-check"></i><b>11.5.2</b> Add dependencies</a></li>
-<li class="chapter" data-level="11.5.3" data-path="stepbuild.html"><a href="stepbuild.html#add-tests"><i class="fa fa-check"></i><b>11.5.3</b> Add tests</a></li>
-<li class="chapter" data-level="11.5.4" data-path="stepbuild.html"><a href="stepbuild.html#add-a-browser-button"><i class="fa fa-check"></i><b>11.5.4</b> Add a browser button</a></li>
-<li class="chapter" data-level="11.5.5" data-path="stepbuild.html"><a href="stepbuild.html#add-external-files"><i class="fa fa-check"></i><b>11.5.5</b> Add external files</a></li>
-</ul></li>
-<li class="chapter" data-level="11.6" data-path="stepbuild.html"><a href="stepbuild.html#adding-these-external-resources-to-your-app"><i class="fa fa-check"></i><b>11.6</b> Adding these external resources to your app</a></li>
-<li class="chapter" data-level="11.7" data-path="stepbuild.html"><a href="stepbuild.html#documentation"><i class="fa fa-check"></i><b>11.7</b> Documentation</a><ul>
-<li class="chapter" data-level="11.7.1" data-path="stepbuild.html"><a href="stepbuild.html#vignette"><i class="fa fa-check"></i><b>11.7.1</b> Vignette</a></li>
-<li class="chapter" data-level="11.7.2" data-path="stepbuild.html"><a href="stepbuild.html#code-coverage"><i class="fa fa-check"></i><b>11.7.2</b> Code coverage</a></li>
-</ul></li>
-<li class="chapter" data-level="11.8" data-path="stepbuild.html"><a href="stepbuild.html#using-golem-dev-functions"><i class="fa fa-check"></i><b>11.8</b> Using <code>{golem}</code> dev functions</a></li>
+<li class="chapter" data-level="11.5" data-path="stepbuild.html"><a href="stepbuild.html#using-golem-dev-functions"><i class="fa fa-check"></i><b>11.5</b> Using <code>{golem}</code> dev functions</a></li>
 </ul></li>
 <li class="part"><span><b>V Step 4: Strengthen</b></span></li>
 <li class="chapter" data-level="12" data-path="step-secure.html"><a href="step-secure.html"><i class="fa fa-check"></i><b>12</b> Build yourself a safety net</a><ul>
@@ -318,14 +319,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12.1.3" data-path="step-secure.html"><a href="step-secure.html#testing-the-app-load"><i class="fa fa-check"></i><b>12.1.3</b> Testing the app load</a></li>
 </ul></li>
 <li class="chapter" data-level="12.2" data-path="step-secure.html"><a href="step-secure.html#a-reproducible-environment"><i class="fa fa-check"></i><b>12.2</b> A reproducible environment</a><ul>
-<li class="chapter" data-level="12.2.1" data-path="step-secure.html"><a href="step-secure.html#renv"><i class="fa fa-check"></i><b>12.2.1</b> {renv}</a></li>
-<li class="chapter" data-level="12.2.2" data-path="step-secure.html"><a href="step-secure.html#docker-rstudio-connect"><i class="fa fa-check"></i><b>12.2.2</b> Docker &amp; RStudio Connect</a></li>
+<li class="chapter" data-level="12.2.1" data-path="step-secure.html"><a href="step-secure.html#renv"><i class="fa fa-check"></i><b>12.2.1</b> <code>{renv}</code></a></li>
+<li class="chapter" data-level="12.2.2" data-path="step-secure.html"><a href="step-secure.html#docker"><i class="fa fa-check"></i><b>12.2.2</b> Docker</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="secure.html"><a href="secure.html"><i class="fa fa-check"></i><b>13</b> Version Control</a><ul>
 <li class="chapter" data-level="13.1" data-path="secure.html"><a href="secure.html#using-version-control-with-git"><i class="fa fa-check"></i><b>13.1</b> Using Version Control with <code>git</code></a><ul>
 <li class="chapter" data-level="13.1.1" data-path="secure.html"><a href="secure.html#why-version-control"><i class="fa fa-check"></i><b>13.1.1</b> Why Version Control?</a></li>
-<li class="chapter" data-level="13.1.2" data-path="secure.html"><a href="secure.html#git-basics-commit---push---pull"><i class="fa fa-check"></i><b>13.1.2</b> <code>Git</code> basics: <code>commit</code> - <code>push</code> - <code>pull</code></a></li>
+<li class="chapter" data-level="13.1.2" data-path="secure.html"><a href="secure.html#git-basics-add---commit---push---pull"><i class="fa fa-check"></i><b>13.1.2</b> <code>Git</code> basics: <code>add</code> - <code>commit</code> - <code>push</code> - <code>pull</code></a></li>
 <li class="chapter" data-level="13.1.3" data-path="secure.html"><a href="secure.html#about-branches"><i class="fa fa-check"></i><b>13.1.3</b> About branches</a></li>
 <li class="chapter" data-level="13.1.4" data-path="secure.html"><a href="secure.html#issues"><i class="fa fa-check"></i><b>13.1.4</b> Issues</a></li>
 </ul></li>
@@ -335,75 +336,83 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="13.2.3" data-path="secure.html"><a href="secure.html#about-git-flow"><i class="fa fa-check"></i><b>13.2.3</b> About <code>git-flow</code></a></li>
 <li class="chapter" data-level="13.2.4" data-path="secure.html"><a href="secure.html#further-readings-on-git"><i class="fa fa-check"></i><b>13.2.4</b> Further readings on <code>git</code></a></li>
 </ul></li>
-<li class="chapter" data-level="13.3" data-path="secure.html"><a href="secure.html#ci-and-testing"><i class="fa fa-check"></i><b>13.3</b> CI and testing</a></li>
+<li class="chapter" data-level="13.3" data-path="secure.html"><a href="secure.html#automated-testing"><i class="fa fa-check"></i><b>13.3</b> Automated testing</a></li>
 </ul></li>
-<li class="part"><span><b>VI Step 5: Deploy</b></span></li>
-<li class="chapter" data-level="14" data-path="stepdeploy.html"><a href="stepdeploy.html"><i class="fa fa-check"></i><b>14</b> Send your app to production</a><ul>
-<li class="chapter" data-level="14.1" data-path="stepdeploy.html"><a href="stepdeploy.html#where-to-deploy-your-app"><i class="fa fa-check"></i><b>14.1</b> Where to deploy your app</a></li>
-<li class="chapter" data-level="14.2" data-path="stepdeploy.html"><a href="stepdeploy.html#before-deployment-check-list"><i class="fa fa-check"></i><b>14.2</b> Before deployment Check-list</a><ul>
-<li class="chapter" data-level="14.2.1" data-path="stepdeploy.html"><a href="stepdeploy.html#what-to-check-on-the-app"><i class="fa fa-check"></i><b>14.2.1</b> What to check on the app</a></li>
-<li class="chapter" data-level="14.2.2" data-path="stepdeploy.html"><a href="stepdeploy.html#what-to-check-in-the-production-envionment"><i class="fa fa-check"></i><b>14.2.2</b> What to check in the production envionment</a></li>
+<li class="chapter" data-level="14" data-path="deploy-golem.html"><a href="deploy-golem.html"><i class="fa fa-check"></i><b>14</b> Deploy your application</a><ul>
+<li class="chapter" data-level="14.1" data-path="deploy-golem.html"><a href="deploy-golem.html#before-deployment-check-list"><i class="fa fa-check"></i><b>14.1</b> Before deployment Check-list</a></li>
+<li class="chapter" data-level="14.2" data-path="deploy-golem.html"><a href="deploy-golem.html#sharing-your-app-as-a-package"><i class="fa fa-check"></i><b>14.2</b> Sharing your app as a package</a><ul>
+<li class="chapter" data-level="14.2.1" data-path="deploy-golem.html"><a href="deploy-golem.html#install-on-your-machine"><i class="fa fa-check"></i><b>14.2.1</b> Install on your machine</a></li>
+<li class="chapter" data-level="14.2.2" data-path="deploy-golem.html"><a href="deploy-golem.html#share-as-built-package"><i class="fa fa-check"></i><b>14.2.2</b> Share as built package</a></li>
 </ul></li>
+<li class="chapter" data-level="14.3" data-path="deploy-golem.html"><a href="deploy-golem.html#deploying-apps-with-golem"><i class="fa fa-check"></i><b>14.3</b> Deploying Apps with <code>{golem}</code></a></li>
+<li class="chapter" data-level="14.4" data-path="deploy-golem.html"><a href="deploy-golem.html#rstudio-environments"><i class="fa fa-check"></i><b>14.4</b> RStudio Environments</a></li>
+<li class="chapter" data-level="14.5" data-path="deploy-golem.html"><a href="deploy-golem.html#docker-1"><i class="fa fa-check"></i><b>14.5</b> Docker</a></li>
 </ul></li>
-<li class="chapter" data-level="15" data-path="deploy-golem.html"><a href="deploy-golem.html"><i class="fa fa-check"></i><b>15</b> Deploy with <code>{golem}</code></a><ul>
-<li class="chapter" data-level="15.1" data-path="deploy-golem.html"><a href="deploy-golem.html#local-deployment-1"><i class="fa fa-check"></i><b>15.1</b> Local deployment</a></li>
-<li class="chapter" data-level="15.2" data-path="deploy-golem.html"><a href="deploy-golem.html#deploying-apps-with-golem"><i class="fa fa-check"></i><b>15.2</b> Deploying Apps with <code>{golem}</code></a></li>
-<li class="chapter" data-level="15.3" data-path="deploy-golem.html"><a href="deploy-golem.html#rstudio-environments"><i class="fa fa-check"></i><b>15.3</b> RStudio Environments</a></li>
-<li class="chapter" data-level="15.4" data-path="deploy-golem.html"><a href="deploy-golem.html#docker"><i class="fa fa-check"></i><b>15.4</b> Docker</a></li>
+<li class="part"><span><b>VI Optimizing</b></span></li>
+<li class="chapter" data-level="15" data-path="when-optimize.html"><a href="when-optimize.html"><i class="fa fa-check"></i><b>15</b> The Need for Optimization</a><ul>
+<li class="chapter" data-level="15.1" data-path="when-optimize.html"><a href="when-optimize.html#build-first-then-optimize"><i class="fa fa-check"></i><b>15.1</b> Build first, then optimize</a><ul>
+<li class="chapter" data-level="15.1.1" data-path="when-optimize.html"><a href="when-optimize.html#identifying-bottlenecks"><i class="fa fa-check"></i><b>15.1.1</b> Identifying bottlenecks</a></li>
+<li class="chapter" data-level="15.1.2" data-path="when-optimize.html"><a href="when-optimize.html#do-you-need-faster-functions"><i class="fa fa-check"></i><b>15.1.2</b> Do you need faster functions?</a></li>
+<li class="chapter" data-level="15.1.3" data-path="when-optimize.html"><a href="when-optimize.html#dont-sacrifice-readability"><i class="fa fa-check"></i><b>15.1.3</b> Don’t sacrifice readability</a></li>
 </ul></li>
-<li class="part"><span><b>VII Optimizing</b></span></li>
-<li class="chapter" data-level="16" data-path="when-optimize.html"><a href="when-optimize.html"><i class="fa fa-check"></i><b>16</b> The Need for Optimization</a><ul>
-<li class="chapter" data-level="16.1" data-path="when-optimize.html"><a href="when-optimize.html#build-first-then-optimize"><i class="fa fa-check"></i><b>16.1</b> Build first, then optimize</a><ul>
-<li class="chapter" data-level="16.1.1" data-path="when-optimize.html"><a href="when-optimize.html#identifying-bottlenecks"><i class="fa fa-check"></i><b>16.1.1</b> Identifying bottlenecks</a></li>
-<li class="chapter" data-level="16.1.2" data-path="when-optimize.html"><a href="when-optimize.html#do-you-need-faster-functions"><i class="fa fa-check"></i><b>16.1.2</b> Do you need faster functions?</a></li>
-<li class="chapter" data-level="16.1.3" data-path="when-optimize.html"><a href="when-optimize.html#dont-sacrifice-readability"><i class="fa fa-check"></i><b>16.1.3</b> Don’t sacrifice readability</a></li>
-</ul></li>
-<li class="chapter" data-level="16.2" data-path="when-optimize.html"><a href="when-optimize.html#tools-for-profiling"><i class="fa fa-check"></i><b>16.2</b> Tools for profiling</a><ul>
-<li class="chapter" data-level="16.2.1" data-path="when-optimize.html"><a href="when-optimize.html#profiling-r-code"><i class="fa fa-check"></i><b>16.2.1</b> Profiling R code</a></li>
-<li class="chapter" data-level="16.2.2" data-path="when-optimize.html"><a href="when-optimize.html#profiling-shiny"><i class="fa fa-check"></i><b>16.2.2</b> Profiling Shiny</a></li>
+<li class="chapter" data-level="15.2" data-path="when-optimize.html"><a href="when-optimize.html#tools-for-profiling"><i class="fa fa-check"></i><b>15.2</b> Tools for profiling</a><ul>
+<li class="chapter" data-level="15.2.1" data-path="when-optimize.html"><a href="when-optimize.html#profiling-r-code"><i class="fa fa-check"></i><b>15.2.1</b> Profiling R code</a></li>
+<li class="chapter" data-level="15.2.2" data-path="when-optimize.html"><a href="when-optimize.html#profiling-shiny"><i class="fa fa-check"></i><b>15.2.2</b> Profiling Shiny</a></li>
+<li class="chapter" data-level="15.2.3" data-path="when-optimize.html"><a href="when-optimize.html#more-resources-about-web-page-performance"><i class="fa fa-check"></i><b>15.2.3</b> More resources about web page performance</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="17" data-path="optim-caveat.html"><a href="optim-caveat.html"><i class="fa fa-check"></i><b>17</b> Common Application Caveats</a><ul>
-<li class="chapter" data-level="17.1" data-path="optim-caveat.html"><a href="optim-caveat.html#reactivity-anti-patterns"><i class="fa fa-check"></i><b>17.1</b> Reactivity anti-patterns</a><ul>
-<li class="chapter" data-level="17.1.1" data-path="optim-caveat.html"><a href="optim-caveat.html#reactivity-is-awesome-until-its-not"><i class="fa fa-check"></i><b>17.1.1</b> Reactivity is awesome… until it’s not</a></li>
-<li class="chapter" data-level="17.1.2" data-path="optim-caveat.html"><a href="optim-caveat.html#observe-vs-observeevent"><i class="fa fa-check"></i><b>17.1.2</b> <code>observe</code> vs <code>observeEvent</code></a></li>
-<li class="chapter" data-level="17.1.3" data-path="optim-caveat.html"><a href="optim-caveat.html#building-triggers-and-watchers"><i class="fa fa-check"></i><b>17.1.3</b> Building triggers and watchers</a></li>
-<li class="chapter" data-level="17.1.4" data-path="optim-caveat.html"><a href="optim-caveat.html#using-r6-as-a-data-storage"><i class="fa fa-check"></i><b>17.1.4</b> Using R6 as a data storage</a></li>
+<li class="chapter" data-level="16" data-path="optim-caveat.html"><a href="optim-caveat.html"><i class="fa fa-check"></i><b>16</b> Common Application Caveats</a><ul>
+<li class="chapter" data-level="16.1" data-path="optim-caveat.html"><a href="optim-caveat.html#reactivity-anti-patterns"><i class="fa fa-check"></i><b>16.1</b> Reactivity anti-patterns</a><ul>
+<li class="chapter" data-level="16.1.1" data-path="optim-caveat.html"><a href="optim-caveat.html#reactivity-is-awesome-until-it-is-not"><i class="fa fa-check"></i><b>16.1.1</b> Reactivity is awesome… until it is not</a></li>
+<li class="chapter" data-level="16.1.2" data-path="optim-caveat.html"><a href="optim-caveat.html#observe-vs-observeevent"><i class="fa fa-check"></i><b>16.1.2</b> <code>observe</code> vs <code>observeEvent</code></a></li>
+<li class="chapter" data-level="16.1.3" data-path="optim-caveat.html"><a href="optim-caveat.html#building-triggers-and-watchers"><i class="fa fa-check"></i><b>16.1.3</b> Building triggers and watchers</a></li>
+<li class="chapter" data-level="16.1.4" data-path="optim-caveat.html"><a href="optim-caveat.html#using-r6-as-a-data-storage"><i class="fa fa-check"></i><b>16.1.4</b> Using R6 as a data storage</a></li>
 </ul></li>
-<li class="chapter" data-level="17.2" data-path="optim-caveat.html"><a href="optim-caveat.html#r-does-too-much"><i class="fa fa-check"></i><b>17.2</b> R does too much</a></li>
-<li class="chapter" data-level="17.3" data-path="optim-caveat.html"><a href="optim-caveat.html#reading-data"><i class="fa fa-check"></i><b>17.3</b> Reading data</a></li>
+<li class="chapter" data-level="16.2" data-path="optim-caveat.html"><a href="optim-caveat.html#r-does-too-much"><i class="fa fa-check"></i><b>16.2</b> R does too much</a><ul>
+<li class="chapter" data-level="16.2.1" data-path="optim-caveat.html"><a href="optim-caveat.html#rendering-ui-from-server-side"><i class="fa fa-check"></i><b>16.2.1</b> Rendering UI from server side</a></li>
+<li class="chapter" data-level="16.2.2" data-path="optim-caveat.html"><a href="optim-caveat.html#too-much-data-in-memory"><i class="fa fa-check"></i><b>16.2.2</b> Too Much Data in Memory</a></li>
 </ul></li>
-<li class="chapter" data-level="18" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html"><i class="fa fa-check"></i><b>18</b> Optimizing Shiny Code</a><ul>
-<li class="chapter" data-level="18.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#optimizing-r-code"><i class="fa fa-check"></i><b>18.1</b> Optimizing R code</a></li>
-<li class="chapter" data-level="18.2" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#caching-elements"><i class="fa fa-check"></i><b>18.2</b> Caching elements</a><ul>
-<li class="chapter" data-level="18.2.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#whats-caching"><i class="fa fa-check"></i><b>18.2.1</b> What’s caching?</a></li>
-<li class="chapter" data-level="18.2.2" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#using-caching-in-r"><i class="fa fa-check"></i><b>18.2.2</b> Using caching in R</a></li>
-<li class="chapter" data-level="18.2.3" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#caching-shiny"><i class="fa fa-check"></i><b>18.2.3</b> Caching Shiny</a></li>
-</ul></li>
-<li class="chapter" data-level="18.3" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#asynchronous-in-shiny"><i class="fa fa-check"></i><b>18.3</b> Asynchronous in Shiny</a><ul>
-<li class="chapter" data-level="18.3.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#how-to"><i class="fa fa-check"></i><b>18.3.1</b> How to</a></li>
+<li class="chapter" data-level="16.3" data-path="optim-caveat.html"><a href="optim-caveat.html#reading-data"><i class="fa fa-check"></i><b>16.3</b> Reading data</a><ul>
+<li class="chapter" data-level="16.3.1" data-path="optim-caveat.html"><a href="optim-caveat.html#including-data-in-your-application"><i class="fa fa-check"></i><b>16.3.1</b> Including Data in your Application</a></li>
+<li class="chapter" data-level="16.3.2" data-path="optim-caveat.html"><a href="optim-caveat.html#reading-external-datasets"><i class="fa fa-check"></i><b>16.3.2</b> Reading External Datasets</a></li>
+<li class="chapter" data-level="16.3.3" data-path="optim-caveat.html"><a href="optim-caveat.html#using-external-databases"><i class="fa fa-check"></i><b>16.3.3</b> Using External DataBases</a></li>
+<li class="chapter" data-level="16.3.4" data-path="optim-caveat.html"><a href="optim-caveat.html#reminder"><i class="fa fa-check"></i><b>16.3.4</b> Reminder</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="19" data-path="optimjs.html"><a href="optimjs.html"><i class="fa fa-check"></i><b>19</b> Using JavaScript</a><ul>
-<li class="chapter" data-level="19.1" data-path="optimjs.html"><a href="optimjs.html#a-quick-introduction-to-javascript"><i class="fa fa-check"></i><b>19.1</b> A quick introduction to JavaScript</a><ul>
-<li class="chapter" data-level="19.1.1" data-path="optimjs.html"><a href="optimjs.html#understanding-html-class-and-id"><i class="fa fa-check"></i><b>19.1.1</b> Understanding html, class, and id</a></li>
-<li class="chapter" data-level="19.1.2" data-path="optimjs.html"><a href="optimjs.html#about-jquery-jquery-selectors"><i class="fa fa-check"></i><b>19.1.2</b> About jQuery &amp; jQuery selectors</a></li>
+<li class="chapter" data-level="17" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html"><i class="fa fa-check"></i><b>17</b> Optimizing Shiny Code</a><ul>
+<li class="chapter" data-level="17.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#optimizing-r-code"><i class="fa fa-check"></i><b>17.1</b> Optimizing R code</a></li>
+<li class="chapter" data-level="17.2" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#caching-elements"><i class="fa fa-check"></i><b>17.2</b> Caching elements</a><ul>
+<li class="chapter" data-level="17.2.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#what-is-caching"><i class="fa fa-check"></i><b>17.2.1</b> What is caching?</a></li>
+<li class="chapter" data-level="17.2.2" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#native-caching-in-r"><i class="fa fa-check"></i><b>17.2.2</b> Native Caching in R</a></li>
+<li class="chapter" data-level="17.2.3" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#caching-shiny"><i class="fa fa-check"></i><b>17.2.3</b> Caching Shiny</a></li>
 </ul></li>
-<li class="chapter" data-level="19.2" data-path="optimjs.html"><a href="optimjs.html#client-side-javascript"><i class="fa fa-check"></i><b>19.2</b> Client-side JavaScript</a><ul>
-<li class="chapter" data-level="19.2.1" data-path="optimjs.html"><a href="optimjs.html#common-patterns"><i class="fa fa-check"></i><b>19.2.1</b> Common patterns</a></li>
-<li class="chapter" data-level="19.2.2" data-path="optimjs.html"><a href="optimjs.html#where-to-put-them---introduction-to-javascript-events"><i class="fa fa-check"></i><b>19.2.2</b> Where to put them - introduction to JavaScript events</a></li>
+<li class="chapter" data-level="17.3" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#asynchronous-in-shiny"><i class="fa fa-check"></i><b>17.3</b> Asynchronous in Shiny</a><ul>
+<li class="chapter" data-level="17.3.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#how-to"><i class="fa fa-check"></i><b>17.3.1</b> How to</a></li>
 </ul></li>
-<li class="chapter" data-level="19.3" data-path="optimjs.html"><a href="optimjs.html#javascript---shiny-communication"><i class="fa fa-check"></i><b>19.3</b> JavaScript &lt;-&gt; Shiny communication</a><ul>
-<li class="chapter" data-level="19.3.1" data-path="optimjs.html"><a href="optimjs.html#from-r-to-javascript"><i class="fa fa-check"></i><b>19.3.1</b> From R to JavaScript</a></li>
-<li class="chapter" data-level="19.3.2" data-path="optimjs.html"><a href="optimjs.html#from-javascript-to-r"><i class="fa fa-check"></i><b>19.3.2</b> From JavaScript to R</a></li>
 </ul></li>
-<li class="chapter" data-level="19.4" data-path="optimjs.html"><a href="optimjs.html#about-golem-js-functions"><i class="fa fa-check"></i><b>19.4</b> About <code>{golem}</code> js functions</a><ul>
-<li class="chapter" data-level="19.4.1" data-path="optimjs.html"><a href="optimjs.html#goleminvoke_js"><i class="fa fa-check"></i><b>19.4.1</b> <code>golem::invoke_js()</code></a></li>
+<li class="chapter" data-level="18" data-path="optimjs.html"><a href="optimjs.html"><i class="fa fa-check"></i><b>18</b> Using JavaScript</a><ul>
+<li class="chapter" data-level="18.1" data-path="optimjs.html"><a href="optimjs.html#a-quick-introduction-to-javascript"><i class="fa fa-check"></i><b>18.1</b> A quick introduction to JavaScript</a><ul>
+<li class="chapter" data-level="18.1.1" data-path="optimjs.html"><a href="optimjs.html#understanding-html-class-and-id"><i class="fa fa-check"></i><b>18.1.1</b> Understanding html, class, and id</a></li>
+<li class="chapter" data-level="18.1.2" data-path="optimjs.html"><a href="optimjs.html#querying-in-vanilla-javascript"><i class="fa fa-check"></i><b>18.1.2</b> Querying in Vanilla JavaScript</a></li>
+<li class="chapter" data-level="18.1.3" data-path="optimjs.html"><a href="optimjs.html#about-dom-events"><i class="fa fa-check"></i><b>18.1.3</b> About DOM events</a></li>
+<li class="chapter" data-level="18.1.4" data-path="optimjs.html"><a href="optimjs.html#about-jquery-jquery-selectors"><i class="fa fa-check"></i><b>18.1.4</b> About <code>jQuery</code> &amp; <code>jQuery</code> selectors</a></li>
 </ul></li>
-<li class="chapter" data-level="19.5" data-path="optimjs.html"><a href="optimjs.html#learn-more-about-javascript"><i class="fa fa-check"></i><b>19.5</b> Learn more about JavaScript</a><ul>
-<li class="chapter" data-level="19.5.1" data-path="optimjs.html"><a href="optimjs.html#javascript-basics"><i class="fa fa-check"></i><b>19.5.1</b> JavaScript basics</a></li>
-<li class="chapter" data-level="19.5.2" data-path="optimjs.html"><a href="optimjs.html#jquery"><i class="fa fa-check"></i><b>19.5.2</b> jQuery</a></li>
-<li class="chapter" data-level="19.5.3" data-path="optimjs.html"><a href="optimjs.html#intermediate-advanced-javascript"><i class="fa fa-check"></i><b>19.5.3</b> Intermediate / advanced JavaScript</a></li>
+<li class="chapter" data-level="18.2" data-path="optimjs.html"><a href="optimjs.html#client-side-javascript"><i class="fa fa-check"></i><b>18.2</b> Client-side JavaScript</a><ul>
+<li class="chapter" data-level="18.2.1" data-path="optimjs.html"><a href="optimjs.html#common-patterns"><i class="fa fa-check"></i><b>18.2.1</b> Common patterns</a></li>
+<li class="chapter" data-level="18.2.2" data-path="optimjs.html"><a href="optimjs.html#where-to-put-them---back-to-javascript-events"><i class="fa fa-check"></i><b>18.2.2</b> Where to put them - Back to JavaScript Events</a></li>
+</ul></li>
+<li class="chapter" data-level="18.3" data-path="optimjs.html"><a href="optimjs.html#javascript---shiny-communication"><i class="fa fa-check"></i><b>18.3</b> JavaScript &lt;-&gt; Shiny communication</a><ul>
+<li class="chapter" data-level="18.3.1" data-path="optimjs.html"><a href="optimjs.html#from-r-to-javascript"><i class="fa fa-check"></i><b>18.3.1</b> From R to JavaScript</a></li>
+<li class="chapter" data-level="18.3.2" data-path="optimjs.html"><a href="optimjs.html#from-javascript-to-r"><i class="fa fa-check"></i><b>18.3.2</b> From JavaScript to R</a></li>
+</ul></li>
+<li class="chapter" data-level="18.4" data-path="optimjs.html"><a href="optimjs.html#about-golem-js-functions"><i class="fa fa-check"></i><b>18.4</b> About <code>{golem}</code> js functions</a><ul>
+<li class="chapter" data-level="18.4.1" data-path="optimjs.html"><a href="optimjs.html#goleminvoke_js"><i class="fa fa-check"></i><b>18.4.1</b> <code>golem::invoke_js()</code></a></li>
+</ul></li>
+<li class="chapter" data-level="18.5" data-path="optimjs.html"><a href="optimjs.html#learn-more-about-javascript"><i class="fa fa-check"></i><b>18.5</b> Learn more about JavaScript</a><ul>
+<li class="chapter" data-level="18.5.1" data-path="optimjs.html"><a href="optimjs.html#shiny-javascript"><i class="fa fa-check"></i><b>18.5.1</b> Shiny &amp; JavaScript</a></li>
+<li class="chapter" data-level="18.5.2" data-path="optimjs.html"><a href="optimjs.html#javascript-basics"><i class="fa fa-check"></i><b>18.5.2</b> JavaScript basics</a></li>
+<li class="chapter" data-level="18.5.3" data-path="optimjs.html"><a href="optimjs.html#jquery"><i class="fa fa-check"></i><b>18.5.3</b> jQuery</a></li>
+<li class="chapter" data-level="18.5.4" data-path="optimjs.html"><a href="optimjs.html#intermediate-advanced-javascript"><i class="fa fa-check"></i><b>18.5.4</b> Intermediate / advanced JavaScript</a></li>
 </ul></li>
 </ul></li>
 <li class="divider"></li>
@@ -427,359 +436,471 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
             <section class="normal" id="section-">
 <div id="optimizing-shiny-code" class="section level1">
-<h1><span class="header-section-number">Chapter 18</span> Optimizing Shiny Code</h1>
+<h1><span class="header-section-number">Chapter 17</span> Optimizing Shiny Code</h1>
 <div id="optimizing-r-code" class="section level2">
-<h2><span class="header-section-number">18.1</span> Optimizing R code</h2>
-<p>// TODO</p>
+<h2><span class="header-section-number">17.1</span> Optimizing R code</h2>
+<p>In its core, Shiny runs R code on the server side.
+So to be efficient, the R code computing your values and returning results also has to be optimized.</p>
+<p>Optimizing R code is such a broad topic that it would be possible to write a full book about it, and in fact a lot of books about R already cover this topic.
+Instead of re-writing these books, we will try to point to some crucial resources you can refer to if you want get started optimizing your R code.</p>
+<ul>
+<li><p><a href="https://csgillespie.github.io/efficientR/">Efficient R programming</a>, by Colin Gillespie and Robin Lovelace, has a series of methods you can quickly put into practice for more efficient R code.</p></li>
+<li><p><a href="https://adv-r.hadley.nz/">Advanced R</a>, by Hadley Wickham, has a chapter about optimizing R code (number 24).</p></li>
+</ul>
+<p>In the rest of this chapter, we will be focusing on how to optimize Shiny specifically.</p>
 </div>
 <div id="caching-elements" class="section level2">
-<h2><span class="header-section-number">18.2</span> Caching elements</h2>
-<div id="whats-caching" class="section level3">
-<h3><span class="header-section-number">18.2.1</span> What’s caching?</h3>
-<p>Caching is the process of storing resources intensive results so that when they are needed again, your programm can reuse the result again without having to redo it another time.</p>
-<p>Let’s imagine that you know that you’ll need to use a phone number many time in the day, and for the purpose of this thought experiment you’re completly unable to remember it<a href="#fn33" class="footnote-ref" id="fnref33"><sup>33</sup></a>.
+<h2><span class="header-section-number">17.2</span> Caching elements</h2>
+<div id="what-is-caching" class="section level3">
+<h3><span class="header-section-number">17.2.1</span> What is caching?</h3>
+<p>Caching is the process of storing resources intensive results so that when they are needed again, your program can reuse the result another time without having to redo the computation again.</p>
+<p>How does it work?
+Let’s make a brief parallel with the human brain, and imagine that you know that you will need to use a phone number many time in the day, and for the purpose of this thought experiment you are completely unable to remember it<a href="#fn44" class="footnote-ref" id="fnref44"><sup>44</sup></a>.
 What are you going to do?
-There are two solutions here: either every time you need it you look in the phone book or in your phone contact list, making it so that it takes a couple of seconds every time, or you use a post-it that you put on your computer screen with the number of it, so that you have direct access to it when you need it.
-It takes a couple of seconds the first time you look for the number, but it’s almost instantaneous the next times you need it.</p>
+There are two solutions here: either you look in the phone book or in your phone contact list every time you need it, which takes a couple of seconds every time, or you use a post-it that you put on your computer screen with the number of it, so that you have direct access to it when you need it.
+It takes a couple of seconds the first time you look for the number, but it is almost instantaneous the next times you need it.</p>
 <p>This is what caching do: keep the result of computation so when they are needed in the very same context, they are quickly accessible.
-The downside being that you only have limited space on your screen: when your screen is covered by sticky notes, you can’t store any more notes<a href="#fn34" class="footnote-ref" id="fnref34"><sup>34</sup></a>.</p>
+The downside being that you only have limited space on your screen: when your screen is covered by sticky notes, you can not store any more notes<a href="#fn45" class="footnote-ref" id="fnref45"><sup>45</sup></a>.</p>
 <p>In the context of an interactive application in a framework like Shiny, it makes much sense to cache data structures: users tend to repeat what they do, or go back and forth between parameters.
-For example, if you have a graph that take 2 seconds to render (which is quite common in Shiny), you don’t want these 2 seconds to be repeated over and over again when users switch from one parameter to another and back to the first, as the two graphs will be the same for the same parameter.
-Same goes for queries to a database: if a query is done with the same parameters, and you know that they will return the same result, there is no need to ask the database—ask the cache to retrieve the data.</p>
+For example, if you have a graph that take 2 seconds to render (which is quite common in Shiny, notably when relying on <code>{ggplot2}</code>), you do not want these 2 seconds to be repeated over and over again when users switch from one parameter to another and back to the first, as the two graphs will be the same for the same parameter.
+Same goes for queries to a database: if a query is done with the same parameters, and you know that they will return the same result, there is no need to ask the database again and again—ask the cache to retrieve the data.</p>
 </div>
-<div id="using-caching-in-r" class="section level3">
-<h3><span class="header-section-number">18.2.2</span> Using caching in R</h3>
+<div id="native-caching-in-r" class="section level3">
+<h3><span class="header-section-number">17.2.2</span> Native Caching in R</h3>
 <p>At least two packages in R implement caching of functions (also called memoization): <code>{memoize}</code>, and <code>{memoise}</code>.
-They both more or less work the same way: you’ll call a memoization function on another function, and cache is created for this function.
-Then everytime you call this function again with the same parameters, the cache is returned instead of computing again.
-Here is a simple example with <code>{memoise}</code>:</p>
-<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb130-1" data-line-number="1"><span class="kw">library</span>(memoise)</a>
-<a class="sourceLine" id="cb130-2" data-line-number="2"><span class="kw">library</span>(tictoc)</a>
-<a class="sourceLine" id="cb130-3" data-line-number="3">fct &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">sleep =</span> <span class="dv">1</span>){</a>
-<a class="sourceLine" id="cb130-4" data-line-number="4">  <span class="kw">Sys.sleep</span>(sleep)</a>
-<a class="sourceLine" id="cb130-5" data-line-number="5">  <span class="kw">return</span>(<span class="kw">Sys.time</span>())</a>
-<a class="sourceLine" id="cb130-6" data-line-number="6">}</a>
-<a class="sourceLine" id="cb130-7" data-line-number="7">mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct)</a>
-<a class="sourceLine" id="cb130-8" data-line-number="8"><span class="kw">tic</span>()</a>
-<a class="sourceLine" id="cb130-9" data-line-number="9"><span class="kw">mfct</span>(<span class="dv">2</span>)</a></code></pre></div>
-<pre><code>[1] &quot;2020-02-20 13:33:33 UTC&quot;</code></pre>
-<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb132-1" data-line-number="1"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>2.005 sec elapsed</code></pre>
-<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb134-1" data-line-number="1"><span class="kw">tic</span>()</a>
-<a class="sourceLine" id="cb134-2" data-line-number="2"><span class="kw">mfct</span>(<span class="dv">2</span>)</a></code></pre></div>
-<pre><code>[1] &quot;2020-02-20 13:33:33 UTC&quot;</code></pre>
-<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb136-1" data-line-number="1"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>0.019 sec elapsed</code></pre>
+They both more or less work the same way: you will call a memoization function on another function, and cache is created for this function output, based on the arguments value.
+Then every time you call this function again with the same parameters, the cache is returned instead of computing the function another time.
+So for example, if computing your data once takes 5 seconds with the parameter <code>n = 50</code>, the next time you will be calling this function with <code>n = 50</code>, instead of recomputing, R will go and fetch the value stored in cache.</p>
+<p>Here is a simple example with <code>{memoise}</code>:</p>
+<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="optimizing-shiny-code.html#cb229-1"></a><span class="kw">library</span>(memoise)</span>
+<span id="cb229-2"><a href="optimizing-shiny-code.html#cb229-2"></a><span class="kw">library</span>(tictoc)</span>
+<span id="cb229-3"><a href="optimizing-shiny-code.html#cb229-3"></a>fct &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">sleep =</span> <span class="dv">1</span>){</span>
+<span id="cb229-4"><a href="optimizing-shiny-code.html#cb229-4"></a>  <span class="kw">Sys.sleep</span>(sleep)</span>
+<span id="cb229-5"><a href="optimizing-shiny-code.html#cb229-5"></a>  <span class="kw">return</span>(<span class="kw">Sys.time</span>())</span>
+<span id="cb229-6"><a href="optimizing-shiny-code.html#cb229-6"></a>}</span>
+<span id="cb229-7"><a href="optimizing-shiny-code.html#cb229-7"></a>mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct)</span>
+<span id="cb229-8"><a href="optimizing-shiny-code.html#cb229-8"></a><span class="kw">tic</span>()</span>
+<span id="cb229-9"><a href="optimizing-shiny-code.html#cb229-9"></a><span class="kw">mfct</span>(<span class="dv">2</span>)</span></code></pre></div>
+<pre><code>[1] &quot;2020-04-24 16:19:36 UTC&quot;</code></pre>
+<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="optimizing-shiny-code.html#cb231-1"></a><span class="kw">toc</span>()</span></code></pre></div>
+<pre><code>2.066 sec elapsed</code></pre>
+<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="optimizing-shiny-code.html#cb233-1"></a><span class="kw">tic</span>()</span>
+<span id="cb233-2"><a href="optimizing-shiny-code.html#cb233-2"></a><span class="kw">mfct</span>(<span class="dv">2</span>)</span></code></pre></div>
+<pre><code>[1] &quot;2020-04-24 16:19:36 UTC&quot;</code></pre>
+<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="optimizing-shiny-code.html#cb235-1"></a><span class="kw">toc</span>()</span></code></pre></div>
+<pre><code>0.026 sec elapsed</code></pre>
 <p>Let’s try with another example that might look more like what we can find in a Shiny App: connecting to a database</p>
-<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb138-1" data-line-number="1">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</a>
-<a class="sourceLine" id="cb138-2" data-line-number="2">  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </a>
-<a class="sourceLine" id="cb138-3" data-line-number="3">  <span class="dt">dbname =</span> <span class="st">&quot;:memory:&quot;</span></a>
-<a class="sourceLine" id="cb138-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb138-5" data-line-number="5">DBI<span class="op">::</span><span class="kw">dbWriteTable</span>(</a>
-<a class="sourceLine" id="cb138-6" data-line-number="6">  con, </a>
-<a class="sourceLine" id="cb138-7" data-line-number="7">  <span class="st">&quot;diams&quot;</span>, </a>
-<a class="sourceLine" id="cb138-8" data-line-number="8">  dplyr<span class="op">::</span><span class="kw">bind_rows</span>(</a>
-<a class="sourceLine" id="cb138-9" data-line-number="9">    purrr<span class="op">::</span><span class="kw">rerun</span>(<span class="dv">10</span>, ggplot2<span class="op">::</span>diamonds)</a>
-<a class="sourceLine" id="cb138-10" data-line-number="10">  )</a>
-<a class="sourceLine" id="cb138-11" data-line-number="11">)</a>
-<a class="sourceLine" id="cb138-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb138-13" data-line-number="13">fct_sql &lt;-<span class="st"> </span><span class="cf">function</span>(SQL, con){</a>
-<a class="sourceLine" id="cb138-14" data-line-number="14">  DBI<span class="op">::</span><span class="kw">dbGetQuery</span>(</a>
-<a class="sourceLine" id="cb138-15" data-line-number="15">    con, SQL</a>
-<a class="sourceLine" id="cb138-16" data-line-number="16">  ) </a>
-<a class="sourceLine" id="cb138-17" data-line-number="17">}</a>
-<a class="sourceLine" id="cb138-18" data-line-number="18">mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql)</a>
-<a class="sourceLine" id="cb138-19" data-line-number="19"><span class="kw">tic</span>()</a>
-<a class="sourceLine" id="cb138-20" data-line-number="20">res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
-<a class="sourceLine" id="cb138-21" data-line-number="21"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>0.423 sec elapsed</code></pre>
-<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb140-1" data-line-number="1"><span class="kw">tic</span>()</a>
-<a class="sourceLine" id="cb140-2" data-line-number="2">res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
-<a class="sourceLine" id="cb140-3" data-line-number="3"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>0.021 sec elapsed</code></pre>
-<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb142-1" data-line-number="1"><span class="kw">all.equal</span>(res_a, res_b)</a></code></pre></div>
+<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="optimizing-shiny-code.html#cb237-1"></a>con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</span>
+<span id="cb237-2"><a href="optimizing-shiny-code.html#cb237-2"></a>  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </span>
+<span id="cb237-3"><a href="optimizing-shiny-code.html#cb237-3"></a>  <span class="dt">dbname =</span> <span class="st">&quot;:memory:&quot;</span></span>
+<span id="cb237-4"><a href="optimizing-shiny-code.html#cb237-4"></a>)</span>
+<span id="cb237-5"><a href="optimizing-shiny-code.html#cb237-5"></a></span>
+<span id="cb237-6"><a href="optimizing-shiny-code.html#cb237-6"></a><span class="co"># Writing a large dataset to the db</span></span>
+<span id="cb237-7"><a href="optimizing-shiny-code.html#cb237-7"></a>DBI<span class="op">::</span><span class="kw">dbWriteTable</span>(</span>
+<span id="cb237-8"><a href="optimizing-shiny-code.html#cb237-8"></a>  con, </span>
+<span id="cb237-9"><a href="optimizing-shiny-code.html#cb237-9"></a>  <span class="st">&quot;diams&quot;</span>, </span>
+<span id="cb237-10"><a href="optimizing-shiny-code.html#cb237-10"></a>  dplyr<span class="op">::</span><span class="kw">bind_rows</span>(</span>
+<span id="cb237-11"><a href="optimizing-shiny-code.html#cb237-11"></a>    purrr<span class="op">::</span><span class="kw">rerun</span>(<span class="dv">10</span>, ggplot2<span class="op">::</span>diamonds)</span>
+<span id="cb237-12"><a href="optimizing-shiny-code.html#cb237-12"></a>  )</span>
+<span id="cb237-13"><a href="optimizing-shiny-code.html#cb237-13"></a>)</span>
+<span id="cb237-14"><a href="optimizing-shiny-code.html#cb237-14"></a></span>
+<span id="cb237-15"><a href="optimizing-shiny-code.html#cb237-15"></a><span class="co"># Do a query to the SQL db</span></span>
+<span id="cb237-16"><a href="optimizing-shiny-code.html#cb237-16"></a>fct_sql &lt;-<span class="st"> </span><span class="cf">function</span>(SQL, con){</span>
+<span id="cb237-17"><a href="optimizing-shiny-code.html#cb237-17"></a>  DBI<span class="op">::</span><span class="kw">dbGetQuery</span>(</span>
+<span id="cb237-18"><a href="optimizing-shiny-code.html#cb237-18"></a>    con, SQL</span>
+<span id="cb237-19"><a href="optimizing-shiny-code.html#cb237-19"></a>  ) </span>
+<span id="cb237-20"><a href="optimizing-shiny-code.html#cb237-20"></a>}</span>
+<span id="cb237-21"><a href="optimizing-shiny-code.html#cb237-21"></a>mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql)</span>
+<span id="cb237-22"><a href="optimizing-shiny-code.html#cb237-22"></a><span class="kw">tic</span>()</span>
+<span id="cb237-23"><a href="optimizing-shiny-code.html#cb237-23"></a>res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</span>
+<span id="cb237-24"><a href="optimizing-shiny-code.html#cb237-24"></a><span class="kw">toc</span>()</span></code></pre></div>
+<pre><code>0.623 sec elapsed</code></pre>
+<div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb239-1"><a href="optimizing-shiny-code.html#cb239-1"></a><span class="kw">tic</span>()</span>
+<span id="cb239-2"><a href="optimizing-shiny-code.html#cb239-2"></a>res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</span>
+<span id="cb239-3"><a href="optimizing-shiny-code.html#cb239-3"></a><span class="kw">toc</span>()</span></code></pre></div>
+<pre><code>0.026 sec elapsed</code></pre>
+<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="optimizing-shiny-code.html#cb241-1"></a><span class="kw">all.equal</span>(res_a, res_b)</span></code></pre></div>
 <pre><code>[1] TRUE</code></pre>
-<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb144-1" data-line-number="1"><span class="kw">tic</span>()</a>
-<a class="sourceLine" id="cb144-2" data-line-number="2">res_c &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</a>
-<a class="sourceLine" id="cb144-3" data-line-number="3"><span class="kw">toc</span>()</a></code></pre></div>
-<pre><code>0.13 sec elapsed</code></pre>
-<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb146-1" data-line-number="1"><span class="kw">setequal</span>(res_a, res_c)</a></code></pre></div>
+<div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="optimizing-shiny-code.html#cb243-1"></a><span class="kw">tic</span>()</span>
+<span id="cb243-2"><a href="optimizing-shiny-code.html#cb243-2"></a>res_c &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</span>
+<span id="cb243-3"><a href="optimizing-shiny-code.html#cb243-3"></a><span class="kw">toc</span>()</span></code></pre></div>
+<pre><code>0.172 sec elapsed</code></pre>
+<div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="optimizing-shiny-code.html#cb245-1"></a><span class="kw">setequal</span>(res_a, res_c)</span></code></pre></div>
 <pre><code>[1] FALSE</code></pre>
-<p>Note that you can change where the cache is stored by <code>{memoise}</code>. Here, we’ll save it in the temp directory, but don’t do this in production.</p>
-<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb148-1" data-line-number="1">tpd &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">path</span>(<span class="kw">tempdir</span>(), <span class="kw">paste</span>(<span class="kw">sample</span>(letters, <span class="dv">10</span>), <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span>))</a></code></pre></div>
-<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb149-1" data-line-number="1">tpd &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">dir_create</span>(tpd)</a>
-<a class="sourceLine" id="cb149-2" data-line-number="2">dfs &lt;-<span class="st"> </span><span class="kw">cache_filesystem</span>(tpd)</a>
-<a class="sourceLine" id="cb149-3" data-line-number="3">mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql, <span class="dt">cache =</span> dfs)</a>
-<a class="sourceLine" id="cb149-4" data-line-number="4">res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</a>
-<a class="sourceLine" id="cb149-5" data-line-number="5">res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</a>
-<a class="sourceLine" id="cb149-6" data-line-number="6">fs<span class="op">::</span><span class="kw">dir_ls</span>(tpd)</a></code></pre></div>
-<pre><code>/tmp/RtmpXRkNqG/efkaszopht/45d7f487be5ee2bb
-/tmp/RtmpXRkNqG/efkaszopht/c5efc7726abebeb7</code></pre>
-<p>As you can see, I now have two cache objects inside the directory I’ve specified as a <code>cache_filesystem</code>.</p>
+<p>Note that you can change where the cache is stored by <code>{memoise}</code>.
+Here, we will save it in a temp directory (but do not do this in production).</p>
+<div class="sourceCode" id="cb247"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb247-1"><a href="optimizing-shiny-code.html#cb247-1"></a>tpd &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">path</span>(<span class="kw">paste</span>(<span class="kw">sample</span>(letters, <span class="dv">10</span>), <span class="dt">collapse =</span> <span class="st">&quot;&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb248-1"><a href="optimizing-shiny-code.html#cb248-1"></a>tpd &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">dir_create</span>(tpd)</span>
+<span id="cb248-2"><a href="optimizing-shiny-code.html#cb248-2"></a>dfs &lt;-<span class="st"> </span><span class="kw">cache_filesystem</span>(tpd)</span>
+<span id="cb248-3"><a href="optimizing-shiny-code.html#cb248-3"></a>mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql, <span class="dt">cache =</span> dfs)</span>
+<span id="cb248-4"><a href="optimizing-shiny-code.html#cb248-4"></a>res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</span>
+<span id="cb248-5"><a href="optimizing-shiny-code.html#cb248-5"></a>res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</span>
+<span id="cb248-6"><a href="optimizing-shiny-code.html#cb248-6"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(tpd)</span></code></pre></div>
+<pre><code>[01;34mugiqfpkdro[0m
+├── b9b735fbb54ca606
+└── e558711ba57d82c0</code></pre>
+<p>As you can see, we now have two cache objects inside the directory we have specified as a <code>cache_filesystem</code>.</p>
 </div>
 <div id="caching-shiny" class="section level3">
-<h3><span class="header-section-number">18.2.3</span> Caching Shiny</h3>
-<p>At the time of writing this page (January 2020), <code>{shiny}</code> has one caching function: <code>renderCachedPlot()</code>.
+<h3><span class="header-section-number">17.2.3</span> Caching Shiny</h3>
+<p>At the time of writing this page (April 2020), <code>{shiny}</code> has one caching function: <code>renderCachedPlot()</code>.
 This function behaves more or less like the <code>renderPlot()</code> function, except that it is tailored for caching.
-The extra arguments you’ll find are <code>cacheKeyExpr</code> and <code>sizePolicy</code>: the former is the list of inputs and values that allow to cache the plot—conceptually, every time these values and inputs are the same, they produce the same graph.
+The extra arguments you will find are <code>cacheKeyExpr</code> and <code>sizePolicy</code>: the former is the list of inputs and values that allow to cache the plot—every time these values and inputs are the same, they produce the same graph, so <code>{shiny}</code> will be fetching inside the cache instead of computing the value another time.
 <code>sizePolicy</code> is a function that returns a <code>width</code> and an <code>height</code>, and which are used to round the plot dimension in pixels, so that not every pixel combination are generated in the cache.</p>
-<p>The good news is that converting existing <code>renderPlot()</code> functions to <code>renderCachedPlot()</code> is pretty straightforward in most cases: take your current <code>renderPlot()</code>, and add the cache keys<a href="#fn35" class="footnote-ref" id="fnref35"><sup>35</sup></a>.</p>
+<p>The good news is that converting existing <code>renderPlot()</code> functions to <code>renderCachedPlot()</code> is pretty straightforward in most cases: take your current <code>renderPlot()</code>, and add the cache keys<a href="#fn46" class="footnote-ref" id="fnref46"><sup>46</sup></a>.</p>
 <p>Here is an example:</p>
-<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb151-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
-<a class="sourceLine" id="cb151-2" data-line-number="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb151-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb151-4" data-line-number="4">    <span class="kw">selectInput</span>(<span class="st">&quot;tbl&quot;</span>, <span class="st">&quot;Table&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;iris&quot;</span>, <span class="st">&quot;mtcars&quot;</span>, <span class="st">&quot;airquality&quot;</span>)),</a>
-<a class="sourceLine" id="cb151-5" data-line-number="5">    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</a>
-<a class="sourceLine" id="cb151-6" data-line-number="6">  )</a>
-<a class="sourceLine" id="cb151-7" data-line-number="7">}</a>
-<a class="sourceLine" id="cb151-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb151-9" data-line-number="9">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
-<a class="sourceLine" id="cb151-10" data-line-number="10">  input, </a>
-<a class="sourceLine" id="cb151-11" data-line-number="11">  output, </a>
-<a class="sourceLine" id="cb151-12" data-line-number="12">  session</a>
-<a class="sourceLine" id="cb151-13" data-line-number="13">){</a>
-<a class="sourceLine" id="cb151-14" data-line-number="14">  </a>
-<a class="sourceLine" id="cb151-15" data-line-number="15">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderCachedPlot</span>({</a>
-<a class="sourceLine" id="cb151-16" data-line-number="16">    <span class="kw">plot</span>(</a>
-<a class="sourceLine" id="cb151-17" data-line-number="17">      <span class="kw">get</span>(input<span class="op">$</span>tbl)</a>
-<a class="sourceLine" id="cb151-18" data-line-number="18">    )</a>
-<a class="sourceLine" id="cb151-19" data-line-number="19">  }, <span class="dt">cacheKeyExpr =</span> {</a>
-<a class="sourceLine" id="cb151-20" data-line-number="20">    input<span class="op">$</span>tbl</a>
-<a class="sourceLine" id="cb151-21" data-line-number="21">  })</a>
-<a class="sourceLine" id="cb151-22" data-line-number="22">  </a>
-<a class="sourceLine" id="cb151-23" data-line-number="23">}</a>
-<a class="sourceLine" id="cb151-24" data-line-number="24"></a>
-<a class="sourceLine" id="cb151-25" data-line-number="25"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
+<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="optimizing-shiny-code.html#cb250-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb250-2"><a href="optimizing-shiny-code.html#cb250-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
+<span id="cb250-3"><a href="optimizing-shiny-code.html#cb250-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb250-4"><a href="optimizing-shiny-code.html#cb250-4"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;tbl&quot;</span>, <span class="st">&quot;Table&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;iris&quot;</span>, <span class="st">&quot;mtcars&quot;</span>, <span class="st">&quot;airquality&quot;</span>)),</span>
+<span id="cb250-5"><a href="optimizing-shiny-code.html#cb250-5"></a>    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb250-6"><a href="optimizing-shiny-code.html#cb250-6"></a>  )</span>
+<span id="cb250-7"><a href="optimizing-shiny-code.html#cb250-7"></a>}</span>
+<span id="cb250-8"><a href="optimizing-shiny-code.html#cb250-8"></a></span>
+<span id="cb250-9"><a href="optimizing-shiny-code.html#cb250-9"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb250-10"><a href="optimizing-shiny-code.html#cb250-10"></a>  input, </span>
+<span id="cb250-11"><a href="optimizing-shiny-code.html#cb250-11"></a>  output, </span>
+<span id="cb250-12"><a href="optimizing-shiny-code.html#cb250-12"></a>  session</span>
+<span id="cb250-13"><a href="optimizing-shiny-code.html#cb250-13"></a>){</span>
+<span id="cb250-14"><a href="optimizing-shiny-code.html#cb250-14"></a>  </span>
+<span id="cb250-15"><a href="optimizing-shiny-code.html#cb250-15"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderCachedPlot</span>({</span>
+<span id="cb250-16"><a href="optimizing-shiny-code.html#cb250-16"></a>    <span class="kw">plot</span>(</span>
+<span id="cb250-17"><a href="optimizing-shiny-code.html#cb250-17"></a>      <span class="kw">get</span>(input<span class="op">$</span>tbl)</span>
+<span id="cb250-18"><a href="optimizing-shiny-code.html#cb250-18"></a>    )</span>
+<span id="cb250-19"><a href="optimizing-shiny-code.html#cb250-19"></a>  }, <span class="dt">cacheKeyExpr =</span> {</span>
+<span id="cb250-20"><a href="optimizing-shiny-code.html#cb250-20"></a>    input<span class="op">$</span>tbl</span>
+<span id="cb250-21"><a href="optimizing-shiny-code.html#cb250-21"></a>  })</span>
+<span id="cb250-22"><a href="optimizing-shiny-code.html#cb250-22"></a>  </span>
+<span id="cb250-23"><a href="optimizing-shiny-code.html#cb250-23"></a>}</span>
+<span id="cb250-24"><a href="optimizing-shiny-code.html#cb250-24"></a></span>
+<span id="cb250-25"><a href="optimizing-shiny-code.html#cb250-25"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>If you try this app, the first rendering of the three plots will take a little bit of time, but every subsequent rendering of the plot is almost instantaneous.</p>
-<p>And if we apply what we’ve just sen with <code>{memoise}</code>:</p>
-<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb152-1" data-line-number="1">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</a>
-<a class="sourceLine" id="cb152-2" data-line-number="2">  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </a>
-<a class="sourceLine" id="cb152-3" data-line-number="3">  <span class="dt">dbname =</span> <span class="st">&quot;:memory:&quot;</span></a>
-<a class="sourceLine" id="cb152-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb152-5" data-line-number="5">DBI<span class="op">::</span><span class="kw">dbWriteTable</span>(</a>
-<a class="sourceLine" id="cb152-6" data-line-number="6">  con, </a>
-<a class="sourceLine" id="cb152-7" data-line-number="7">  <span class="st">&quot;diams&quot;</span>, </a>
-<a class="sourceLine" id="cb152-8" data-line-number="8">  dplyr<span class="op">::</span><span class="kw">bind_rows</span>(</a>
-<a class="sourceLine" id="cb152-9" data-line-number="9">    purrr<span class="op">::</span><span class="kw">rerun</span>(<span class="dv">100</span>, ggplot2<span class="op">::</span>diamonds)</a>
-<a class="sourceLine" id="cb152-10" data-line-number="10">  )</a>
-<a class="sourceLine" id="cb152-11" data-line-number="11">)</a>
-<a class="sourceLine" id="cb152-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb152-13" data-line-number="13">fct_sql &lt;-<span class="st"> </span><span class="cf">function</span>(cut, con){</a>
-<a class="sourceLine" id="cb152-14" data-line-number="14">  <span class="co"># NEVER EVER SPRINTF AN SQL CODE LIKE THAT</span></a>
-<a class="sourceLine" id="cb152-15" data-line-number="15">  <span class="co"># IT&#39;S SENSITIVE TO SQL INJECTIONS, WE&#39;RE</span></a>
-<a class="sourceLine" id="cb152-16" data-line-number="16">  <span class="co"># DOING IT FOR THE EXAMPLE</span></a>
-<a class="sourceLine" id="cb152-17" data-line-number="17">  DBI<span class="op">::</span><span class="kw">dbGetQuery</span>(</a>
-<a class="sourceLine" id="cb152-18" data-line-number="18">    con, <span class="kw">sprintf</span>(</a>
-<a class="sourceLine" id="cb152-19" data-line-number="19">      <span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;%s&#39;&quot;</span>, </a>
-<a class="sourceLine" id="cb152-20" data-line-number="20">      cut</a>
-<a class="sourceLine" id="cb152-21" data-line-number="21">    )</a>
-<a class="sourceLine" id="cb152-22" data-line-number="22">  )  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</a>
-<a class="sourceLine" id="cb152-23" data-line-number="23">}</a>
-<a class="sourceLine" id="cb152-24" data-line-number="24">db &lt;-<span class="st"> </span><span class="kw">cache_filesystem</span>(<span class="st">&quot;cache/&quot;</span>)</a>
-<a class="sourceLine" id="cb152-25" data-line-number="25">fct_sql &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql, <span class="dt">cache =</span> db)</a>
-<a class="sourceLine" id="cb152-26" data-line-number="26">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb152-27" data-line-number="27">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb152-28" data-line-number="28">    <span class="kw">selectInput</span>(<span class="st">&quot;cut&quot;</span>, <span class="st">&quot;cut&quot;</span>, <span class="kw">unique</span>(ggplot2<span class="op">::</span>diamonds<span class="op">$</span>cut)),</a>
-<a class="sourceLine" id="cb152-29" data-line-number="29">    <span class="kw">tableOutput</span>(<span class="st">&quot;tbl&quot;</span>)</a>
-<a class="sourceLine" id="cb152-30" data-line-number="30">  )</a>
-<a class="sourceLine" id="cb152-31" data-line-number="31">}</a>
-<a class="sourceLine" id="cb152-32" data-line-number="32"></a>
-<a class="sourceLine" id="cb152-33" data-line-number="33">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
-<a class="sourceLine" id="cb152-34" data-line-number="34">  input, </a>
-<a class="sourceLine" id="cb152-35" data-line-number="35">  output, </a>
-<a class="sourceLine" id="cb152-36" data-line-number="36">  session</a>
-<a class="sourceLine" id="cb152-37" data-line-number="37">){</a>
-<a class="sourceLine" id="cb152-38" data-line-number="38">  </a>
-<a class="sourceLine" id="cb152-39" data-line-number="39">  output<span class="op">$</span>tbl &lt;-<span class="st"> </span><span class="kw">renderTable</span>({</a>
-<a class="sourceLine" id="cb152-40" data-line-number="40">    <span class="kw">fct_sql</span>(input<span class="op">$</span>cut, con)</a>
-<a class="sourceLine" id="cb152-41" data-line-number="41">  })</a>
-<a class="sourceLine" id="cb152-42" data-line-number="42">  </a>
-<a class="sourceLine" id="cb152-43" data-line-number="43">}</a>
-<a class="sourceLine" id="cb152-44" data-line-number="44"></a>
-<a class="sourceLine" id="cb152-45" data-line-number="45"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
-<p>You’ll see that the first time you run this piece of code, it will take a couple of seconds to render the table for a new <code>input$cut</code> value.
+<p>And if we apply what we have just seen with <code>{memoise}</code>:</p>
+<div class="sourceCode" id="cb251"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb251-1"><a href="optimizing-shiny-code.html#cb251-1"></a>con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</span>
+<span id="cb251-2"><a href="optimizing-shiny-code.html#cb251-2"></a>  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </span>
+<span id="cb251-3"><a href="optimizing-shiny-code.html#cb251-3"></a>  <span class="dt">dbname =</span> <span class="st">&quot;:memory:&quot;</span></span>
+<span id="cb251-4"><a href="optimizing-shiny-code.html#cb251-4"></a>)</span>
+<span id="cb251-5"><a href="optimizing-shiny-code.html#cb251-5"></a>DBI<span class="op">::</span><span class="kw">dbWriteTable</span>(</span>
+<span id="cb251-6"><a href="optimizing-shiny-code.html#cb251-6"></a>  con, </span>
+<span id="cb251-7"><a href="optimizing-shiny-code.html#cb251-7"></a>  <span class="st">&quot;diams&quot;</span>, </span>
+<span id="cb251-8"><a href="optimizing-shiny-code.html#cb251-8"></a>  dplyr<span class="op">::</span><span class="kw">bind_rows</span>(</span>
+<span id="cb251-9"><a href="optimizing-shiny-code.html#cb251-9"></a>    purrr<span class="op">::</span><span class="kw">rerun</span>(<span class="dv">100</span>, ggplot2<span class="op">::</span>diamonds)</span>
+<span id="cb251-10"><a href="optimizing-shiny-code.html#cb251-10"></a>  )</span>
+<span id="cb251-11"><a href="optimizing-shiny-code.html#cb251-11"></a>)</span>
+<span id="cb251-12"><a href="optimizing-shiny-code.html#cb251-12"></a></span>
+<span id="cb251-13"><a href="optimizing-shiny-code.html#cb251-13"></a>fct_sql &lt;-<span class="st"> </span><span class="cf">function</span>(cut, con){</span>
+<span id="cb251-14"><a href="optimizing-shiny-code.html#cb251-14"></a>  <span class="co"># NEVER EVER SPRINTF AN SQL CODE LIKE THAT</span></span>
+<span id="cb251-15"><a href="optimizing-shiny-code.html#cb251-15"></a>  <span class="co"># IT&#39;S SENSITIVE TO SQL INJECTIONS, WE&#39;RE</span></span>
+<span id="cb251-16"><a href="optimizing-shiny-code.html#cb251-16"></a>  <span class="co"># DOING IT FOR THE EXAMPLE</span></span>
+<span id="cb251-17"><a href="optimizing-shiny-code.html#cb251-17"></a>  DBI<span class="op">::</span><span class="kw">dbGetQuery</span>(</span>
+<span id="cb251-18"><a href="optimizing-shiny-code.html#cb251-18"></a>    con, <span class="kw">sprintf</span>(</span>
+<span id="cb251-19"><a href="optimizing-shiny-code.html#cb251-19"></a>      <span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;%s&#39;&quot;</span>, </span>
+<span id="cb251-20"><a href="optimizing-shiny-code.html#cb251-20"></a>      cut</span>
+<span id="cb251-21"><a href="optimizing-shiny-code.html#cb251-21"></a>    )</span>
+<span id="cb251-22"><a href="optimizing-shiny-code.html#cb251-22"></a>  )  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</span>
+<span id="cb251-23"><a href="optimizing-shiny-code.html#cb251-23"></a>}</span>
+<span id="cb251-24"><a href="optimizing-shiny-code.html#cb251-24"></a>db &lt;-<span class="st"> </span><span class="kw">cache_filesystem</span>(<span class="st">&quot;cache/&quot;</span>)</span>
+<span id="cb251-25"><a href="optimizing-shiny-code.html#cb251-25"></a>fct_sql &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct_sql, <span class="dt">cache =</span> db)</span>
+<span id="cb251-26"><a href="optimizing-shiny-code.html#cb251-26"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
+<span id="cb251-27"><a href="optimizing-shiny-code.html#cb251-27"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb251-28"><a href="optimizing-shiny-code.html#cb251-28"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;cut&quot;</span>, <span class="st">&quot;cut&quot;</span>, <span class="kw">unique</span>(ggplot2<span class="op">::</span>diamonds<span class="op">$</span>cut)),</span>
+<span id="cb251-29"><a href="optimizing-shiny-code.html#cb251-29"></a>    <span class="kw">tableOutput</span>(<span class="st">&quot;tbl&quot;</span>)</span>
+<span id="cb251-30"><a href="optimizing-shiny-code.html#cb251-30"></a>  )</span>
+<span id="cb251-31"><a href="optimizing-shiny-code.html#cb251-31"></a>}</span>
+<span id="cb251-32"><a href="optimizing-shiny-code.html#cb251-32"></a></span>
+<span id="cb251-33"><a href="optimizing-shiny-code.html#cb251-33"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb251-34"><a href="optimizing-shiny-code.html#cb251-34"></a>  input, </span>
+<span id="cb251-35"><a href="optimizing-shiny-code.html#cb251-35"></a>  output, </span>
+<span id="cb251-36"><a href="optimizing-shiny-code.html#cb251-36"></a>  session</span>
+<span id="cb251-37"><a href="optimizing-shiny-code.html#cb251-37"></a>){</span>
+<span id="cb251-38"><a href="optimizing-shiny-code.html#cb251-38"></a>  </span>
+<span id="cb251-39"><a href="optimizing-shiny-code.html#cb251-39"></a>  output<span class="op">$</span>tbl &lt;-<span class="st"> </span><span class="kw">renderTable</span>({</span>
+<span id="cb251-40"><a href="optimizing-shiny-code.html#cb251-40"></a>    <span class="kw">fct_sql</span>(input<span class="op">$</span>cut, con)</span>
+<span id="cb251-41"><a href="optimizing-shiny-code.html#cb251-41"></a>  })</span>
+<span id="cb251-42"><a href="optimizing-shiny-code.html#cb251-42"></a>  </span>
+<span id="cb251-43"><a href="optimizing-shiny-code.html#cb251-43"></a>}</span>
+<span id="cb251-44"><a href="optimizing-shiny-code.html#cb251-44"></a></span>
+<span id="cb251-45"><a href="optimizing-shiny-code.html#cb251-45"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>You will see that the first time you run this piece of code, it will take a couple of seconds to render the table for a new <code>input$cut</code> value.
 But if you re-select this input a second time, the output will show instantaneously.</p>
-<p>Caching is a nice way to make your app faster: even more if you expect your output to be stable over time: if the plot created by a series of inputs stays the same all along your app lifecycle, it’s worth thinking about implementing an on-disk caching.
-If your application needs “fresh” data every time it is used, for example because data in the SQL database are updated every hour, cache won’t help you here, on the contrary: the same inputs on the function will render different output.</p>
-<p>Note thought that, just like our computer screen from before, you don’t have unlimited space when it come to storing cache:storing a large amount of cache will take space on your disk.</p>
+<p>Caching is a nice way to make your app faster: even more if you expect your output to be stable over time: if the plot created by a series of inputs stays the same all along your app lifecycle, it is worth thinking about implementing an on-disk caching.
+At the time of writing these lines (April 2020), you can also use remote caching, in the form of Amazon S3 storage or with Google Cloud Storage.
+To do that, you will need the development version of <code>{memoise}</code> (version 1.1.0).</p>
+<p>If your application needs “fresh” data every time it is used, for example because data in the SQL database are updated every hour, cache will not be of much help here, on the contrary: the same inputs on the function will render different output depending on when they are called.</p>
+<p>One other thing to remember is that, just like our computer screen from our phone number example from before, you do not have unlimited space when it come to storing cache: storing a large amount of cache will take space on your disk.</p>
 <p>For example, from our stored cache from before:</p>
-<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb153-1" data-line-number="1">fs<span class="op">::</span><span class="kw">dir_info</span>(tpd)[, <span class="st">&quot;size&quot;</span>]</a></code></pre></div>
-<pre><code># A tibble: 2 x 1
-         size
-  &lt;fs::bytes&gt;
-1       1.86M
-2     462.31K</code></pre>
+<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb252-1"><a href="optimizing-shiny-code.html#cb252-1"></a>fs<span class="op">::</span><span class="kw">dir_info</span>(tpd)[, <span class="st">&quot;size&quot;</span>]</span></code></pre></div>
+<pre><code>462.31K   1.86M</code></pre>
 <p>Managing cache at a system level is out of scope for this book, but note that the most commonly accepted rule for deleting cache is called <strong>LRU</strong>, for <strong>Least Recently Used</strong>.
 The underlying principle of this approach is that users tend to need what they have needed recently: hence the more a piece of data has been used recently, the more likely it is that it will be needed soon.</p>
-<p>And this can be seen with:</p>
-<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb155-1" data-line-number="1">fs<span class="op">::</span><span class="kw">dir_info</span>(tpd)[, <span class="st">&quot;access_time&quot;</span>]</a></code></pre></div>
-<pre><code># A tibble: 2 x 1
-  access_time        
-  &lt;dttm&gt;             
-1 2020-02-20 13:33:42
-2 2020-02-20 13:33:36</code></pre>
+<p>And this can be retrieved with:</p>
+<div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb254-1"><a href="optimizing-shiny-code.html#cb254-1"></a>fs<span class="op">::</span><span class="kw">dir_info</span>(tpd)[, <span class="st">&quot;access_time&quot;</span>]</span></code></pre></div>
+<pre><code>[1] &quot;2020-04-24 16:19:40 UTC&quot; &quot;2020-04-24 16:19:46 UTC&quot;</code></pre>
+<p>Hence, when using cache, it might be interesting to periodically removed the oldest used cache, so that you can regain some space on the server running the application.</p>
 </div>
 </div>
 <div id="asynchronous-in-shiny" class="section level2">
-<h2><span class="header-section-number">18.3</span> Asynchronous in Shiny</h2>
-<p>One of the drawbacks of Shiny is that as it’s running on top of R, it’s single threaded: meaning that each computation is run in sequence, one after the other.
+<h2><span class="header-section-number">17.3</span> Asynchronous in Shiny</h2>
+<p>One of the drawbacks of Shiny is that as it is running on top of R, it is single threaded: meaning that each computation is run in sequence, one after the other.
 Well, at least natively, as methods have emerged to run pieces of code in parallel.</p>
 <div id="how-to" class="section level3">
-<h3><span class="header-section-number">18.3.1</span> How to</h3>
-<p>To launch code blocks in parallel, we will use a combination of two packages, <code>{future}</code> and <code>{promises}</code>, and a <code>reactiveVal()</code>.
-<code>{future}</code> is an R package which main purporse is to allow users to send code to be run elsewhere, i.e in another session, thread, or even in another machine.
-<code>{promises}</code>, on the other hand, is a package providing structure for handling asynchronous programming in R.</p>
+<h3><span class="header-section-number">17.3.1</span> How to</h3>
+<p>To launch code blocks in parallel, we will use a combination of two packages, <code>{future}</code> and <code>{promises}</code>, and a <code>reactiveValue()</code>.
+<code>{future}</code> is an R package which main purpose is to allow users to send code to be run elsewhere, i.e in another session, thread, or even on another machine.
+<code>{promises}</code>, on the other hand, is a package providing structure for handling asynchronous programming in R<a href="#fn47" class="footnote-ref" id="fnref47"><sup>47</sup></a>.</p>
 <div id="asynchronous-for-cross-sessions-availability" class="section level4">
-<h4><span class="header-section-number">18.3.1.1</span> Asynchronous for Cross-sessions Availability</h4>
-<p>The first type of asynchronous programming in Shiny is the one that allow non-blocking programming in a cross-session context.
-In other words, it’s a programming technic which is useful in the context of running one Shiny session which is accessed by multiple users.
-Natively, in Shiny, if user1 comes and launches a 15 second computation, then user2 has to wait for this computation to finish, before launching their own 15 second computation, and user 3 has to wait the 15 seconds of user1 plus the 15 seconds for useré, etc.</p>
+<h4><span class="header-section-number">17.3.1.1</span> Asynchronous for Cross-sessions Availability</h4>
+<p>The first type of asynchronous programming in Shiny is the one that allow non-blocking programming at a cross-session context.
+In other words, it is a programming method which is useful in the context of running one Shiny session which is accessed by multiple users.
+Natively, in Shiny, if user1 comes and launches a 15 second computation, then user2 has to wait for this computation to finish, before launching their own 15 second computation, and user 3 has to wait the 15 seconds of user1 plus the 15 seconds for user, etc.</p>
 <p>With <code>{future}</code> and <code>{promises}</code>, each long computation is sent to be run somewhere else, so when user1 launches their 15 second computation, they are not blocking the R process for user2 and user3.</p>
-<p>How does it work<a href="#fn36" class="footnote-ref" id="fnref36"><sup>36</sup></a>?
-<code>{promises}</code> comes with two operators which will be useful in our case, <code>%...&gt;%</code> and <code>%...!%</code>: the first being “what happens when the <code>future()</code> is solved?” (i.e. when the computation from the <code>future()</code> is completed), and the second is “what happens if the <code>future()</code> fails?” (i.e. what to do when the <code>future()</code> returns an error).
-Here is an example of using this skeleton:</p>
-<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb157-1" data-line-number="1"><span class="kw">library</span>(future)</a>
-<a class="sourceLine" id="cb157-2" data-line-number="2"><span class="kw">library</span>(promises)</a>
-<a class="sourceLine" id="cb157-3" data-line-number="3"><span class="kw">plan</span>(multisession) <span class="co"># We&#39;re opening several R session (future specific)</span></a>
-<a class="sourceLine" id="cb157-4" data-line-number="4"><span class="kw">future</span>({</a>
-<a class="sourceLine" id="cb157-5" data-line-number="5">  <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb157-6" data-line-number="6">  <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</a>
-<a class="sourceLine" id="cb157-7" data-line-number="7">}) <span class="op">%...&gt;%</span><span class="st"> </span>(</a>
-<a class="sourceLine" id="cb157-8" data-line-number="8">  <span class="cf">function</span>(result){</a>
-<a class="sourceLine" id="cb157-9" data-line-number="9">    <span class="kw">print</span>(result)</a>
-<a class="sourceLine" id="cb157-10" data-line-number="10">  }</a>
-<a class="sourceLine" id="cb157-11" data-line-number="11">) <span class="op">%...!%</span><span class="st"> </span>(</a>
-<a class="sourceLine" id="cb157-12" data-line-number="12">  <span class="cf">function</span>(error){</a>
-<a class="sourceLine" id="cb157-13" data-line-number="13">    <span class="kw">stop</span>(error)</a>
-<a class="sourceLine" id="cb157-14" data-line-number="14">  }</a>
-<a class="sourceLine" id="cb157-15" data-line-number="15">)</a></code></pre></div>
+<p>How does it work<a href="#fn48" class="footnote-ref" id="fnref48"><sup>48</sup></a>?
+<code>{promises}</code> comes with two operators which will be useful in our case, <code>%...&gt;%</code> and <code>%...!%</code>: the first being “what happens when the <code>future()</code> is solved?” (i.e. when the computation from the <code>future()</code> is completed), and the second is “what happens if the <code>future()</code> fails?” (i.e. what to do when the <code>future()</code> returns an error).</p>
+<p>Here is an example of using this skeleton:</p>
+<div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb256-1"><a href="optimizing-shiny-code.html#cb256-1"></a><span class="kw">library</span>(future)</span>
+<span id="cb256-2"><a href="optimizing-shiny-code.html#cb256-2"></a><span class="kw">library</span>(promises)</span>
+<span id="cb256-3"><a href="optimizing-shiny-code.html#cb256-3"></a><span class="kw">plan</span>(multisession) <span class="co"># We&#39;re opening several R session (future specific)</span></span>
+<span id="cb256-4"><a href="optimizing-shiny-code.html#cb256-4"></a><span class="kw">future</span>({</span>
+<span id="cb256-5"><a href="optimizing-shiny-code.html#cb256-5"></a>  <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</span>
+<span id="cb256-6"><a href="optimizing-shiny-code.html#cb256-6"></a>  <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</span>
+<span id="cb256-7"><a href="optimizing-shiny-code.html#cb256-7"></a>}) <span class="op">%...&gt;%</span><span class="st"> </span>(</span>
+<span id="cb256-8"><a href="optimizing-shiny-code.html#cb256-8"></a>  <span class="cf">function</span>(result){</span>
+<span id="cb256-9"><a href="optimizing-shiny-code.html#cb256-9"></a>    <span class="kw">print</span>(result)</span>
+<span id="cb256-10"><a href="optimizing-shiny-code.html#cb256-10"></a>  }</span>
+<span id="cb256-11"><a href="optimizing-shiny-code.html#cb256-11"></a>) <span class="op">%...!%</span><span class="st"> </span>(</span>
+<span id="cb256-12"><a href="optimizing-shiny-code.html#cb256-12"></a>  <span class="cf">function</span>(error){</span>
+<span id="cb256-13"><a href="optimizing-shiny-code.html#cb256-13"></a>    <span class="kw">stop</span>(error)</span>
+<span id="cb256-14"><a href="optimizing-shiny-code.html#cb256-14"></a>  }</span>
+<span id="cb256-15"><a href="optimizing-shiny-code.html#cb256-15"></a>)</span></code></pre></div>
 <p>If you run this in your console, you will see that you have access to the R console directly after launching the code.
 And a couple of seconds later (a little bit more than 3), the result of the <code>rnorm(5)</code> will be printed to the console.</p>
-<p>Note that you can also one line function with <code>.</code> as a parameter, instead of building the full anonymous function (we will use this notation in the rest of the chapter):</p>
-<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb158-1" data-line-number="1"><span class="kw">library</span>(future)</a>
-<a class="sourceLine" id="cb158-2" data-line-number="2"><span class="kw">library</span>(promises)</a>
-<a class="sourceLine" id="cb158-3" data-line-number="3"><span class="kw">plan</span>(multisession) <span class="co"># We&#39;re opening several R session (future specific)</span></a>
-<a class="sourceLine" id="cb158-4" data-line-number="4"><span class="kw">future</span>({</a>
-<a class="sourceLine" id="cb158-5" data-line-number="5">  <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb158-6" data-line-number="6">  <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</a>
-<a class="sourceLine" id="cb158-7" data-line-number="7">}) <span class="op">%...&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb158-8" data-line-number="8"><span class="st">  </span><span class="kw">print</span>(.) <span class="op">%...!%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb158-9" data-line-number="9"><span class="st">  </span><span class="kw">stop</span>(.)</a></code></pre></div>
+<p>Note that you can also write one-line function with <code>.</code> as a parameter, instead of building the full anonymous function (we will use this notation in the rest of the chapter):</p>
+<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb257-1"><a href="optimizing-shiny-code.html#cb257-1"></a><span class="kw">library</span>(future)</span>
+<span id="cb257-2"><a href="optimizing-shiny-code.html#cb257-2"></a><span class="kw">library</span>(promises)</span>
+<span id="cb257-3"><a href="optimizing-shiny-code.html#cb257-3"></a><span class="kw">plan</span>(multisession) <span class="co"># We&#39;re opening several R session (future specific)</span></span>
+<span id="cb257-4"><a href="optimizing-shiny-code.html#cb257-4"></a><span class="kw">future</span>({</span>
+<span id="cb257-5"><a href="optimizing-shiny-code.html#cb257-5"></a>  <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</span>
+<span id="cb257-6"><a href="optimizing-shiny-code.html#cb257-6"></a>  <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</span>
+<span id="cb257-7"><a href="optimizing-shiny-code.html#cb257-7"></a>}) <span class="op">%...&gt;%</span><span class="st"> </span></span>
+<span id="cb257-8"><a href="optimizing-shiny-code.html#cb257-8"></a><span class="st">  </span><span class="kw">print</span>(.) <span class="op">%...!%</span><span class="st"> </span></span>
+<span id="cb257-9"><a href="optimizing-shiny-code.html#cb257-9"></a><span class="st">  </span><span class="kw">stop</span>(.)</span></code></pre></div>
 <p>Let’s port this to Shiny:</p>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb159-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
-<a class="sourceLine" id="cb159-2" data-line-number="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb159-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb159-4" data-line-number="4">    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>)</a>
-<a class="sourceLine" id="cb159-5" data-line-number="5">  )</a>
-<a class="sourceLine" id="cb159-6" data-line-number="6">}</a>
-<a class="sourceLine" id="cb159-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb159-8" data-line-number="8">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
-<a class="sourceLine" id="cb159-9" data-line-number="9">  input, </a>
-<a class="sourceLine" id="cb159-10" data-line-number="10">  output, </a>
-<a class="sourceLine" id="cb159-11" data-line-number="11">  session</a>
-<a class="sourceLine" id="cb159-12" data-line-number="12">){</a>
-<a class="sourceLine" id="cb159-13" data-line-number="13">  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</a>
-<a class="sourceLine" id="cb159-14" data-line-number="14">    <span class="kw">future</span>({</a>
-<a class="sourceLine" id="cb159-15" data-line-number="15">      <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb159-16" data-line-number="16">      <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</a>
-<a class="sourceLine" id="cb159-17" data-line-number="17">    }) <span class="op">%...&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb159-18" data-line-number="18"><span class="st">      </span><span class="kw">print</span>(.) <span class="op">%...!%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb159-19" data-line-number="19"><span class="st">      </span><span class="kw">stop</span>(.)</a>
-<a class="sourceLine" id="cb159-20" data-line-number="20">  })</a>
-<a class="sourceLine" id="cb159-21" data-line-number="21">}</a>
-<a class="sourceLine" id="cb159-22" data-line-number="22"></a>
-<a class="sourceLine" id="cb159-23" data-line-number="23"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
-<div style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;" class="muted well">Shiny applications not supported in static R Markdown documents</div>
+<div class="sourceCode" id="cb258"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb258-1"><a href="optimizing-shiny-code.html#cb258-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb258-2"><a href="optimizing-shiny-code.html#cb258-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
+<span id="cb258-3"><a href="optimizing-shiny-code.html#cb258-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb258-4"><a href="optimizing-shiny-code.html#cb258-4"></a>    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>)</span>
+<span id="cb258-5"><a href="optimizing-shiny-code.html#cb258-5"></a>  )</span>
+<span id="cb258-6"><a href="optimizing-shiny-code.html#cb258-6"></a>}</span>
+<span id="cb258-7"><a href="optimizing-shiny-code.html#cb258-7"></a></span>
+<span id="cb258-8"><a href="optimizing-shiny-code.html#cb258-8"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb258-9"><a href="optimizing-shiny-code.html#cb258-9"></a>  input, </span>
+<span id="cb258-10"><a href="optimizing-shiny-code.html#cb258-10"></a>  output, </span>
+<span id="cb258-11"><a href="optimizing-shiny-code.html#cb258-11"></a>  session</span>
+<span id="cb258-12"><a href="optimizing-shiny-code.html#cb258-12"></a>){</span>
+<span id="cb258-13"><a href="optimizing-shiny-code.html#cb258-13"></a>  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb258-14"><a href="optimizing-shiny-code.html#cb258-14"></a>    <span class="kw">future</span>({</span>
+<span id="cb258-15"><a href="optimizing-shiny-code.html#cb258-15"></a>      <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</span>
+<span id="cb258-16"><a href="optimizing-shiny-code.html#cb258-16"></a>      <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</span>
+<span id="cb258-17"><a href="optimizing-shiny-code.html#cb258-17"></a>    }) <span class="op">%...&gt;%</span><span class="st"> </span></span>
+<span id="cb258-18"><a href="optimizing-shiny-code.html#cb258-18"></a><span class="st">      </span><span class="kw">print</span>(.) <span class="op">%...!%</span><span class="st"> </span></span>
+<span id="cb258-19"><a href="optimizing-shiny-code.html#cb258-19"></a><span class="st">      </span><span class="kw">stop</span>(.)</span>
+<span id="cb258-20"><a href="optimizing-shiny-code.html#cb258-20"></a>  })</span>
+<span id="cb258-21"><a href="optimizing-shiny-code.html#cb258-21"></a>}</span>
+<span id="cb258-22"><a href="optimizing-shiny-code.html#cb258-22"></a></span>
+<span id="cb258-23"><a href="optimizing-shiny-code.html#cb258-23"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>If you have run this, that does not seem like a revolution: but trust us, the <code>Sys.sleep()</code> is not blocking as it allows other users to launch the same computation at the same moment.</p>
 </div>
 <div id="inner-session-asynchronousity" class="section level4">
-<h4><span class="header-section-number">18.3.1.2</span> Inner-session Asynchronousity</h4>
-<p>In the previous section we have implemented cross-session asynchronousity, meaning that the code is non-blocking but for when two or more users access the same app.
-But the code is still blocking at an inner-session level.
-Let’s have a look at this code:</p>
-<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb160-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
-<a class="sourceLine" id="cb160-2" data-line-number="2">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb160-3" data-line-number="3">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb160-4" data-line-number="4">    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>), </a>
-<a class="sourceLine" id="cb160-5" data-line-number="5">    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</a>
-<a class="sourceLine" id="cb160-6" data-line-number="6">  )</a>
-<a class="sourceLine" id="cb160-7" data-line-number="7">}</a>
-<a class="sourceLine" id="cb160-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb160-9" data-line-number="9">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
-<a class="sourceLine" id="cb160-10" data-line-number="10">  input, </a>
-<a class="sourceLine" id="cb160-11" data-line-number="11">  output, </a>
-<a class="sourceLine" id="cb160-12" data-line-number="12">  session</a>
-<a class="sourceLine" id="cb160-13" data-line-number="13">){</a>
-<a class="sourceLine" id="cb160-14" data-line-number="14">  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</a>
-<a class="sourceLine" id="cb160-15" data-line-number="15">    <span class="kw">future</span>({</a>
-<a class="sourceLine" id="cb160-16" data-line-number="16">      <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb160-17" data-line-number="17">      <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</a>
-<a class="sourceLine" id="cb160-18" data-line-number="18">    }) <span class="op">%...&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb160-19" data-line-number="19"><span class="st">      </span><span class="kw">print</span>(.) <span class="op">%...!%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb160-20" data-line-number="20"><span class="st">      </span><span class="kw">stop</span>(.)</a>
-<a class="sourceLine" id="cb160-21" data-line-number="21">  })</a>
-<a class="sourceLine" id="cb160-22" data-line-number="22">  </a>
-<a class="sourceLine" id="cb160-23" data-line-number="23">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</a>
-<a class="sourceLine" id="cb160-24" data-line-number="24">    <span class="kw">plot</span>(iris)</a>
-<a class="sourceLine" id="cb160-25" data-line-number="25">  })</a>
-<a class="sourceLine" id="cb160-26" data-line-number="26">}</a>
-<a class="sourceLine" id="cb160-27" data-line-number="27"></a>
-<a class="sourceLine" id="cb160-28" data-line-number="28"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
-<div style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;" class="muted well">Shiny applications not supported in static R Markdown documents</div>
-<p>Here, you would expect the plot to be avaiable before the <code>rnorm()</code>, but it’s not: <code>{promises}</code> is still blocking at an inner-session level, so elements are still rendered sequentially.
-To bypass that, we will use a <code>reactiveVal()</code> structure.</p>
-<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb161-1" data-line-number="1"><span class="kw">library</span>(shiny)</a>
-<a class="sourceLine" id="cb161-2" data-line-number="2"><span class="kw">library</span>(promises)</a>
-<a class="sourceLine" id="cb161-3" data-line-number="3"><span class="kw">library</span>(future)</a>
-<a class="sourceLine" id="cb161-4" data-line-number="4"><span class="kw">plan</span>(multisession)</a>
-<a class="sourceLine" id="cb161-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb161-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb161-7" data-line-number="7">ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</a>
-<a class="sourceLine" id="cb161-8" data-line-number="8">  <span class="kw">tagList</span>(</a>
-<a class="sourceLine" id="cb161-9" data-line-number="9">    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>), </a>
-<a class="sourceLine" id="cb161-10" data-line-number="10">    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</a>
-<a class="sourceLine" id="cb161-11" data-line-number="11">  )</a>
-<a class="sourceLine" id="cb161-12" data-line-number="12">}</a>
-<a class="sourceLine" id="cb161-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb161-14" data-line-number="14">server &lt;-<span class="st"> </span><span class="cf">function</span>(</a>
-<a class="sourceLine" id="cb161-15" data-line-number="15">  input, </a>
-<a class="sourceLine" id="cb161-16" data-line-number="16">  output, </a>
-<a class="sourceLine" id="cb161-17" data-line-number="17">  session</a>
-<a class="sourceLine" id="cb161-18" data-line-number="18">) {</a>
-<a class="sourceLine" id="cb161-19" data-line-number="19">  </a>
-<a class="sourceLine" id="cb161-20" data-line-number="20">  rv &lt;-<span class="st"> </span><span class="kw">reactiveVal</span>()</a>
-<a class="sourceLine" id="cb161-21" data-line-number="21">  </a>
-<a class="sourceLine" id="cb161-22" data-line-number="22">  <span class="kw">rv</span>(<span class="ot">NULL</span>)</a>
-<a class="sourceLine" id="cb161-23" data-line-number="23">  </a>
-<a class="sourceLine" id="cb161-24" data-line-number="24">  <span class="kw">future</span>({</a>
-<a class="sourceLine" id="cb161-25" data-line-number="25">    <span class="kw">Sys.sleep</span>(<span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb161-26" data-line-number="26">    <span class="kw">rnorm</span>(<span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb161-27" data-line-number="27">  }) <span class="op">%...&gt;%</span></a>
-<a class="sourceLine" id="cb161-28" data-line-number="28"><span class="st">    </span><span class="kw">rv</span>() <span class="op">%...!%</span></a>
-<a class="sourceLine" id="cb161-29" data-line-number="29"><span class="st">    </span>(<span class="cf">function</span>(e){</a>
-<a class="sourceLine" id="cb161-30" data-line-number="30">      <span class="kw">rv</span>(<span class="ot">NULL</span>)</a>
-<a class="sourceLine" id="cb161-31" data-line-number="31">      <span class="kw">warning</span>(e)</a>
-<a class="sourceLine" id="cb161-32" data-line-number="32">    })</a>
-<a class="sourceLine" id="cb161-33" data-line-number="33">  </a>
-<a class="sourceLine" id="cb161-34" data-line-number="34">  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</a>
-<a class="sourceLine" id="cb161-35" data-line-number="35">    <span class="kw">req</span>(<span class="kw">rv</span>())</a>
-<a class="sourceLine" id="cb161-36" data-line-number="36">    <span class="kw">rv</span>()</a>
-<a class="sourceLine" id="cb161-37" data-line-number="37">  })</a>
-<a class="sourceLine" id="cb161-38" data-line-number="38">  </a>
-<a class="sourceLine" id="cb161-39" data-line-number="39">  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</a>
-<a class="sourceLine" id="cb161-40" data-line-number="40">    <span class="kw">plot</span>(iris)</a>
-<a class="sourceLine" id="cb161-41" data-line-number="41">  })</a>
-<a class="sourceLine" id="cb161-42" data-line-number="42">}</a>
-<a class="sourceLine" id="cb161-43" data-line-number="43"></a>
-<a class="sourceLine" id="cb161-44" data-line-number="44"><span class="kw">shinyApp</span>(ui, server)</a></code></pre></div>
-<div style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;" class="muted well">Shiny applications not supported in static R Markdown documents</div>
-<p>Let’s detail this step by step:</p>
+<h4><span class="header-section-number">17.3.1.2</span> Inner-session Asynchronousity</h4>
+<p>In the previous section we have implemented cross-session asynchronousity, meaning that the code is non-blocking but for when two or more users access the same app: the code is still blocking at an inner-session level.</p>
+<p>Let’s have a look at this code:</p>
+<div class="sourceCode" id="cb259"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb259-1"><a href="optimizing-shiny-code.html#cb259-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb259-2"><a href="optimizing-shiny-code.html#cb259-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
+<span id="cb259-3"><a href="optimizing-shiny-code.html#cb259-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb259-4"><a href="optimizing-shiny-code.html#cb259-4"></a>    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>), </span>
+<span id="cb259-5"><a href="optimizing-shiny-code.html#cb259-5"></a>    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb259-6"><a href="optimizing-shiny-code.html#cb259-6"></a>  )</span>
+<span id="cb259-7"><a href="optimizing-shiny-code.html#cb259-7"></a>}</span>
+<span id="cb259-8"><a href="optimizing-shiny-code.html#cb259-8"></a></span>
+<span id="cb259-9"><a href="optimizing-shiny-code.html#cb259-9"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb259-10"><a href="optimizing-shiny-code.html#cb259-10"></a>  input, </span>
+<span id="cb259-11"><a href="optimizing-shiny-code.html#cb259-11"></a>  output, </span>
+<span id="cb259-12"><a href="optimizing-shiny-code.html#cb259-12"></a>  session</span>
+<span id="cb259-13"><a href="optimizing-shiny-code.html#cb259-13"></a>){</span>
+<span id="cb259-14"><a href="optimizing-shiny-code.html#cb259-14"></a>  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb259-15"><a href="optimizing-shiny-code.html#cb259-15"></a>    <span class="kw">future</span>({</span>
+<span id="cb259-16"><a href="optimizing-shiny-code.html#cb259-16"></a>      <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</span>
+<span id="cb259-17"><a href="optimizing-shiny-code.html#cb259-17"></a>      <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</span>
+<span id="cb259-18"><a href="optimizing-shiny-code.html#cb259-18"></a>    }) <span class="op">%...&gt;%</span><span class="st"> </span></span>
+<span id="cb259-19"><a href="optimizing-shiny-code.html#cb259-19"></a><span class="st">      </span><span class="kw">print</span>(.) <span class="op">%...!%</span><span class="st"> </span></span>
+<span id="cb259-20"><a href="optimizing-shiny-code.html#cb259-20"></a><span class="st">      </span><span class="kw">stop</span>(.)</span>
+<span id="cb259-21"><a href="optimizing-shiny-code.html#cb259-21"></a>  })</span>
+<span id="cb259-22"><a href="optimizing-shiny-code.html#cb259-22"></a>  </span>
+<span id="cb259-23"><a href="optimizing-shiny-code.html#cb259-23"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb259-24"><a href="optimizing-shiny-code.html#cb259-24"></a>    <span class="kw">plot</span>(iris)</span>
+<span id="cb259-25"><a href="optimizing-shiny-code.html#cb259-25"></a>  })</span>
+<span id="cb259-26"><a href="optimizing-shiny-code.html#cb259-26"></a>}</span>
+<span id="cb259-27"><a href="optimizing-shiny-code.html#cb259-27"></a></span>
+<span id="cb259-28"><a href="optimizing-shiny-code.html#cb259-28"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>Here, you would expect the plot to be available before the <code>rnorm()</code>, but it is not: <code>{promises}</code> is still blocking at an inner-session level, so elements are still rendered sequentially.
+To bypass that, we will use a <code>reactiveValue()</code> structure.</p>
+<div class="sourceCode" id="cb260"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb260-1"><a href="optimizing-shiny-code.html#cb260-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb260-2"><a href="optimizing-shiny-code.html#cb260-2"></a><span class="kw">library</span>(promises)</span>
+<span id="cb260-3"><a href="optimizing-shiny-code.html#cb260-3"></a><span class="kw">library</span>(future)</span>
+<span id="cb260-4"><a href="optimizing-shiny-code.html#cb260-4"></a><span class="kw">plan</span>(multisession)</span>
+<span id="cb260-5"><a href="optimizing-shiny-code.html#cb260-5"></a></span>
+<span id="cb260-6"><a href="optimizing-shiny-code.html#cb260-6"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
+<span id="cb260-7"><a href="optimizing-shiny-code.html#cb260-7"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb260-8"><a href="optimizing-shiny-code.html#cb260-8"></a>    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>), </span>
+<span id="cb260-9"><a href="optimizing-shiny-code.html#cb260-9"></a>    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb260-10"><a href="optimizing-shiny-code.html#cb260-10"></a>  )</span>
+<span id="cb260-11"><a href="optimizing-shiny-code.html#cb260-11"></a>}</span>
+<span id="cb260-12"><a href="optimizing-shiny-code.html#cb260-12"></a></span>
+<span id="cb260-13"><a href="optimizing-shiny-code.html#cb260-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb260-14"><a href="optimizing-shiny-code.html#cb260-14"></a>  input, </span>
+<span id="cb260-15"><a href="optimizing-shiny-code.html#cb260-15"></a>  output, </span>
+<span id="cb260-16"><a href="optimizing-shiny-code.html#cb260-16"></a>  session</span>
+<span id="cb260-17"><a href="optimizing-shiny-code.html#cb260-17"></a>) {</span>
+<span id="cb260-18"><a href="optimizing-shiny-code.html#cb260-18"></a>  </span>
+<span id="cb260-19"><a href="optimizing-shiny-code.html#cb260-19"></a>  rv &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>(</span>
+<span id="cb260-20"><a href="optimizing-shiny-code.html#cb260-20"></a>    <span class="dt">res =</span> <span class="ot">NULL</span></span>
+<span id="cb260-21"><a href="optimizing-shiny-code.html#cb260-21"></a>  )</span>
+<span id="cb260-22"><a href="optimizing-shiny-code.html#cb260-22"></a>  </span>
+<span id="cb260-23"><a href="optimizing-shiny-code.html#cb260-23"></a>  <span class="kw">future</span>({</span>
+<span id="cb260-24"><a href="optimizing-shiny-code.html#cb260-24"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">5</span>)</span>
+<span id="cb260-25"><a href="optimizing-shiny-code.html#cb260-25"></a>    <span class="kw">rnorm</span>(<span class="dv">5</span>)</span>
+<span id="cb260-26"><a href="optimizing-shiny-code.html#cb260-26"></a>  }) <span class="op">%...&gt;%</span></span>
+<span id="cb260-27"><a href="optimizing-shiny-code.html#cb260-27"></a><span class="st">    </span>(<span class="cf">function</span>(e){</span>
+<span id="cb260-28"><a href="optimizing-shiny-code.html#cb260-28"></a>      rv<span class="op">$</span>res &lt;-<span class="st"> </span>e</span>
+<span id="cb260-29"><a href="optimizing-shiny-code.html#cb260-29"></a>    }) <span class="op">%...!%</span></span>
+<span id="cb260-30"><a href="optimizing-shiny-code.html#cb260-30"></a><span class="st">    </span>(<span class="cf">function</span>(e){</span>
+<span id="cb260-31"><a href="optimizing-shiny-code.html#cb260-31"></a>      rv<span class="op">$</span>res &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb260-32"><a href="optimizing-shiny-code.html#cb260-32"></a>      <span class="kw">warning</span>(e)</span>
+<span id="cb260-33"><a href="optimizing-shiny-code.html#cb260-33"></a>    })</span>
+<span id="cb260-34"><a href="optimizing-shiny-code.html#cb260-34"></a>  </span>
+<span id="cb260-35"><a href="optimizing-shiny-code.html#cb260-35"></a>  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb260-36"><a href="optimizing-shiny-code.html#cb260-36"></a>    <span class="kw">req</span>(rv<span class="op">$</span>res)</span>
+<span id="cb260-37"><a href="optimizing-shiny-code.html#cb260-37"></a>  })</span>
+<span id="cb260-38"><a href="optimizing-shiny-code.html#cb260-38"></a>  </span>
+<span id="cb260-39"><a href="optimizing-shiny-code.html#cb260-39"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb260-40"><a href="optimizing-shiny-code.html#cb260-40"></a>    <span class="kw">plot</span>(iris)</span>
+<span id="cb260-41"><a href="optimizing-shiny-code.html#cb260-41"></a>  })</span>
+<span id="cb260-42"><a href="optimizing-shiny-code.html#cb260-42"></a>}</span>
+<span id="cb260-43"><a href="optimizing-shiny-code.html#cb260-43"></a></span>
+<span id="cb260-44"><a href="optimizing-shiny-code.html#cb260-44"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>Let’s detail this code step by step:</p>
 <ul>
-<li><p><code>rv &lt;- reactiveVal()</code></p></li>
-<li><p><code>rv(NULL)</code></p></li>
-<li><p><code>%...&gt;% rv() %...!%</code></p></li>
-<li><p><code>%...!% (function(e){ rv(NULL) ; warning(e) })</code></p></li>
+<li><p><code>rv &lt;- reactiveValues</code> creates a <code>reactiveValue()</code> that will contains <code>NULL</code>, and which will serve the content of <code>renderPrint()</code> when the <code>future()</code> is resolved.
+It is initiated as <code>NULL</code> so that the <code>renderPrint()</code> is silent at launch.</p></li>
+<li><p><code>%...&gt;% rv() %...!%</code> is the <code>{promises}</code> structure we have seen before.</p></li>
+<li><p><code>%...!% (function(e){ rv$res &lt;- NULL ; warning(e) })</code> is what happens when the <code>future({})</code> fails: we are setting the <code>rv$res</code> value back to <code>NULL</code> so that the <code>renderPrint()</code> does not fails and print an error in case of failure.</p></li>
 </ul>
+</div>
+<div id="potential-pitfalls-of-asynchronous-shiny" class="section level4">
+<h4><span class="header-section-number">17.3.1.3</span> Potential Pitfalls of Asynchronous Shiny</h4>
+<p>There is one thing to be aware of if you plan on using this async methodology: that you are not in a sequential context anymore.
+What that implies is that the first <code>future({})</code> you will send is not necessary the first you will get back.
+For example, if you send SQL requests to be run asynchronically and that each call takes between 1 an 10 seconds to return, there is a chance that the first request to return will be the last one you have sent.</p>
+<p>To handle that, we can adopt two different strategies, depending on what we need:</p>
+<ul>
+<li>We need only the last expression sent.
+In other words, if we send three expressions to be evaluated somewhere, we only need to get back the last one.<br />
+To handle that, the best way is to have an id that is also sent to the future, and when the future comes back, we check that this id is the one we are expecting.
+If it is, we update the <code>reactiveValues()</code>.
+If it is not, we ignore it.</li>
+</ul>
+<div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb261-1"><a href="optimizing-shiny-code.html#cb261-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb261-2"><a href="optimizing-shiny-code.html#cb261-2"></a><span class="kw">library</span>(promises)</span>
+<span id="cb261-3"><a href="optimizing-shiny-code.html#cb261-3"></a><span class="kw">library</span>(future)</span>
+<span id="cb261-4"><a href="optimizing-shiny-code.html#cb261-4"></a><span class="kw">plan</span>(multisession)</span>
+<span id="cb261-5"><a href="optimizing-shiny-code.html#cb261-5"></a></span>
+<span id="cb261-6"><a href="optimizing-shiny-code.html#cb261-6"></a></span>
+<span id="cb261-7"><a href="optimizing-shiny-code.html#cb261-7"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
+<span id="cb261-8"><a href="optimizing-shiny-code.html#cb261-8"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb261-9"><a href="optimizing-shiny-code.html#cb261-9"></a>    <span class="kw">actionButton</span>(<span class="st">&quot;go&quot;</span>, <span class="st">&quot;go&quot;</span>),</span>
+<span id="cb261-10"><a href="optimizing-shiny-code.html#cb261-10"></a>    <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;pr&quot;</span>), </span>
+<span id="cb261-11"><a href="optimizing-shiny-code.html#cb261-11"></a>    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb261-12"><a href="optimizing-shiny-code.html#cb261-12"></a>  )</span>
+<span id="cb261-13"><a href="optimizing-shiny-code.html#cb261-13"></a>}</span>
+<span id="cb261-14"><a href="optimizing-shiny-code.html#cb261-14"></a></span>
+<span id="cb261-15"><a href="optimizing-shiny-code.html#cb261-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb261-16"><a href="optimizing-shiny-code.html#cb261-16"></a>  input, </span>
+<span id="cb261-17"><a href="optimizing-shiny-code.html#cb261-17"></a>  output, </span>
+<span id="cb261-18"><a href="optimizing-shiny-code.html#cb261-18"></a>  session</span>
+<span id="cb261-19"><a href="optimizing-shiny-code.html#cb261-19"></a>) {</span>
+<span id="cb261-20"><a href="optimizing-shiny-code.html#cb261-20"></a>  </span>
+<span id="cb261-21"><a href="optimizing-shiny-code.html#cb261-21"></a>  rv &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>(</span>
+<span id="cb261-22"><a href="optimizing-shiny-code.html#cb261-22"></a>    <span class="dt">res =</span> <span class="ot">NULL</span>, </span>
+<span id="cb261-23"><a href="optimizing-shiny-code.html#cb261-23"></a>    <span class="dt">last_id =</span> <span class="dv">0</span></span>
+<span id="cb261-24"><a href="optimizing-shiny-code.html#cb261-24"></a>  )</span>
+<span id="cb261-25"><a href="optimizing-shiny-code.html#cb261-25"></a>  </span>
+<span id="cb261-26"><a href="optimizing-shiny-code.html#cb261-26"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>go , {</span>
+<span id="cb261-27"><a href="optimizing-shiny-code.html#cb261-27"></a>    rv<span class="op">$</span>last_id &lt;-<span class="st"> </span>rv<span class="op">$</span>last_id <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb261-28"><a href="optimizing-shiny-code.html#cb261-28"></a>    last_id &lt;-<span class="st"> </span>rv<span class="op">$</span>last_id</span>
+<span id="cb261-29"><a href="optimizing-shiny-code.html#cb261-29"></a>    </span>
+<span id="cb261-30"><a href="optimizing-shiny-code.html#cb261-30"></a>    <span class="kw">future</span>({</span>
+<span id="cb261-31"><a href="optimizing-shiny-code.html#cb261-31"></a>      <span class="cf">if</span> (last_id <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>){</span>
+<span id="cb261-32"><a href="optimizing-shiny-code.html#cb261-32"></a>        <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</span>
+<span id="cb261-33"><a href="optimizing-shiny-code.html#cb261-33"></a>      }</span>
+<span id="cb261-34"><a href="optimizing-shiny-code.html#cb261-34"></a>      <span class="kw">list</span>(</span>
+<span id="cb261-35"><a href="optimizing-shiny-code.html#cb261-35"></a>        <span class="dt">id =</span> last_id,</span>
+<span id="cb261-36"><a href="optimizing-shiny-code.html#cb261-36"></a>        <span class="dt">res =</span> <span class="kw">rnorm</span>(<span class="dv">5</span>)</span>
+<span id="cb261-37"><a href="optimizing-shiny-code.html#cb261-37"></a>      )</span>
+<span id="cb261-38"><a href="optimizing-shiny-code.html#cb261-38"></a>    }) <span class="op">%...&gt;%</span></span>
+<span id="cb261-39"><a href="optimizing-shiny-code.html#cb261-39"></a><span class="st">      </span>(<span class="cf">function</span>(e){</span>
+<span id="cb261-40"><a href="optimizing-shiny-code.html#cb261-40"></a>        cli<span class="op">::</span><span class="kw">cat_rule</span>(</span>
+<span id="cb261-41"><a href="optimizing-shiny-code.html#cb261-41"></a>          <span class="kw">sprintf</span>(<span class="st">&quot;Back from %s&quot;</span>, e<span class="op">$</span>id)</span>
+<span id="cb261-42"><a href="optimizing-shiny-code.html#cb261-42"></a>        )</span>
+<span id="cb261-43"><a href="optimizing-shiny-code.html#cb261-43"></a>        <span class="cf">if</span> (e<span class="op">$</span>id <span class="op">==</span><span class="st"> </span>rv<span class="op">$</span>last_id){</span>
+<span id="cb261-44"><a href="optimizing-shiny-code.html#cb261-44"></a>          rv<span class="op">$</span>res &lt;-<span class="st"> </span>e</span>
+<span id="cb261-45"><a href="optimizing-shiny-code.html#cb261-45"></a>        }</span>
+<span id="cb261-46"><a href="optimizing-shiny-code.html#cb261-46"></a>      }) <span class="op">%...!%</span></span>
+<span id="cb261-47"><a href="optimizing-shiny-code.html#cb261-47"></a><span class="st">      </span>(<span class="cf">function</span>(e){</span>
+<span id="cb261-48"><a href="optimizing-shiny-code.html#cb261-48"></a>        rv<span class="op">$</span>res &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb261-49"><a href="optimizing-shiny-code.html#cb261-49"></a>        <span class="kw">warning</span>(e)</span>
+<span id="cb261-50"><a href="optimizing-shiny-code.html#cb261-50"></a>      })</span>
+<span id="cb261-51"><a href="optimizing-shiny-code.html#cb261-51"></a>    cli<span class="op">::</span><span class="kw">cat_rule</span>(</span>
+<span id="cb261-52"><a href="optimizing-shiny-code.html#cb261-52"></a>      <span class="kw">sprintf</span>(<span class="st">&quot;%s sent&quot;</span>, rv<span class="op">$</span>last_id)</span>
+<span id="cb261-53"><a href="optimizing-shiny-code.html#cb261-53"></a>    )</span>
+<span id="cb261-54"><a href="optimizing-shiny-code.html#cb261-54"></a>  })</span>
+<span id="cb261-55"><a href="optimizing-shiny-code.html#cb261-55"></a>  </span>
+<span id="cb261-56"><a href="optimizing-shiny-code.html#cb261-56"></a>  output<span class="op">$</span>pr &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb261-57"><a href="optimizing-shiny-code.html#cb261-57"></a>    <span class="kw">req</span>(rv<span class="op">$</span>res)</span>
+<span id="cb261-58"><a href="optimizing-shiny-code.html#cb261-58"></a>  })</span>
+<span id="cb261-59"><a href="optimizing-shiny-code.html#cb261-59"></a>  </span>
+<span id="cb261-60"><a href="optimizing-shiny-code.html#cb261-60"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb261-61"><a href="optimizing-shiny-code.html#cb261-61"></a>    <span class="kw">plot</span>(iris)</span>
+<span id="cb261-62"><a href="optimizing-shiny-code.html#cb261-62"></a>  })</span>
+<span id="cb261-63"><a href="optimizing-shiny-code.html#cb261-63"></a>}</span>
+<span id="cb261-64"><a href="optimizing-shiny-code.html#cb261-64"></a></span>
+<span id="cb261-65"><a href="optimizing-shiny-code.html#cb261-65"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<ul>
+<li>We need to treat the outputs in the order they are received.
+In that case, instead of waiting for the very last input, you will need to build a structure that will receive the output, check if this output is the “next in line”, store it if it is not, or return it if it is and see if there is another output in the queue.
+This type of implementation is a little bit more complex so we will not detail it all inside this chapter, but here is a small implementation using <code>{liteq}</code>.</li>
+</ul>
+<div class="sourceCode" id="cb262"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb262-1"><a href="optimizing-shiny-code.html#cb262-1"></a><span class="kw">library</span>(promises)</span>
+<span id="cb262-2"><a href="optimizing-shiny-code.html#cb262-2"></a><span class="kw">library</span>(future)</span>
+<span id="cb262-3"><a href="optimizing-shiny-code.html#cb262-3"></a><span class="kw">plan</span>(multisession)</span>
+<span id="cb262-4"><a href="optimizing-shiny-code.html#cb262-4"></a></span>
+<span id="cb262-5"><a href="optimizing-shiny-code.html#cb262-5"></a><span class="kw">library</span>(liteq)</span></code></pre></div>
+<pre><code>
+Attaching package: &#39;liteq&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:purrr&#39;:
+
+    is_empty</code></pre>
+<div class="sourceCode" id="cb265"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb265-1"><a href="optimizing-shiny-code.html#cb265-1"></a>db &lt;-<span class="st"> </span><span class="kw">tempfile</span>()</span>
+<span id="cb265-2"><a href="optimizing-shiny-code.html#cb265-2"></a>q &lt;-<span class="st"> </span><span class="kw">ensure_queue</span>(<span class="st">&quot;jobs&quot;</span>, <span class="dt">db =</span> db)</span>
+<span id="cb265-3"><a href="optimizing-shiny-code.html#cb265-3"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>){</span>
+<span id="cb265-4"><a href="optimizing-shiny-code.html#cb265-4"></a>  <span class="kw">future</span>({</span>
+<span id="cb265-5"><a href="optimizing-shiny-code.html#cb265-5"></a>    <span class="kw">Sys.sleep</span>(<span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dv">1</span>))</span>
+<span id="cb265-6"><a href="optimizing-shiny-code.html#cb265-6"></a>    <span class="kw">return</span>(<span class="kw">rnorm</span>(<span class="dv">5</span>))</span>
+<span id="cb265-7"><a href="optimizing-shiny-code.html#cb265-7"></a>  }) <span class="op">%...&gt;%</span><span class="st"> </span></span>
+<span id="cb265-8"><a href="optimizing-shiny-code.html#cb265-8"></a><span class="st">    </span>(<span class="cf">function</span>(res){</span>
+<span id="cb265-9"><a href="optimizing-shiny-code.html#cb265-9"></a>      <span class="kw">publish</span>(q, <span class="dt">title =</span> <span class="kw">as.character</span>(i), <span class="dt">message =</span> <span class="kw">paste</span>(res, <span class="dt">collapse =</span> <span class="st">&quot;,&quot;</span>))</span>
+<span id="cb265-10"><a href="optimizing-shiny-code.html#cb265-10"></a>    }) <span class="op">%...!%</span><span class="st"> </span></span>
+<span id="cb265-11"><a href="optimizing-shiny-code.html#cb265-11"></a><span class="st">    </span><span class="kw">stop</span>(.)</span>
+<span id="cb265-12"><a href="optimizing-shiny-code.html#cb265-12"></a>}</span></code></pre></div>
 
 </div>
 </div>
@@ -826,7 +947,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/optimizing-shiny-code.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/17-optimizing-shiny-code.Rmd",
 "text": "Edit"
 },
 "history": {
