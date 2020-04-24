@@ -136,7 +136,7 @@ Note though that some users find using the pipe more complex than not.
 For example, the two following pieces of code do the same thing. 
 Both have a different number of lines, and a different level of reading complexity.
 
-```{r}
+```{r 01-big-shiny-1}
 library(dplyr, warn.conflicts = FALSE)
 # With pipe
 iris %>%
@@ -148,7 +148,7 @@ summarize(group_by(iris, Species), m_sp = mean(Sepal.Length))
 
 Also, there is also no limit in the way you can indent your code. 
 
-```{r 01-big-shiny-1 }
+```{r 01-big-shiny-2 }
 iris[
   1
   :
@@ -159,7 +159,7 @@ iris[
 
 Six lines of code for something that could also be written in one line.  
 
-```{r 01-big-shiny-2 }
+```{r 01-big-shiny-3 }
 iris[1:5, "Species"]
 
 ```
@@ -181,13 +181,13 @@ On the other hand, one big 10.000-lines file which is standing alone in the proj
 
 If you want to use the number of lines metric, you can do it from R with the `{cloc}` package, available at <https://github.com/hrbrmstr/cloc>.
 
-```{r 01-big-shiny-3, include = FALSE}
+```{r 01-big-shiny-4, include = FALSE}
 if (!requireNamespace("cloc")){
   remotes::install_github("hrbrmstr/cloc")
 }
 ```
 
-```{r eval = FALSE}
+```{r 01-big-shiny-5, eval = FALSE}
 if (!requireNamespace("cloc")){
   remotes::install_github("hrbrmstr/cloc")
 }
@@ -195,7 +195,7 @@ if (!requireNamespace("cloc")){
 
 For example, let's compare a rather big package (`{shiny}`) with a small one (`{attempt}`):
 
-```{r 01-big-shiny-4 }
+```{r 01-big-shiny-6 }
 library(cloc)
 library(dplyr)
 shiny_cloc <- cloc_cran("shiny", .progress = FALSE, repos = "http://cran.irsn.fr/" )
@@ -243,12 +243,12 @@ Please refer to the bibliography for further readings about the theory behind th
 In R, the cyclomatic complexity can be computed using the `{cyclocomp}` package.
 You can get it from `CRAN` with:
 
-```{r 01-big-shiny-5, include=FALSE}
+```{r 01-big-shiny-7, include=FALSE}
 # for writers
 if (!requireNamespace("cyclocomp")) {install.packages("cyclocomp")}
 ```
 
-```{r 01-big-shiny-6, eval = FALSE}
+```{r 01-big-shiny-8, eval = FALSE}
 install.packages("cyclocomp")
 ```
 
@@ -257,58 +257,58 @@ The one we will be interested in is `cyclocomp_package_dir()`: building successf
 Then, you will be able to use `cyclocomp_package_dir()` to compute the complexity of your app. 
 Here is for example the cyclomatic complexity of the default golem template:
 
-```{r 01-big-shiny-7, include = FALSE}
+```{r 01-big-shiny-9, include = FALSE}
 remotes::install_local("golex", upgrade = "never")
 ```
 
-```{r 01-big-shiny-8, echo=FALSE, eval=FALSE}
+```{r 01-big-shiny-10, echo=FALSE, eval=FALSE}
 db <- memoise::cache_filesystem(here::here("fcache/"))
 cyclocomp_package <- memoise::memoise(cyclocomp::cyclocomp_package, cache = db)
 ```
 
-```{r 01-big-shiny-9, eval=FALSE}
+```{r 01-big-shiny-11, eval=FALSE}
 library(cyclocomp)
 cyclocomp_package("golex") %>% head()
 ```
-```{r 01-big-shiny-10, echo=FALSE}
+```{r 01-big-shiny-12, echo=FALSE}
 cyclo_golex <- readr::read_rds(here::here("dataset", "cyclo_golex.rds"))
 head(cyclo_golex)
 ```
 
-```{r 01-big-shiny-11, include = FALSE}
+```{r 01-big-shiny-13, include = FALSE}
 remove.packages("golex")
 ```
 
 And the one from another small application:
 
-```{r 01-big-shiny-12, include = FALSE}
+```{r 01-big-shiny-14, include = FALSE}
 if (!requireNamespace("tidytuesday201942")) {
   remotes::install_github("ColinFay/tidytuesday201942")
 }
 ```
 
 
-```{r 01-big-shiny-13, eval=FALSE}
+```{r 01-big-shiny-15, eval=FALSE}
 cyclocomp_package("tidytuesday201942") %>% head()
 ```
-```{r 01-big-shiny-14, echo=FALSE}
+```{r 01-big-shiny-16, echo=FALSE}
 cyclo_tidytuesday <- readr::read_rds(here::here("dataset", "cyclo_tidytuesday.rds"))
 head(cyclo_tidytuesday)
 ```
 
 And, finally, the one for `{shiny}`:
 
-```{r 01-big-shiny-15, include = FALSE}
+```{r 01-big-shiny-17, include = FALSE}
 if (!requireNamespace("shiny")) {
   remotes::install_cran("shiny")
 }
 ```
 
-```{r 01-big-shiny-16, eval=FALSE}
+```{r 01-big-shiny-18, eval=FALSE}
 cyclocomp_package("shiny") %>% head()
 ```
 
-```{r 01-big-shiny-17, echo=FALSE}
+```{r 01-big-shiny-19, echo=FALSE}
 cyclo_shiny <- readr::read_rds(here::here("dataset", "cyclo_shiny.rds"))
 head(cyclo_shiny)
 ```
@@ -328,13 +328,13 @@ Complexity can come from other sources: insufficient code coverage, dependencies
 
 We can use the `{packageMetrics2}` package to get some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc., ... and the number of lines of code and the cyclomatic complexity.
 
-```{r 01-big-shiny-18, include = FALSE}
+```{r 01-big-shiny-20, include = FALSE}
 if (!requireNamespace("packageMetrics2")) {
   remotes::install_github("MangoTheCat/packageMetrics2")
 }
 ```
 
-```{r 01-big-shiny-19 }
+```{r 01-big-shiny-21 }
 library(packageMetrics2)
 frame_metric <- function(pkg){
   metrics <- package_metrics(pkg)
@@ -346,35 +346,35 @@ frame_metric <- function(pkg){
 }
 ```
 
-```{r 01-big-shiny-20, echo=FALSE, eval=FALSE}
+```{r 01-big-shiny-22, echo=FALSE, eval=FALSE}
 db <- memoise::cache_filesystem(here::here("fcache/"))
 frame_metric <- memoise::memoise(frame_metric, cache = db)
 ```
 
 *{golem}*
 
-```{r 01-big-shiny-21, cache=TRUE, warning=FALSE, eval=FALSE}
+```{r 01-big-shiny-23, cache=TRUE, warning=FALSE, eval=FALSE}
 frame_metric("golem") %>% knitr::kable()
 ```
-```{r 01-big-shiny-22, echo=FALSE}
+```{r 01-big-shiny-24, echo=FALSE}
 frame_golem <- readr::read_rds(here::here("dataset", "frame_golem.rds"))
 knitr::kable(frame_golem)
 ```
 
 *{shiny}*
 
-```{r 01-big-shiny-23, cache=TRUE, warning=FALSE, eval=FALSE}
+```{r 01-big-shiny-25, cache=TRUE, warning=FALSE, eval=FALSE}
 frame_metric("shiny") %>% knitr::kable()
 ```
 
-```{r 01-big-shiny-24, echo=FALSE}
+```{r 01-big-shiny-26, echo=FALSE}
 frame_shiny <- readr::read_rds(here::here("dataset", "frame_shiny.rds"))
 knitr::kable(frame_shiny)
 ```
 
 If you are building you Shiny application with `{golem}`, you can use the `DESCRIPTION` file, which contains the list of dependencies, as a starting point to explore these metrics for your dependencies: 
 
-```{r 01-big-shiny-25 }
+```{r 01-big-shiny-27 }
 desc::desc_get_deps("golex/DESCRIPTION")
 # See also 
 attachment::att_from_description("golex/DESCRIPTION")
