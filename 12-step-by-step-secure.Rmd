@@ -1,14 +1,28 @@
 # (PART) Step 4: Strengthen {-}
 
+```{r 12-step-by-step-secure-1, include = FALSE}
+try({
+  system("docker kill hexmake")
+  system("docker kill hexmake2")
+})
+```
+
+
 # Build yourself a safety net {#step-secure}
 
 > "Don't fuck over Future You"
 
-> JD 
+> [JD](https://twitter.com/CMastication) 
 
 Strengthening your app means two things: testing, and locking the application environment.
 
 ## Testing your app
+
+The process of getting your application production-ready implies that the application is tested.
+With a robust testing suite, you will develop, maintain, and improve in a safe environment and ensure your project sustainability. 
+What will you be testing? 
+Both sides of the application: the business logic and the user interface.
+And also, the application load, _i.e_ how much time and memory is required when your application starts being used by a significant amount of users, be it from the user perspective (how many time does it take to complete a full scenario) and from the server perspective (how many memory is needed for my app to run).
 
 ### Testing the business logic
 
@@ -19,18 +33,20 @@ If you have been following the good practices we have listed in previous chapter
 
 On top of being a sane organization approach, using this separation inside a package structure allows to leverage all the tooling that has been built for testing "standard" packages. 
 
-R developers have been developing packages for a long time, and at the time of writing these lines (February 2020), more than 15,000 packages are available on CRAN. 
-To sustain these developments, a lot of tooling has been created to secure the development process, and especially in the field of creating unit tests for your package.
+R developers have been developing packages for a long time, and at the time of writing these lines (April 2020), more than 15,000 packages are available on CRAN. 
+To sustain these developments, a lot of tools have been created to secure the development process, and especially tools for creating unit tests for your package.
 
-Unit tests are a general concept in software engineering that describes the process of writing a form of assessment of your code validity. 
+Unit tests are a general concept in software engineering that describes the process of writing a form of assessment to check the validity of your code. 
 A simplified explanation is that if you write a function call `meaning_of_life` that returns `42`, you will expect this function to always return `42`, and to be alerted if ever this value changes. 
-Using unit tests is a way to secure your work in the future, be it from future you or from collaborator: if anyone comes and change the code behind `meaning_of_life` so that the result is no longer `42`, the developer working on this piece of code will be able to catch it. 
+Using unit tests is a way to secure your work in the future, be it for future you, for your collaborator, or for anybody wanting to collaborate to the project: if anyone comes and change the code behind the `meaning_of_life()` function, and the result is no longer `42`, the developer working on this piece of code will be able to catch it.
+The general idea is to detect bugs and breaking changes at the moment they are happening, not once it is too late.
 
 There are several packages in R that can be used to implement unit testing, and you can even implement your own tests. 
 One of the most popular right now^[
 Based on the number of Reverse dependencies & suggests at https://cran.r-project.org/web/packages/testthat/index.html
-] is [`{testthat}`](https://testthat.r-lib.org/), by Hadley Wickham.
+] is `{testthat}` [@R-testthat]..
 This testing framework lets you write a series of tests and expectations, which are then launch when calling `devtools::test()`, either locally or in you CI system. 
+
 Here is an example of testing that the `meaning_of_life` will always be `42`.
 
 ``` r
@@ -41,6 +57,8 @@ test_that("The meaning of life is 42", {
   )
 })
 ```
+
+Once you have this test skeleton set, you will be able to detect any change to this function. 
 
 If you want to learn more about how to use `{testthat}`, you can refer to the following resources: 
 
@@ -53,64 +71,445 @@ If you want to learn more about how to use `{testthat}`, you can refer to the fo
 
 ### Testing the interactive logic
 
-// TO DO
+Once you have built a solid test suite for your business logic, another side of your app you might want to check is the interactive logic, i.e. the user interface. 
 
-+ When it comes to testing the front end, you can try the {shinytest} package from RStudio, if you need to be sure there is no visual regression all along the project development. 
+There are several tools from the web developer world that can be used to do exactly that: mimicking an interactive session where instead of deliberately clicking on the application interface, you let a program do it for you. 
 
-+ One other tool I like to use is Katalon Studio. 
-It’s not R related, and can be used with any kind of web app. 
-How it works is quite simple: it opens your browser where the Shiny app runs, and record everything that happens. 
-Once you stop the recording, you can relaunch the app and it will replay all the events it has recorded. 
-And of course, you can specify your own scenario, define your own events, etc. 
-It’s not that straightforward to use, but once you get a good grasp of how it works, it’s a very powerful tool.
+#### `puppeteer`
+
+`puppeteer` is a NodeJS module that drives a Google Chrome headless session and mimic a session on the app. 
+
+And good news, there is a Google Chrome extension, called [Puppeteer Recorder](https://chrome.google.com/webstore/detail/puppeteer-recorder/djeegiggegleadkkbgopoonhjimgehda), that allows you to create, while visiting a webpage, the `pupepeteer` script to reproduce your visit. 
+Here is, for example, a very small script for testing `{hexmake}`, generated by this extension.
+
+``` javascript
+const puppeteer = require('puppeteer');
+(async () => {
+  const browser = await puppeteer.launch()
+  const page = await browser.newPage()
+  
+  await page.goto('http://localhost:2811/')
+  
+  await page.setViewport({ width: 1440, height: 766 })
+  
+  await page.waitForSelector('.row > .col > .rounded > details:nth-child(3) > summary')
+  await page.click('.row > .col > .rounded > details:nth-child(3) > summary')
+  
+  await page.waitForSelector('.innerrounded #main_ui_1-left_ui_1-pkg_name_ui_1-package')
+  await page.click('.innerrounded #main_ui_1-left_ui_1-pkg_name_ui_1-package')
+  
+  await browser.close()
+})()
+```
+
+Be aware though that this extension does not record everything, at least with the version used while writing this book (`0.7.1`). 
+For example, typing inside a text input is not recorded: that is completely doable inside `puppeteer`, yet not recorded by this extension^[
+See [puppeteer/issues/441](https://github.com/puppeteer/puppeteer/issues/441) for the code to set the text input values.
+].
+
+Once you have this piece of code, put it into a NodeJS script, and replay the session as many time as you need.
+If ever one of the steps can not be replayed as recorded, the script will fail, notifying you of a regression.
+
+Several packages in R mimic what `puppeteer` does (Google Chrome headless orchestration),with notably `{crrri}` [@R-crrri] and `{chromote}` [@R-chromote].
+These packages can be used to launch and manipulate a Google Chrome headless session, meaning that you can programmatically navigate and interact with a webpage from R.
+And to do the tests in a `puppeteer` spirit, you can refer to the `{crrry}` package [@R-crrry], which contains a series of wrapper functions around `{crrri}`, specifically designed for Shiny. 
+
+Here is an example:
+
+```{r 12-step-by-step-secure-2 }
+test <- crrry::CrrryOnPage$new(
+  chrome_bin = pagedown::find_chrome(),
+  chrome_port = httpuv::randomPort(), # Note that you will need httpuv >= 1.5.2
+  url = "https://connect.thinkr.fr/hexmake/",
+  inspect = FALSE,
+  headless = TRUE
+)
+test$wait_for_shiny_ready()
+```
+
+You can then call one of the `test` object methods: 
+
++ `call_js()`, that allows you to run JavaScript code
++ `shiny_set_input()` changes the value of a Shiny Input
++ `wait_for()` waits for a JavaScript condition to be TRUE
++ `click_on_id` clicks on a given id
+
+Of course, the interesting part is doing "bulk testing" of your application, for example by setting a series of values to an input:
+
+```{r 12-step-by-step-secure-3 }
+for (i in letters[1:5]){
+  test$shiny_set_input(
+    "main_ui_1-left_ui_1-pkg_name_ui_1-package", 
+    i
+  )
+}
+```
+
+And once your test is done, do not forget to close the connection!
+
+```{r 12-step-by-step-secure-4 }
+test$stop()
+```
+
+#### Monkey test
+
+If you are working on a user-facing software (i.e a software used by external users), there is one rule to live by: every unexpected behavior that can happen, will happen. 
+In other words, if you develop and think "a user will never do that", just expect a user to eventually do "that". 
+
+But how can we get prepared for the unexpected? 
+How can we test the "crazy behavior" that user will adopt?
+In web development, there exists a methodology called "Monkey testing", which consists of launching a series of random event on a webpage: random text in input, scrolling, clicking, zooming... and see if the application crashes or not. 
+This software testing method allows to test the robustness of the application, by seeing how much it can handle unexpected behavior. 
+
+Several JavaScript libraries exist when it comes to monkey testing, one of the most popular (and easy to use) library is called [`gremlin.js`](https://github.com/marmelab/gremlins.js). 
+This library is particularly interesting when it comes to Shiny as it does not need external installation: you can add the library as a bookmark on your browser, navigate to the application, and launch the testing (click on the "Generate Bookmarklet" link on the [top of the README]((https://github.com/marmelab/gremlins.js))). 
+
+(ref:gremlinscap) Example of using `gremlins.js` on the "prenoms" Shiny application.
+
+```{r 12-step-by-step-secure-5, echo=FALSE, fig.cap="(ref:gremlinscap)"}
+knitr::include_graphics("img/gremlins.png")
+```
+
+And if you want to scale this, you can also combine it with `{shinyloadtest}` [@R-shinyloadtest]: launch a session recording, run `gremlins` one or several time inside the recording, then replay it with multiple sessions. 
+
+With `{crrry}`, this `gremlins` test comes for free: 
+
+```{r 12-step-by-step-secure-6 }
+test <- crrry::CrrryOnPage$new(
+  chrome_bin = pagedown::find_chrome(),
+  chrome_port = httpuv::randomPort(),
+  url = "https://connect.thinkr.fr/hexmake/",
+  inspect = FALSE,
+  headless = TRUE
+)
+test$wait_for_shiny_ready()
+test$gremlins_horde()
+test$stop()
+```
+
+#### `{shinytest}`
+
+Finally, if you  prefer a Shiny specific package, you can go for `{shinytest}`. 
+This package, created and maintained by RStudio, allows you to do a series of screenshots of your application, and then replays your app and compare the previously taken screenshots to the current state of your application, allowing you to detect any changes in the interface. 
+
+If you are building your application with `{golem}`, you will need to add an `app.R` file at the root of your package, then run `shinytest::recordTest()`: 
+
+
+```{r 12-step-by-step-secure-7, eval = FALSE}
+golem::add_rstudioconnect_file()
+shinytest::recordTest()
+```
+
+Once this function is run, a new window opens: it contains your app, and a "Screenshot" button on the right. 
+Using this button, you can take various recording of your shiny application at different states. 
+
+(ref:shinytestcap) General view of a `{shinytest}` window.
+
+```{r 12-step-by-step-secure-8, echo=FALSE, fig.cap="(ref:shinytestcap)"}
+knitr::include_graphics("img/shinytest.png")
+```
+
+Then, you can do some changes in your app, and run:
+
+```{r 12-step-by-step-secure-9, eval = FALSE}
+shinytest::testApp()
+```
+
+If the `{shinytest}` package detects a visual change in the application, you will be immediately alerted, with a report of the difference from the snapshots you took and the current state of the application. 
 
 ### Testing the app load
 
-// TODO
+```{r 12-step-by-step-secure-10, include=FALSE, error=TRUE}
+try({system("docker rm hexmake")})
+```
 
-{shinyloadtest}, on the other hand, tests how an application behaves when one, two, three, twenty, one hundred users connect to the app, and gives you a visual report about the connection and response time of each session.
+#### `{shinyloadtest}`
+
+`{shinyloadtest}` tests how an application behaves when one, two, three, twenty, one hundred users connect to the app, and gives you a visual report about the connection and response time of each session.
+The idea with `{shinyloadtest}` is to first record a session where you mimic a user behavior, then `shinycannon`, a command line tool coming with `{shinyloadtest}`, replays the recording several times. 
+Once the session has been replayed several times mimicking the session you have recorded, you have access to a report of the behavior of your app. 
+
+
+```{r 12-step-by-step-secure-11 }
+library(shinyloadtest)
+```
+
+```{r 12-step-by-step-secure-12, eval = FALSE}
+# Starting your app in another process
+p <- processx::process$new(
+  "Rscript", c("-e", "options('shiny.port'= 2811);hexmake::run_app()")
+)
+# Check that the process is alive
+Sys.sleep(5) # We wait for the app to be ready
+p$is_alive()
+browseURL("http:://localhost:2811")
+```
+
+Record the tests, potentially in a new dir: 
+
+```{r 12-step-by-step-secure-13, eval = FALSE}
+fs::dir_create("shinylogs")
+withr::with_dir(
+  "shinylogs", {
+    shinyloadtest::record_session("http://localhost:2811", port = 1234) 
+  }
+)
+```
+
+We now have a series of one or more recording(s) inside the `shinylogs/` folder: 
+
+Then, let's switch to our command line, and rerun the session with `shinycannon`. 
+The `shinycannon` command line tools take several argument: the path the `.log` file, the URL of the app, `--workers` specify the number of concurrent connections to run, and the `--output-dir` argument specifies where the report should be written. 
+
+Then, go to your terminal and run:
+
+```{bash 12-step-by-step-secure-14, eval = FALSE}
+shinycannon shinylogs/recording.log http://localhost:2811 --workers 10 --output-dir shinylogs/run1
+```
+
+And now, we have new files inside the folder, corresponding to the session recordings. 
+
+```{r 12-step-by-step-secure-15 }
+fs::dir_tree("shinylogs", recurse = FALSE)
+```
+
+Good news: we do not have to manually analyze these files—`{shinyloadtest}` offers a series of wrapper functions to do that. 
+
+```{r 12-step-by-step-secure-16, message = FALSE}
+shinyload_runs <- shinyloadtest::load_runs("5 workers" = "shinylogs/run1")
+```
+
+We now have a data.frame with 
+
+```{r 12-step-by-step-secure-17 }
+dplyr::glimpse(shinyload_runs)
+```
+
+Then, `{shinyloadtest}` comes with a series of plotting functions that can be used to analyse your recording. 
+Here are some examples:
+
++ `slt_session_duration()` plots the session duration, with the various types of event that takes computation time: JS and CSS load, R computation... 
+
+```{r 12-step-by-step-secure-18 }
+slt_session_duration(shinyload_runs)
+```
+
++ `slt_waterfall()` plots the waterfall graph of session durations, ordered by events. 
+
+```{r 12-step-by-step-secure-19 }
+slt_waterfall(shinyload_runs)
+```
+
+And if you need to bundle everything into an HTML reports, `shinyloadtest_report()` is what you are looking for. 
+
+```{r 12-step-by-step-secure-20, eval = FALSE}
+shinyloadtest_report(shinyload_runs)
+```
+
+So, to sum up with a step by step guide:
+
++ If the shiny app is only available on your machine, launch a process with `{processx}`, or in another R session, that launches the application. 
+You can either set the port with `options('shiny.port'= 2811)`, or let shiny decide for you. 
+Be sure that the process is running. 
+If the app is online, use the online url (and make sure you have access to the app).
+
++ Run `shinyloadtest::record_session(url)`. 
+You should probably set a different port for `{shinyloadtest}`, so that it does not try to connect on port 80. 
+
++ Play around with your app, record a scenario of usage
+
++ Close the tab where the app is running. 
+
++ Return to your terminal, and run the `shinycannon` command line tool
+
++ Wait for the process to be terminated
+
++ Go back to R, and then you can analyse the data from the recordings, either manually or by generating the html report 
+
+#### `{shinyloadtest}`, `{crrry}`, and `{dockerstats}`
+
+Another thing you might want to monitor is the memory/CPU usage of your application, which `{shinyloadtest}` does not natively provide: the package records the load from the browser point of view, not from the server one. 
+That's where `{dockerstats}` [@R-dockerstats] can come into play: this package is a wrapper around the command line `docker stats`, and returns an R data.frame with the stats. 
+
+You can get the `{dockerstats}` package from GitHub with:
+
+```{r 12-step-by-step-secure-21, eval = FALSE}
+remotes::install_github("ColinFay/dockerstats")
+```
+
+With these stats, we can monitor the load on the app when it is run in a docker container. 
+
+```{r 12-step-by-step-secure-22, echo = FALSE, error = TRUE}
+try({system("docker rm hexmake")})
+system("docker run --name hexmake --rm -p 2811:80 colinfay/hexmake", wait = FALSE)
+Sys.sleep(5)
+```
+
+```{r 12-step-by-step-secure-23, eval = FALSE}
+system("docker run --name hexmake --rm -p 2811:80 colinfay/hexmake", wait = FALSE)
+```
+
+Let's say now we want the stats for the hexmake container:
+
+```{r 12-step-by-step-secure-24 }
+dockerstats::dockerstats("hexmake")
+```
+
+Of course, right now nobody is using the app, so the usage can be pretty small. 
+But let's push it a little bit an mimic a lot of connections. 
+
+To do that, we can replay our `shinycannon` call, with at the same time using the `dockerstats_recurse()` function, that will recursively call `dockerstats()` on a regular interval. 
+
+```{bash 12-step-by-step-secure-25, eval = FALSE}
+shinycannon shinylogs/recording.log http://localhost:2811 --workers 10 --output-dir shinylogs/run2
+```
+
+Let's launch at the same time a `dockerstats_recurse()`
+For example, here, we will print, on each loop, the `MemUsage` of the container, then saving the data inside a `dockerstats.csv` file. 
+
+```{r 12-step-by-step-secure-26, eval = FALSE}
+dockerstats_recurse(
+  "hexmake",
+  callback = function(res){
+    print(
+      paste("Mem usage: ", res$MemUsage)
+    )
+    write.table(
+      res, 
+      "dockerstats.csv", 
+      append = TRUE, 
+      col.names = FALSE, 
+      row.names = FALSE, 
+      sep = ","
+    )
+  }
+)
+```
+
+Here is what both these processes look side to side:
+
+(ref:dockerstatscap) `{dockerstats}` and `shinycannon` running side-by-side at the same time.
+
+```{r 12-step-by-step-secure-27, echo=FALSE, fig.cap='(ref:dockerstatscap)'}
+knitr::include_graphics("img/hexmake-dockerstats.png")
+```
+
+As you can see, as the number of connections grow, the memory usage grows. 
+And we now have a csv with the evolution of the `docker stats` records over time!
+
+```{r 12-step-by-step-secure-28 }
+docker_stats <- read_appended_csv(
+  "shinylogs/dockerstats.csv"
+)
+```
+
+```{r 12-step-by-step-secure-29 }
+dplyr::glimpse(docker_stats)
+```
+
+```{r 12-step-by-step-secure-30, include=FALSE}
+try({system("docker kill hexmake")})
+```
+
+If you need a deeper look into the connection between application actions and the docker stats, you can also combine `{dockerstats}` with `{crrry}`, the idea being that you can record the CPU usage at the exact moment the application performs a specific computation.
+
+Let's record the computation of the `hexmake` container containing the same app as before. 
+
+```{r 12-step-by-step-secure-31 }
+system(
+  "docker run -p 2708:80 --rm --name hexmake2 -d colinfay/hexmake", 
+  wait = FALSE
+  )
+Sys.sleep(5) # Let's leave some time for the container to be ready
+test <- crrry::CrrryOnPage$new(
+  chrome_bin = pagedown::find_chrome(),
+  chrome_port = httpuv::randomPort(),
+  url ="http://localhost:2708",
+  inspect = FALSE,
+  headless = TRUE
+)
+test$wait_for_shiny_ready()
+
+results <- dockerstats::dockerstats("hexmake2", extra = "launch")
+
+for (i in letters[1:10]){
+  test$shiny_set_input(
+    "main_ui_1-left_ui_1-pkg_name_ui_1-package", 
+    i
+  )
+  results <- rbind(
+    results, 
+    dockerstats::dockerstats("hexmake2", extra = i)
+  )
+}
+system("docker kill hexmake2")
+```
+
+And draw a small graph of this evolution: 
+
+```{r 12-step-by-step-secure-32 }
+library(dplyr, warn.conflicts = FALSE)
+results <- results %>% 
+  mutate(
+    MemUsage = to_mib(MemUsage), 
+    record_time = as.POSIXct(record_time)
+  )
+
+library(ggplot2)
+ggplot(data = results, aes(x = record_time)) + 
+  geom_line(aes(y = MemUsage)) + 
+  scale_y_continuous(labels = scales::label_bytes(units = "MiB")) +
+  geom_vline(aes(xintercept = record_time)) + 
+  geom_label(aes(y = max(MemUsage), label = extra)) + 
+  labs(
+    title = "MemUsage of setting ten inputs for package name in {hexmake}"
+  )
+```
 
 ## A reproducible environment
 
 One of the challenges of building an app that needs to be sent to production is that you will need to work in a reproducible environment. 
-What does that mean?
-That you are building an application that is to be deployed in another "computer" than yours. 
-Indeed, once your app is built, there are few chances that you will launch it on your computer and that external user will connect to your computer. 
-What will happen is that you will either give your user a package (which will be the simplest way to share it: bundle the app into a package, then let people install it either manually or from a package repository), or a url where they can connect and use your app. 
+What does this mean?
+That you are building an application that is to be deployed in another computer (be it a server or another R user's computer). 
+Once your app is built, there are few chances that you will launch it on your own computer and that external user will connect to your computer. 
+What will happen is that you will either give your users a package (which will be the simplest way to share it: bundle the packaged app to a `tar.gz`, then let people install it either manually or from a package repository), or a URL where they can connect and use your app. 
 
+If you follow the `{golem}` workflow and all the good practices for a solid package, the application you have built should be deployable on another computer that has R. 
 In that second case, you will have to think about how you can create your app in a reproducible environment: in other words, be sure that the app is deployed under the same configuration as your local application—R version, package versions, system requirements, environment variables...
 
-To achieve that, we will introduce you to two tools to do that: `{renv}`, and Docker.
+To help you achieve that,, we will introduce two tools in the next section: `{renv}` [@R-renv], and [Docker](https://www.docker.com/).
 
-### {renv} 
+### `{renv}`
 
-#### About {renv} 
+#### About `{renv}`
 
 How do we make sure the package versions we have installed on our machine stays the same in the production environment? 
-And also, how can we be sure that, working as a team, we'll be able to work together using the same package version? 
+And also, how can we be sure that, working as a team, we will be able to work together using the same package versions? 
 
 From one version to another, functions and behaviors change. 
 Most of the time, new version means new functions, and new features. 
 But from time to time, a new version means breaking changes. 
-And of course, catching that these new versions cause breaking changes can be hard to catch: either because we do not realize that the version is different, or because debugging the error is difficult, especially in Shiny where the trace-back is very deep. 
+Catching that these new versions cause breaking changes can be hard: either because we do not realize that the version is different, or because debugging the error is difficult, especially in Shiny where the trace-back is very deep. 
+And of course, the moment when we discover the error might not be the perfect time for us, as we might not have enough free time on our calendar to debug the application which has stopped running...
+
 For example, here is an error from a real life error when pushing an app on a shiny-server: 
 
 ``` bash
 root@westeros-vm:/var/log/shiny-server# cat thewall(...).log
- *** caught segfault ***
-  [...]
+*** caught segfault ***
+[...]
 address 0x5100004d, cause 'memory not mapped'
 
 Traceback:
- 1: rcpp_sf_to_geojson(sf, digits, factors_as_string)
- 2: sf_geojson.sf(data)
- 3: geojsonsf::sf_geojson(data)
- 4: addGlifyPolygons(., data = pol_V1, color = les_couleurs, popup = "val", opacity = 1)
- 5: function_list[[i]](value)
- 6: freduce(value, `_function_list`)
- 7: `_fseq`(`_lhs`)
- 8: eval(quote(`_fseq`(`_lhs`)), env, env)
-  [...]
+1: rcpp_sf_to_geojson(sf, digits, factors_as_string)
+2: sf_geojson.sf(data)
+3: geojsonsf::sf_geojson(data)
+4: addGlifyPolygons(., data = pol_V1, color = les_couleurs, popup = "val", opacity = 1)
+5: function_list[[i]](value)
+6: freduce(value, `_function_list`)
+7: `_fseq`(`_lhs`)
+8: eval(quote(`_fseq`(`_lhs`)), env, env)
+[...]
 105: captureStackTraces({    while (!.globals$stopped) {        ..stacktracefloor..(serviceApp())        Sys.sleep(0.001)    }})
 106: ..stacktraceoff..(captureStackTraces({    while (!.globals$stopped) {        ..stacktracefloor..(serviceApp())        Sys.sleep(0.001)    }}))
 107: runApp(Sys.getenv("SHINY_APP"), port = port, launch.browser = FALSE)
@@ -119,63 +518,90 @@ An irrecoverable exception occurred. R is aborting now ...
 
 Pretty hard to debug, isn't it? 
 So, what has actually happened? 
-It turned out that the package version from `{geojsonsf}` was `1.2.1`, and the one on the Shiny server was `1.3.0`. 
+On that specific case, it turned out that the package version from `{geojsonsf}` was `1.2.1` on our development machine, and the one on the Shiny server was updated to `1.3.0`. 
 And there was a breaking change in the package. 
+These kind of bugs are even harder to detect as `{geojsonsf}` was not a direct dependency of our app, but a dependency of one of our dependency, making it just a little bit more complex to identify.
 
-![](img/geojson.png)
+(ref:geojsoncap) Breaking changes in `{geojsonsf}`, a dependency of a dependency of our Shiny application.
+
+```{r 12-step-by-step-secure-33, echo=FALSE, fig.cap='(ref:geojsoncap)'}
+knitr::include_graphics("img/geojson.png")
+```
 
 The same thing could have happen if working as a team: one of the computer has an old version, when another one has updated to a more recent one. 
 How do we prevent that? 
 This is where the `{renv}` package comes into play: this package allows to have a project-based library, instead of a global one. 
-In other words, instead of having a library that is global to your machine, `{renv}` allows to specify packages with fixed version for a project. 
+In other words, instead of having a library that is global to your machine, `{renv}` allows to specify packages with fixed versions for a project. 
 That means that you can have `{geojsonsf}` version `1.2.1` in one of your project, and the `1.3.0` in another, with the two not conflicting with each other. 
 
-#### Using {renv} 
+#### Using `{renv}`
 
 > Underlying the philosophy of renv is that any of your existing workflows should just work as they did before
 
 `r right_link("Introduction to renv", "https://rstudio.github.io/renv/articles/renv.html")`
 
 The first thing to do with `{renv}` is initiating it with the `init()` function. 
-
-```{r eval = FALSE}
-renv::init()
+```{r 12-step-by-step-secure-34, eval = FALSE}
+library(renv)
+init()
 ```
 
+This function does several things: 
 
-```{r eval = FALSE}
-renv::init(here::here("golex"), restart = FALSE)
++ Create/modify the `.Rprofile` file at the root of your project. 
+Here is an example of what this files may look like inside an empty project: 
+
+```{r 12-step-by-step-secure-35, comment="", echo = FALSE}
+readLines("data-raw/.Rprofile")
 ```
 
-What this does is initiating a new `Lockfile` inside your project, listing the packages versions and linking it to your computer cache.
+In this example, there is just one call to a script, one located at `renv/activate.R`.
+
++ It creates a `renv.lock` file, which will list all the package dependencies
+
+```{r 12-step-by-step-secure-36, comment="", echo = FALSE}
+readLines("data-raw/renv.lock")
+```
+
+As we have initiated an empty project, we do not have any dependencies here. 
+If you run this command in a project that already has scripts and dependencies, `{renv}` will try to locate them all, and add them to this file. 
 Note that these packages can come from CRAN, Bioconductor, GitHub, Gitlab, 
 Bitbucket, and even local repositories.
 
-And now, when you need a new package, you will need to install it in your local library.
-The fastest way to install new packages is by using the `install.packages` function, which is shimmed by `{renv}`. 
-This shim will search into the local cache to see if the package has already been cached.
+The `renv/` folder contains a series of files that that store your settings and the necessary packages, using a structure that mimics a local repository.
 
-```{r eval = FALSE}
-install.packages("dplyr")
+```{r 12-step-by-step-secure-37}
+fs::dir_tree("data-raw/renv/")
 ```
 
-```{r eval = FALSE}
-withr::with_dir(
-  "golex", {
-    install.packages("dplyr")
-  }
-)
+We will not go into details on this folder, as it is a rather complex structure and chances are that you will never have to update it by hand
+
+With `{renv}`, you can choose to link this "local repository" to a local cache, _i.e_ a folder which is common to all your projects and stores packages and the different versions you already installed (this is the default behavior) or to store the complete packages inside the project, making it portable.
+
+When you need a new package, you will have to install it in your local library.
+The fastest way to install new packages in your `{renv}` powered project is by using the `install.packages` function, which is shimmed by `{renv}`. 
+This shim will search into the local cache to see if the package has already been cached, and if it is not, it will install and link it.
+
+```{r 12-step-by-step-secure-38, eval = FALSE}
+install.packages("attempt")
+```
+
+We will now add a little call to this library now:
+
+```{r 12-step-by-step-secure-39}
+write("library(attempt)", "script.R")
 ```
 
 Once you want to update your `{renv}` `Lockfile`, call `snapshot()`
 
-```{r eval = FALSE}
-renv::snapshot()
+```{r 12-step-by-step-secure-40, eval = FALSE}
+renv::snapshot(confirm = FALSE)
 ```
 
+Note that if you are building an application as a package, use `renv::snapshot(type = "explicit")` (need version > `0.9.3-99`): this will only capture the dependencies listed in the `DESCRIPTION` file.
 
-```{r eval = FALSE}
-renv::snapshot(here::here("golex"), restart = FALSE)
+```{r 12-step-by-step-secure-41, comment="", echo = FALSE}
+readLines("data-raw/renv.lock")
 ```
 
 And now that you have a reproducible `{renv}` library, what is next? 
@@ -184,13 +610,14 @@ And to do that, the function to call is `env::restore()`, which will update your
 
 So, to sum up, here are the step to follow: 
 
-+ Init the project with `renv::init()`
++ Initiate the project with `renv::init()`
 + Install / remove packages 
 + Take a `snapshot()` of the state of your project 
-+ `restore()` the state of your project using the `Lockfile`
++ `renv::restore()` the state of your project using `renv.lock`
++ Share `.Rprofile`, `renv.lock`, `renv/activate.R` and `renv/settings.dcf` files for reproducibility
 
-Of course, `renv::restore()` comes with another superpower: time travelling! 
-If you work on a project and decide to update a package you have been using, and realize that this package makes the application crash (for example, as the update to `{geojsonsf}` made our application crash), you can go back in time to a previous version of your library by calling the `restore()` function. 
+Of course, `renv::restore()` comes with another superpower: time traveling! 
+If you decide to update a package in your project, and realize that this package makes the application crash (_e.g._ an update to `{geojsonsf}`), you can go back in time to a previous version of your library by calling the `restore()` function. 
 
 There are more things you can do with `{renv}`. 
 If you want to know more, feel free to refer to the [official website](https://rstudio.github.io/renv).
@@ -200,16 +627,19 @@ If you want to know more, feel free to refer to the [official website](https://r
 #### R, Docker, Shiny
 
 Docker is a program that allows to download, install, create, launch and stop multiple operating systems, called containers, on a machine, which will be called the host.
-This host can be your local computer, or the server where you are deploying your application. 
+This host can be your local computer, or the server where you deploy your application(s). 
 
-Docker was designed for enclosing software environments inside an image that can later be launch. 
-The general idea is that with Docker, you're defining in a `Dockerfile` all the "rules" that are used to create a given environment, and then you can use this file (and the linked files, for example the R package containing your app) to deploy your application on any giver server that can run Docker. 
-That way, if the `Dockerfile` can compile on your machine and if you can run it, it should work everywhere (of course, it's a little bit more complex than that, but you have got the idea). 
+Docker was designed for enclosing software environments inside an image that can later be launched. 
+The general idea is that with Docker, you are defining in a `Dockerfile` all the "rules" that are used to create a given environment, and then you can use this file (and the linked files, for example the R package containing your app) to deploy your application on any given server that can run Docker. 
+That way, if the `Dockerfile` can compile on your machine and if you can run it, it should work everywhere (of course, it is a little bit more complex than that, but you get the idea). 
 
 So, why Docker in the context of Shiny apps? 
 Because Docker allows you to abstract away the complexity of managing multiple versions of R and multiple version of the same package, or even different versions of the same system requirement. 
-By using Docker for your deployment, you can build and deploy an application with the very same version of packages and R as the one from your computer. 
-That way, if your are building your application with an older version of `{shiny}`, you are sure that sending it to production won't break everything: the version inside the Docker is the same as the one from your machine. 
+For example, with our `{geojsonsf}` example from before, we could safely have had a docker container with the `1.2.1` version, working locally, and changing versions on the server would not have broken our code.
+
+By using Docker for your deployment, you can build and deploy an application with the very same version of packages and R as the one from your computer.
+And of course, you can change them without breaking the rest of the machine: everything that happens in a container stays in a container.
+That way, if your are building your application with an older version of `{shiny}`, you are sure that sending it to production will not break everything: the version inside the Docker is the same as the one from your machine. 
 And later, if you update `{shiny}` and start a new project, you can deploy your app with another version of the package. 
 Same goes for your version of R. 
 
@@ -217,15 +647,20 @@ Same goes for your version of R.
 
 Good news! 
 If you are building your app with `{golem}`, the creation of the `Dockerfile` is just one function away! 
-If you have a look at the `03_deploy.R` file in the `dev` folder, you will find a series of functions that can create the `Dockerfile` for your project. 
+If you have a look at the `03_deploy.R` file in the `dev` folder, you will find a series of functions that can create the `Dockerfile` for your project: either as a generic docker image, or for ShinyProxy or Heroku.  
 
-Let's take some time to understand what this file contains, or how we could be building it from scratch.
+For example, to create a `Dockerfile` for a `{golem}` project, you can run, from the root of your package:
 
+```{r 12-step-by-step-secure-42, eval=FALSE}
+golem::add_dockerfile()
+```
+
+Let's take some time to understand file, or how we could be building it from scratch.
 
 1. `FROM`
 
-```{r echo = FALSE}
-readLines("Dockerfile")[1] %>% 
+```{r 12-step-by-step-secure-43, echo = FALSE, comment=""}
+readLines("data-raw/Dockerfile")[1] %>% 
   glue::as_glue()
 ```
 
@@ -233,30 +668,30 @@ This line defines what version of R to use for deploying your application.
 This `FROM` line is the one that sets an image to start from: you rarely (if ever) build a Docker image from nothing, but instead you use an existing image on top of which you build your own image.
 Here, we choose one of the [r-ver](https://hub.docker.com/r/rocker/r-ver/) docker images, based on the output of:
 
-```{r}
+```{r 12-step-by-step-secure-44, comment=""}
 R.Version()$version.string
 ```
 
 2. `RUN`
 
-The `RUN` calls in the file refers to bash calls we are making to build the image. 
-For example, the second line of the `Dockerfile` installs all the system requirements needed to your application.
+The `RUN` calls in the file refers to bash calls that are used to build the image. 
+For example, the second line of the `Dockerfile` installs all the system requirements needed by our application.
 
-```{r echo = FALSE}
-readLines("Dockerfile")[2] %>% 
+```{r 12-step-by-step-secure-45, echo = FALSE, comment=""}
+readLines("data-raw/Dockerfile")[2] %>% 
   glue::as_glue()
 ```
 
-In the subsequent `RUN` calls, we are using `remotes::install_version()` to be sure we install the version that matches the one from your machine. 
+In the subsequent `RUN` calls, `{golem}` chooses to call `remotes::install_version()` to be sure we install the version of the package that matches the one from your computer.
 
-```{r echo = FALSE}
-readLines("Dockerfile")[6] %>% 
+```{r 12-step-by-step-secure-46, echo = FALSE, comment=""}
+readLines("data-raw/Dockerfile")[6] %>% 
   glue::as_glue()
 ```
 
 As you can see, it matches the local version: 
 
-```{r}
+```{r 12-step-by-step-secure-47, comment=""}
 packageVersion("config")
 ```
 
@@ -265,8 +700,8 @@ packageVersion("config")
 This Docker entry takes a folder or a file, and copies it inside the image. 
 With `{golem}`, we are adding the current project, containing the app, to a folder called `/build_zone`. 
 
-```{r echo = FALSE}
-readLines("Dockerfile")[13] %>% 
+```{r 12-step-by-step-secure-48, echo = FALSE, comment=""}
+readLines("data-raw/Dockerfile")[13] %>% 
   glue::as_glue()
 ```
 
@@ -274,8 +709,8 @@ readLines("Dockerfile")[13] %>%
 
 This command defines which port of the container will be available from the outside of the container.
 
-```{r echo = FALSE}
-readLines("Dockerfile")[16] %>% 
+```{r 12-step-by-step-secure-49, echo = FALSE, comment=""}
+readLines("data-raw/Dockerfile")[16] %>% 
   glue::as_glue()
 ```
 
@@ -284,10 +719,45 @@ readLines("Dockerfile")[16] %>%
 This final command is the one that is launched when you run a container. 
 With a `{shiny}` app, this command is the one that launches the application.  
 
-```{r echo = FALSE}
-readLines("Dockerfile")[16] %>% 
+```{r 12-step-by-step-secure-50, echo = FALSE, comment=""}
+readLines("data-raw/Dockerfile")[16] %>% 
   glue::as_glue()
 ```
+
+#### `{dockerfiler}`
+
+If you want to do everything from the R command line, the `{dockerfiler}` package [@R-dockerfiler] is here for you! 
+This package allows you to generate a `Dockerfile` straight from R: 
+
+```{r 12-step-by-step-secure-51 }
+library(dockerfiler)
+my_dock <- Dockerfile$new()
+my_dock$RUN("apt-get update && apt-get install -y  git-core libcurl4-openssl-dev")
+my_dock$ADD(".", "/")
+my_dock$RUN("mkdir /build_zone")
+my_dock$ADD(".", "/build_zone")
+my_dock$WORKDIR("/build_zone")
+my_dock$RUN(r(remotes::install_local(upgrade="never")))
+my_dock$EXPOSE(80)
+my_dock
+```
+
+#### Docker & `{renv}`
+
+If you use `{renv}` to build your Shiny application, it can also be used inside your Docker container. 
+To make those two tools work together, you will have to copy the files produces by `{renv}` inside the container: `.Rprofile`, `renv.lock`, `renv/activate.R` and `renv/settings.dcf` files.
+
+Then run `renv::restore()` inside your application, instead of using the calls to `remotes::install_version()` as they are currently implemented when doing it with `{golem}`. 
+
+At the time of writing these lines, there is no native support of `{renv}` (with or without Docker) in `{golem}`, but that is something we can expect to happen in future versions of this package.
+
+#### Develop inside a Docker container
+
+Developers have their own R versions and operating systems.
+If you want to be able to correctly deploy your application, you will use a Docker container.
+Then, why not already developing inside a Docker container having the exact same architecture than the one you will deploy ?  
+This is possible to use ["rocker" containers](https://hub.docker.com/r/rocker/r-ver) to build your application inside the container, using the embedded Rstudio Server or directly an exported R console.  
+You can even combine developing in a Docker container with the use of `{renv}`.
 
 #### Read more about Docker 
 

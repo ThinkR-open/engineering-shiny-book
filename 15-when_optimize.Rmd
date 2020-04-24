@@ -12,39 +12,66 @@
 
 As Donald Knuth puts it _"Premature optimization is the root of all evil"_. 
 What does that means? 
-That focusing on optimizing small portions of your app before making it work fully is the best way to lose time along the way. 
-Even more if you're not carefully using profiling tools: say your application is a little bit slow, or using too many memory, and you've got a specific bottleneck in your app. 
+That focusing on optimizing small portions of your app before making it work fully is the best way to lose time along the way, even more in the context of a production application, where there are deadlines and a limited amount of time to build the application.
 
-// TODO: diagram of an application bottleneck
+Why? 
+Here is the general idea: in the following schema below, you can make the circles travel to the bottleneck as fast as you want, the circles will still be slowed by the narrow bottleneck, hence you will just be losing time making the circle movement faster, without actually gaining any time on the global performance.
+So focus on making the bottleneck larger, before focusing on making the circle travel fast.
+When? 
+Once the application is ready: here in our example, we can only detect the bottleneck once the bottle is actually built, not while we are "building the circle".
 
-This is the very thing you should be optimizing: having faster code anywhere else expect this bottleneck won't make your app faster—you'll just make your app reach the bottleneck faster, but there will still be this part of your app that slows everything down. 
-But it's something you might only realize when the app is fully built: pieces might be fast together, but slow when put together. 
-It's also possible that the test dataset you've been using from the start works just fine, but when you try your app with a bigger, more realistic dataset, or maybe you've been using an example dataset so that you don't have to query the database every time you implement a new feature, and the SQL query to the database is very slow. 
+![](img/bottleneck.png)
+
+`r right_link('Adapted from WikiMedia', 'https://commons.wikimedia.org/wiki/File:Effects_of_a_bottleneck_on_virus_populations.png')`
+
+This is the very thing you should be optimizing: having faster code anywhere else except this bottleneck will not make your app faster: you will just make your app reach the bottleneck faster, but there will still be this part of your app that slows everything down. 
+But this is something you might only realize when the app is fully built: pieces might be fast together, but slow when put together. 
+It is also possible that the test dataset you have been using from the start works just fine, but when you try your app with a bigger, more realistic dataset, the application is actually way slower than it should be.
+And, maybe you have been using an example dataset so that you do not have to query the database every time you implement a new feature, but actually the SQL query to the database is very slow. 
+This is something you will discover only when the application is fully functional, not when building the parts: and realizing that when you only have 5% of the allocated time for this project left on your calendar is not a good surprise. 
 
 ### Do you need faster functions?
 
 Optimizing an app is a matter of trade-offs: of course, in a perfect world, every piece of the app would be tailored to be fast, easy to maintain, and elegant. 
-But in our world, you have deadlines, limited times, and we're all but humans. 
-That means that at the end of the day, your app won't be completely perfect: a software can __always__ be better. 
+But in the real world, you have deadlines, limited times and resources, and we are all but humans. 
+That means that at the end of the day, your app will not be completely perfect: a software can __always__ be made better. 
 No piece of code has ever reached complete perfection. 
-But do you want to spend 5 days out of the 30 you've planned optimizing a function so that it runs in a quarter of a second instead of half a second, then realize the critical bottleneck of your app is actually the SQL query and not the data manipulation? 
-Of course a function runnning two times faster is a good thing, but think about it in context: for example, how many times is this function called ? 
-We can safely bet that if your function is only called once, making it twice faster is a little bit too much, unless you have unlimited time to work on your project. 
-And in that case lucky you, you can spend a massive amount of time building the perfect software.
+
+Given that, do you want to spend 5 days out of the 30 you have planned optimizing a function so that it runs in a quarter of a second instead of half a second, then realize the critical bottleneck of your app is actually the SQL query and not the data manipulation? 
+Of course a function running two times faster is a good thing, but think about it in context: for example, how many times is this function called ? 
+We can safely bet that if your function is only called once, working on making it twice faster might not be the one function you would want to focus on (well, unless you have unlimited time to work on your project, and in that case lucky you, you can spend a massive amount of time building the perfect software).
+On the other hand, the function which is called thousands of time in your application might benefit from being optimized. 
+
+And all of this is basic maths. 
+Let's assume the following: 
+
++ A current scenario takes 300 seconds to be accomplished on your application 
++ One function `A()` takes 30 seconds, and it's called once
++ One function `B()` takes 1 second, and it's called 50 times
+
+If you divide the execution time of `A()` by two, you would be performing a local optimization of 15 seconds, and a global optimization of 15 seconds. 
+On the other hand, if you divide the execution time of `B()` by two, you would be performing a local optimization of 0.5 seconds, but a global optimization of 25 seconds. 
+
+Again, this kind of optimization is hard to detect until the app is functional. 
+An optimization of 15 seconds is way greater that an optimization of 0.5 seconds.
+Yet you will only realize that once the application is up and running!
 
 ### Don't sacrifice readability
 
 As said in the last section, every piece of code can be rewritten to be faster, either from R to R or using a lower level language: for example C or C++. 
-You can also rebuild data manipulation code from one package to another, use complexe data structures to optimizing memory usage, etc, etc.
-But that comes with a price: not keeping thing simples for the sake of local optimization makes maintainance harder, even more if you're using a lesser known language/package, which implies that you might be the only person alive being able to maintain a portion of code, or that your colleague taking over the project will have to spend hours learning the tools you've been building. 
-So think about it: is local optimization worth the extra hours you'll have to spend correcting bugs when the app will crash and when you'll be the only one able to correct it?
+You can also rebuild data manipulation code use one package to another^[
+A common case is rewriting `{dplyr}` to `{data.table}`.
+], use complex data structures to optimizing memory usage, etc, etc.
+But that comes with a price: not keeping thing simple for the sake of local optimization makes maintenance harder, even more if you are using a lesser known language/package. 
+For example, switching some portions of your code to C++ implies that you might be the only person being able to maintain that specific portion of code, or that your colleague taking over the project will have to spend hours learning the tools you have been building, or the language you have chosen to write your functions with. 
+
+Again, optimization is always a matter of trade-off: is the half-second local optimization worth the extra hours you will have to spend correcting bugs when the app will crash and when you will be the only one able to correct it?
+Also, are the extra hours/days spent rewriting a working code-base worth the speed gain of 0.5 seconds on one function? 
 
 For example, let's compare both these implementations of the same function, one in R, and one in C++. 
 Of course, the C++ function is faster than the R one—this is the very reason of using C++ with R. 
-Though, how much faster is worth the trade-off of being sure you'll get someone in your team to take over the maintenance if needed? 
-Using external languages or complex data structures implies that from the start, you'll need to think about who and how your code base will be maintain over the years. 
 
-```{r when-optimize-1}
+```{r 15-when-optimize-1 }
 library("Rcpp")
 cppFunction("
 double mean_cpp(NumericVector x) {
@@ -57,20 +84,26 @@ double mean_cpp(NumericVector x) {
   return res / size;
 }")
 
-bench::mark(
-  cpp = mean_cpp(1:100),
-  native = mean(1:100), 
+benched <- bench::mark(
+  cpp = mean_cpp(1:100000),
+  native = mean(1:100000), 
   iterations = 1000
 )
+benched
 ```
 
 (Note: we'll come back on `bench::mark` in the next chapter)
 
-So, to sum up, there are three ways to optimize your application & R code, and the bad news is that you' can't optimize for all of them: 
+Though, how much time gain is worth being sure you will get someone in your team to take over the maintenance if needed? 
+In other words, given that (in our example), we are gaining around `r benched$median[1] - benched$median[2]` on the execution time of our function, is it worth switching to C++? 
+Using external languages or complex data structures implies that from the start, you will need to think about who and how your code base will be maintain over the years. 
+Chances are that if you plan on using a Shiny application during a span of several years, various R developers will be working on the project, and including C++ code inside your application means that these future developer will either be required to know C++, or they will not be able to maintain this piece of code. 
+
+So, to sum up, there are three ways to optimize your application & R code, and the bad news is that you can not optimize for all of them: 
 
 + Optimizing for speed
 + Optimizing for memory
-+ Optimizing for readability
++ Optimizing for readability/maintainability
 
 Leading a successful project means that you should, as much as possible, find the perfect balance between these three. 
 
@@ -81,69 +114,126 @@ Leading a successful project means that you should, as much as possible, find th
 #### Identifying bottlenecks
 
 The best way to profile R code is by using the `{profvis}` package^[
-`{utils}` also comes with a function call `Rprof()`, but we won't be examining this one here.
+`{utils}` also comes with a function call `Rprof()`, but we will not be examining this one here, as `{profvis}` provides a more user-friendly and enhanced interface to this profiling function.
 ], a package designed to evaluate how much time each part of a function call take. 
-That way, you can spot the bottleneck of your function, a task which would have to be done by guessing, which will, most of the time, come with bad guesses: 
+With `{profvis}`, you can spot the bottleneck of your function. 
+Without an automated tool to do the profiling, the developers would have to profile by guessing, which will, most of the time, come with bad results: 
 
 > One of the lessons that the original Unix programmers learned early is that intuition is a poor guide to where the bottlenecks are, even for one who knows the code in question intimately.
 
-`r right_link("The Art of Unix Programming", "")`
+`r right_link("The Art of Unix Programming", "http://www.catb.org/~esr/writings/taoup/html/ch12s02.html")`
 
-Using a tool like `{profvis}` allows to have a details view of what takes a long time to run in your R code. 
-Here is how it works: 
+Instead of guessing, it is safe bet to go for a tool like `{profvis}`, which allows to have a detailed view of what takes a long time to run in your R code. 
 
-```{r when-optimize-1-bis, eval = FALSE}
-x <- function(){
-  profvis::pause(0.1)
+Using this package is quite straightforward: put the code you want to benchmark inside the `profvis()` function^[
+Do not forget to add `{}` inside `profvis({})` if you want to write several lines of code.
+], wait for  the code to run, and... that is it, you now have an analysis of your code running time. 
+
+Here is an example with 3 nested functions, `top()`, `middle()` and `bottom()`, where `top()` calls `middle()` which calls `bottom()`:
+
+```{r 15-when-optimize-2, eval = FALSE}
+library(profvis)
+top <- function(){
+  # We use profvis::pause() because Sys.sleep() doesn't 
+  # show in the flame graph
+  pause(0.1)
   lapply(1:10, function(x){
     x * 10
   })
-  y()
+  middle()
 }
 
-y <- function(){
-  profvis::pause(0.2)
+middle <- function(){
+  pause(0.2)
   1e4 * 9
-  z()
+  bottom_a()
+  bottom_b()
 }
 
-z <- function(){
-  profvis::pause(0.3)
+bottom_a <- function(){
+  pause(0.5)
   print("hey")
 }
-profvis::profvis({
-  x()
+bottom_b <- function(){
+  pause(2)
+  print("hey")
+}
+profvis({
+  top()
 })
 ```
 
-![](img/profviz_out.png)
+What you see now is what is called a `flame graph`: it is a detailed timing of how your function has run, with a clear decomposition of the call stack. 
+What you see on top window is the expression evaluated, and on the bottom a detail of the call stack, with what looks like a little bit like a Gantt diagram. 
+This result reads as such: the wider the function call, the more time it has taken R to computer this piece of code.
+On the very bottom, the "top" function (i.e. the function which is directly called in the console), and the more you go up, the more you enter the nested function calls.
 
-What you see now is what is called a `flame graph`: it's a detailled timing of how your function has run. 
-What you see on top is the expression evaluated, and on the bottom a detail of the call stack, with what looks like a Gantt diagram. 
-This result reads as such: the wider the function call, the more time it has taken R to computer this piece of code. 
-If you hover over one of the band, you'll get more details about the function call timing. 
+Here is how to read this graph: 
 
-Here it is, now you have identified bottlenecks!
++ On the x axis, the time spent computing the function.
+Our `top()` function being the only one executed, it takes the whole record time. 
+
++ Then, the second level is the first level of what is called inside `top()`: first, the function pauses, then it does a series of call to `FUN` (which is the internal anonymous function from `lapply()`), then calls the `middle()` function, which spans from around 100 ms to the end of the call. 
+Then, a detail of `middle()`, which calls `bottom_a()` and `bottom_b()`, which each `pause()` for a given amount of time. 
+
+![](img/profviz_flame.png)
+
+If you click on the "Data" tab, you will also find another view of the `flame graph`, where you can read the hierarchy of calls and the time and memory spent on each function call:
+
+![](img/profviz_data.png) 
+
+If you are working on profiling the memory usage, you can also use the `{profmem}` package which, instead of focusing on execution time, will record the memory usage of calls. 
+
+```{r 15-when-optimize-3 }
+library(profmem)
+p <- profmem({
+  x <- raw(1000)
+  A <- matrix(rnorm(100), ncol = 10)
+})
+p
+```
+
+You can also get the total allocated memory with:
+
+```{r 15-when-optimize-4 }
+total(p)
+```
+
+And extract specific values based on the memory allocation:
+
+```{r 15-when-optimize-5 }
+p2 <- subset(p, bytes > 1000)
+print(p2)
+```
+
+(Example extracted from `{profmem}` help page).
+
+Here it is, now you have a tool to identify bottlenecks!
 
 #### Benchmarking R Code
 
 Identifying bottlenecks is a start, but what to do now? 
-In the chapter about optimization, we'll dive deeper into common strategies for optimizing R & Shiny code. 
-But before that, remember this rule: __never start optimizing if you can't benchmark this optimization__.
+In the next chapter about optimization, we will dive deeper into common strategies for optimizing R & Shiny code. 
+But before that, remember this rule: __never start optimizing if you can not benchmark this optimization__.
 Why? 
-Because developers are not perfect and some optimization technics might lead to slower code.
-Of course, most of the time they won't, but in some cases adopting optimization technics leads to writting slower code, because we've missed a bottleneck in our new code. 
-And of course, without a clear documentation of what we are doing, we will be missing it, relying only on our intuition as an assurance of speed gain. 
+Because developers are not perfect at identifying bottlenecks and estimating if something is faster or not, and some optimization methods might lead to slower code.
+Of course, most of the time they will not, but in some cases adopting optimization methods leads to writing slower code, because we have missed a bottleneck in our new code. 
+And of course, without a clear documentation of what we are doing, we will be missing it, relying only on our intuition as an rough guess of speed gain. 
 
-In other words, if you want to be sure that you're actually doing code optimization, be sure that you have a basis to compare with. 
+In other words, if you want to be sure that you are actually optimizing, be sure that you have a basis to compare with. 
+
 How to do that? 
-One thing that can be done is to keep an RMarkdown file with your starting point: use this notebook to keep track of what you're doing, by noting where you're starting from (i.e, what's the original function you want to optimize), and compare it with the new one. 
-By using an Rmd, you can also document the strategies you've been using to optimize the code: "switched from for loop to vectorize function", "changed from x to y", etc. 
+One thing that can be done is to keep an RMarkdown file with your starting point: use this notebook to keep track of what you are doing, by noting where you are starting from (i.e, what's the original function you want to optimize), and compare it with the new one. 
+By using an Rmd, you can document the strategies you have been using to optimize the code, e.g: "switched from for loop to vectorize function", "changed from x to y", etc. 
+This will also be helpful for the future: either for you in other projects (you can get back to this document), or for other developers, as it will explain why specific decisions have been made.
 
-And of course, you will need to time things. 
-To do that, you can use the `{bench}` package, which compares the execution time (and other metrics) of two functions. 
+To do the timing computation, you can use the `{bench}` package, which compares the execution time (and other metrics) of two functions. 
+This function takes a series of named elements, each containing an R expression that will be timed.
+Note that by default, the `mark()` function compares the output of each function, 
 
-```{r when-optimize-2}
+Once the timing is done, you will get a data.frame with various metrics about the benchmark.
+
+```{r 15-when-optimize-6 }
 x <- function(size){
   res <- numeric(size)
   for (i in 1:size){
@@ -154,17 +244,106 @@ x <- function(size){
 y <- function(size){
   (1:size) * 10
 }
-bench::mark(
+res <- bench::mark(
   `for` = x(1000), 
   vectorized = y(1000), 
   iterations = 1000
 )
+res
 ```
 
 Here, we have an empiric evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest. 
-And, bonus point, `{bench}` takes time to check that the two outputs are the same, so that you're sure that you're not comparing apple and oranges!
+
+If you want a graphical analysis, `{bench}` comes with an `autoplot` method for `{ggplot2}`:
+
+```{r 15-when-optimize-7 }
+ggplot2::autoplot(res)
+```
+
+And, bonus point, `{bench}` takes time to check that the two outputs are the same, so that you are sure you are comparing the very same thing, which is another crucial aspect of benchmarking: be sure you are not comparing apple with oranges!
 
 ### Profiling Shiny
 
-// TODO
+You can profile Shiny application using the `{profvis}` package, just as any other piece of R code. 
+The only thing to note if you want to use this function on an app built with `{golem}`, you will have to wrap the `run_app()` function in a `print()` function. 
+Long story short, what make the app run is not the function itself, but the printing of the function, so the object returned by `run_app()` itself can not be profiled. 
+See the discussion on this [issue on {golem}](https://github.com/ThinkR-open/golem/issues/146) to learn more about this.
 
+One other thing that can be optimized when it comes to the user interface is the webpage rendering performance. 
+To do that, we can use standard web development tools: as said several times, a Shiny application IS a web application, so tools that are language agnostic will work with Shiny. 
+There are thousands of tools available to do exactly that, and going through all of them would probably not make a lot of sense.
+
+So, let's focus on getting started with a basic but powerful tool, that comes for free inside your browser: [Google Lighthouse](https://developers.google.com/web/tools/lighthouse), one of the famous tool for profiling web pages, and which is bundled into recent versions of Google Chrome. 
+The nice thing is that this tool not only cover what you see (i.e. not only what you are actually rendering on your personal computer), but can also audits your app with various configuration, notably on mobile, with low bandwidth and/or mimicking 3G connection. 
+being able to perform audit of our application as seen on a mobile device is a real strength: we are developing application on our computer, and might not be regularly checking how our application is performing on a mobile. 
+Yet a large portion of the web navigation is performed on a mobile or table. 
+Already in 2016, Google [wrote](https://www.thinkwithgoogle.com/data/web-traffic-from-smartphones-and-tablets/) that "_More than half of all web traffic now comes from smartphones and tablets_". 
+Knowing the exact number of visitors that browse through mobile is hard: the web is vast, and not all website record the traffic they receive. 
+Yet many, if not all, studies around how the web is browsed are reporting the same results: more traffic is performed via mobile than via computer^[
+[broadbandsearch](https://www.broadbandsearch.net/blog/mobile-desktop-internet-usage-statistics) for example, reports a 53.3% share for mobile browsing.
+].
+
+And, the pro of running it in your browser is that it can perform the analysis on locally deployed applications: in other word, you can launch your Shiny application in your R console, open the app in Google Chrome, and run the audit. 
+A lot of online services needs an URL to do the audit!
+
+Each result from the audit comes with a series of advises and changes you can make on your application to make it better, with links to know more about the specific issue. 
+
+And of course, last but not least, you also got the results of the metrics you have "passed", and it is always a good mood booster to see our app passing some audited points!
+
+Here is a quick introduction to this tool: 
+
++ Open Chrome in incognito mode, so that the page performance is not influenced by any of the installed extensions in your Google Chrome
++ Open your developer console, either by going to View > Developer > Developer tools, by doing right click > Inspect, or with the keyboard shortcut ctrl/cmd + alt + I
++ Go to the "Audit" tab
++ Configure your report (or leave the default)
++ Click on "Generate Report"
+
+Note that you can also install a command line tool with `npm install -g lighthouse`^[
+Being a NodeJS application, you will need to have NodeJS installed on your machine.
+], then run `lighthouse http://urlto.audit`: it will produce either a JSON (if asked) or an HTML report (the default).
+
+![](img/lighthouse-audit.png) 
+
+Google Lighthouse is computing a series of analysis about your webpage.
+
+![](img/lighthouse-audit-results.png) 
+
+Once the audit is finished, you have some basic but useful indications about your application:
+
++ Performance. This metric mostly analyzes the rendering time of the page: for example how many time does it take to load the app in full, that is to say how many time it takes from the first byte received to the app being fully ready to be used, the time between the very first call to the server and the very first response, etc.
+With Shiny, you will probably get low performance here, notably due to the fact that `{shiny}` is serving external dependencies that you might not be able to control. 
+For example, the report from `{hexmake}` suggests to "Eliminate render-blocking resources", and most of them are not controlled by the shiny developer: they come bundled with `shiny::fluidPage` itself.
+
++ Accessibility. Google Lighthouse performs a series of tests about accessibility (see our chapter about accessibility for more information).
+
++ Best practices bundles a list of "misc" best practices around web applications. 
+
++ SEO: search engine optimization, or how will your app perform when it comes to search engine indexation. 
+
++ Progressive Web App (PWA): a PWA is an app that can run on any device, _" reaching anyone, anywhere, on any device with a single codebase"_. 
+Google audit your application to see if your application fits with this idea.
+
+Profiling web page is a wide topic and a lot of things can be done to enhance the global page performance.
+That being said, if you have a limited time to invest in optimizing the front-end performance of the application, Google Lighthouse is a perfect tool, and can be your go-to audit tool for your application. 
+
+And if you want to do if from R, the npm lighthouse module allows to output the audit in JSON, which can then be brought back to R!
+
+```bash
+lighthouse --output json --output-path data-raw/output.json http://localhost:2811
+```
+
+Then, being a JSON file, you can call if from R:
+
+```{r 15-when-optimize-8 }
+lighthouse_report <- jsonlite::read_json("data-raw/output.json")
+lighthouse_report$audits$`speed-index`
+```
+
+Google Lighthouse also comes with a continuous integration tool, so that you can use it as a regression testing tool for your application. 
+To know more, feel free to read the [documentation](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/getting-started.md)!
+
+### More resources about web page performance
+
++ [Why Performance Matters - Google Web Fundamentals](https://developers.google.com/web/fundamentals/performance/why-performance-matters)
+
++ [Web Performance - Mozilla Web Docs](https://developer.mozilla.org/en-US/docs/Web/Performance)

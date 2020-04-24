@@ -1,17 +1,39 @@
 # Deploy your application {#deploy-golem}
 
+> Your deploys should be as boring, straightforward, and stress-free as possible.
+
+`r right_link("How to Deploy Software - Zach Holman","https://zachholman.com/posts/deploying-software")`
+
 Once your app is built, you are ready to deploy it! 
-In other words, your software is now ready to be used by other users.
+In other words, your software is now ready to be used by other users, be it from 
 There are two main ways to share your application and make it available to others: by creating a package and making it installable, or by sending it to a remote server. 
 We'll see in this part how you can do that using `{golem}`. 
 
 ## Before deployment Check-list 
 
-+ [ ] `devtools::check()` returns 0 errors, 0 warnings, 0 notes
+Here is a quick checklist of things to think about once your application is read, and before sending it to production
 
-+ [ ] 
++ [ ] `devtools::check()`, run from the command line, returns 0 errors, 0 warnings, 0 notes
 
-+ [ ] 
++ [ ] Everything is fully documented
+
++ [ ] Test coverage is good
+
++ [ ] The contact and debugging processes are clear and everybody involves in the project management knows what to expect
+
++ [ ] (If relevant) The server it is deployed on has all the necessary software installed (Docker, Connect, Shiny Server...) to make the application run
+
++ [ ] The server has all the system requirements needed (_i.e_ the system libraries), and if not, they are installed with my application (if it's dockerized) 
+
++ [ ] The application, if deployed on a server, will be deployed on a port which will be accessible by the users
+
++ [ ] (If relevant) The environment variables from the production server are managed inside the application
+
++ [ ] (If relevant) The app is launched on the correct port, or at least this port can be configured via environment variable
+
++ [ ] (If relevant) The server where the app is deployed have access to the data sources (database, API...)
+
++ [ ] If the app record data, there are backups for these data.
 
 ## Sharing your app as a package
 
@@ -20,7 +42,8 @@ We'll see in this part how you can do that using `{golem}`.
 A Shiny application built with golem is __by definition__ created as an R package. 
 
 So before sending it to a remote server or sharing it to the world, the first step is testing if the package can be installed on your own computer.
-To do that, when you are in the project corresponding to the golem you built, you can call `remotes::install_local()` to install the application on your computer. If you are using the RStudio IDE, you can also click on the `Build` tab, then search for the `Install and Restart` button.
+To do that, when you are in the project corresponding to the golem you built, you can call `remotes::install_local()` to install the application on your computer. 
+If you are using the RStudio IDE, you can also click on the `Build` tab, then click on the `Install and Restart` button.
 
 This should restart your R session, and call `library(yourpackagename)`. 
 Then, try the `run_app()` function to check that the app can be launched.
@@ -30,30 +53,30 @@ Then, try the `run_app()` function to check that the app can be launched.
 Building an app as a package also means that this app can be bundled into an archive, and then shared, either as is or using a package repository like the CRAN.  
 
 To do that, you first need an bundled version of your app, which can be created using the `pkgbuild::build()` function in the same working directory as your application. 
-Calling this function wîll create a .tar.gz file that called `mygolem_0.0.1.tar.gz` (of course with the name of your package). 
-Once you have this `tar.gz`, you can send it to your favorite package repository. 
+Calling this function wîll create a .tar.gz file that is called `mygolem_0.0.1.tar.gz` (of course with the name of your package). 
+Once you have this `tar.gz`, you can send it to your favorite package repository.
 
 You can also share the file as is with others.
-If you do so, they will have to install the app with `remotes::install_local("path/to/tar.gz")`, that will take care of doing a full installation of the app. 
+If you do so, they will have to install the app with `remotes::install_local("path/to/tar.gz")`, that will take care of doing a full installation of the app, including installing the required dependencies.    
 Then, they can do `library(yourpackagename)` and `run_app()` on their machine.
 
 ## Deploying Apps with `{golem}`
 
 The other way to make your application available to others is by sending it to a remote server that can serve Shiny applications. 
-When using `{golem}`, you will need to open the `dev/03_deploy.R` to find the functions for server deployment. 
+When using `{golem}`, you can open the `dev/03_deploy.R` and find the functions for server deployment. 
 
 At the time of writing this book, there are two main ways to deploy a shiny app on a server: 
 
 + Rstudio's solutions
-+ a docker based solution
++ A docker based solution
 
 ## RStudio Environments
 
-Rstudio proposes three services to deploy shiny application : 
+Rstudio proposes three services to deploy Shiny application : 
 
-+ shinyapps.io, an on premise solution that can serve shiny application (freemium)
++ shinyapps.io, an on-premise solution that can serve Shiny application (freemium)
 
-+ Shiny server, a software you have to install on your own server, and that can be used to deploy multiple applications (you can find either an open source or a professional edition)
++ Shiny-server, a software you have to install on your own server, and that can be used to deploy multiple applications (you can find either an open source or a professional edition)
 
 + Rstudio connect, a server-based solution that can deploy Shiny applications and markdown documents (and other kind of content)
 
@@ -68,13 +91,12 @@ Each of these platforms has its own function to create an `app.R` file that is t
 What these `app.R` files do is calling a `pkgload::load_all()` function, that will mimic the launch of your package, and then call the `run_app()` function from your packaged app. 
 Note that if you need to configure the way your app is launched on these plateforms (for example if you need to pass arguments to the `run_app()` function), you will have to edit this file. 
 
-Another way to deploy your `{golem}` based app to Shiny server and to Connect is to link these two software to a local repository (for example an RStudio Package Manager), and then to only use 
-`mypackage::run_app()` to the `app.R`. 
+Another way to deploy your `{golem}` based app to Shiny server and to Connect is to link these two software to a local repository (for example an RStudio Package Manager), and then to only use `mypackage::run_app()` to the `app.R`. 
 
 ## Docker 
 
-Docker is an open source used to build and deploy applications in containers. Docker has become an core solution in the devops world and a lot of server solution are based on it.
-See the "Strenghten" chapter for a more complete introduction to Docker. 
+Docker is an open source software used to build and deploy applications in containers. Docker has become an core solution in the DevOps world and a lot of server solution are based on it.
+See the "Strengthen" chapter for a more complete introduction to Docker. 
 
 You will find the function for creating a `Dockerfile` for your `{golem}` app inside the `03_deploy.R` file, which contains a series of 3 functions: 
 
@@ -86,5 +108,6 @@ The first function creates a "generic" `Dockerfile`, in the sense that it is not
 The second one is meant for [ShinyProxy](https://www.shinyproxy.io/), an open source solution for deploying containarized Shiny application, and the third for [Heroku](https://www.heroku.com/), an online service that can serve containerized applications (not specific to Shiny). 
 
 Note that the `Dockerfile` creation in `{golem}` tries to replicate your local environment as precisely as possible, notably by matching your R version, and the version of the packages you have installed on your machine. 
-System requirements are also added when they are found on <sysreqs.r-hub.io>). Otherwise you might have to add them manually. 
+System requirements are also added when they are found on <sysreqs.r-hub.io>). 
+Otherwise you might have to add them manually. 
 
