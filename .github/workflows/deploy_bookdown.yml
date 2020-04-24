@@ -3,7 +3,6 @@ on:
      branches:
        - master
        - wip
-  
 
 name: renderbook
 
@@ -15,6 +14,12 @@ jobs:
       - uses: actions/checkout@v1
       - uses: r-lib/actions/setup-r@v1
       - uses: r-lib/actions/setup-pandoc@v1
+      - name: Install docker
+        run: |
+          brew install docker-machine docker
+          sudo docker –version
+      - name: Pull docker image
+        run: docker pull colinfay/hexmake:latest
       - name: Install rmarkdown
         run: Rscript -e 'install.packages(c("rmarkdown","bookdown"), Ncpus = 4)'
       - name: Install local deps
@@ -46,6 +51,7 @@ jobs:
      - name: Deploy to GitHub Pages
        uses: Cecilapp/GitHub-Pages-deploy@master
        env:
+          CNAME: engineering-shiny.org
           EMAIL: ${{ secrets.EMAIL }}               # must be a verified email
           GH_TOKEN: ${{ secrets.TOKEN }} # https://github.com/settings/tokens
           BUILD_DIR: _book/                     # "_site/" by default
