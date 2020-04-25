@@ -1,4 +1,4 @@
-#install.packages(c("attachment", "remotes", "usethis", "namer", "desc"))
+install.packages(c("attachment", "remotes", "usethis", "namer", "desc"))
 paks <- c(
   attachment::att_from_rmds(".", recursive = FALSE), 
   'bookdown', 'knitr', 'rmarkdown', 'tidyverse', 
@@ -12,7 +12,7 @@ paks <- c(
   'data.table', 'jsonlite', 'readxl', 
   'R.cache', 'glouton', 'bubble'
 )
-#cran_paks <- tools::CRAN_package_db()
+cran_paks <- tools::CRAN_package_db()
 desc_pak <- desc::desc_get_deps()$package
 for (pak in paks){
   if ( !(pak %in% desc_pak)){
