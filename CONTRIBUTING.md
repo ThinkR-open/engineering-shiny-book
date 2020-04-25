@@ -12,7 +12,7 @@ There are two ways to contribute to the book:
 
 ### How to
 
-+ Open an issue with the content and / or with the error you've spotted
++ Open an issue with the content and / or with the error you have spotted
 
 + If you want to make written contribution, please open a pull request with your correction / contribution 
 

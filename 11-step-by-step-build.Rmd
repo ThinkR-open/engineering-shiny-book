@@ -1,0 +1,97 @@
+# (PART) Step 3: Build  {-}
+
+# Building app with `{golem}` {#stepbuild}
+
+Now that the application is prototyped inside a `{golem}` [@R-golem] skeleton, you can now work on the integration of the application. 
+
+This parts encompasses the integration of the back-end/front-end, together, and working on the software engineering task of the application:
+
++ add and organize dependencies
++ creating and including sub-modules if necessary
++ organize utility functions and link them to the module they are used in
++ adding testing infrastructure 
++ linking to CI / CD services
++ check
+
+## Add dependencies
+
+Every time you add a new dependency, you can add it with:
+
+```{r 11-step-by-step-build-1, eval = FALSE}
+usethis::use_package("pkg")
+```
+
+Note that all the explicitly namespaced calls (_i.e_ `pkg::fun`) can be scraped using the `{attachment}` [@R-attachment] package:
+
+```{r 11-step-by-step-build-2, eval = FALSE}
+attachment::att_from_rscripts()
+```
+
+## Submodules and utility functions
+
+Two functions can be called to add utility functions: 
+
+```{r 11-step-by-step-build-3, eval = FALSE}
+golem::add_fct( "helpers" ) 
+golem::add_utils( "helpers" )
+```
+
++ The first will create a `R/fct_helpers.R` file
++ The second will create a `R/utils_helpers.R` file
+
+## Add tests
+
+You can add more tests to your application with:
+
+```{r 11-step-by-step-build-4, eval = FALSE}
+usethis::use_test("app")
+```
+
+
+## Documentation and Code Coverage
+
+### Vignette
+
+Whenever you need to add a new Vignette, you can call:
+
+```{r 11-step-by-step-build-5, eval = FALSE}
+usethis::use_vignette("shinyexample")
+```
+
+The Vignettes can then be compiled with:
+
+```{r 11-step-by-step-build-6, eval = FALSE}
+devtools::build_vignettes()
+```
+
+### Code coverage
+
+```{r 11-step-by-step-build-7, eval = FALSE}
+usethis::use_travis()
+usethis::use_appveyor()
+usethis::use_coverage()
+```
+
+## Using `{golem}` dev functions
+
+There is a series of tools to make your app behave differently whether it is in dev or prod mode. 
+Notably, the `app_prod()` and `app_dev()` function look for the value of `options( "golem.app.prod" )`, or return TRUE if this option does not exist.
+
+Setting this options at the beginning of your dev process allows to make your app behave in a specific way when you are in dev mode. 
+For example, printing message to the console with `cat_dev()`.
+
+```{r 11-step-by-step-build-8, eval = TRUE}
+options( "golem.app.prod" = TRUE)
+golem::cat_dev("hey\n")
+options( "golem.app.prod" = FALSE)
+golem::cat_dev("hey\n")
+```
+
+You can then make any function being "dev-dependant" with the `make_dev()` function: 
+
+```{r 11-step-by-step-build-9, eval = TRUE}
+log_dev <- golem::make_dev(log)
+log_dev(10)
+options( "golem.app.prod" = TRUE)
+log_dev(10)
+```
