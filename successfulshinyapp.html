@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-04-24" />
+<meta name="date" content="2020-04-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -202,14 +202,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="a-very-short-introduction-to-shiny" class="section level2">
 <h2><span class="header-section-number">1.1</span> A (very) short introduction to Shiny</h2>
 <p>If you are reading this page, chances are you already know what a Shiny application (shorten “Shiny app”) is—a web application that communicates with R, built in R, and working with R.
-The beauty of <code>{shiny}</code> <span class="citation">(Chang et al. <a href="#ref-R-shiny" role="doc-biblioref">2020</a>)</span> is that it makes it easy for someone already familiar with R to create a small app in a matter of hours.
+The beauty of <code>{shiny}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-shiny"><strong>???</strong></span>)</span> is that it makes it easy for someone already familiar with R to create a small app in a matter of hours.
 With small and minimal Shiny apps, no knowledge of HTML, CSS or JavaScript is required, and you do not have to think about technical elements that usually come with web applications—for example, you do not have to think about the port the application is served on: <code>{shiny}</code> picks one for you<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.
 Same goes for serving external dependencies: the application comes with its set of CSS and JavaScript dependencies that a common Shiny developer does not need to worry about.
 And that is probably one of the main reason why this package has become so successful over the years—with very little training, you can rapidly create a proof-of-concept (PoC) for a data-product, showcase an algorithm, or present your results in an elegant and accessible user interface.</p>
 <p>The first version of <code>{shiny}</code> was published in 2012.
 Since then, it has been one of the top project of the RStudio team.
 At the time of writing these lines (April 2020), there are more than 4700 commits in the master branch of the GitHub repository, made by 46 contributors.
-It is now downloaded around 400K times a month, according to <a href="https://cranlogs.r-pkg.org/badges/shiny">cranlogs</a>, and has 733 reverse dependencies (i.e packages that depend on it), according to <code>devtools::revdep("shiny")</code>.</p>
+It is now downloaded around 400K times a month, according to <a href="https://cranlogs.r-pkg.org/badges/shiny">cranlogs</a>, and has 733 reverse dependencies (i.e packages that depend on it), according to <code>revdep("shiny")</code> from <code>{devtools}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-devtools"><strong>???</strong></span>)</span>.</p>
 <p>If you are very new to Shiny, this book might feel a little bit overwhelming: we will be discussing some advance <code>{shiny}</code> production methods, best practices and structural idea for sending Shiny applications to production.
 This books relies on the assumption that you already know how to build basic Shiny applications, and that you want to push your Shiny skills to the next level: in other words, you are ready to move from the Proof of Concept to the production-grade application.
 If you are very new to Shiny, we suggest you start with the <a href="https://mastering-shiny.org/">Mastering Shiny book</a> before reading the present book.</p>
@@ -233,7 +233,7 @@ But things change when your application reaches “the cliff of complexity”<a 
 <p>But what do we mean by complexity?
 Getting a clear definition is not an easy task<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>
 as it very much depends on who is concerned and who you are talking to.
-But a good definition can be found in <em>The DevOps Handbook</em> <span class="citation">(<span class="citeproc-not-found" data-reference-id="genekim2016"><strong>???</strong></span>)</span> : <em>“One of the defining characteristics of a complex system is that it <strong>defies any single person’s ability to see the system as a whole and understand how all the pieces fit together</strong>. Complex system typically have a high degree of interconnectedness of tightly coupled components, and system-level behavior cannot be explained merely in terms of the behavior of the system components.”</em> (we underlined).</p>
+But a good definition can be found in <em>The DevOps Handbook</em> <span class="citation">(Kim <a href="#ref-genekim2016" role="doc-biblioref">2016</a>)</span> : <em>“One of the defining characteristics of a complex system is that it <strong>defies any single person’s ability to see the system as a whole and understand how all the pieces fit together</strong>. Complex system typically have a high degree of interconnectedness of tightly coupled components, and system-level behavior cannot be explained merely in terms of the behavior of the system components.”</em> (we underlined).</p>
 <p>Building on top of this quote, let’s try to come up with a definition that will serve us in the context of engineering Shiny applications.</p>
 <p>When building software, we can think of complexity from two points of view: the complexity as it is seen by the developer, and the complexity as it is seen by the customer/end-user.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
 <ul>
@@ -245,7 +245,7 @@ Indeed, the user will have to invest more time learning how the app works, and w
 <p>Let’s dive a little bit more in these two type of complexity.</p>
 <div id="developers-complexity" class="section level4">
 <h4><span class="header-section-number">1.2.1.1</span> Developers complexity</h4>
-<p>An app is to be considered complex when it is so large in terms of size and functionality that it makes it impossible to reason about it at once, and developer must rely on tools and methods to understand and handle this complexity: for example, when it comes to <code>{shiny}</code>, you will rely on tools like the <code>{golem}</code> framework, introduced all along this book, to handle some implementation, development and deployment complexity.
+<p>An app is to be considered complex when it is so large in terms of size and functionality that it makes it impossible to reason about it at once, and developer must rely on tools and methods to understand and handle this complexity: for example, when it comes to <code>{shiny}</code>, you will rely on tools like the <code>{golem}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-golem"><strong>???</strong></span>)</span> framework, introduced all along this book, to handle some implementation, development and deployment complexity.
 This book will introduce a clear methodology that comes with a series of conventions, which are crucial when it comes to building and maintaining complex systems: by imposing a formalized structure for a software, it enhances its readability, lower the learning curve for new-comers, and reduces the risk of errors inherent to repetitive tasks.</p>
 <p>This type of complexity is called <em>implementation complexity</em>.
 One of the goal of this book is to present you a methodology and toolkit that will help you reduce this form of complexity.</p>
@@ -340,11 +340,11 @@ It is rather unlikely that you will find this “extreme” coding style we show
 <p>Another good metric related to this metric is the number of files in the project: R developers tend to split their functions into several files, so the more files you will find in a project, the larger the code base is.
 And numerous files can also be a sign of maintenance complexity, as it may be harder to reason about an app logic split into several files than about something that fits into one linear code inside one file<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>.
 On the other hand, one big 10.000-lines file which is standing alone in the project is not a good sign either.</p>
-<p>If you want to use the number of lines metric, you can do it from R with the <code>{cloc}</code> <span class="citation">(Rudis and Danial <a href="#ref-R-cloc" role="doc-biblioref">2020</a>)</span> package, available at <a href="https://github.com/hrbrmstr/cloc" class="uri">https://github.com/hrbrmstr/cloc</a>.</p>
+<p>If you want to use the number of lines metric, you can do it from R with the <code>{cloc}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-cloc"><strong>???</strong></span>)</span> package, available at <a href="https://github.com/hrbrmstr/cloc" class="uri">https://github.com/hrbrmstr/cloc</a>.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="successfulshinyapp.html#cb13-1"></a><span class="cf">if</span> (<span class="op">!</span><span class="kw">requireNamespace</span>(<span class="st">&quot;cloc&quot;</span>)){</span>
 <span id="cb13-2"><a href="successfulshinyapp.html#cb13-2"></a>  remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;hrbrmstr/cloc&quot;</span>)</span>
 <span id="cb13-3"><a href="successfulshinyapp.html#cb13-3"></a>}</span></code></pre></div>
-<p>For example, let’s compare a rather big package (<code>{shiny}</code>) with a small one (<code>{attempt}</code> <span class="citation">(Fay <a href="#ref-R-attempt" role="doc-biblioref">2019</a><a href="#ref-R-attempt" role="doc-biblioref">a</a>)</span>):</p>
+<p>For example, let’s compare a rather big package (<code>{shiny}</code>) with a small one (<code>{attempt}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-attempt"><strong>???</strong></span>)</span>):</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="successfulshinyapp.html#cb14-1"></a><span class="kw">library</span>(cloc)</span>
 <span id="cb14-2"><a href="successfulshinyapp.html#cb14-2"></a><span class="kw">library</span>(dplyr)</span>
 <span id="cb14-3"><a href="successfulshinyapp.html#cb14-3"></a>shiny_cloc &lt;-<span class="st"> </span><span class="kw">cloc_cran</span>(<span class="st">&quot;shiny&quot;</span>, <span class="dt">.progress =</span> <span class="ot">FALSE</span>, <span class="dt">repos =</span> <span class="st">&quot;http://cran.irsn.fr/&quot;</span> )</span>
@@ -389,7 +389,7 @@ The complexity number is then computed by taking the number of nodes, subtractin
 The algorithm is then <span class="math inline">\(M = E − N + 2P\)</span>, where <span class="math inline">\(M\)</span> is the measure, <span class="math inline">\(E\)</span> the number of edges, <span class="math inline">\(N\)</span> the number of nodes and <span class="math inline">\(2P\)</span> is 2 time the number of connected components.
 We will not go deep into this topic, as there are a lot things going on in this computation and you can find many documentation about this online.
 Please refer to the bibliography for further readings about the theory behind this measurement.</p>
-<p>In R, the cyclomatic complexity can be computed using the <code>{cyclocomp}</code> <span class="citation">(Csardi <a href="#ref-R-cyclocomp" role="doc-biblioref">2016</a>)</span> package.
+<p>In R, the cyclomatic complexity can be computed using the <code>{cyclocomp}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-cyclocomp"><strong>???</strong></span>)</span> package.
 You can get it from <code>CRAN</code> with:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="successfulshinyapp.html#cb18-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;cyclocomp&quot;</span>)</span></code></pre></div>
 <p>The <code>{cyclocomp}</code> package comes with three main functions: <code>cyclocomp()</code>, <code>cyclocomp_package()</code>, and <code>cyclocomp_package_dir()</code>.
@@ -430,7 +430,7 @@ And indeed, splitting code into smaller pieces lower the local cyclomatic comple
 <div id="other-measures-for-code-complexity" class="section level4">
 <h4><span class="header-section-number">1.2.3.3</span> Other measures for code complexity</h4>
 <p>Complexity can come from other sources: insufficient code coverage, dependencies that breaks the implementation, relying on old packages, or a lot of other things.</p>
-<p>We can use the <code>{packageMetrics2}</code> <span class="citation">(Csardi <a href="#ref-R-packageMetrics2" role="doc-biblioref">2020</a>)</span> package to get some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc., … and the number of lines of code and the cyclomatic complexity.</p>
+<p>We can use the <code>{packageMetrics2}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-packageMetrics2"><strong>???</strong></span>)</span> package to get some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc., … and the number of lines of code and the cyclomatic complexity.</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="successfulshinyapp.html#cb25-1"></a><span class="kw">library</span>(packageMetrics2)</span>
 <span id="cb25-2"><a href="successfulshinyapp.html#cb25-2"></a>frame_metric &lt;-<span class="st"> </span><span class="cf">function</span>(pkg){</span>
 <span id="cb25-3"><a href="successfulshinyapp.html#cb25-3"></a>  metrics &lt;-<span class="st"> </span><span class="kw">package_metrics</span>(pkg)</span>
@@ -686,7 +686,7 @@ And indeed, splitting code into smaller pieces lower the local cyclomatic comple
 </tr>
 </tbody>
 </table>
-<p>If you are building you Shiny application with <code>{golem}</code>, you can use the <code>DESCRIPTION</code> file, which contains the list of dependencies, as a starting point to explore these metrics for your dependencies:</p>
+<p>If you are building you Shiny application with <code>{golem}</code>, you can use the <code>DESCRIPTION</code> file, which contains the list of dependencies, as a starting point to explore these metrics for your dependencies, for example using <code>{desc}</code> <span class="citation">(Csárdi, Müller, and Hester <a href="#ref-R-desc" role="doc-biblioref">2018</a>)</span> or <code>{attachment}</code> <span class="citation">(Guyader and Rochette <a href="#ref-R-attachment" role="doc-biblioref">2020</a>)</span>:</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="successfulshinyapp.html#cb28-1"></a>desc<span class="op">::</span><span class="kw">desc_get_deps</span>(<span class="st">&quot;golex/DESCRIPTION&quot;</span>)</span></code></pre></div>
 <pre><code>     type package version
 1 Imports  config       *
@@ -760,23 +760,17 @@ And this, again, is hard to do without effective planning and efficient engineer
 </div>
 <h3>References</h3>
 <div id="refs" class="references">
-<div id="ref-R-shiny">
-<p>Chang, Winston, Joe Cheng, JJ Allaire, Yihui Xie, and Jonathan McPherson. 2020. <em>Shiny: Web Application Framework for R</em>. <a href="https://CRAN.R-project.org/package=shiny">https://CRAN.R-project.org/package=shiny</a>.</p>
+<div id="ref-R-desc">
+<p>Csárdi, Gábor, Kirill Müller, and Jim Hester. 2018. <em>Desc: Manipulate Description Files</em>. <a href="https://CRAN.R-project.org/package=desc">https://CRAN.R-project.org/package=desc</a>.</p>
 </div>
-<div id="ref-R-cyclocomp">
-<p>Csardi, Gabor. 2016. <em>Cyclocomp: Cyclomatic Complexity of R Code</em>. <a href="https://CRAN.R-project.org/package=cyclocomp">https://CRAN.R-project.org/package=cyclocomp</a>.</p>
+<div id="ref-R-attachment">
+<p>Guyader, Vincent, and Sébastien Rochette. 2020. <em>Attachment: Deal with Dependencies</em>. <a href="https://CRAN.R-project.org/package=attachment">https://CRAN.R-project.org/package=attachment</a>.</p>
 </div>
-<div id="ref-R-packageMetrics2">
-<p>Csardi, Gabor. 2020. <em>PackageMetrics2: Collect Metrics About R Packages</em>. <a href="http://git.mango.local/gcsardi/packageMetrics2">http://git.mango.local/gcsardi/packageMetrics2</a>.</p>
-</div>
-<div id="ref-R-attempt">
-<p>Fay, Colin. 2019a. <em>Attempt: Tools for Defensive Programming</em>. <a href="https://CRAN.R-project.org/package=attempt">https://CRAN.R-project.org/package=attempt</a>.</p>
+<div id="ref-genekim2016">
+<p>Kim, Gene. 2016. <em>The Devops Handbook: How to Create World-Class Agility, Reliability, and Security in Technology Organizations</em>. IT Revolution Press. <a href="https://www.xarg.org/ref/a/1942788002/">https://www.xarg.org/ref/a/1942788002/</a>.</p>
 </div>
 <div id="ref-ericraymond2003">
 <p>Raymond, Eric S. 2003. <em>The Art of Unix Programming (the Addison-Wesley Professional Computng Series)</em>. Addison-Wesley.</p>
-</div>
-<div id="ref-R-cloc">
-<p>Rudis, Bob, and Al Danial. 2020. <em>Cloc: Count Lines of Code, Comments and Whitespace in Source Files and Archives</em>. <a href="https://gitlab.com/hrbrmstr/cloc">https://gitlab.com/hrbrmstr/cloc</a>.</p>
 </div>
 </div>
 <div class="footnotes">
