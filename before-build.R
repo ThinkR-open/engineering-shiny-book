@@ -14,6 +14,7 @@ paks <- c(
 )
 cran_paks <- tools::CRAN_package_db()
 desc_pak <- desc::desc_get_deps()$package
+remotes::install_version("subprocess", "0.8.3")
 for (pak in paks){
   if ( !(pak %in% desc_pak)){
     try({
