@@ -280,11 +280,11 @@ Of course, the C++ function is faster than the R one—this is the very reason o
 <pre><code>[90m# A tibble: 2 x 6[39m
   expression    min median `itr/sec` mem_alloc `gc/sec`
   [3m[90m&lt;bch:expr&gt;[39m[23m [3m[90m&lt;bch:&gt;[39m[23m [3m[90m&lt;bch:&gt;[39m[23m     [3m[90m&lt;dbl&gt;[39m[23m [3m[90m&lt;bch:byt&gt;[39m[23m    [3m[90m&lt;dbl&gt;[39m[23m
-[90m1[39m cpp         145µs  442µs     [4m2[24m573.   783.8KB     36.5
-[90m2[39m native      418µs  451µs     [4m2[24m180.    22.7KB      0  </code></pre>
+[90m1[39m cpp         145µs  441µs     [4m2[24m554.   783.8KB     33.6
+[90m2[39m native      418µs  446µs     [4m2[24m204.    22.7KB      0  </code></pre>
 <p>(Note: we will come back to <code>bench::mark</code> later)</p>
 <p>Though, how much time gain is worth being sure you will get someone in your team to take over the maintenance if needed?
-In other words, given that (in our example), we are gaining around -8.72110^{-6} on the execution time of our function, is it worth switching to C++?
+In other words, given that (in our example), we are gaining around -4.862510^{-6} on the execution time of our function, is it worth switching to C++?
 Using external languages or complex data structures implies that from the start, you will need to think about who and how your code base will be maintain over the years.
 Chances are that if you plan on using a Shiny application during a span of several years, various R developers will be working on the project, and including C++ code inside your application means that these future developer will either be required to know C++, or they will not be able to maintain this piece of code.</p>
 <p>So, to sum up, there are three ways to optimize your application &amp; R code, and the bad news is that you can not optimize for all of them:</p>
@@ -302,7 +302,7 @@ Chances are that if you plan on using a Shiny application during a span of sever
 <h3><span class="header-section-number">15.2.1</span> Profiling R code</h3>
 <div id="identifying-bottlenecks-1" class="section level4">
 <h4><span class="header-section-number">15.2.1.1</span> Identifying bottlenecks</h4>
-<p>The best way to profile R code is by using the <code>{profvis}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-profvis"><strong>???</strong></span>)</span> package<a href="#fn39" class="footnote-ref" id="fnref39"><sup>39</sup></a>, a package designed to evaluate how much time each part of a function call take.
+<p>The best way to profile R code is by using the <code>{profvis}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-profvis"><strong>???</strong></span>)</span> package,<a href="#fn37" class="footnote-ref" id="fnref37"><sup>37</sup></a> a package designed to evaluate how much time each part of a function call take.
 With <code>{profvis}</code>, you can spot the bottleneck of your function.
 Without an automated tool to do the profiling, the developers would have to profile by guessing, which will, most of the time, come with bad results:</p>
 <blockquote>
@@ -315,7 +315,7 @@ Without an automated tool to do the profiling, the developers would have to prof
 <a href="http://www.catb.org/~esr/writings/taoup/html/ch12s02.html">The Art of Unix Programming</a>
 </div>
 <p>Instead of guessing, it is safe bet to go for a tool like <code>{profvis}</code>, which allows to have a detailed view of what takes a long time to run in your R code.</p>
-<p>Using this package is quite straightforward: put the code you want to benchmark inside the <code>profvis()</code> function<a href="#fn40" class="footnote-ref" id="fnref40"><sup>40</sup></a>, wait for the code to run, and… that is it, you now have an analysis of your code running time.</p>
+<p>Using this package is quite straightforward: put the code you want to benchmark inside the <code>profvis()</code> function,<a href="#fn38" class="footnote-ref" id="fnref38"><sup>38</sup></a> wait for the code to run, and… that is it, you now have an analysis of your code running time.</p>
 <p>Here is an example with 3 nested functions, <code>top()</code>, <code>middle()</code> and <code>bottom()</code>, where <code>top()</code> calls <code>middle()</code> which calls <code>bottom()</code>:</p>
 <div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="when-optimize.html#cb202-1"></a><span class="kw">library</span>(profvis)</span>
 <span id="cb202-2"><a href="when-optimize.html#cb202-2"></a>top &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
@@ -458,8 +458,8 @@ Note that by default, the <code>mark()</code> function compares the output of ea
 <pre><code>[90m# A tibble: 2 x 6[39m
   expression     min  median `itr/sec` mem_alloc
   [3m[90m&lt;bch:expr&gt;[39m[23m [3m[90m&lt;bch:t&gt;[39m[23m [3m[90m&lt;bch:t&gt;[39m[23m     [3m[90m&lt;dbl&gt;[39m[23m [3m[90m&lt;bch:byt&gt;[39m[23m
-[90m1[39m for        53.12µs 55.11µs    [4m1[24m[4m7[24m841.    30.4KB
-[90m2[39m vectorized  3.79µs  4.28µs   [4m1[24m[4m2[24m[4m3[24m900.    11.8KB
+[90m1[39m for        52.74µs 53.67µs    [4m1[24m[4m8[24m322.    30.4KB
+[90m2[39m vectorized  4.22µs  4.74µs   [4m1[24m[4m3[24m[4m2[24m285.    11.8KB
 [90m# … with 1 more variable: `gc/sec` [3m[90m&lt;dbl&gt;[90m[23m[39m</code></pre>
 <p>Here, we have an empiric evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest.</p>
 <p>If you want a graphical analysis, <code>{bench}</code> comes with an <code>autoplot</code> method for <code>{ggplot2}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-ggplot2"><strong>???</strong></span>)</span>:</p>
@@ -483,7 +483,7 @@ being able to perform audit of our application as seen on a mobile device is a r
 Yet a large portion of the web navigation is performed on a mobile or table.
 Already in 2016, Google <a href="https://www.thinkwithgoogle.com/data/web-traffic-from-smartphones-and-tablets/">wrote</a> that “<em>More than half of all web traffic now comes from smartphones and tablets</em>”.
 Knowing the exact number of visitors that browse through mobile is hard: the web is vast, and not all website record the traffic they receive.
-Yet many, if not all, studies around how the web is browsed are reporting the same results: more traffic is performed via mobile than via computer<a href="#fn41" class="footnote-ref" id="fnref41"><sup>41</sup></a>.</p>
+Yet many, if not all, studies around how the web is browsed are reporting the same results: more traffic is performed via mobile than via computer.<a href="#fn39" class="footnote-ref" id="fnref39"><sup>39</sup></a></p>
 <p>And, the pro of running it in your browser is that it can perform the analysis on locally deployed applications: in other word, you can launch your Shiny application in your R console, open the app in Google Chrome, and run the audit.
 A lot of online services needs an URL to do the audit!</p>
 <p>Each result from the audit comes with a series of advises and changes you can make on your application to make it better, with links to know more about the specific issue.</p>
@@ -496,7 +496,7 @@ A lot of online services needs an URL to do the audit!</p>
 <li>Configure your report (or leave the default)</li>
 <li>Click on “Generate Report”</li>
 </ul>
-<p>Note that you can also install a command line tool with <code>npm install -g lighthouse</code><a href="#fn42" class="footnote-ref" id="fnref42"><sup>42</sup></a>, then run <code>lighthouse http://urlto.audit</code>: it will produce either a JSON (if asked) or an HTML report (the default).</p>
+<p>Note that you can also install a command line tool with <code>npm install -g lighthouse</code>,<a href="#fn40" class="footnote-ref" id="fnref40"><sup>40</sup></a> then run <code>lighthouse http://urlto.audit</code>: it will produce either a JSON (if asked) or an HTML report (the default).</p>
 <p><img src="img/lighthouse-audit.png" /></p>
 <p>Google Lighthouse is computing a series of analysis about your webpage.</p>
 <p><img src="img/lighthouse-audit-results.png" /></p>
@@ -556,6 +556,15 @@ To know more, feel free to read the <a href="https://github.com/GoogleChrome/lig
 <div id="ref-R-Rcpp">
 <p>Eddelbuettel, Dirk, Romain Francois, JJ Allaire, Kevin Ushey, Qiang Kou, Nathan Russell, Douglas Bates, and John Chambers. 2020. <em>Rcpp: Seamless R and C++ Integration</em>. <a href="https://CRAN.R-project.org/package=Rcpp">https://CRAN.R-project.org/package=Rcpp</a>.</p>
 </div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="37">
+<li id="fn37"><p><code>{utils}</code> also comes with a function call <code>Rprof()</code>, but we will not be examining this one here, as <code>{profvis}</code> provides a more user-friendly and enhanced interface to this profiling function.<a href="when-optimize.html#fnref37" class="footnote-back">↩︎</a></p></li>
+<li id="fn38"><p>Do not forget to add <code>{}</code> inside <code>profvis({})</code> if you want to write several lines of code.<a href="when-optimize.html#fnref38" class="footnote-back">↩︎</a></p></li>
+<li id="fn39"><p><a href="https://www.broadbandsearch.net/blog/mobile-desktop-internet-usage-statistics">broadbandsearch</a> for example, reports a 53.3% share for mobile browsing.<a href="when-optimize.html#fnref39" class="footnote-back">↩︎</a></p></li>
+<li id="fn40"><p>Being a NodeJS application, you will need to have NodeJS installed on your machine.<a href="when-optimize.html#fnref40" class="footnote-back">↩︎</a></p></li>
+</ol>
 </div>
 <hr/>
 <footer>
