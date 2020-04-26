@@ -1,6 +1,6 @@
 install.packages(c("attachment", "remotes", "usethis", "namer", "desc"))
 paks <- c(
-  attachment::att_from_rmds(".", recursive = FALSE), 
+  c("cloc", "dplyr", "cyclocomp", "tidytuesday201942", "shiny", "packageMetrics2", "remotes", "readr", "here", "tibble", "knitr", "desc", "attachment", "magrittr", "tools", "fs", "glue", "dichromat", "purrr", "htmltools", "matlab", "viridis", "golem", "shinipsum", "ggplot2", "DT", "fakir", "shinyloadtest", "dockerstats", "attempt", "dockerfiler", "Rcpp", "profmem", "bench", "jsonlite", "cli", "memoise", "tictoc", "promises", "future", "liteq", "DBI", "RSQLite", "xfun"), 
   'bookdown', 'knitr', 'rmarkdown', 'tidyverse', 
   'testthat', 'usethis', 'config', 'hexmake', 'shinyalert', 
   'plotly', 'shinyMobile', 'resume', 'nessy','skeleton',
