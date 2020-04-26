@@ -27,6 +27,8 @@ for (pak in paks){
   }
 }
 
+remotes::install_local()
+
 knitr::write_bib(c(
   paks
 ), 'packages.bib')
