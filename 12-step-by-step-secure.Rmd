@@ -116,7 +116,7 @@ And to do the tests in a `puppeteer` spirit, you can refer to the `{crrry}` pack
 
 Here is an example:
 
-```{r 12-step-by-step-secure-2, eval = FALSE}
+```{r 12-step-by-step-secure-2, eval = TRUE}
 test <- crrry::CrrryOnPage$new(
   chrome_bin = pagedown::find_chrome(),
   chrome_port = httpuv::randomPort(), # Note that you will need httpuv >= 1.5.2
@@ -136,7 +136,7 @@ You can then call one of the `test` object methods:
 
 Of course, the interesting part is doing "bulk testing" of your application, for example by setting a series of values to an input:
 
-```{r 12-step-by-step-secure-3, eval = FALSE}
+```{r 12-step-by-step-secure-3, eval = TRUE}
 for (i in letters[1:5]){
   test$shiny_set_input(
     "main_ui_1-left_ui_1-pkg_name_ui_1-package", 
@@ -147,7 +147,7 @@ for (i in letters[1:5]){
 
 And once your test is done, do not forget to close the connection!
 
-```{r 12-step-by-step-secure-4, eval = FALSE}
+```{r 12-step-by-step-secure-4, eval = TRUE}
 test$stop()
 ```
 
@@ -219,7 +219,7 @@ If the `{shinytest}` package detects a visual change in the application, you wil
 
 ### Testing the app load
 
-```{r 12-step-by-step-secure-10, include=FALSE, error=TRUE, eval = FALSE}
+```{r 12-step-by-step-secure-10, include=FALSE, error=TRUE, eval = TRUE}
 try({system("docker rm hexmake")})
 ```
 
@@ -411,12 +411,20 @@ If you need a deeper look into the connection between application actions and th
 
 Let's record the computation of the `hexmake` container containing the same app as before. 
 
-```{r 12-step-by-step-secure-33, eval = TRUE, cache=TRUE}
+First, launch the container:
+
+```{r}
 system(
   "docker run -p 2708:80 --rm --name hexmake2 -d colinfay/hexmake", 
   wait = FALSE
   )
 Sys.sleep(5) # Let's leave some time for the container to be ready
+```
+
+
+Then, a `{crrry}` job:
+
+```{r 12-step-by-step-secure-33, eval = TRUE, cache=TRUE}
 test <- crrry::CrrryOnPage$new(
   chrome_bin = pagedown::find_chrome(),
   chrome_port = httpuv::randomPort(),
