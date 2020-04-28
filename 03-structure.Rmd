@@ -25,29 +25,29 @@ Second, you need to find a way to __handle the dependencies__.
 As you know, when you want to push your app into production, you do not want to have this conversation with I.T. people: 
 
 
->IT: Hey, I tried to `source("app.R")` as you said, but I got an error. 
->
->R-dev: What is the error?
->
->IT: It says "could not find package 'shiny'". 
->
->R-dev: Ah yes, you need to install {shiny}. Try to run `install.packages("shiny")`. 
->
->IT: OK nice. What else?
->
->R-dev: Let me think, try also `install.packages("DT")`... good? Now try `install.packages("ggplot2")`, and ...
->
->[...]
->
->IT: Ok, now I source the 'app.R', right?
->
->R-dev: Sure!
->
->IT: Ok so it says 'could not find function `runApp()`
->
->R-dev: Ah, you got to do `library(shiny)` at the beginning of your script. And `library(purrr)`, and `library(jsonlite)`*, and...
+- IT: Hey, I tried to `source("app.R")` as you said, but I got an error. 
 
-`*` will lead to a NAMESPACE conflict on the `flatten()` function that can cause you some debugging headache (trust us, we have been there before). 
+- R-dev: What is the error?
+
+- IT: It says "could not find package 'shiny'". 
+
+- R-dev: Ah yes, you need to install {shiny}. Try to run `install.packages("shiny")`. 
+
+- IT: OK nice. What else?
+
+- R-dev: Let me think, try also `install.packages("DT")`... good? Now try `install.packages("ggplot2")`, and ...
+
+- [...]
+
+- IT: Ok, now I source the 'app.R', right?
+
+- R-dev: Sure!
+
+- IT: Ok so it says 'could not find function `runApp()`
+
+- R-dev: Ah, you got to do `library(shiny)` at the beginning of your script. And `library(purrr)`, and `library(jsonlite)`, and...
+
+For example here, this `library(purrr)` and `library(jsonlite)` will lead to a NAMESPACE conflict on the `flatten()` function that can cause you some debugging headache (trust us, we have been there before). 
 So, hey, it would be cool if we could have a Shiny app that only imports specific functions from a package, right?
 
 We can not stress it enough that __dependencies matter__. You need to handle them, and handle them correctly if you want to ensure a smooth deployment to production.
@@ -93,10 +93,8 @@ In a perfect world, you would create one vignette per shiny page/tab.
 Every function in your package should come with its own documentation, even if only for your future self. 
 "Exported" functions, the one which are available once you run `library(myapp)`, should be fully documented and will be listed in the package help page. 
 Internal functions need less documentation, but documenting them is the best way to be sure you can come back to the app in a few months and still know why things are the way they are, what the pieces of the apps are used for, and how to use these functions
-^[`{roxygen2}` comes with a `@noRd` tag, that prevents the documentation from being built. 
-This allows to still write the documentation using the same tags as the exported function, without the internal functions being documented in the end package. 
-For example, that is why by default the modules built with `{golem}` version > 0.2.0 come with `@noRd`: you should document them, but chances are your do not need to export them.
-].
+^[`{roxygen2}` comes with a `@noRd` tag, that prevents the documentation from being built. This allows to still write the documentation using the same tags as the exported function, without the internal functions being documented in the end package. For example, that is why by default the modules built with `{golem}` version > 0.2.0 come with `@noRd`: you should document them, but chances are your do not need to export them.]
+.
 - If needed, you can build a `{pkgdown}` website, that can either be deployed on the web or kept internally. 
 It can contain installation steps for I.T., internal features use for developers, a user guide, etc.
 
@@ -275,8 +273,8 @@ Yes, you guessed right: using shiny modules.
 Shiny modules aim to do three things: simplify "id" namespacing, split the codebase into a series of functions, and allow UI/Server parts of your app to be reused. 
 Most of the time, modules are used for the first two aims.
 In our case, we could say that 90% of the modules we write are never reused
-^[Most of the time, pieces / panels of the app are too unique to be reused elsewhere.
-] ; they are here to allow us to split the code base into smaller, more manageable pieces. 
+^[Most of the time, pieces / panels of the app are too unique to be reused elsewhere.] 
+; they are here to allow us to split the code base into smaller, more manageable pieces. 
 
 With Shiny modules, you will be writing a combination of UI and server functions. 
 Think of them as small, standalone Shiny apps, which handle a fraction of your global application. 
@@ -369,8 +367,8 @@ ns("choice")
 And here it is, our namespaced `id`.
 
 Each call to a module with `callModule()` requires a different `id` argument that will allow creating various internal namespaces, preventing from id conflicts
-^[Well, of course you can still have inner module id conflicts, but they are easier to avoid, detect, and fix. 
-].
+^[Well, of course you can still have inner module id conflicts, but they are easier to avoid, detect, and fix.]
+.
 Then you can have as many `validate` input as you want in your app, as long as this `validate` has a unique id inside your module.
 
 #### Passing arguments to your modules
