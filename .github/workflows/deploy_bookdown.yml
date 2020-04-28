@@ -29,16 +29,29 @@ jobs:
       - name: Pulling hexmake
         run: docker pull colinfay/hexmake
         
+      - name: Install Chromium
+        run: |
+          sudo apt-get update
+          sudo apt-get install software-properties-common
+          sudo add-apt-repository ppa:canonical-chromium-builds/stage
+          sudo apt-get update
+          sudo apt-get install chromium-browser 
+        
       - name: Install sysfonts
         run: Rscript -e 'install.packages("sysfonts", Ncpus = 4)'
+        
       - name: Install rmarkdown
         run: Rscript -e 'install.packages(c("rmarkdown","bookdown"), Ncpus = 4)'
+      
       - name: Befor build
         run: Rscript before-build.R
+      
       - name: Install local deps
         run: Rscript -e 'install.packages("remotes", Ncpus = 4);remotes::install_local(upgrade = "never", Ncpus = 4)'
+      
       - name: Render Book
         run: Rscript -e 'bookdown::render_book("index.Rmd")'
+      
       - uses: actions/upload-artifact@v1
         with:
           name: _book
