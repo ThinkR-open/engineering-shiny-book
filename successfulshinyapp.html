@@ -202,14 +202,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="a-very-short-introduction-to-shiny" class="section level2">
 <h2><span class="header-section-number">1.1</span> A (very) short introduction to Shiny</h2>
 <p>If you are reading this page, chances are you already know what a Shiny application (shorten “Shiny app”) is—a web application that communicates with R, built in R, and working with R.
-The beauty of <code>{shiny}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-shiny"><strong>???</strong></span>)</span> is that it makes it easy for someone already familiar with R to create a small app in a matter of hours.
-With small and minimal Shiny apps, no knowledge of HTML, CSS or JavaScript is required, and you do not have to think about technical elements that usually come with web applications—for example, you do not have to think about the port the application is served on: <code>{shiny}</code> picks one for you.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
+The beauty of <code>{shiny}</code> <span class="citation">(Chang et al. <a href="#ref-R-shiny" role="doc-biblioref">2020</a>)</span> is that it makes it easy for someone already familiar with R to create a small app in a matter of hours.
+With small and minimal Shiny apps, no knowledge of HTML, CSS or JavaScript is required, and you do not have to think about technical elements that usually come with web applications—for example, you do not have to think about the port the application is served on: <code>{shiny}</code> picks one for you<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
+.
 Same goes for serving external dependencies: the application comes with its set of CSS and JavaScript dependencies that a common Shiny developer does not need to worry about.
 And that is probably one of the main reason why this package has become so successful over the years—with very little training, you can rapidly create a proof-of-concept (PoC) for a data-product, showcase an algorithm, or present your results in an elegant and accessible user interface.</p>
 <p>The first version of <code>{shiny}</code> was published in 2012.
 Since then, it has been one of the top project of the RStudio team.
 At the time of writing these lines (April 2020), there are more than 4700 commits in the master branch of the GitHub repository, made by 46 contributors.
-It is now downloaded around 400K times a month, according to <a href="https://cranlogs.r-pkg.org/badges/shiny">cranlogs</a>, and has 734 reverse dependencies (i.e packages that depend on it), according to <code>revdep("shiny")</code> from <code>{devtools}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-devtools"><strong>???</strong></span>)</span>.</p>
+It is now downloaded around 400K times a month, according to <a href="https://cranlogs.r-pkg.org/badges/shiny">cranlogs</a>, and has 734 reverse dependencies (i.e packages that depend on it), according to <code>revdep("shiny")</code> from <code>{devtools}</code> <span class="citation">(Wickham, Hester, and Chang <a href="#ref-R-devtools" role="doc-biblioref">2020</a>)</span>.</p>
 <p>If you are very new to Shiny, this book might feel a little bit overwhelming: we will be discussing some advance <code>{shiny}</code> production methods, best practices and structural idea for sending Shiny applications to production.
 This books relies on the assumption that you already know how to build basic Shiny applications, and that you want to push your Shiny skills to the next level: in other words, you are ready to move from the Proof of Concept to the production-grade application.
 If you are very new to Shiny, we suggest you start with the <a href="https://mastering-shiny.org/">Mastering Shiny book</a> before reading the present book.</p>
@@ -229,13 +230,15 @@ If you are very new to Shiny, we suggest you start with the <a href="https://mas
 <div id="reaching-the-cliff-of-complexity" class="section level3">
 <h3><span class="header-section-number">1.2.1</span> Reaching the cliff of complexity</h3>
 <p>Building a Shiny application seems quite straightforward when it comes to small prototypes or proof of concepts: after a few hours of practice and documentation reading, most R developers can have a small working application.<br />
-But things change when your application reaches “the cliff of complexity,”<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> <em>i.e</em> that moment when the application reaches a states when it can be qualified as “complex”.</p>
+But things change when your application reaches “the cliff of complexity”<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>
+, <em>i.e</em> that moment when the application reaches a states when it can be qualified as “complex”.</p>
 <p>But what do we mean by complexity?
 Getting a clear definition is not an easy task<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>
 as it very much depends on who is concerned and who you are talking to.
 But a good definition can be found in <em>The DevOps Handbook</em> <span class="citation">(Kim <a href="#ref-genekim2016" role="doc-biblioref">2016</a>)</span> : <em>“One of the defining characteristics of a complex system is that it <strong>defies any single person’s ability to see the system as a whole and understand how all the pieces fit together</strong>. Complex system typically have a high degree of interconnectedness of tightly coupled components, and system-level behavior cannot be explained merely in terms of the behavior of the system components.”</em> (we underlined).</p>
 <p>Building on top of this quote, let’s try to come up with a definition that will serve us in the context of engineering Shiny applications.</p>
-<p>When building software, we can think of complexity from two points of view: the complexity as it is seen by the developer, and the complexity as it is seen by the customer/end-user.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<p>When building software, we can think of complexity from two points of view: the complexity as it is seen by the developer, and the complexity as it is seen by the customer/end-user<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>
+.</p>
 <ul>
 <li><p>For the code, bugs are harder to anticipate: it is hard to think about all the different paths the software can follow and difficult to identify bugs because they are deeply nested in the numerous routines the app is doing.
 It is also hard to think about what the state of your app is at a given moment because of the numerous inputs and outputs your app contains.</p></li>
@@ -245,7 +248,7 @@ Indeed, the user will have to invest more time learning how the app works, and w
 <p>Let’s dive a little bit more in these two type of complexity.</p>
 <div id="developers-complexity" class="section level4">
 <h4><span class="header-section-number">1.2.1.1</span> Developers complexity</h4>
-<p>An app is to be considered complex when it is so large in terms of size and functionality that it makes it impossible to reason about it at once, and developer must rely on tools and methods to understand and handle this complexity: for example, when it comes to <code>{shiny}</code>, you will rely on tools like the <code>{golem}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-golem"><strong>???</strong></span>)</span> framework, introduced all along this book, to handle some implementation, development and deployment complexity.
+<p>An app is to be considered complex when it is so large in terms of size and functionality that it makes it impossible to reason about it at once, and developer must rely on tools and methods to understand and handle this complexity: for example, when it comes to <code>{shiny}</code>, you will rely on tools like the <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> framework, introduced all along this book, to handle some implementation, development and deployment complexity.
 This book will introduce a clear methodology that comes with a series of conventions, which are crucial when it comes to building and maintaining complex systems: by imposing a formalized structure for a software, it enhances its readability, lower the learning curve for new-comers, and reduces the risk of errors inherent to repetitive tasks.</p>
 <p>This type of complexity is called <em>implementation complexity</em>.
 One of the goal of this book is to present you a methodology and toolkit that will help you reduce this form of complexity.</p>
@@ -276,7 +279,8 @@ We will argue somewhere else in the book that not enough reactivity is better th
 This function requires the user to choose a starting date and an ending date.
 However, the function allows to choose a start date which is posterior to the end (that is the behavior of the JavaScript plugin used in <code>{shiny}</code> to create this input).
 But allowing this behavior leads to bugs, notably in a context of full reactivity.
-Handling this special case is completely doable: with a little bit of craft, you can watch what the user inputs and throw an error if the start is after the end.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>
+Handling this special case is completely doable: with a little bit of craft, you can watch what the user inputs and throw an error if the start is after the end<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>
+.
 On one hand that solution increases implementation complexity, while on the other leaving this naive behavior requires the user to think carefully about what they are selecting, thus increasing the interface complexity.</p>
 <p>So what should we do?
 It’s up to you: deciding where to draw the line between interface &amp; implementation complexity very much depends of the project, but that is something that you should keep in mind all along the project’s life.</p>
@@ -292,10 +296,12 @@ But before that, let’s dive into code complexity.</p>
 <div id="codebase-size" class="section level4">
 <h4><span class="header-section-number">1.2.3.1</span> Codebase size</h4>
 <p>The total number of lines of code, or the number of files, can be good clue of potential complexity, but only if used as order ofs magnitude (for example a 10.000-line codebase is potentially more complex than a 100-line codebase), but should not be relied on if used strictly: even more if you try to reduce this number of line by sacrificing code readability.</p>
-<p>R is very permissive when it comes to indentation and line breaks, and, unlike JavaScript or CSS, it is generally not minified.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a><br />
+<p>R is very permissive when it comes to indentation and line breaks, and, unlike JavaScript or CSS, it is generally not minified<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>
+.<br />
 In R, the number of lines of code depends on your coding style and the packages you are using.
-For example, the <code>{tidyverse}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="tidyverse2019"><strong>???</strong></span>)</span> style guide encourages the use of <code>%&gt;%</code> (called “pipe”), with one function by line, producing more lines in the end code : “<em><code>%&gt;%</code> should always have a space before it, and should usually be followed by a new line</em>” <a href="https://style.tidyverse.org/pipes.html" target="_blank">tidyverse style guide</a>.
-So you can expect a “tidyverse-centric” package to contain more line of code, yet the pipe itself has been thought as a tool to lower code complexity by enhancing its readability<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>.
+For example, the <code>{tidyverse}</code> <span class="citation">(Wickham, Averick, et al. <a href="#ref-tidyverse2019" role="doc-biblioref">2019</a>)</span> style guide encourages the use of <code>%&gt;%</code> (called “pipe”), with one function by line, producing more lines in the end code : _“<code>%&gt;%</code> should always have a space before it, and should usually be followed by a new line_” <a href="https://style.tidyverse.org/pipes.html" target="_blank">tidyverse style guide</a>.
+So you can expect a “tidyverse-centric” package to contain more line of code, yet the pipe itself has been thought as a tool to lower code complexity by enhancing its readability<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>
+.
 For example, the two following pieces of code do the same thing.
 Both have a different number of lines, and a different level of reading complexity.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="successfulshinyapp.html#cb5-1"></a><span class="kw">library</span>(dplyr, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)</span>
@@ -339,11 +345,9 @@ It is rather unlikely that you will find this “extreme” coding style we show
 And numerous files can also be a sign of maintenance complexity, as it may be harder to reason about an app logic split into several files than about something that fits into one linear code inside one file. To handle that, you can set filenames to follow the structure of the project.
 This pattern is developed in another part of this book, where we explicit the conventions used in <code>{golem}</code>.
 On the other hand, one big 10.000-lines file which is standing alone in the project is not a good sign either.</p>
-<p>If you want to use the number of lines metric, you can do it from R with the <code>{cloc}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-cloc"><strong>???</strong></span>)</span> package, available at <a href="https://github.com/hrbrmstr/cloc" class="uri">https://github.com/hrbrmstr/cloc</a>.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="successfulshinyapp.html#cb13-1"></a><span class="cf">if</span> (<span class="op">!</span><span class="kw">requireNamespace</span>(<span class="st">&quot;cloc&quot;</span>)){</span>
-<span id="cb13-2"><a href="successfulshinyapp.html#cb13-2"></a>  remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;hrbrmstr/cloc&quot;</span>)</span>
-<span id="cb13-3"><a href="successfulshinyapp.html#cb13-3"></a>}</span></code></pre></div>
-<p>For example, let’s compare a rather big package (<code>{shiny}</code>) with a small one (<code>{attempt}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-attempt"><strong>???</strong></span>)</span>):</p>
+<p>If you want to use the number of lines metric, you can do it from R with the <code>{cloc}</code> <span class="citation">(Rudis and Danial <a href="#ref-R-cloc" role="doc-biblioref">2020</a>)</span> package, available at <a href="https://github.com/hrbrmstr/cloc" class="uri">https://github.com/hrbrmstr/cloc</a>.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="successfulshinyapp.html#cb13-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;hrbrmstr/cloc&quot;</span>)</span></code></pre></div>
+<p>For example, let’s compare a rather big package (<code>{shiny}</code>) with a small one (<code>{attempt}</code> <span class="citation">(Fay <a href="#ref-R-attempt" role="doc-biblioref">2019</a><a href="#ref-R-attempt" role="doc-biblioref">a</a>)</span>):</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="successfulshinyapp.html#cb14-1"></a><span class="kw">library</span>(cloc)</span>
 <span id="cb14-2"><a href="successfulshinyapp.html#cb14-2"></a><span class="kw">library</span>(dplyr)</span>
 <span id="cb14-3"><a href="successfulshinyapp.html#cb14-3"></a>shiny_cloc &lt;-<span class="st"> </span><span class="kw">cloc_cran</span>(<span class="st">&quot;shiny&quot;</span>, <span class="dt">.progress =</span> <span class="ot">FALSE</span>, <span class="dt">repos =</span> <span class="st">&quot;http://cran.irsn.fr/&quot;</span> )</span>
@@ -381,14 +385,15 @@ On the other hand, one big 10.000-lines file which is standing alone in the proj
 <h4><span class="header-section-number">1.2.3.2</span> Cyclomatic complexity</h4>
 <p>Cyclomatic complexity is a software engineering measure which allows to define the number of different linear paths a piece of code can take.
 The higher the number of paths, the harder it can be to have a clear mental model ot this function.</p>
-<p>Cyclomatic complexity is computed based on a control-flow graph<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a> representation of an algorithm.</p>
+<p>Cyclomatic complexity is computed based on a control-flow graph<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>
+representation of an algorithm.</p>
 <p><img src="img/controlflow.png" /></p>
 <p><em>(The following paragraph details the algorithm implementation, feel free to skip it)</em>
 The complexity number is then computed by taking the number of nodes, subtracting the number of edges, plus two times the number of connected components of this graph.
 The algorithm is then <span class="math inline">\(M = E − N + 2P\)</span>, where <span class="math inline">\(M\)</span> is the measure, <span class="math inline">\(E\)</span> the number of edges, <span class="math inline">\(N\)</span> the number of nodes and <span class="math inline">\(2P\)</span> is 2 time the number of connected components.
 We will not go deep into this topic, as there are a lot things going on in this computation and you can find many documentation about this online.
 Please refer to the bibliography for further readings about the theory behind this measurement.</p>
-<p>In R, the cyclomatic complexity can be computed using the <code>{cyclocomp}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-cyclocomp"><strong>???</strong></span>)</span> package.
+<p>In R, the cyclomatic complexity can be computed using the <code>{cyclocomp}</code> <span class="citation">(Csardi <a href="#ref-R-cyclocomp" role="doc-biblioref">2016</a>)</span> package.
 You can get it from <code>CRAN</code> with:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="successfulshinyapp.html#cb18-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;cyclocomp&quot;</span>)</span></code></pre></div>
 <p>The <code>{cyclocomp}</code> package comes with three main functions: <code>cyclocomp()</code>, <code>cyclocomp_package()</code>, and <code>cyclocomp_package_dir()</code>.
@@ -429,7 +434,7 @@ And indeed, splitting code into smaller pieces lower the local cyclomatic comple
 <div id="other-measures-for-code-complexity" class="section level4">
 <h4><span class="header-section-number">1.2.3.3</span> Other measures for code complexity</h4>
 <p>Complexity can come from other sources: insufficient code coverage, dependencies that breaks the implementation, relying on old packages, or a lot of other things.</p>
-<p>We can use the <code>{packageMetrics2}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-packageMetrics2"><strong>???</strong></span>)</span> package to get some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc., … and the number of lines of code and the cyclomatic complexity.</p>
+<p>We can use the <code>{packageMetrics2}</code> <span class="citation">(Csardi <a href="#ref-R-packageMetrics2" role="doc-biblioref">2020</a>)</span> package to get some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc., … and the number of lines of code and the cyclomatic complexity.</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="successfulshinyapp.html#cb25-1"></a><span class="kw">library</span>(packageMetrics2)</span>
 <span id="cb25-2"><a href="successfulshinyapp.html#cb25-2"></a>frame_metric &lt;-<span class="st"> </span><span class="cf">function</span>(pkg){</span>
 <span id="cb25-3"><a href="successfulshinyapp.html#cb25-3"></a>  metrics &lt;-<span class="st"> </span><span class="kw">package_metrics</span>(pkg)</span>
@@ -743,7 +748,7 @@ Delivering is not the only thing to keep in mind: you can deliver a working app 
 </div>
 <div id="it-is-usable" class="section level3">
 <h3><span class="header-section-number">1.3.3</span> It is usable</h3>
-<p>Being usable means that the app was delivered, it serves the purpose, and it is user-friendly.
+<p>being usable means that the app was delivered, it serves the purpose, and it is user-friendly.
 Unless you are coding for art sake, there will always be one or more end users.
 And if these people cannot use the application because it is too hard to use, too hard to understand, because it is too slow or there is no inherent logic in how the user experience is designed, then it is inappropriate to call the app is a success.</p>
 </div>
@@ -751,7 +756,8 @@ And if these people cannot use the application because it is too hard to use, to
 <h3><span class="header-section-number">1.3.4</span> It is immortal</h3>
 <p>Of course “immortal” is a little bit far fetched, but when designing the application, you should aim for robustness along the years, by engineering a (theoretical) application immortality.</p>
 <p>Planning for the future is a very important component of a successful Shiny App project.
-Once the app is out, it is successful if it can exist in the long run, with all the hazards that this implies: new package versions that could potentially break the code base, sudden call for the implementation of new features in the global interface, changing key features of the UI or the back-end, and not to mention passing the code base along to someone who has not worked on the first version, and who is now in charge of developing the next version.<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>
+Once the app is out, it is successful if it can exist in the long run, with all the hazards that this implies: new package versions that could potentially break the code base, sudden call for the implementation of new features in the global interface, changing key features of the UI or the back-end, and not to mention passing the code base along to someone who has not worked on the first version, and who is now in charge of developing the next version<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>
+.
 And this, again, is hard to do without effective planning and efficient engineering.</p>
 
 </div>
@@ -759,8 +765,23 @@ And this, again, is hard to do without effective planning and efficient engineer
 </div>
 <h3>References</h3>
 <div id="refs" class="references">
+<div id="ref-R-shiny">
+<p>Chang, Winston, Joe Cheng, JJ Allaire, Yihui Xie, and Jonathan McPherson. 2020. <em>Shiny: Web Application Framework for R</em>. <a href="https://CRAN.R-project.org/package=shiny">https://CRAN.R-project.org/package=shiny</a>.</p>
+</div>
+<div id="ref-R-cyclocomp">
+<p>Csardi, Gabor. 2016. <em>Cyclocomp: Cyclomatic Complexity of R Code</em>. <a href="https://CRAN.R-project.org/package=cyclocomp">https://CRAN.R-project.org/package=cyclocomp</a>.</p>
+</div>
+<div id="ref-R-packageMetrics2">
+<p>Csardi, Gabor. 2020. <em>PackageMetrics2: Collect Metrics About R Packages</em>. <a href="http://git.mango.local/gcsardi/packageMetrics2">http://git.mango.local/gcsardi/packageMetrics2</a>.</p>
+</div>
 <div id="ref-R-desc">
 <p>Csárdi, Gábor, Kirill Müller, and Jim Hester. 2018. <em>Desc: Manipulate Description Files</em>. <a href="https://CRAN.R-project.org/package=desc">https://CRAN.R-project.org/package=desc</a>.</p>
+</div>
+<div id="ref-R-attempt">
+<p>Fay, Colin. 2019a. <em>Attempt: Tools for Defensive Programming</em>. <a href="https://CRAN.R-project.org/package=attempt">https://CRAN.R-project.org/package=attempt</a>.</p>
+</div>
+<div id="ref-R-golem">
+<p>Guyader, Vincent, Colin Fay, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
 </div>
 <div id="ref-R-attachment">
 <p>Guyader, Vincent, and Sébastien Rochette. 2020. <em>Attachment: Deal with Dependencies</em>. <a href="https://CRAN.R-project.org/package=attachment">https://CRAN.R-project.org/package=attachment</a>.</p>
@@ -771,6 +792,15 @@ And this, again, is hard to do without effective planning and efficient engineer
 <div id="ref-ericraymond2003">
 <p>Raymond, Eric S. 2003. <em>The Art of Unix Programming (the Addison-Wesley Professional Computng Series)</em>. Addison-Wesley.</p>
 </div>
+<div id="ref-R-cloc">
+<p>Rudis, Bob, and Al Danial. 2020. <em>Cloc: Count Lines of Code, Comments and Whitespace in Source Files and Archives</em>. <a href="https://gitlab.com/hrbrmstr/cloc">https://gitlab.com/hrbrmstr/cloc</a>.</p>
+</div>
+<div id="ref-tidyverse2019">
+<p>Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. “Welcome to the tidyverse.” <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.</p>
+</div>
+<div id="ref-R-devtools">
+<p>Wickham, Hadley, Jim Hester, and Winston Chang. 2020. <em>Devtools: Tools to Make Developing R Packages Easier</em>. <a href="https://CRAN.R-project.org/package=devtools">https://CRAN.R-project.org/package=devtools</a>.</p>
+</div>
 </div>
 <div class="footnotes">
 <hr />
@@ -778,12 +808,13 @@ And this, again, is hard to do without effective planning and efficient engineer
 <li id="fn1"><p>Of course you can specify one if you need to, but by default the package picks one;<a href="successfulshinyapp.html#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>We borrow this term from Charity Major, as heard in <em>Test in Production with Charity Majors</em>, <a href="https://corecursive.com/019-test-in-production-with-charity-majors/" target="_blank">CoRecursive</a><a href="successfulshinyapp.html#fnref2" class="footnote-back">↩︎</a></p></li>
 <li id="fn3"><p>Ironic right?<a href="successfulshinyapp.html#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>from <em>The Art of Unix Programming</em>, “Chapter 13: Speaking of Complexity”, <span class="citation">(Raymond <a href="#ref-ericraymond2003" role="doc-biblioref">2003</a>)</span><a href="successfulshinyapp.html#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p>see <a href="https://github.com/rstudio/shiny/issues/2043#issuecomment-525640738" target="_blank">shiny/issues/2043#issuecomment-525640738</a> for an example<a href="successfulshinyapp.html#fnref5" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>From <em>The Art of Unix Programming</em>, “Chapter 13: Speaking of Complexity”, <span class="citation">(Raymond <a href="#ref-ericraymond2003" role="doc-biblioref">2003</a>)</span><a href="successfulshinyapp.html#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>See <a href="https://github.com/rstudio/shiny/issues/2043#issuecomment-525640738" target="_blank">shiny/issues/2043#issuecomment-525640738</a> for an example<a href="successfulshinyapp.html#fnref5" class="footnote-back">↩︎</a></p></li>
 <li id="fn6"><p>The minification process is the process of removing all blank characters and put everything on one line so that the file in the output is much smaller.<a href="successfulshinyapp.html#fnref6" class="footnote-back">↩︎</a></p></li>
 <li id="fn7"><p>Note though that some users find using the pipe more complex than not.<a href="successfulshinyapp.html#fnref7" class="footnote-back">↩︎</a></p></li>
 <li id="fn8"><p>A control flow graph is a graph representing all the possible paths a piece of code can take while it is executed.<a href="successfulshinyapp.html#fnref8" class="footnote-back">↩︎</a></p></li>
-<li id="fn9"><p>By production-grade, we mean a software that can be used in a context where people use it for doing their job, and where failures or bugs have real-life consequences<a href="successfulshinyapp.html#fnref9" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p>By production-grade, we mean a software that can be used in a context where people use it for doing their job, and where failures or bugs have real-life consequences.<a href="successfulshinyapp.html#fnref9" class="footnote-back">↩︎</a></p></li>
+<li id="fn10"><p>In fact, this new person might simply be you, a month from now. And <em>"You’ll be there in the future too, maintaining code you may have half forgotten under the press of more recent projects. When you design for the future, the sanity you save may be your own.</em> <span class="citation">(Raymond <a href="#ref-ericraymond2003" role="doc-biblioref">2003</a>)</span>.<a href="successfulshinyapp.html#fnref10" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 <hr/>

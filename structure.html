@@ -195,7 +195,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="shiny-app-as-a-package" class="section level2">
 <h2><span class="header-section-number">3.1</span> Shiny App as a Package</h2>
 <p>Building a robust, maintainable and shareable Shiny application will be made possible by building an R package.</p>
-<p>In the next chapter you will be introduced to the <code>{golem}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-golem"><strong>???</strong></span>)</span> package, which is <strong>an opinionated framework for building production-ready Shiny Applications</strong>—this framework will be used a lot through this book, and it relies on the idea that every Shiny application should be built as an R package.</p>
+<p>In the next chapter you will be introduced to the <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> package, which is <strong>an opinionated framework for building production-ready Shiny Applications</strong>—this framework will be used a lot through this book, and it relies on the idea that every Shiny application should be built as an R package.</p>
 <p>But in a world where Shiny Applications are mostly created as a series of files, why bother with a package?</p>
 <div id="what-is-in-a-production-grade-shiny-app" class="section level3">
 <h3><span class="header-section-number">3.1.1</span> What is in a production-grade Shiny App?</h3>
@@ -205,20 +205,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 In other words, all the necessary information for something that runs in production: the name of the app, the version number (which is crucial to any serious, production-level project), what the application does, who to contact if something goes wrong… etc.</p>
 <p>Second, you need to find a way to <strong>handle the dependencies</strong>.
 As you know, when you want to push your app into production, you do not want to have this conversation with I.T. people:</p>
-<blockquote>
-<p>IT: Hey, I tried to <code>source("app.R")</code> as you said, but I got an error.</p>
-<p>R-dev: What is the error?</p>
-<p>IT: It says “could not find package ‘shiny’”.</p>
-<p>R-dev: Ah yes, you need to install {shiny}. Try to run <code>install.packages("shiny")</code>.</p>
-<p>IT: OK nice. What else?</p>
-<p>R-dev: Let me think, try also <code>install.packages("DT")</code>… good? Now try <code>install.packages("ggplot2")</code>, and …</p>
-<p>[…]</p>
-<p>IT: Ok, now I source the ‘app.R’, right?</p>
-<p>R-dev: Sure!</p>
-<p>IT: Ok so it says ’could not find function <code>runApp()</code></p>
-<p>R-dev: Ah, you got to do <code>library(shiny)</code> at the beginning of your script. And <code>library(purrr)</code>, and <code>library(jsonlite)</code>*, and…</p>
-</blockquote>
-<p><code>*</code> will lead to a NAMESPACE conflict on the <code>flatten()</code> function that can cause you some debugging headache (trust us, we have been there before).
+<ul>
+<li><p>IT: Hey, I tried to <code>source("app.R")</code> as you said, but I got an error.</p></li>
+<li><p>R-dev: What is the error?</p></li>
+<li><p>IT: It says “could not find package ‘shiny’”.</p></li>
+<li><p>R-dev: Ah yes, you need to install {shiny}. Try to run <code>install.packages("shiny")</code>.</p></li>
+<li><p>IT: OK nice. What else?</p></li>
+<li><p>R-dev: Let me think, try also <code>install.packages("DT")</code>… good? Now try <code>install.packages("ggplot2")</code>, and …</p></li>
+<li><p>[…]</p></li>
+<li><p>IT: Ok, now I source the ‘app.R’, right?</p></li>
+<li><p>R-dev: Sure!</p></li>
+<li><p>IT: Ok so it says ’could not find function <code>runApp()</code></p></li>
+<li><p>R-dev: Ah, you got to do <code>library(shiny)</code> at the beginning of your script. And <code>library(purrr)</code>, and <code>library(jsonlite)</code>, and…</p></li>
+</ul>
+<p>For example here, this <code>library(purrr)</code> and <code>library(jsonlite)</code> will lead to a NAMESPACE conflict on the <code>flatten()</code> function that can cause you some debugging headache (trust us, we have been there before).
 So, hey, it would be cool if we could have a Shiny app that only imports specific functions from a package, right?</p>
 <p>We can not stress it enough that <strong>dependencies matter</strong>. You need to handle them, and handle them correctly if you want to ensure a smooth deployment to production.</p>
 <p>Third, let’s say you are building a big application.
@@ -256,7 +256,8 @@ In a perfect world, you would create one vignette per shiny page/tab.</li>
 <li>Functions documentation.
 Every function in your package should come with its own documentation, even if only for your future self.
 “Exported” functions, the one which are available once you run <code>library(myapp)</code>, should be fully documented and will be listed in the package help page.
-Internal functions need less documentation, but documenting them is the best way to be sure you can come back to the app in a few months and still know why things are the way they are, what the pieces of the apps are used for, and how to use these functions.<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a></li>
+Internal functions need less documentation, but documenting them is the best way to be sure you can come back to the app in a few months and still know why things are the way they are, what the pieces of the apps are used for, and how to use these functions<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a>
+.</li>
 <li>If needed, you can build a <code>{pkgdown}</code> website, that can either be deployed on the web or kept internally.
 It can contain installation steps for I.T., internal features use for developers, a user guide, etc.</li>
 </ul>
@@ -265,8 +266,8 @@ It can contain installation steps for I.T., internal features use for developers
 <h4><span class="header-section-number">3.1.2.2</span> Testing</h4>
 <p><strong>Nothing should go to production without being tested. Nothing.</strong></p>
 <p>Testing production apps is a broad question that we will come back to in another chapter, but let’s talk briefly about why using a package structure helps with testing.</p>
-<p>Frameworks for package testing are robust and widely documented in the R world, and if you choose to embrace the “Shiny App as a Package” structure, you do not have to put any extra-effort for testing your application back-end: use a canonical testing framework like <code>{testthat}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-testthat"><strong>???</strong></span>)</span>.
-Learning how to use it is not the subject of this chapter, so feel free to refer to the documentation, and see also Chapter 5 of the <a href="https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107">workshop: “Building a package that lasts”</a>.</p>
+<p>Frameworks for package testing are robust and widely documented in the R world, and if you choose to embrace the “Shiny App as a Package” structure, you do not have to put any extra-effort into testing your application back-end: use a canonical testing framework like <code>{testthat}</code> <span class="citation">(Wickham <a href="#ref-R-testthat" role="doc-biblioref">2020</a>)</span>.
+Learning how to use testing frameworks is not the subject of this chapter, so feel free to refer to the documentation, and see also Chapter 5 of the <a href="https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107">workshop: “Building a package that lasts”</a>.</p>
 <p>We will come back to testing in the “Build Yourself a Safety Net” chapter.</p>
 </div>
 </div>
@@ -357,8 +358,8 @@ The need to be unique is made a little bit complex by the way Shiny handles the 
 Namespaces?</p>
 <p>Namespaces are a computer science concept created to handle a common issue: how to share the same name for a variable in various places of your program without them conflicting.
 In other words, how to use an object called <code>plop</code> several times in the program, and still be sure that it is correctly used depending on the context.
-R itself has a system for namespaces ; this is what packages do and why you can have <code>purrr::flatten</code> and <code>jsonlite::flatten</code> on the same computer and inside the same script: the function names are the same, but the two live in different namespaces, and the behavior of both functions can be totally different as the symbol is evaluated inside two different namespaces.
-If you want to learn more about namespaces, please refer to the <a href="https://adv-r.hadley.nz/environments.html#special-environments">7.4 Special environments</a> chapter from <em>Advanced R</em>, or turn to any computer science book: namespaces are pretty common in any programming language.</p>
+R itself has a system for namespaces; this is what packages do and why you can have <code>purrr::flatten</code> and <code>jsonlite::flatten</code> on the same computer and inside the same script: the function names are the same, but the two live in different namespaces, and the behavior of both functions can be totally different as the symbol is evaluated inside two different namespaces.
+If you want to learn more about namespaces, please refer to the <a href="https://adv-r.hadley.nz/environments.html#special-environments">7.4 Special environments</a> chapter from <em>Advanced R</em>, or turn to any computer science book, since namespaces are pretty common in any programming language.</p>
 <p>So, that is what modules are made for: creating small namespaces where you can safely define <code>ids</code> without conflicting with other ids in the app.<br />
 Why do we need to do that?<br />
 Think about the number of times you created a “OK” or “validate” button.<br />
@@ -408,13 +409,14 @@ Also, how do you work smoothly in a context where you have to scroll from <code>
 </div>
 <div id="a-bite-sized-code-base" class="section level4">
 <h4><span class="header-section-number">3.2.1.2</span> A bite-sized code base</h4>
-<p>Build your application through multiple smaller applications that are easier to understand, develop and maintain, using <code>{shiny}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-shiny"><strong>???</strong></span>)</span> modules.</p>
+<p>Build your application through multiple smaller applications that are easier to understand, develop and maintain, using <code>{shiny}</code> <span class="citation">(Chang et al. <a href="#ref-R-shiny" role="doc-biblioref">2020</a>)</span> modules.</p>
 <p>We assume that you know the saying that <em>“if you copy and paste something more than twice, you should make a function”</em>.
 So, in a Shiny application, how can we refactor a partially repetitive piece of code so that it is reusable?</p>
 <p>Yes, you guessed right: using shiny modules.
-Shiny modules aim at three things: simplifying “id” namespacing, split the code base into a series of functions, and allow UI/Server parts of your app to be reused.
-Most of the time, modules are used to do the two first.
-In our case, we could say that 90% of the modules we write are never reused<a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a> ; they are here to allow us to split the code base into smaller, more manageable pieces.</p>
+Shiny modules aim to do three things: simplify “id” namespacing, split the codebase into a series of functions, and allow UI/Server parts of your app to be reused.
+Most of the time, modules are used for the first two aims.
+In our case, we could say that 90% of the modules we write are never reused<a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a>
+; they are here to allow us to split the code base into smaller, more manageable pieces.</p>
 <p>With Shiny modules, you will be writing a combination of UI and server functions.
 Think of them as small, standalone Shiny apps, which handle a fraction of your global application.
 If you develop R packages, chances are you have split your functions into series of smaller functions. With shiny modules, you are doing the exact same thing: with just a little bit of tweaking, you can split your application into series of smaller applications.</p>
@@ -438,8 +440,8 @@ So, you will be better off building solid foundations for your application from 
 <p>An example is worth a thousand words, so let’s explore the code of a very small Shiny application that is split into modules.</p>
 <div id="your-first-shiny-module" class="section level4">
 <h4><span class="header-section-number">3.2.3.1</span> Your first Shiny Module</h4>
-<p>Let’s try to transform the above example (the one with two sliders and two action buttons) into an application with a module.
-The module is a small shiny application separated from the main code:</p>
+<p>Let’s try to transform the above example (the one with two sliders and two action buttons) into a modularized application.
+The module is small shiny application separated from the main code:</p>
 <div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="structure.html#cb36-1"></a><span class="co"># Re-usable module</span></span>
 <span id="cb36-2"><a href="structure.html#cb36-2"></a>mod_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
 <span id="cb36-3"><a href="structure.html#cb36-3"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
@@ -494,7 +496,8 @@ To understand what it does, let us try and run it outside Shiny:</p>
 <span id="cb37-3"><a href="structure.html#cb37-3"></a><span class="kw">ns</span>(<span class="st">&quot;choice&quot;</span>)</span></code></pre></div>
 <pre><code>[1] &quot;mod_ui_1-choice&quot;</code></pre>
 <p>And here it is, our namespaced <code>id</code>.</p>
-<p>Each call to a module with <code>callModule()</code> requires a different <code>id</code> argument that will allow creating various internal namespaces, preventing from id conflicts.<a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a>
+<p>Each call to a module with <code>callModule()</code> requires a different <code>id</code> argument that will allow creating various internal namespaces, preventing from id conflicts<a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a>
+.
 Then you can have as many <code>validate</code> input as you want in your app, as long as this <code>validate</code> has a unique id inside your module.</p>
 </div>
 <div id="passing-arguments-to-your-modules" class="section level4">
@@ -516,7 +519,7 @@ As UI and server are functions, you can set parameters that will be used to conf
 
 &lt;button id=&quot;mod_ui_2-validate&quot; type=&quot;button&quot; class=&quot;btn btn-default action-button&quot;&gt;Validate Choice, again&lt;/button&gt;</code></pre>
 <p>The <strong>app_server</strong> side contains a series of <code>callModule(mod_server, unique_id, ...)</code>, also allowing additional parameters, just like any other function.</p>
-<p>As a live example, we can have a look at <a href="https://github.com/ColinFay/tidytuesday201942/blob/master/R/mod_dataviz.R#L17">mod_dataviz.R</a> from the <code>{tidytuesday201942}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-tidytuesday201942"><strong>???</strong></span>)</span> Shiny application.</p>
+<p>As a live example, we can have a look at <a href="https://github.com/ColinFay/tidytuesday201942/blob/master/R/mod_dataviz.R#L17">mod_dataviz.R</a> from the <code>{tidytuesday201942}</code> <span class="citation">(Fay <a href="#ref-R-tidytuesday201942" role="doc-biblioref">2020</a><a href="#ref-R-tidytuesday201942" role="doc-biblioref">j</a>)</span> Shiny application.</p>
 <p>This application contains 6 tabs, 4 of them being pretty much alike: a side bar with inputs, a main panel with a button, and the plot.
 This is a typical case where you should reuse modules: if two or more parts are relatively similar, it is easier to bundle it inside a reusable module, and condition the ui/server with function arguments.</p>
 <div class="figure">
@@ -594,7 +597,12 @@ This is a typical case where you should reuse modules: if two or more parts are 
 <div id="communication-between-modules" class="section level3">
 <h3><span class="header-section-number">3.2.4</span> Communication between modules</h3>
 <p>One of the hardest parts of using modules is sharing data across them.
-There are at least three approaches: (i) returning a <code>reactive</code> function, (ii) the “stratégie du petit r” (to be pronounced with a french accent of course) or (iii) the “stratégie du grand R6”.</p>
+There are at least three approaches:</p>
+<ul>
+<li>Returning a <code>reactive</code> function</li>
+<li>The “stratégie du petit r” (to be pronounced with a french accent of course)</li>
+<li>The “stratégie du grand R6”.</li>
+</ul>
 <div id="returning-values-from-the-module" class="section level4">
 <h4><span class="header-section-number">3.2.4.1</span> Returning values from the module</h4>
 <p>One common approach is to return a <code>reactive</code> function from one module, and pass it to another in the general <code>app_server()</code> function.</p>
@@ -713,7 +721,7 @@ For example:</p>
 <p>Similarly to the “stratégie du petit r”, we can create an R6 object, which is passed along inside the modules.
 As this R6 object is not a reactive object and is not meant to be used as such, this reduces uncontrolled reactivity of the application, thus reduces the complexity of handling chain reactions across modules.
 Of course, you need to have another special tool in your app to trigger elements.
-All this will be explained in details in chapter <a href="optim-caveat.html#optim-caveat">Reactivity anti-patterns</a> of this book, and you can find an example of this pattern inside the <a href="https://github.com/ColinFay/hexmake/blob/master/R/R6.R"><code>{hexmake}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-hexmake"><strong>???</strong></span>)</span></a> application.</p>
+All this will be explained in details in chapter <a href="optim-caveat.html#optim-caveat">Reactivity anti-patterns</a> of this book, and you can find an example of this pattern inside the <a href="https://github.com/ColinFay/hexmake/blob/master/R/R6.R"><code>{hexmake}</code></a> <span class="citation">(Fay <a href="#ref-R-hexmake" role="doc-biblioref">2020</a><a href="#ref-R-hexmake" role="doc-biblioref">f</a>)</span> application.</p>
 </div>
 </div>
 </div>
@@ -728,7 +736,7 @@ These components are not specific to your core business: you could use them for 
 This has no other use case than your interactive application: it is not meant to be used outside your app, you would not use them in a markdown report for instance.</p></li>
 <li><p>Business logic is the components with the core algorithms and functions that make your application specific to your area of work.
 You can recognize these elements as the ones that can be run outside any interactive context.
-This is the case for specific computation and algorithm, custom plot or <code>geom</code> for <code>{ggplot2}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-ggplot2"><strong>???</strong></span>)</span>, specific calls to a database, etc.</p></li>
+This is the case for specific computation and algorithm, custom plot or <code>geom</code> for <code>{ggplot2}</code> <span class="citation">(Wickham, Chang, et al. <a href="#ref-R-ggplot2" role="doc-biblioref">2020</a>)</span>, specific calls to a database, etc.</p></li>
 </ul>
 <p>These two components do not have to live together.
 They should not live together if you want to keep your sanity when you build an app.</p>
@@ -810,8 +818,8 @@ You can even write the business logic inside another package, making these funct
 Well, there still is the 10000-line long <code>app.R</code> file, but you get the idea.
 Long scripts are almost always synonymous with complexity when it comes to building software.
 Of course, small and numerous scripts do not systematically prevent codebase complexity, but they do simplify collaboration and maintenance, and divide the application logic into smaller, easier-to-understand bits of code.</p>
-<p>So yes, big files are complex to handle and make development harder.
-Here is what happens when you work on an application for production:</p>
+<p>So yes, big files are complex and make development harder.
+Here is what happens when you work on a application for production:</p>
 <ul>
 <li><p>You will work during a long period of time (either in one run or split across several months) on your codebase.
 Hence, you will have to get back to pieces of code you wrote a long time ago.</p></li>
@@ -864,11 +872,33 @@ But be it one or thousands of files, it is always a good practice to stick to a 
 </div>
 </div>
 </div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-R-shiny">
+<p>Chang, Winston, Joe Cheng, JJ Allaire, Yihui Xie, and Jonathan McPherson. 2020. <em>Shiny: Web Application Framework for R</em>. <a href="https://CRAN.R-project.org/package=shiny">https://CRAN.R-project.org/package=shiny</a>.</p>
+</div>
+<div id="ref-R-hexmake">
+<p>Fay, Colin. 2020f. <em>Hexmake: Hex Stickers Maker</em>. <a href="https://github.com/colinfay/hexmake">https://github.com/colinfay/hexmake</a>.</p>
+</div>
+<div id="ref-R-tidytuesday201942">
+<p>Fay, Colin. 2020j. <em>Tidytuesday201942: A Golem App for Tidy Tuesday</em>. <a href="http://www.github.com/ColinFay/tidytuesday201942">http://www.github.com/ColinFay/tidytuesday201942</a>.</p>
+</div>
+<div id="ref-R-golem">
+<p>Guyader, Vincent, Colin Fay, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
+</div>
+<div id="ref-R-testthat">
+<p>Wickham, Hadley. 2020. <em>Testthat: Unit Testing for R</em>. <a href="https://CRAN.R-project.org/package=testthat">https://CRAN.R-project.org/package=testthat</a>.</p>
+</div>
+<div id="ref-R-ggplot2">
+<p>Wickham, Hadley, Winston Chang, Lionel Henry, Thomas Lin Pedersen, Kohske Takahashi, Claus Wilke, Kara Woo, Hiroaki Yutani, and Dewey Dunnington. 2020. <em>Ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics</em>. <a href="https://CRAN.R-project.org/package=ggplot2">https://CRAN.R-project.org/package=ggplot2</a>.</p>
+</div>
+</div>
 <div class="footnotes">
 <hr />
-<ol start="14">
+<ol start="13">
+<li id="fn13"><p><code>{roxygen2}</code> comes with a <code>@noRd</code> tag, that prevents the documentation from being built. This allows to still write the documentation using the same tags as the exported function, without the internal functions being documented in the end package. For example, that is why by default the modules built with <code>{golem}</code> version &gt; 0.2.0 come with <code>@noRd</code>: you should document them, but chances are your do not need to export them.<a href="structure.html#fnref13" class="footnote-back">↩︎</a></p></li>
 <li id="fn14"><p>Most of the time, pieces / panels of the app are too unique to be reused elsewhere.<a href="structure.html#fnref14" class="footnote-back">↩︎</a></p></li>
-<li id="fn15"><p>Well, of course you can still have inner module id conflicts, but they are easier to avoid, detect, and fix. <a href="structure.html#fnref15" class="footnote-back">↩︎</a></p></li>
+<li id="fn15"><p>Well, of course you can still have inner module id conflicts, but they are easier to avoid, detect, and fix.<a href="structure.html#fnref15" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 <hr/>
