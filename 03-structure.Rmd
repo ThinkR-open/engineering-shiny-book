@@ -6,7 +6,7 @@
 library(shiny)
 ```
 
-Building a robust, maintenable and shareable Shiny application will be made possible by building an R package.
+Building a robust, maintainable and shareable Shiny application will be made possible by building an R package.
 
 In the next chapter you will be introduced to the `{golem}` [@R-golem] package, which is __an opinionated framework for building production-ready Shiny Applications__—this framework will be used a lot through this book, and it relies on the idea that every Shiny application should be built as an R package.
 
@@ -14,15 +14,15 @@ But in a world where Shiny Applications are mostly created as a series of files,
 
 ### What is in a production-grade Shiny App? 
 
-You probably do not have realized it yet, but it you have built a significant (in term of code base) Shiny application, chances are you have been using a package-like strucutre without even seeing it. 
+You probably haven't realized it yet, but if you have built a significant (in term of code base) Shiny application, chances are you have been using a package-like structure without even seeing it. 
 
-Think about your last Shiny which was created as a single-file (`app.R`) or two files app (`ui.R` and `server.R`), and what is needed there to make it __a production-ready application__.
+Think about your last Shiny application which was created as a single-file (`app.R`) or two files app (`ui.R` and `server.R`), and what is needed there to make it __a production-ready application__.
 
-First of all, you wîll need to add __metadata__ to your application.
-In other words, all the information that are necessary for something that runs in production; the name of the app, the version number (which is crucial to any serious, production-level project), what the application does, who to contact if something goes wrong... etc. 
+First of all, you will need to add __metadata__ to your application.
+In other words, all the necessary information for something that runs in production: the name of the app, the version number (which is crucial to any serious, production-level project), what the application does, who to contact if something goes wrong... etc. 
 
 Second, you need to find a way to __handle the dependencies__. 
-Because you know, when you want to push your app into production, you can not have this conversation with I.T. people: 
+As you know, when you want to push your app into production, you do not want to have this conversation with I.T. people: 
 
 
 >IT: Hey, I tried to `source("app.R")` as you said, but I got an error. 
@@ -43,30 +43,29 @@ Because you know, when you want to push your app into production, you can not ha
 >
 >R-dev: Sure!
 >
->IT: Ok so it says 'could not find function `runApp()`'
+>IT: Ok so it says 'could not find function `runApp()`
 >
 >R-dev: Ah, you got to do `library(shiny)` at the beginning of your script. And `library(purrr)`, and `library(jsonlite)`*, and...
 
-`*` Which will lead to a NAMESPACE conflict on the `flatten()` function that can cause you some debugging headache (trust us, we have been there before). 
+`*` will lead to a NAMESPACE conflict on the `flatten()` function that can cause you some debugging headache (trust us, we have been there before). 
 So, hey, it would be cool if we could have a Shiny app that only imports specific functions from a package, right?
 
-We can not stress it enough but __dependencies matter__. You need to handle them, and handle them correctly if you want to ensure a smooth deployment to production.
+We can not stress it enough that __dependencies matter__. You need to handle them, and handle them correctly if you want to ensure a smooth deployment to production.
 
-Third, let's say you are building a big appplication.
+Third, let's say you are building a big application.
 Something with thousands of lines of code.
-While doing that, you can not built this large application by writting all the codebase into one, maybe two files, that is simply impossible to maintain in the long run, nor to use on a daily basis while developing. 
-So, what to do? 
-Let us split everything into smaller files that we can call! 
-Og, and maybe we can store these files in a specific directory.
-We can name this directory `R/` for instance.
+You can not build this large application by writing one or two files, as it is simply impossible to maintain in the long run or use on a daily basis. 
+So, if we are developing a large application, we should split everything into smaller files. 
+And maybe we can store those files in a specific directory.
+For instance, we can name this directory `R/`.
 
-Last but not least, we want our app to live long and prosper, which means we need to document it: it would be nice to find a way to __comment each small piece of codet__ to explain what these specific lines do, so that either the end users or the developers that take over the code will be able to maintain it.
+Last but not least, we want our app to live long and prosper, which means we need to document it. It would be nice to find a way to __comment each small piece of code__ to explain what these specific lines do, so that either the end users or the developers that take over the code will be able to maintain it.
 
 The other thing we need for our application to be successful on the long term is tests, so that we are sure we are not introducing any regression along development.
 
-Oh, and that would be nice if people could get a `tar.gz` and install it on their computer and have access to a local copy of the app!
+Oh, and it would also be nice if people could get a `tar.gz` and install it on their computer and have access to a local copy of the app!
 
-OK, so let's sum it up what we need for our application:
+OK, so let's sum up what we need for our application:
 
 + This app needs to have __metadata__ and to handle __dependencies__ correctly, which is what you get from the `DESCRIPTION` + `NAMESPACE` files of a package. 
 Even more practical is the fact that you can do "selective namespace extraction" inside a package, _i.e._ you can say "I want this function from this package". 
@@ -74,38 +73,38 @@ Even more practical is the fact that you can do "selective namespace extraction"
 + Also, __this app needs to be split up in smaller `.R` files__, stored in a specific directory, which is the way a package is organized. 
 And I do not need to emphasize how __documentation__ is a vital part of any package, so we solved this question too here. So is the __testing toolkit__. 
 
-+ And of course, the "install everywhere" wish comes to life when a Shiny App is in a package. 
++ And of course, the "install everywhere" wish comes for free when a Shiny App is in a package. 
 
 ### Document and test
 
-As for any software in production, assuring the usability and sustainability of your app will be done through documentation and testing.
+As with any production-grade software, documentation and testing will help to ensure the usability and sustainability of your app.
 
 #### Documenting your app
 
-Documenting your Shiny app is explaining features to the end users, and also to the future developers (chances are it will be you).
+Documenting your Shiny app involves explaining features to the end users and also to the future developers (chances are it will be you).
 The good news is that using the R package structure helps you leverage the common tools for documentation in R:
 
 - A `README` file that you will put at the root of your package, which will document how to install the package, and some information about how to use the package.
 Note that in many cases developers go for a `.md` file (short for markdown) because this format is automatically rendered on services like GitHub, GitLab, or any other main version control system.  
 - `Vignettes` are longer form documentation that explain in more depth how to use your app.
 There are also useful if you need to detail the core functions of the application using a static document. 
-In a perfect world, you will be creating one vignette per shiny page/tab.
+In a perfect world, you would create one vignette per shiny page/tab.
 - Functions documentation.
 Every function in your package should come with its own documentation, even if only for your future self. 
-"Exported" functions, the one which are available once you do `library(myapp)`, should be fully documented: they are the one that will be listed in the package help page. 
-The internal functions need less documentation, but documenting them is the best way to be sure you can come back to the app in a few months and still know why things are the way they are, what the pieces of the apps are used for, and how to use these functions
+"Exported" functions, the one which are available once you run `library(myapp)`, should be fully documented and will be listed in the package help page. 
+Internal functions need less documentation, but documenting them is the best way to be sure you can come back to the app in a few months and still know why things are the way they are, what the pieces of the apps are used for, and how to use these functions
 ^[`{roxygen2}` comes with a `@noRd` tag, that prevents the documentation from being built. 
-This allows to stillwrite the documentation using the same tags as the exported function, without the internal functions being documented in the end package. 
+This allows to still write the documentation using the same tags as the exported function, without the internal functions being documented in the end package. 
 For example, that is why by default the modules built with `{golem}` version > 0.2.0 come with `@noRd`: you should document them, but chances are your do not need to export them.
 ].
 - If needed, you can build a `{pkgdown}` website, that can either be deployed on the web or kept internally. 
-It can contain installation steps for I.T., internal features use for developers, user guide....
+It can contain installation steps for I.T., internal features use for developers, a user guide, etc.
 
 #### Testing 
 
 __Nothing should go to production without being tested. Nothing.__ 
 
-Testing production apps is a wide question and we will come back to this question in another chapter, but let's talk briefly about why using a package structure helps with testing.
+Testing production apps is a broad question that we will come back to in another chapter, but let's talk briefly about why using a package structure helps with testing.
 
 Frameworks for package testing are robust and widely documented in the R world, and if you choose to embrace the "Shiny App as a Package" structure, you do not have to put any extra-effort for testing your application back-end: use a canonical testing framework like `{testthat}` [@R-testthat]. 
 Learning how to use it is not the subject of this chapter, so feel free to refer to the documentation, and see also Chapter 5 of the [workshop: "Building a package that lasts"](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107). 
@@ -123,7 +122,7 @@ When adopting the package structure, you can use classical tools to locally inst
 A Shiny App as a package can be built as a `tar.gz`, sent to your colleagues, friends, and family, and even to the CRAN. 
 It can also be installed in any R-package repository.
 You can then install your packaged application along with its dependencies using the appropriate `remotes::install_*()` command.
-And, if you built your app with `{golem}`, you will launch the app using: 
+And, if you built your app with `{golem}`, you can launch the app using: 
 
 ```{r 03-structure-2, eval=FALSE}
 library(myuberapp)
@@ -134,7 +133,7 @@ run_app()
 
 Sending a Shiny application to a Rstudio product currently requires placing an R script at the root of your package directory.
 
-To run  your application on these platforms, you will need to use a "standard" Shiny formation, _i.e._ an `app.R` file or `ui.R` / `server.R`, and send the whole thing to the server. 
+To run  your application on these platforms, you will need to use a "standard" Shiny filename pattern, _i.e._ an `app.R` file or `ui.R` / `server.R`, and send the whole thing to the server. 
 To integrate your "Shiny App as a package" into Connect or Shiny Server, you can adopt two strategies: 
 
 + Use an internal package manager like [RStudio Package Manager](https://www.rstudio.com/products/package-manager/), where the package app is installed.
@@ -157,14 +156,14 @@ This is the file you will get if you run one of the three RStudio related functi
 
 #### Docker containers
 
-Docker containers can be used to embed a frozen OS that will launch your application in a safe environnement.
-In order to dockerize your app, create a Dockerfile that list your package to be installed as in the local deployment with the appropriate `remotes::install_*()` function. 
+Docker containers can be used to embed a frozen OS that will launch your application in a safe environment.
+In order to dockerize your app, create a Dockerfile that lists your package to be installed as in the local deployment with the appropriate `remotes::install_*()` function. 
 Then, use as a `CMD` `R -e 'options("shiny.port" = 80, shiny.host = "0.0.0.0"); myuberapp::run_app()'` so that your app will be launched when starting the Docker container. 
-Change the output port to the one you need. 
+Change the output port according to your needs.
 
 Note that {golem} provides you the Dockerfile you need with `golem::add_dockerfile()`.
 
-We will be back to Docker container in a few chapters, notably in the context of building `Dockerfile` for `{golem}`-based applications.
+We will return to Docker containers in a few chapters, notably in the context of building `Dockerfile` for `{golem}`-based applications.
 
 ### Resources 
 
@@ -182,33 +181,33 @@ If you need to read some resources before continuing, feel free to have a look a
 
 ## Using Shiny Modules
 
-Modules are one of the most powerful tool for building Shiny Application in a maintenable and sustainable way.
+Modules are one of the most powerful tools for building Shiny Application in a maintainable and sustainable way.
 
 ### Why are we using Shiny modules?
 
 Small is beautiful. 
-Being able to properly cut a code in small modules helps the developers build their mental model of the application (Remember ["What is a complex Shiny Application?"](#complex-shiny)).
+Being able to properly cut a codebase into small modules will help developers build a mental model of the application (Remember ["What is a complex Shiny Application?"](#complex-shiny)).
 But what are Shiny modules?
 
 > Shiny modules address the namespacing problem in Shiny UI and server logic, adding a level of abstraction beyond functions
 
 `r right_link("Modularizing Shiny app code", "https://shiny.rstudio.com/articles/modules.html")`
 
-Let us first untangle this quote with an example about what is the Shiny namespace problem. 
+Let us first untangle this quote with an example about the Shiny namespace problem. 
 
 #### One million "Validate" buttons
 
-A big Shiny application usually requires using several times the same pieces of ui/server, which makes it hard to name and identify similar inputs and outputs.
+A big Shiny application usually requires reusing the pieces of the ui/server scripts, which makes it hard to name and identify similar inputs and outputs.
 
-Indeed, Shiny requires its outputs and inputs to have a __unique id__. 
-And unfortunately, we can not bypass that: when you send a plot __from R to the browser__, i.e from the `server` to the `ui`, the browser needs to know exactly where to put this element. 
+Accordingly, Shiny requires its outputs and inputs to have a __unique id__. 
+And, unfortunately, we can not bypass that: when you send a plot __from R to the browser__, i.e from the `server` to the `ui`, the browser needs to know exactly where to put this element. 
 This "exactly where" is handled through the use of an `id`. 
 Ids are not Shiny specific: they are at the very root of the way web pages work. 
 Understanding all of this is not the purpose of this chapter: just remember that Shiny inputs and outputs ids __have__ to be unique, just as any id on a webpage, so that the browser knows where to put what it receives from R, and R knows what to listen to from the browser. 
 The need to be unique is made a little bit complex by the way Shiny handles the names, as it shares a global pool for all the id names, with no native way to use namespaces. 
 Namespaces?
 
-Namespaces are a computer science concept which has been created to handle a common issue: how to share the same name for a variable in various places of your program without them conflicting. 
+Namespaces are a computer science concept created to handle a common issue: how to share the same name for a variable in various places of your program without them conflicting. 
 In other words, how to use an object called `plop` several times in the program, and still be sure that it is correctly used depending on the context. 
 R itself has a system for namespaces ; this is what packages do and why you can have `purrr::flatten` and `jsonlite::flatten` on the same computer and inside the same script: the function names are the same, but the two live in different namespaces, and the behavior of both functions can be totally different as the symbol is evaluated inside two different namespaces. 
 If you want to learn more about namespaces, please refer to the [7.4 Special environments](https://adv-r.hadley.nz/environments.html#special-environments) chapter from _Advanced R_, or turn to any computer science book: namespaces are pretty common in any programming language.
@@ -267,10 +266,10 @@ Also, how do you work smoothly in a context where you have to scroll from `slide
 
 #### A bite-sized code base
 
-Build your application through multiple smaller application, easier to understand, develop and maintain, using `{shiny}` [@R-shiny] modules.
+Build your application through multiple smaller applications that are easier to understand, develop and maintain, using `{shiny}` [@R-shiny] modules.
 
-We assume that you know the R saying that _"if you copy and paste something more than twice, you should make a function"_.
-Then, how do we refactor the partially repetitive piece of code so that it is reusable?
+We assume that you know the saying that _"if you copy and paste something more than twice, you should make a function"_.
+So, in a Shiny application, how can we refactor a partially repetitive piece of code so that it is reusable?
 
 Yes, you guessed right: using shiny modules. 
 Shiny modules aim at three things: simplifying "id" namespacing, split the code base into a series of functions, and allow UI/Server parts of your app to be reused. 
@@ -281,25 +280,24 @@ In our case, we could say that 90% of the modules we write are never reused
 
 With Shiny modules, you will be writing a combination of UI and server functions. 
 Think of them as small, standalone Shiny apps, which handle a fraction of your global application. 
-If you develop R packages, chances are you have split your functions into series of smaller functions ; with shiny modules, you are doing the exact same thing: with just a little bit of tweaking, you are splitting your application into series of smaller applications. 
+If you develop R packages, chances are you have split your functions into series of smaller functions. With shiny modules, you are doing the exact same thing: with just a little bit of tweaking, you can split your application into series of smaller applications. 
 
 ### When should you modularize?
 
-No matter how big your applicatoin is, it is always a safe to start modularising from the very beginning,
-The effort of writing a module from start is pretty low compared to converting an app that starts to grow to a module structure. 
+No matter how big your application is, it is always a safe to start modularizing from the very beginning. The sooner in the application development process that you begin to modularize, the easier downstream development will be.
 It is even easier if you are working with `{golem}`, which promotes the use of modules from the very beginning of your application. 
 
-> "Yes, but I just want to write a small app, nothing fancy
+> "Yes, but I just want to write a small app, nothing fancy"
 
 Production apps almost always started as a small Proof Of Concept. 
 Then, the small PoC becomes an interesting idea. 
 Then, this idea becomes a strategical asset. 
 And before you know it, your 'not-that-fancy' app needs to become larger and larger.
-So you will be better build solid foundations for your application from the very beginning.
+So, you will be better off building solid foundations for your application from the very beginning.
 
 ### A practical walk through 
 
-As an example is worth a thousand words, let's explore together the code of a very small Shiny application that is split into modules.
+An example is worth a thousand words, so let's explore the code of a very small Shiny application that is split into modules.
 
 #### Your first Shiny Module
 
@@ -405,7 +403,7 @@ The __app_server__ side contains a series of `callModule(mod_server, unique_id, 
 
 As a live example, we can have a look at [mod_dataviz.R](https://github.com/ColinFay/tidytuesday201942/blob/master/R/mod_dataviz.R#L17) from the `{tidytuesday201942}` [@R-tidytuesday201942] Shiny application. 
 
-This application contains 6 tabs, 4 of them being pretty much alike: a side bar with inputs, an a main panel with a button and the plot. 
+This application contains 6 tabs, 4 of them being pretty much alike: a side bar with inputs, a main panel with a button, and the plot. 
 This is a typical case where you should reuse modules: if two or more parts are relatively similar, it is easier to bundle it inside a reusable module, and condition the ui/server with function arguments. 
 
 ![`{tidytuesday201942}`](img/tidytuesdayapp.png)
@@ -494,12 +492,12 @@ app_server <- function(input, output, session) {
 
 ### Communication between modules 
 
-One of the hardest part about modules is sharing data across them. 
+One of the hardest parts of using modules is sharing data across them. 
 There are at least three approaches: (i) returning a `reactive` function, (ii) the "stratégie du petit r" (to be pronounced with a french accent of course) or (iii) the "stratégie du grand R6". 
 
 #### Returning values from the module
 
-One common approach is to return a `reactive` function from one module, and pass it to another, in the general `app_server()` function. 
+One common approach is to return a `reactive` function from one module, and pass it to another in the general `app_server()` function. 
 
 Here is an example that illustrate this pattern.
 
@@ -551,7 +549,7 @@ app_server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-This strategy works well, but for large Shiny Apps it might be hard to handle large list of reactive outputs / inputs and to keep track of how things are organised. 
+This strategy works well, but for large Shiny Apps it might be hard to handle large lists of reactive outputs / inputs and to keep track of how things are organised. 
 It might also create some reactivity issues, as a lot of `reactive` function calls is harder to control. 
 
 #### The "stratégie du petit r"
@@ -615,7 +613,7 @@ shinyApp(ui, server)
 ```
 
 The good thing about this method is that whenever you add something in one module, it is immediately available in all other modules where `r` is present. 
-The downside is that it can make it harder to reason about the app, as the input/content of the `r` is not specified anywhere unless you explicitely document it: the parameter to your server function being "r" only, you need to be a little bit more zealous when it comes to documenting it.
+The downside is that it can make it harder to reason about the app, as the input/content of the `r` is not specified anywhere unless you explicitly document it: the parameter to your server function being "r" only, you need to be a little bit more zealous when it comes to documenting it.
 
 Note that if you want to share your module, for example in a package, you should document the structure of the `r`. 
 For example: 
@@ -638,7 +636,7 @@ All this will be explained in details in chapter [Reactivity anti-patterns](#opt
 
 A shiny application has two main components: the application logic and the business logic.
 
-+ Application logic is what makes your Shiny app interactive: structure, button, table, interactivity, etc. 
++ Application logic is what makes your Shiny app interactive: structure, buttons, tables, interactivity, etc. 
 These components are not specific to your core business: you could use them for any other line of work or professional context.
 This has no other use case than your interactive application: it is not meant to be used outside your app, you would not use them in a markdown report for instance.
 
@@ -722,11 +720,11 @@ This function can be tested, documented and reused outside the application.
 Moreover, this approach lowers the cognitive load when debugging: you either debug an application issue, or a business logic issue. 
 You never debug both at the same time.
 
-Even more, think about the future: how likely are the colors or the UI subject to change, compare to how likely the core algorithms are to change?
+Even more, think about the future: how likely are the colors or the UI subject to change, compared to how likely the core algorithms are to change?
 As said in _The Art of Unix Programming_, "_Fashions in the look and feel of GUI toolkits may come and go, but raster operations and compositing are forever_".
 In other words, the core back-end, once consolidated, will potentially stay unchanged forever. 
 On the other hand, the front-end might change: new colors, new graphic designs, new interactions, new visualization libraries... 
-Whenever this will happen, you will be happy you have separated the business logic from the application logic, as you will have to change less code.
+Whenever this happens, you will be happy you have separated the business logic from the application logic, as you will have to change less code.
 
 How to do that?
 Add you application logic inside a file (typically, a module), and the business logic in another R script (typically starting with `fct_` or `utils_`).
@@ -737,9 +735,9 @@ You can even write the business logic inside another package, making these funct
 There are a lot of reasons for splitting your application into smaller pieces, including the fact that it is easier to maintain, easier to decipher, and it facilitates collaboration. 
 
 There is nothing harder to maintain than a Shiny app only made of a unique 1000-line long `app.R` file. 
-Well, there still is the 10000-line long `app.R` file, but you got the idea. 
-Long scripts are almost always synonym of complexity when it comes to building a software. 
-Of course, small and numerous scripts do not systematically prevent from codebase complexity but they simplify collaboration and maintenance, and divide the application logic into smaller, easier to understand bits of code. 
+Well, there still is the 10000-line long `app.R` file, but you get the idea. 
+Long scripts are almost always synonymous with complexity when it comes to building software. 
+Of course, small and numerous scripts do not systematically prevent codebase complexity, but they do simplify collaboration and maintenance, and divide the application logic into smaller, easier-to-understand bits of code. 
 
 So yes, big files are complex to handle and make development harder.
 Here is what happens when you work on an application for production:
@@ -753,7 +751,7 @@ It is almost impossible to work together on one same file all along the project 
 
 + You will implement numerous features. 
 Numerous features imply a lot of UI & server interactions. 
-In an `app.R` file of thousands of lines, it is very hard to match the UI element with its server counterpart: when the UI is on line 50 and the server on line 570, you will be scrolling a lot when working on these elements. 
+In an `app.R` file containing thousands of lines, it is very hard to match the UI element with its server counterpart. When the UI is on line 50 and the server on line 570, you will be scrolling a lot when working on these elements. 
 
 ### Conventions matter
 
@@ -763,9 +761,9 @@ Splitting files is good.
 Splitting files using a defined convention is better. 
 Why? 
 Because using a common convention for your files helps the other developers (and potentially you) to know exactly what is contained in a specific file. 
-Using a convention allows everyone to be able to know where to look for debugging and implementing new features. 
-For example, if you follow `{golem}`'s convention (which is the one developed in this section), you will know immediatly that a file starting with `mod_` contains a module. 
-If you take over a project, look in the `R/` folder and see files starting with these three letters, yoy will know immediately that these files contain modules.
+Using a convention allows everyone to know where to look when debugging and implementing new features. 
+For example, if you follow `{golem}`'s convention (which is the one developed in this section), you will know immediately that a file starting with `mod_` contains a module. 
+If you take over a project, look in the `R/` folder, and see files starting with these three letters, you will know immediately that these files contain modules.
 
 Here is our proposition for a convention defining how to split your application into smaller pieces.
 
@@ -782,7 +780,7 @@ They are the backbone of the application and may not be specific to a given modu
 They can be added using `{golem}` with the `add_fct("name")` function. 
 
 + `mod_*` files contain a unique module. 
-Many Shiny apps contain a series of tabs, or at least a tab-like pattern, so we suggest that you number then according to their step in the application; 
+Many Shiny apps contain a series of tabs, or at least a tab-like pattern, so we suggest that you number them according to their step in the application.
 Tabs are almost always named in the user interface, so that you can use this tab-name as the file name. 
 For example, if you build a dashboard where the first tab is called "Import", you should name your file `mod_01_import.R`.
 You can create this file with a module skeleton using `golem::add_module("01_import")`. 
@@ -792,13 +790,14 @@ For example, you might want to have a `not_na`, which is `not_na <- Negate(is.na
 Note that you can also create `utils` for a specific module. 
 
 + `*_ui_*`, for example `utils_ui.R`, relates to the user interface.
-Anything back-end can be noted using `*_server_*`. 
+
++ `*_server_*` are files that contain anything related to the application's back-end.
 For example `fct_connection_server.R` will contain functions that are related to the connection to a database, and which are specifically used from the server side. 
 
 
 Note that when building a module file with `{golem}`, you can also create `fct_` and `utils_` specific files that will hold functions and utilities for this specific module. 
 For example, `golem::add_module("01_import", fct = "readr", utils = "ui")` will create `R/mod_01_import.R`, `R/mod_01_import_fct_readr.R` and `R/mod_01_import_utils_ui.R`. 
 
-Of course, as with any convention, you might be deviating from time to time from this pattern. 
+Of course, as with any convention, you might occasionally see fit to deviate from the general pattern. 
 Your app may not have that many functions, or maybe the functions can all fit into one `utils_` file. 
-But be it one or thousands of files, it is always a good practice to stick to a formalized pattern. 
+But be it one or thousands of files, it is always a good practice to stick to a formalized pattern as much as possible.
