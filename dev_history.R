@@ -18,6 +18,8 @@ imports <- unique(c(
 )
 attachment::att_to_desc_from_is(path.d = "DESCRIPTION", imports = imports)
 
+usethis::use_tidy_description()
+
 # Name chunks
 namer::name_dir_chunks(".")
 

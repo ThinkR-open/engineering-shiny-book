@@ -26,8 +26,10 @@ for (pak in paks){
     })
   }
 }
-
-remotes::install_local(Ncpus = 4)
+# Sort packages in DESCRIPTION
+usethis::use_tidy_description()
+# Install
+remotes::install_local(Ncpus = 4, upgrade = "never", force = TRUE)
 
 knitr::write_bib(c(
   paks

@@ -1,7 +1,7 @@
 __WORK IN PROGRESS__ 
 
   <!-- badges: start -->
-  [![R build status](https://github.com/ThinkR-open/building-shiny-apps-workflow/workflows/R-CMD-check/badge.svg)](https://github.com/ThinkR-open/building-shiny-apps-workflow/actions)
+  ![renderbook](https://github.com/ThinkR-open/engineering-shiny-book/workflows/renderbook/badge.svg)
   <!-- badges: end -->
 
 A book about "Engineering Production-Grade Shiny Apps". 
