@@ -25,29 +25,29 @@ Second, you need to find a way to __handle the dependencies__.
 As you know, when you want to push your app into production, you do not want to have this conversation with IT people: 
 
 
->IT: Hey, I tried to `source("app.R")` as you said, but I got an error. 
->
->R-dev: What is the error?
->
->IT: It says "could not find package 'shiny'". 
->
->R-dev: Ah yes, you need to install {shiny}. Try to run `install.packages("shiny")`. 
->
->IT: OK nice. What else?
->
->R-dev: Let me think, try also `install.packages("DT")`... good? Now try `install.packages("ggplot2")`, and ...
->
->[...]
->
->IT: Ok, now I source the 'app.R', right?
->
->R-dev: Sure!
->
->IT: Ok so it says 'could not find function `runApp()`
->
->R-dev: Ah, you got to do `library(shiny)` at the beginning of your script. And `library(purrr)`, and `library(jsonlite)`*, and...
+- IT: Hey, I tried to `source("app.R")` as you said, but I got an error. 
 
-`*` will lead to a NAMESPACE conflict on the `flatten()` function that can cause you some debugging headache (trust us, we have been there before). 
+- R-dev: What is the error?
+
+- IT: It says "could not find package 'shiny'". 
+
+- R-dev: Ah yes, you need to install {shiny}. Try to run `install.packages("shiny")`. 
+
+- IT: OK nice. What else?
+
+- R-dev: Let me think, try also `install.packages("DT")`... good? Now try `install.packages("ggplot2")`, and ...
+
+- [...]
+
+- IT: Ok, now I source the 'app.R', right?
+
+- R-dev: Sure!
+
+- IT: Ok so it says 'could not find function `runApp()`
+
+- R-dev: Ah, you got to do `library(shiny)` at the beginning of your script. And `library(purrr)`, and `library(jsonlite)`, and...
+
+For example here, this `library(purrr)` and `library(jsonlite)` will lead to a NAMESPACE conflict on the `flatten()` function that can cause you some debugging headache (trust us, we have been there before). 
 So, hey, it would be cool if we could have a Shiny app that only imports specific functions from a package, right?
 
 We can not stress it enough that __dependencies matter__. You need to handle them, and handle them correctly if you want to ensure a smooth deployment to production.
@@ -93,10 +93,8 @@ In a perfect world, you would create one vignette per shiny page/tab.
 Every function in your package should come with its own documentation, even if only for your future self. 
 "Exported" functions, the one which are available once you run `library(myapp)`, should be fully documented and will be listed in the package help page. 
 Internal functions need less documentation, but documenting them is the best way to be sure you can come back to the app in a few months and still know why things are the way they are, what the pieces of the apps are used for, and how to use these functions
-^[`{roxygen2}` comes with a `@noRd` tag, that prevents the documentation from being built. 
-This allows to still write the documentation using the same tags as the exported function, without the internal functions being documented in the end package. 
-For example, that is why by default the modules built with `{golem}` version > 0.2.0 come with `@noRd`: you should document them, but chances are your do not need to export them.
-].
+^[`{roxygen2}` comes with a `@noRd` tag, that prevents the documentation from being built. This allows to still write the documentation using the same tags as the exported function, without the internal functions being documented in the end package. For example, that is why by default the modules built with `{golem}` version > 0.2.0 come with `@noRd`: you should document them, but chances are your do not need to export them.]
+.
 - If needed, you can build a `{pkgdown}` website, that can either be deployed on the web or kept internally. 
 It can contain installation steps for I.T., internal features use for developers, a user guide, etc.
 
@@ -106,8 +104,8 @@ __Nothing should go to production without being tested. Nothing.__
 
 Testing production apps is a broad question that we will come back to in another chapter, but let's talk briefly about why using a package structure helps with testing.
 
-Frameworks for package testing are robust and widely documented in the R world, and if you choose to embrace the "Shiny App as a Package" structure, you do not have to put any extra-effort into testing your application back-end: use a canonical testing framework like `{testthat}` [@R-testthat]. 
-Learning how to use testing frameworks is not the subject of this chapter, so feel free to refer to the documentation, and see also Chapter 5 of the [workshop: "Building a package that lasts"](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107). 
+Frameworks for package testing are robust and widely documented in the R world, and if you choose to embrace the "Shiny App as a Package" structure, you do not have to put any extra-effort for testing your application back-end: use a canonical testing framework like `{testthat}` [@R-testthat]. 
+Learning how to use it is not the subject of this chapter, so feel free to refer to the documentation, and see also Chapter 5 of the [workshop: "Building a package that lasts"](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107). 
 
 We will come back to testing in the "Build Yourself a Safety Net" chapter.
 
@@ -209,8 +207,8 @@ Namespaces?
 
 Namespaces are a computer science concept created to handle a common issue: how to share the same name for a variable in various places of your program without them conflicting. 
 In other words, how to use an object called `plop` several times in the program, and still be sure that it is correctly used depending on the context. 
-R itself has a system for namespaces; this is what packages do and why you can have `purrr::flatten` and `jsonlite::flatten` on the same computer and inside the same script: the function names are the same, but the two live in different namespaces, and the behavior of both functions can be totally different as the symbol is evaluated inside two different namespaces. 
-If you want to learn more about namespaces, please refer to the [7.4 Special environments](https://adv-r.hadley.nz/environments.html#special-environments) chapter from _Advanced R_, or turn to any computer science book, since namespaces are pretty common in any programming language.
+R itself has a system for namespaces ; this is what packages do and why you can have `purrr::flatten` and `jsonlite::flatten` on the same computer and inside the same script: the function names are the same, but the two live in different namespaces, and the behavior of both functions can be totally different as the symbol is evaluated inside two different namespaces. 
+If you want to learn more about namespaces, please refer to the [7.4 Special environments](https://adv-r.hadley.nz/environments.html#special-environments) chapter from _Advanced R_, or turn to any computer science book: namespaces are pretty common in any programming language.
 
 So, that is what modules are made for: creating small namespaces where you can safely define `ids` without conflicting with other ids in the app.  
 Why do we need to do that?  
@@ -272,11 +270,11 @@ We assume that you know the saying that _"if you copy and paste something more t
 So, in a Shiny application, how can we refactor a partially repetitive piece of code so that it is reusable?
 
 Yes, you guessed right: using shiny modules. 
-Shiny modules aim to do three things: simplify "id" namespacing, split the codebase into a series of functions, and allow UI/Server parts of your app to be reused. 
-Most of the time, modules are used for the first two aims.
+Shiny modules aim at three things: simplifying "id" namespacing, split the code base into a series of functions, and allow UI/Server parts of your app to be reused. 
+Most of the time, modules are used to do the two first.
 In our case, we could say that 90% of the modules we write are never reused
-^[Most of the time, pieces / panels of the app are too unique to be reused elsewhere.
-] ; they are here to allow us to split the code base into smaller, more manageable pieces. 
+^[Most of the time, pieces / panels of the app are too unique to be reused elsewhere.] 
+; they are here to allow us to split the code base into smaller, more manageable pieces. 
 
 With Shiny modules, you will be writing a combination of UI and server functions. 
 Think of them as small, standalone Shiny apps, which handle a fraction of your global application. 
@@ -301,8 +299,8 @@ An example is worth a thousand words, so let's explore the code of a very small 
 
 #### Your first Shiny Module
 
-Let's try to transform the above example (the one with two sliders and two action buttons) into a modularized application.
-The module is small shiny application separated from the main code:
+Let's try to transform the above example (the one with two sliders and two action buttons) into an application with a module.
+The module is a small shiny application separated from the main code:
 
 ```{r 03-structure-6, eval = FALSE}
 # Re-usable module
@@ -369,8 +367,8 @@ ns("choice")
 And here it is, our namespaced `id`.
 
 Each call to a module with `callModule()` requires a different `id` argument that will allow creating various internal namespaces, preventing from id conflicts
-^[Well, of course you can still have inner module id conflicts, but they are easier to avoid, detect, and fix. 
-].
+^[Well, of course you can still have inner module id conflicts, but they are easier to avoid, detect, and fix.]
+.
 Then you can have as many `validate` input as you want in your app, as long as this `validate` has a unique id inside your module.
 
 #### Passing arguments to your modules
@@ -493,7 +491,11 @@ app_server <- function(input, output, session) {
 ### Communication between modules 
 
 One of the hardest parts of using modules is sharing data across them. 
-There are at least three approaches: (i) returning a `reactive` function, (ii) the "stratégie du petit r" (to be pronounced with a french accent of course) or (iii) the "stratégie du grand R6". 
+There are at least three approaches:
+
++ Returning a `reactive` function 
++ The "stratégie du petit r" (to be pronounced with a french accent of course) 
++ The "stratégie du grand R6". 
 
 #### Returning values from the module
 
@@ -628,7 +630,7 @@ For example:
 Similarly to the "stratégie du petit r", we can create an R6 object, which is passed along inside the modules. 
 As this R6 object is not a reactive object and is not meant to be used as such, this reduces uncontrolled reactivity of the application, thus reduces the complexity of handling chain reactions across modules.
 Of course, you need to have another special tool in your app to trigger elements. 
-All this will be explained in details in chapter [Reactivity anti-patterns](#optim-caveat) of this book, and you can find an example of this pattern inside the [`{hexmake}` [@R-hexmake]](https://github.com/ColinFay/hexmake/blob/master/R/R6.R) application.
+All this will be explained in details in chapter [Reactivity anti-patterns](#optim-caveat) of this book, and you can find an example of this pattern inside the [`{hexmake}`](https://github.com/ColinFay/hexmake/blob/master/R/R6.R) [@R-hexmake] application.
 
 ## Structuring your app 
 
@@ -739,8 +741,8 @@ Well, there still is the 10000-line long `app.R` file, but you get the idea.
 Long scripts are almost always synonymous with complexity when it comes to building software. 
 Of course, small and numerous scripts do not systematically prevent codebase complexity, but they do simplify collaboration and maintenance, and divide the application logic into smaller, easier-to-understand bits of code. 
 
-So yes, big files are complex and make development harder.
-Here is what happens when you work on a application for production:
+So yes, big files are complex to handle and make development harder.
+Here is what happens when you work on an application for production:
 
 + You will work during a long period of time (either in one run or split across several months) on your codebase. 
 Hence, you will have to get back to pieces of code you wrote a long time ago. 
