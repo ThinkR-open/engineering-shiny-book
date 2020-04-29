@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-04-28" />
+<meta name="date" content="2020-04-29" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -163,8 +163,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="part"><span><b>V Step 4: Strengthen</b></span></li>
 <li class="chapter" data-level="12" data-path="step-secure.html"><a href="step-secure.html"><i class="fa fa-check"></i><b>12</b> Build yourself a safety net</a></li>
 <li class="chapter" data-level="13" data-path="secure.html"><a href="secure.html"><i class="fa fa-check"></i><b>13</b> Version Control</a></li>
+<li class="part"><span><b>VI Step 5: Deploy</b></span></li>
 <li class="chapter" data-level="14" data-path="deploy-golem.html"><a href="deploy-golem.html"><i class="fa fa-check"></i><b>14</b> Deploy your application</a></li>
-<li class="part"><span><b>VI Optimizing</b></span></li>
+<li class="part"><span><b>VII Optimizing</b></span></li>
 <li class="chapter" data-level="15" data-path="when-optimize.html"><a href="when-optimize.html"><i class="fa fa-check"></i><b>15</b> The Need for Optimization</a></li>
 <li class="chapter" data-level="16" data-path="optim-caveat.html"><a href="optim-caveat.html"><i class="fa fa-check"></i><b>16</b> Common Application Caveats</a></li>
 <li class="chapter" data-level="17" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html"><i class="fa fa-check"></i><b>17</b> Optimizing Shiny Code</a></li>
@@ -266,8 +267,8 @@ It can contain installation steps for I.T., internal features use for developers
 <h4><span class="header-section-number">3.1.2.2</span> Testing</h4>
 <p><strong>Nothing should go to production without being tested. Nothing.</strong></p>
 <p>Testing production apps is a broad question that we will come back to in another chapter, but let’s talk briefly about why using a package structure helps with testing.</p>
-<p>Frameworks for package testing are robust and widely documented in the R world, and if you choose to embrace the “Shiny App as a Package” structure, you do not have to put any extra-effort into testing your application back-end: use a canonical testing framework like <code>{testthat}</code> <span class="citation">(Wickham <a href="#ref-R-testthat" role="doc-biblioref">2020</a>)</span>.
-Learning how to use testing frameworks is not the subject of this chapter, so feel free to refer to the documentation, and see also Chapter 5 of the <a href="https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107">workshop: “Building a package that lasts”</a>.</p>
+<p>Frameworks for package testing are robust and widely documented in the R world, and if you choose to embrace the “Shiny App as a Package” structure, you do not have to put any extra-effort for testing your application back-end: use a canonical testing framework like <code>{testthat}</code> <span class="citation">(Wickham <a href="#ref-R-testthat" role="doc-biblioref">2020</a>)</span>.
+Learning how to use it is not the subject of this chapter, so feel free to refer to the documentation, and see also Chapter 5 of the <a href="https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107">workshop: “Building a package that lasts”</a>.</p>
 <p>We will come back to testing in the “Build Yourself a Safety Net” chapter.</p>
 </div>
 </div>
@@ -358,8 +359,8 @@ The need to be unique is made a little bit complex by the way Shiny handles the 
 Namespaces?</p>
 <p>Namespaces are a computer science concept created to handle a common issue: how to share the same name for a variable in various places of your program without them conflicting.
 In other words, how to use an object called <code>plop</code> several times in the program, and still be sure that it is correctly used depending on the context.
-R itself has a system for namespaces; this is what packages do and why you can have <code>purrr::flatten</code> and <code>jsonlite::flatten</code> on the same computer and inside the same script: the function names are the same, but the two live in different namespaces, and the behavior of both functions can be totally different as the symbol is evaluated inside two different namespaces.
-If you want to learn more about namespaces, please refer to the <a href="https://adv-r.hadley.nz/environments.html#special-environments">7.4 Special environments</a> chapter from <em>Advanced R</em>, or turn to any computer science book, since namespaces are pretty common in any programming language.</p>
+R itself has a system for namespaces ; this is what packages do and why you can have <code>purrr::flatten</code> and <code>jsonlite::flatten</code> on the same computer and inside the same script: the function names are the same, but the two live in different namespaces, and the behavior of both functions can be totally different as the symbol is evaluated inside two different namespaces.
+If you want to learn more about namespaces, please refer to the <a href="https://adv-r.hadley.nz/environments.html#special-environments">7.4 Special environments</a> chapter from <em>Advanced R</em>, or turn to any computer science book: namespaces are pretty common in any programming language.</p>
 <p>So, that is what modules are made for: creating small namespaces where you can safely define <code>ids</code> without conflicting with other ids in the app.<br />
 Why do we need to do that?<br />
 Think about the number of times you created a “OK” or “validate” button.<br />
@@ -413,8 +414,8 @@ Also, how do you work smoothly in a context where you have to scroll from <code>
 <p>We assume that you know the saying that <em>“if you copy and paste something more than twice, you should make a function”</em>.
 So, in a Shiny application, how can we refactor a partially repetitive piece of code so that it is reusable?</p>
 <p>Yes, you guessed right: using shiny modules.
-Shiny modules aim to do three things: simplify “id” namespacing, split the codebase into a series of functions, and allow UI/Server parts of your app to be reused.
-Most of the time, modules are used for the first two aims.
+Shiny modules aim at three things: simplifying “id” namespacing, split the code base into a series of functions, and allow UI/Server parts of your app to be reused.
+Most of the time, modules are used to do the two first.
 In our case, we could say that 90% of the modules we write are never reused<a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a>
 ; they are here to allow us to split the code base into smaller, more manageable pieces.</p>
 <p>With Shiny modules, you will be writing a combination of UI and server functions.
@@ -440,8 +441,8 @@ So, you will be better off building solid foundations for your application from 
 <p>An example is worth a thousand words, so let’s explore the code of a very small Shiny application that is split into modules.</p>
 <div id="your-first-shiny-module" class="section level4">
 <h4><span class="header-section-number">3.2.3.1</span> Your first Shiny Module</h4>
-<p>Let’s try to transform the above example (the one with two sliders and two action buttons) into a modularized application.
-The module is small shiny application separated from the main code:</p>
+<p>Let’s try to transform the above example (the one with two sliders and two action buttons) into an application with a module.
+The module is a small shiny application separated from the main code:</p>
 <div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="structure.html#cb36-1"></a><span class="co"># Re-usable module</span></span>
 <span id="cb36-2"><a href="structure.html#cb36-2"></a>mod_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
 <span id="cb36-3"><a href="structure.html#cb36-3"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
@@ -818,8 +819,8 @@ You can even write the business logic inside another package, making these funct
 Well, there still is the 10000-line long <code>app.R</code> file, but you get the idea.
 Long scripts are almost always synonymous with complexity when it comes to building software.
 Of course, small and numerous scripts do not systematically prevent codebase complexity, but they do simplify collaboration and maintenance, and divide the application logic into smaller, easier-to-understand bits of code.</p>
-<p>So yes, big files are complex and make development harder.
-Here is what happens when you work on a application for production:</p>
+<p>So yes, big files are complex to handle and make development harder.
+Here is what happens when you work on an application for production:</p>
 <ul>
 <li><p>You will work during a long period of time (either in one run or split across several months) on your codebase.
 Hence, you will have to get back to pieces of code you wrote a long time ago.</p></li>
