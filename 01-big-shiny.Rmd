@@ -13,7 +13,8 @@
 If you are reading this page, chances are you already know what a Shiny application (shorten "Shiny app") is—a web application that communicates with R, built in R, and working with R. 
 The beauty of `{shiny}` [@R-shiny] is that it makes it easy for someone already familiar with R to create a small app in a matter of hours.
 With small and minimal Shiny apps, no knowledge of HTML, CSS or JavaScript is required, and you do not have to think about technical elements that usually come with web applications—for example, you do not have to think about the port the application is served on: `{shiny}` picks one for you
-^[Of course you can specify one if you need to, but by default the package picks one;].
+^[Of course you can specify one if you need to, but by default the package picks one;]
+.
 Same goes for serving external dependencies: the application comes with its set of CSS and JavaScript dependencies that a common Shiny developer does not need to worry about. 
 And that is probably one of the main reason why this package has become so successful over the years—with very little training, you can rapidly create a proof-of-concept (PoC) for a data-product, showcase an algorithm, or present your results in an elegant and accessible user interface. 
 
@@ -38,17 +39,20 @@ Ready to start engineering production-grade Shiny Apps?
 
 Building a Shiny application seems quite straightforward when it comes to small prototypes or proof of concepts: after a few hours of practice and documentation reading, most R developers can have a small working application.  
 But things change when your application reaches "the cliff of complexity"
-^[We borrow this term from Charity Major, as heard in _Test in Production with Charity Majors_, [CoRecursive](https://corecursive.com/019-test-in-production-with-charity-majors/){target="_blank"}], _i.e_ that moment when the application reaches a states when it can be qualified as "complex".
+^[We borrow this term from Charity Major, as heard in _Test in Production with Charity Majors_, [CoRecursive](https://corecursive.com/019-test-in-production-with-charity-majors/){target="_blank"}]
+, _i.e_ that moment when the application reaches a states when it can be qualified as "complex".
 
 But what do we mean by complexity? 
 Getting a clear definition is not an easy task
-^[Ironic right?]
+^[Ironic right?] 
 as it very much depends on who is concerned and who you are talking to.
 But a good definition can be found in _The DevOps Handbook_ [@genekim2016] : _"One of the defining characteristics of a complex system is that it __defies any single person's ability to see the system as a whole and understand how all the pieces fit together__. Complex system typically have a high degree of interconnectedness of tightly coupled components, and system-level behavior cannot be explained merely in terms of the behavior of the system components."_ (we underlined).
 
 Building on top of this quote, let's try to come up with a definition that will serve us in the context of engineering Shiny applications. 
 
-When building software, we can think of complexity from two points of view: the complexity as it is seen by the developer, and the complexity as it is seen by the customer/end-user ^[from _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity", [@ericraymond2003]].
+When building software, we can think of complexity from two points of view: the complexity as it is seen by the developer, and the complexity as it is seen by the customer/end-user 
+^[From _The Art of Unix Programming_, "Chapter 13: Speaking of Complexity", [@ericraymond2003]]
+.
 
 + For the code, bugs are harder to anticipate: it is hard to think about all the different paths the software can follow and difficult to identify bugs because they are deeply nested in the numerous routines the app is doing. 
 It is also hard to think about what the state of your app is at a given moment because of the numerous inputs and outputs your app contains. 
@@ -97,7 +101,8 @@ This function requires the user to choose a starting date and an ending date.
 However, the function allows to choose a start date which is posterior to the end (that is the behavior of the JavaScript plugin used in `{shiny}` to create this input).
 But allowing this behavior leads to bugs, notably in a context of full reactivity. 
 Handling this special case is completely doable: with a little bit of craft, you can watch what the user inputs and throw an error if the start is after the end
-^[see [shiny/issues/2043#issuecomment-525640738](https://github.com/rstudio/shiny/issues/2043#issuecomment-525640738){target="_blank"} for an example].
+^[See [shiny/issues/2043#issuecomment-525640738](https://github.com/rstudio/shiny/issues/2043#issuecomment-525640738){target="_blank"} for an example]
+.
 On one hand that solution increases implementation complexity, while on the other leaving this naive behavior requires the user to think carefully about what they are selecting, thus increasing the interface complexity.
 
 So what should we do? 
@@ -119,10 +124,10 @@ But before that, let's dive into code complexity.
 The total number of lines of code, or the number of files, can be good clue of potential complexity, but only if used as order ofs magnitude (for example a 10.000-line codebase is potentially more complex than a 100-line codebase), but should not be relied on if used strictly: even more if you try to reduce this number of line by sacrificing code readability.
 
 R is very permissive when it comes to indentation and line breaks, and, unlike JavaScript or CSS, it is generally not minified
-^[The minification process is the process of removing all blank characters and put everything on one line so that the file in the output is much smaller.
-].  
+^[The minification process is the process of removing all blank characters and put everything on one line so that the file in the output is much smaller.]
+.  
 In R, the number of lines of code depends on your coding style and the packages you are using. 
-For example, the `{tidyverse}` [@tidyverse2019] style guide encourages the use of `%>%` (called "pipe"), with one function by line, producing more lines in the end code : _"`%>%` should always have a space before it, and should usually be followed by a new line_" [tidyverse style guide](https://style.tidyverse.org/pipes.html){target="_blank"}.
+For example, the `{tidyverse}` [@tidyverse2019] style guide encourages the use of `%>%` (called "pipe"), with one function by line, producing more lines in the end code : "_`%>%` should always have a space before it, and should usually be followed by a new line_" [tidyverse style guide](https://style.tidyverse.org/pipes.html){target="_blank"}.
 So you can expect a "tidyverse-centric" package to contain more line of code, yet the pipe itself has been thought as a tool to lower code complexity by enhancing its readability^[Note though that some users find using the pipe more complex than not.].
 For example, the two following pieces of code do the same thing. 
 Both have a different number of lines, and a different level of reading complexity.
@@ -177,9 +182,7 @@ if (!requireNamespace("cloc")){
 ```
 
 ```{r 01-big-shiny-5, eval = FALSE}
-if (!requireNamespace("cloc")){
-  remotes::install_github("hrbrmstr/cloc")
-}
+remotes::install_github("hrbrmstr/cloc")
 ```
 
 For example, let's compare a rather big package (`{shiny}`) with a small one (`{attempt}` [@R-attempt]):
@@ -218,8 +221,8 @@ Cyclomatic complexity is a software engineering measure which allows to define t
 The higher the number of paths, the harder it can be to have a clear mental model ot this function. 
 
 Cyclomatic complexity is computed based on a control-flow graph
-^[A control flow graph is a graph representing all the possible paths a piece of code can take while it is executed.
-] representation of an algorithm. 
+^[A control flow graph is a graph representing all the possible paths a piece of code can take while it is executed.] 
+representation of an algorithm. 
 
 ![](img/controlflow.png)
 
@@ -380,7 +383,7 @@ The resulting app is rather ambitious and implements a lot of features, etc.
 So yes, there is a chance that if you are reading this page, you are working or are planning to work on a complex Shiny app. 
 And this is not necessarily a bad thing! 
 Shiny apps can definitely be used to implement production-grade
-^[By production-grade, we mean a software that can be used in a context where people use it for doing their job, and where failures or bugs have real-life consequences] 
+^[By production-grade, we mean a software that can be used in a context where people use it for doing their job, and where failures or bugs have real-life consequences.] 
 software, but production-grade software implies production-grade software engineering. 
 To make your project a success, you need to use tools that reduce the complexity of your app and ensure that your app is resilient to aging. 
 
@@ -426,7 +429,7 @@ Just as before, accuracy means that between the moment the idea appears in someo
 
 ### It is usable
 
-being usable means that the app was delivered, it serves the purpose, and it is user-friendly. 
+Being usable means that the app was delivered, it serves the purpose, and it is user-friendly. 
 Unless you are coding for art sake, there will always be one or more end users. 
 And if these people cannot use the application because it is too hard to use, too hard to understand, because it is too slow or there is no inherent logic in how the user experience is designed, then it is inappropriate to call the app is a success. 
 
@@ -436,8 +439,8 @@ Of course "immortal" is a little bit far fetched, but when designing the applica
 
 Planning for the future is a very important component of a successful Shiny App project.
 Once the app is out, it is successful if it can exist in the long run, with all the hazards that this implies: new package versions that could potentially break the code base, sudden call for the implementation of new features in the global interface, changing key features of the UI or the back-end, and not to mention passing the code base along to someone who has not worked on the first version, and who is now in charge of developing the next version
-^[In fact, this new person might simply be you, a month from now. 
-And _"You'll be there in the future too, maintaining code you may have half forgotten under the press of more recent projects. When you design for the future, the sanity you save may be your own._ _The Art of Unix Programming_, Eric Steven Raymond, _The Art of UNIX Programming_.
-]. 
+^[In fact, this new person might simply be you, a month from now. And _"You'll be there in the future too, maintaining code you may have half forgotten under the press of more recent projects. When you design for the future, the sanity you save may be your own._ [@ericraymond2003].
+]
+. 
 And this, again, is hard to do without effective planning and efficient engineering. 
 

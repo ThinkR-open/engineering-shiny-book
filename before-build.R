@@ -1,6 +1,6 @@
 install.packages(c("attachment", "remotes", "usethis", "namer", "desc"))
 paks <- c(
-  attachment::att_from_rmds(".", recursive = FALSE), 
+  c("cloc", "dplyr", "cyclocomp", "tidytuesday201942", "shiny", "packageMetrics2", "remotes", "readr", "here", "tibble", "knitr", "desc", "attachment", "magrittr", "tools", "fs", "glue", "dichromat", "purrr", "htmltools", "matlab", "viridis", "golem", "shinipsum", "ggplot2", "DT", "fakir", "shinyloadtest", "dockerstats", "attempt", "dockerfiler", "Rcpp", "profmem", "bench", "jsonlite", "cli", "memoise", "tictoc", "promises", "future", "liteq", "DBI", "RSQLite", "xfun"), 
   'bookdown', 'knitr', 'rmarkdown', 'tidyverse', 
   'testthat', 'usethis', 'config', 'hexmake', 'shinyalert', 
   'plotly', 'shinyMobile', 'resume', 'nessy','skeleton',
@@ -10,7 +10,7 @@ paks <- c(
   'renv', 'geojsonsf', 'pkgbuild', 'profvis', 
   'gargoyle', 'dplyr', 'dbplyr', 'vroom',
   'data.table', 'jsonlite', 'readxl', 
-  'R.cache', 'glouton', 'bubble'
+  'R.cache', 'glouton', 'bubble', 'roxygen2'
 )
 cran_paks <- tools::CRAN_package_db()
 desc_pak <- desc::desc_get_deps()$package
@@ -19,13 +19,15 @@ for (pak in paks){
   if ( !(pak %in% desc_pak)){
     try({
       if (pak %in% cran_paks$Package){
-        usethis::use_package(pak)
+        usethis::use_package()
       } else {
         usethis::use_dev_package(pak)
       } 
     })
   }
 }
+
+remotes::install_local(Ncpus = 4)
 
 knitr::write_bib(c(
   paks
