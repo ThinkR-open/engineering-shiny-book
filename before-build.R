@@ -1,4 +1,6 @@
-install.packages(c("attachment", "remotes", "usethis", "namer", "desc"))
+install.packages(c("attachment", "remotes", "usethis", "namer", "desc", "spelling"))
+remotes::install_version("subprocess", "0.8.3")
+
 paks <- c(
   c("cloc", "dplyr", "cyclocomp", "tidytuesday201942", "shiny", "packageMetrics2", "remotes", "readr", "here", "tibble", "knitr", "desc", "attachment", "magrittr", "tools", "fs", "glue", "dichromat", "purrr", "htmltools", "matlab", "viridis", "golem", "shinipsum", "ggplot2", "DT", "fakir", "shinyloadtest", "dockerstats", "attempt", "dockerfiler", "Rcpp", "profmem", "bench", "jsonlite", "cli", "memoise", "tictoc", "promises", "future", "liteq", "DBI", "RSQLite", "xfun"), 
   'bookdown', 'knitr', 'rmarkdown', 'tidyverse', 
@@ -15,7 +17,7 @@ paks <- c(
 )
 cran_paks <- tools::CRAN_package_db()
 desc_pak <- desc::desc_get_deps()$package
-remotes::install_version("subprocess", "0.8.3")
+
 for (pak in paks){
   if ( !(pak %in% desc_pak)){
     try({
@@ -37,7 +39,29 @@ knitr::write_bib(c(
 lapply(
   list.files(path = ".", pattern = ".Rmd$"), 
   function(x){
-    #namer::unname_all_chunks(x)
     namer::name_chunks(x)
   }
+)
+
+spell_checks <- lapply(
+  list.files(path = ".", pattern = ".Rmd$"), 
+  function(x){
+    spelling::spell_check_files(x)
+  }
+)
+
+repos <- Sys.getenv("GITHUB_REPOSITORY")
+
+gh::gh(
+  "POST /repos/:owner/:repo/issues",
+  owner = gsub("([^/]+)/+*", "\\1", repos),
+  repo = gsub("[^/]+/(+*)", "\\1", repos),
+  title = sprintf(
+    "Spellcheck GA %s - %s", 
+    Sys.getenv("GITHUB_ACTION"), Sys.Date()
+  ), 
+  assignee = "ColinFay", 
+  body = knitr::kable(
+    do.call(rbind, spell_checks)
+  )
 )
