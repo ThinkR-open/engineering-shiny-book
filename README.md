@@ -8,10 +8,7 @@ A book about "Engineering Production-Grade Shiny Apps".
 
 To be published in the R Series in 2020. 
 
-Two versions of the HTML book are available:
-
-- The stable version on: https://thinkr-open.github.io/building-shiny-apps-workflow/
-- The WIP version: https://thinkr-open.github.io/building-shiny-apps-workflow/wip/
+<https://engineering-shiny.org/>
 
 ## Want to help?
 

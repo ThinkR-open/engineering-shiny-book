@@ -10,7 +10,8 @@ paks <- c(
   'renv', 'geojsonsf', 'pkgbuild', 'profvis', 
   'gargoyle', 'dplyr', 'dbplyr', 'vroom',
   'data.table', 'jsonlite', 'readxl', 
-  'R.cache', 'glouton', 'bubble', 'roxygen2'
+  'R.cache', 'glouton', 'bubble', 'roxygen2', 
+  'covr', 'rcmdcheck', 'covrpage'
 )
 cran_paks <- tools::CRAN_package_db()
 desc_pak <- desc::desc_get_deps()$package
@@ -36,7 +37,7 @@ knitr::write_bib(c(
 lapply(
   list.files(path = ".", pattern = ".Rmd$"), 
   function(x){
-    namer::unname_all_chunks(x)
+    #namer::unname_all_chunks(x)
     namer::name_chunks(x)
   }
 )
