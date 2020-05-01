@@ -20,7 +20,7 @@ As you are building a complex, production-grade Shiny application, do not under-
 
 > "Simplify, then add lightness"
 
-> __Colin Chapman CBE, Founder of Lotus Cars__
+__Colin Chapman CBE, Founder of Lotus Cars__
 
 Aiming for simplicity is a hard thing, but some rules will help you build a better UX, paving the way for a successful application.
 
@@ -50,13 +50,19 @@ First of all, user rarely read carefully all the instructions: they __scan__, an
 Navigating the web, users try to optimize their decision but not by making the decision that would be "optimal", but by doing the first that will satisfy a sufficient amount of relevance. 
 They are behaving like that for a lot of reason, but notably because they want to be as quick as possible on the web, and because the cost of being wrong is most of the time very low: even if you make the wrong decision on a website, chances are that you are just a "return" or "cancel" button away from canceling your last action. 
 
-![](img/scanning.png)
+(ref:scanningcap) How we design a webpage versus how a user will really scan it. From [@stevekrug2014].
 
-`r right_link("Don't make me think - Steve Krug", "http://sensible.com/dmmt.html")`
+```{r 06-ux-matters-1-bis, echo=FALSE, fig.cap="(ref:scanningcap)", out.width="100%"}
+knitr::include_graphics("img/scanning.png")
+```
 
 For example, let's have a look at the user interface of `{hexmake}` [@R-hexmake], a Shiny app for building hex stickers, available at https://connect.thinkr.fr/hexmake/
 
-![](img/hexmake.png)
+(ref:hexmakecap) Snapshot of the `{hexmake}` Shiny application on <https://connect.thinkr.fr/hexmake/>.
+
+```{r 06-ux-matters-2-bis, echo=FALSE, fig.cap="(ref:hexmakecap)", out.width="100%"}
+knitr::include_graphics("img/hexmake.png")
+```
 
 What will be your reading pattern for this application? 
 What is the first thing you will do when using this app?
@@ -171,9 +177,9 @@ shinyApp(ui, server)
 One of the goal of a usable app is to make it self-evident, and fall back to a self explanatory app if the first option is too complex a goal. 
 What is the difference between the two? 
 
-> self-evident : "Not needing to be demonstrated or explained; obvious." [lexico.com](https://www.lexico.com/en/definition/self_evident)
++ self-evident : "Not needing to be demonstrated or explained; obvious." [lexico.com](https://www.lexico.com/en/definition/self_evident)
 
-> self-explanatory : "Easily understood; not needing explanation." [https://www.lexico.com/en/definition/self_explanatory](https://www.lexico.com/en/definition/self_explanatory)
++ self-explanatory : "Easily understood; not needing explanation." [https://www.lexico.com/en/definition/self_explanatory](https://www.lexico.com/en/definition/self_explanatory)
 
 So the first is that the app is designed in such a way that there is no learning curve to using it.
 A self-explanatory app has a small learning curve, but it is designed in a way that will make the user understand it in a matter of seconds. 
@@ -226,11 +232,19 @@ This app is built on top of Bootstrap 4, which has no CSS class for `{shiny}` ac
 Result: without any further CSS, the buttons do not come out as buttons, making it harder to decipher they are actually buttons. 
 Compare this native design:
 
-![](img/tidytuesdaybutton1.png)
+(ref:tidytuesdaybutton1cap) Snapshot of `{tidytuesday201942}` without borders around the 'Render Plot' button.
+
+```{r 06-ux-matters-3-bis, echo=FALSE, fig.cap="(ref:tidytuesdaybutton1cap)", out.width="100%"}
+knitr::include_graphics("img/tidytuesdaybutton1.png")
+```
 
 To the one with a little bit of CSS (which is the one online):
 
-![](img/tidytuesdaybutton2.png)
+(ref:tidytuesdaybutton2cap) Snapshot of `{tidytuesday201942}` with borders around the 'Render Plot' button.
+
+```{r 06-ux-matters-4-bis, echo=FALSE, fig.cap="(ref:tidytuesdaybutton2cap)", out.width="100%"}
+knitr::include_graphics("img/tidytuesdaybutton2.png")
+```
 
 Yes, it is subtle, yet the second version of the button is clearer to understand.
 
@@ -389,7 +403,11 @@ In real life usage, people make mistakes using the app, they do not move the sli
 
 In the `{tidytuesday201942}` application example, let's imagine all the elements on the left automatically update the plot: especially in a context of a learning tool, reacting to any configuration change will launch a lot of useless computation, slowing the app in the long run, and making the user experience poorer. 
 
-![](img/tidytuesdayapp.png)
+(ref:uxtidytuesdayappcap) Snapshot of the `{tidytuesday201942}` Shiny application.
+
+```{r 06-ux-matters-5-bis, echo=FALSE, fig.cap="(ref:uxtidytuesdayappcap)", out.width="100%"}
+knitr::include_graphics("img/tidytuesdayapp.png")
+```
 
 So what should we do? 
 Prevent ourselves from implementing "full reactivity": instead, we will add a user input that will launch the computation. 
@@ -420,7 +438,11 @@ They are awesome if you need this kind of interactivity, but for a common plot t
 Instead of focusing on the data, a lot of things show: buttons to zoom, to do selection, to export in png, and things like that. 
 With this kind of graphs, users might lose some time focusing on understanding what the buttons do and why they are there, instead of focusing on what matters: getting insights from the data.
 
-![](img/plotly.png)
+(ref:plotlycap) Output of a `{plotly}` output, with all available buttons shown.
+
+```{r 06-ux-matters-6-bis, echo=FALSE, fig.cap="(ref:plotlycap)", out.width="100%"}
+knitr::include_graphics("img/plotly.png")
+```
 
 Of course these features are awesome if you need them: exploring data interactively is a fundamental strength for an application when the context is right. 
 But if there is no solid reason for using an interactive table, use a standard HTML table. 
@@ -530,7 +552,11 @@ ui <- function(request){
   tagList(
     textInput("text", "title") %>% 
       tagAppendAttributes(
-        onKeyPress = "Shiny.setInputValue('keypress', {value : event.key}, {priority: 'event'})"
+        onKeyPress = "Shiny.setInputValue(
+        'keypress', 
+        {value : event.key}, 
+        {priority: 'event'}
+        )"
       ), 
     actionButton("go", "Go")
   )
@@ -562,10 +588,10 @@ library(nter)
 library(shiny)
 
 ui <- fluidPage(
-  textInput("text", ""),
+  textInput("txt", ""),
   actionButton("send", "Do not click hit enter"),
   verbatimTextOutput("typed"),
-  nter("send", "text") # trigger 'send' button when 'text' is active.
+  nter("send", "txt") # trigger 'send' when 'text' is active
 )
 
 server <- function(input, output) {
@@ -596,7 +622,8 @@ Here are for example a visualization through the lens of various type of color b
 with_palette <- function(palette) {
   x <- y <- seq(-8 * pi, 8 * pi, len = 40)
   r <- sqrt(outer(x^2, y^2, "+"))
-  filled.contour(cos(r^2) * exp(-r / (2 * pi)),
+  z <- cos(r^2) * exp(-r / (2 * pi))
+  filled.contour(z,
     axes = FALSE,
     color.palette = palette,
     asp = 1
@@ -607,11 +634,15 @@ with_palette <- function(palette) {
 
 With the `jet.colors` palette from `{matlab}` [@R-matlab]
 
-```{r 06-ux-matters-11 }
+(ref:jetcolors) Original view of `jet.colors` palette from `{matlab}`.
+
+```{r 06-ux-matters-11, fig.cap="(ref:jetcolors)"}
 with_palette(matlab::jet.colors)
 ```
 
-```{r 06-ux-matters-12 }
+(ref:viridis) Original view of `viridis` palette from `{viridis}`.
+
+```{r 06-ux-matters-12, fig.cap='(ref:viridis)'}
 with_palette(viridis::viridis)
 ```
 
@@ -623,56 +654,61 @@ library(dichromat)
 library(purrr, warn.conflicts = FALSE)
 ```
 
-+ Deutan with `jet.colors` and `viridis`
++ Simulation of Deuteranopia with `jet.colors` and `viridis`
 
-```{r 06-ux-matters-14 }
+(ref:jetcolorsdeutan) View of `jet.colors` palette for a Deuteranopian.
+
+```{r 06-ux-matters-14, fig.cap="(ref:jetcolorsdeutan)"}
 graph <- partial(dichromat, type = "deutan")
 with_palette(
   compose( graph, matlab::jet.colors )
 )
+```
+
+(ref:viridisdeutan) View of `viridis` palette for a Deuteranopian.
+
+```{r 06-ux-matters-7-bis, fig.cap="(ref:viridisdeutan)"}
 with_palette(
   compose( graph, viridis::viridis )
 )
 ```
 
++ Simulation of Protanopia with `jet.colors` and `viridis`
 
-+ Protan with `jet.colors` and `viridis`
+(ref:jetcolorsprotan) View of `jet.colors` palette for a Protanopian.
 
-```{r 06-ux-matters-15 }
+
+```{r 06-ux-matters-15, fig.cap="(ref:jetcolorsprotan)"}
 graph <- partial(dichromat, type = "protan")
 with_palette(
   compose( graph, matlab::jet.colors )
 )
+```
+
+(ref:viridisprotan) View of `viridis` palette for a Protanopian.
+
+```{r 06-ux-matters-8-bis, fig.cap="(ref:viridisprotan)"}
 with_palette(
   compose( graph, viridis::viridis )
 )
 ```
 
-+ Tritan with `jet.colors` and `viridis`
++ Simulation of Tritanopia with `jet.colors` and `viridis`
 
-```{r 06-ux-matters-16 }
+(ref:jetcolorstritan) View of `jet.colors` palette for a Tritanopian.
+
+```{r 06-ux-matters-16, fig.cap="(ref:jetcolorstritan)", out.width="100%"}
 graph <- partial(dichromat, type = "tritan")
 with_palette(
   compose( graph, matlab::jet.colors )
 )
-with_palette(
-  compose( graph, viridis::viridis )
-)
 ```
 
-```{r 06-ux-matters-17 }
-par(mfrow=c(2,1))
+(ref:viridistritan) View of `viridis` palette for a Tritanopian.
+
+```{r 06-ux-matters-9-bis, fig.cap="(ref:viridistritan)", out.width="100%"}
 with_palette(
-  compose(
-    partial(dichromat, type = "deutan"),
-    matlab::jet.colors
-    )
-)
-with_palette(
-  compose(
-    partial(dichromat, type = "deutan"),
-    viridis::viridis
-    )
+  compose( graph, viridis::viridis )
 )
 ```
 
@@ -688,6 +724,12 @@ There are several tools on the web that can evaluate the accessibility of your w
 
 + [https://www.webaccessibility.com/](https://www.webaccessibility.com/) has an online checker for webpage accessibility, and allows you to freely test 5 pages.
 
-![](img/hexmakeaccessibility.png)
+(ref:accessibilitycap) Web accessibility results for the `{hexmake}` application.
 
-> {hexmake} accessibility results
+
+```{r 06-ux-matters-10-bis, echo=FALSE, fig.cap="(ref:accessibilitycap)", out.width="100%"}
+knitr::include_graphics("img/hexmakeaccessibility.png")
+```
+
+Note that you can also add a Chrome or Firefox extension for <www.webaccessibility.com>, making it more straightforward to run your accessibility tests. 
+It also comes with tools for Java and JavaScript, and notably with a NodeJS module, so it can be used programmatically, for example in your Continuous Integration suite. 

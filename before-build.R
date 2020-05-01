@@ -2,7 +2,12 @@ install.packages(c("attachment", "remotes", "usethis", "namer", "desc", "spellin
 remotes::install_version("subprocess", "0.8.3")
 
 paks <- c(
-  c("cloc", "dplyr", "cyclocomp", "tidytuesday201942", "shiny", "packageMetrics2", "remotes", "readr", "here", "tibble", "knitr", "desc", "attachment", "magrittr", "tools", "fs", "glue", "dichromat", "purrr", "htmltools", "matlab", "viridis", "golem", "shinipsum", "ggplot2", "DT", "fakir", "shinyloadtest", "dockerstats", "attempt", "dockerfiler", "Rcpp", "profmem", "bench", "jsonlite", "cli", "memoise", "tictoc", "promises", "future", "liteq", "DBI", "RSQLite", "xfun"), 
+  "cloc", "dplyr", "cyclocomp", "tidytuesday201942", "shiny", "packageMetrics2", 
+  "remotes", "readr", "here", "tibble", "knitr", "desc", "attachment", "magrittr", 
+  "tools", "fs", "glue", "dichromat", "purrr", "htmltools", "matlab", "viridis", 
+  "golem", "shinipsum", "ggplot2", "DT", "fakir", "shinyloadtest", "dockerstats", 
+  "attempt", "dockerfiler", "Rcpp", "profmem", "bench", "jsonlite", "cli", "memoise", 
+  "tictoc", "promises", "future", "liteq", "DBI", "RSQLite", "xfun", 
   'bookdown', 'knitr', 'rmarkdown', 'tidyverse', 
   'testthat', 'usethis', 'config', 'hexmake', 'shinyalert', 
   'plotly', 'shinyMobile', 'resume', 'nessy','skeleton',
@@ -30,46 +35,53 @@ for (pak in paks){
   }
 }
 
-remotes::install_local(Ncpus = 4)
+usethis::use_tidy_description()
+
+remotes::install_local(Ncpus = 4, upgrade = "never", force = TRUE)
 
 knitr::write_bib(c(
   paks
 ), 'packages.bib')
 
-lapply(
+purrr::walk(
   list.files(path = ".", pattern = ".Rmd$"), 
   function(x){
+    cli::cat_rule(x)
     namer::name_chunks(x)
   }
 )
 
-gh::gh(
-  "POST /repos/:owner/:repo/issues",
-  owner = gsub("([^/]*)/.*", "\\1", Sys.getenv("GITHUB_REPOSITORY")),
-  repo = gsub("[^/]*/(.*)", "\\1", Sys.getenv("GITHUB_REPOSITORY")),
-  title = sprintf(
-    "Spellcheck GA %s - %s", 
-    Sys.getenv("GITHUB_ACTION"), Sys.Date()
-  ), 
-  .token = Sys.getenv("GH_TOKEN"),
-  body = paste(
-    capture.output(
-      knitr::kable(
-        do.call(
-          rbind, 
-          lapply(
-            list.files(
-              path = ".", 
-              pattern = ".Rmd$"
-            ), 
-            function(x){
-              spelling::spell_check_files(x)
-            }
+try({
+  gh::gh(
+    "POST /repos/:owner/:repo/issues",
+    owner = gsub("([^/]*)/.*", "\\1", Sys.getenv("GITHUB_REPOSITORY")),
+    repo = gsub("[^/]*/(.*)", "\\1", Sys.getenv("GITHUB_REPOSITORY")),
+    title = sprintf(
+      "Spellcheck GA %s - %s", 
+      Sys.getenv("GITHUB_ACTION"), Sys.Date()
+    ), 
+    .token = Sys.getenv("GH_TOKEN"),
+    body = paste(
+      capture.output(
+        knitr::kable(
+          do.call(
+            rbind, 
+            lapply(
+              list.files(
+                path = ".", 
+                pattern = ".Rmd$"
+              ), 
+              function(x){
+                spelling::spell_check_files(x)
+              }
+            )
           )
         )
-      )
-    ),
-    collapse = "\n"
+      ),
+      collapse = "\n"
+    )
   )
-)
+})
+
+
 

@@ -278,7 +278,8 @@ Here is an example of using this skeleton:
 ```{r 17-optimizing-shiny-code-11, eval = FALSE}
 library(future)
 library(promises)
-plan(multisession) # We're opening several R session (future specific)
+# We're opening several R session (future specific)
+plan(multisession) 
 future({
   Sys.sleep(3)
   return(rnorm(5))
@@ -301,7 +302,7 @@ Note that you can also write one-line function with `.` as a parameter, instead 
 ```{r 17-optimizing-shiny-code-12, eval=FALSE}
 library(future)
 library(promises)
-plan(multisession) # We're opening several R session (future specific)
+plan(multisession)
 future({
   Sys.sleep(3)
   return(rnorm(5))
@@ -532,11 +533,20 @@ db <- tempfile()
 q <- ensure_queue("jobs", db = db)
 for (i in 1:5){
   future({
-    Sys.sleep(sample(1:5, 1))
+    Sys.sleep(
+      sample(1:5, 1)
+    )
     return(rnorm(5))
   }) %...>% 
     (function(res){
-      publish(q, title = as.character(i), message = paste(res, collapse = ","))
+      publish(
+        q, 
+        title = as.character(i), 
+        message = paste(
+          res, 
+          collapse = ","
+        )
+      )
     }) %...!% 
     stop(.)
 }
