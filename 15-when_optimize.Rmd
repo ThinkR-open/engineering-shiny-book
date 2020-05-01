@@ -24,9 +24,11 @@ So focus on making the bottleneck larger, before focusing on making the circle t
 When? 
 Once the application is ready: here in our example, we can only detect the bottleneck once the bottle is actually built, not while we are building the circle.
 
-![](img/bottleneck.png)
+(ref:bottleneck) Schema of a bottleneck, Adapted from WikiMedia <https://commons.wikimedia.org/wiki/File:Effects_of_a_bottleneck_on_virus_populations.png>
 
-`r right_link('Adapted from WikiMedia', 'https://commons.wikimedia.org/wiki/File:Effects_of_a_bottleneck_on_virus_populations.png')`
+```{r 15-when-optimize-1-bis, echo=FALSE, fig.cap="(ref:bottleneck)", out.width="100%"}
+knitr::include_graphics("img/bottleneck.png")
+```
 
 This bottleneck is the very thing you should be optimizing: having faster code anywhere else except this bottleneck will not make your app faster: you will just make your app reach the bottleneck faster, but there will still be this part of your app that slows everything down. 
 But this is something you might only realize when the app is fully built: pieces might be fast apart, but slow when put together. 
@@ -186,11 +188,20 @@ Our `top()` function being the only one executed, it takes the whole record time
 + Then, the second level is the first level of what is called inside `top()`: first, the function pauses, then it does a series of call to `FUN` (which is the internal anonymous function from `lapply()`), then calls the `middle()` function, which spans from around 100 ms to the end of the call. 
 Then, a detail of `middle()`, which calls `bottom_a()` and `bottom_b()`, which each `pause()` for a given amount of time. 
 
-![](img/profviz_flame.png)
+(ref:profvizflame) `{profvis}` flame graph 
+
+```{r 15-when-optimize-2-bis, echo=FALSE, fig.cap="(ref:profvizflame)", out.width="100%"}
+knitr::include_graphics("img/profviz_flame.png")
+```
 
 If you click on the "Data" tab, you will also find another view of the `flame graph`, where you can read the hierarchy of calls and the time and memory spent on each function call:
 
-![](img/profviz_data.png) 
+(ref:profvizdata) `{profvis}` data tab
+
+```{r 15-when-optimize-3-bis, echo=FALSE, fig.cap="(ref:profvizdata)", out.width="100%"}
+knitr::include_graphics("img/profviz_data.png")
+```
+
 
 If you are working on profiling the memory usage, you can also use the `{profmem}` [@R-profmem] package which, instead of focusing on execution time, will record the memory usage of calls. 
 
@@ -266,7 +277,9 @@ Here, we have an empiric evidence that one code is faster than the other: by ben
 
 If you want a graphical analysis, `{bench}` comes with an `autoplot` method for `{ggplot2}` [@R-ggplot2]:
 
-```{r 15-when-optimize-7 }
+(ref:benchautoplot) `{bench}` autoplot 
+
+```{r 15-when-optimize-7, fig.cap="(ref:benchautoplot)", out.width="100%"}
 ggplot2::autoplot(res)
 ```
 
@@ -312,11 +325,21 @@ Note that you can also install a command line tool with `npm install -g lighthou
 ^[Being a NodeJS application, you will need to have NodeJS installed on your machine.]
 , then run `lighthouse http://urlto.audit`: it will produce either a JSON (if asked) or an HTML report (the default).
 
-![](img/lighthouse-audit.png) 
+(ref:lighthouseaudit) Launching LightHouse audit from the Google Chrome
+
+```{r 15-when-optimize-4-bis, echo=FALSE, fig.cap="(ref:lighthouseaudit)", out.width="100%"}
+knitr::include_graphics("img/lighthouse-audit.png")
+```
+
 
 Google Lighthouse is computing a series of analysis about your webpage.
 
-![](img/lighthouse-audit-results.png) 
+(ref:lighthouseres) LightHouse audit results
+
+```{r 15-when-optimize-5-bis, echo=FALSE, fig.cap="(ref:lighthouseres)", out.width="100%"}
+knitr::include_graphics("img/lighthouse-audit.png")
+```
+
 
 Once the audit is finished, you have some basic but useful indications about your application:
 
@@ -346,7 +369,7 @@ Then, being a JSON file, you can call if from R:
 
 ```{r 15-when-optimize-8 }
 lighthouse_report <- jsonlite::read_json("data-raw/output.json")
-lighthouse_report$audits$`speed-index`
+lighthouse_report$audits$`speed-index`$displayValue
 ```
 
 Google Lighthouse also comes with a continuous integration tool, so that you can use it as a regression testing tool for your application. 
