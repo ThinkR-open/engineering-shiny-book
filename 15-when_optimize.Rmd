@@ -10,25 +10,35 @@
 
 ### Identifying bottlenecks
 
+Refactoring existing code for speed sounds like an appealing activity for a lot of us: it is always satisfying to watch our functions get faster, or finding a more elegant way to solve a problem that also results in making your code a little bit faster. 
+Or as Maude Lemaire simply puts in "Refactoring at Scale" [@lemaire2020], "_Refactoring can be a little bit like eating brownies: the first few bites are delicious, making it easy to get carried away and accidentally eat an entire dozen. When you’ve taken your last bite, a bit of regret and perhaps a twinge of nausea kick in._"
+
+But beware! 
 As Donald Knuth puts it _"Premature optimization is the root of all evil"_. 
 What does that means? 
 That focusing on optimizing small portions of your app before making it work fully is the best way to lose time along the way, even more in the context of a production application, where there are deadlines and a limited amount of time to build the application.
 
 Why? 
-Here is the general idea: in the following schema below, you can make the circles travel to the bottleneck as fast as you want, the circles will still be slowed by the narrow bottleneck, hence you will just be losing time making the circle movement faster, without actually gaining any time on the global performance.
+Here is the general idea: in the following schema below, you can make the circles travel to the bottleneck as fast as you want, the circles will still be slowed by the narrow bottleneck, hence you will just be losing time making the circles move faster, without actually gaining any time on the global performance.
 So focus on making the bottleneck larger, before focusing on making the circle travel fast.
 When? 
-Once the application is ready: here in our example, we can only detect the bottleneck once the bottle is actually built, not while we are "building the circle".
+Once the application is ready: here in our example, we can only detect the bottleneck once the bottle is actually built, not while we are building the circle.
 
 ![](img/bottleneck.png)
 
 `r right_link('Adapted from WikiMedia', 'https://commons.wikimedia.org/wiki/File:Effects_of_a_bottleneck_on_virus_populations.png')`
 
-This is the very thing you should be optimizing: having faster code anywhere else except this bottleneck will not make your app faster: you will just make your app reach the bottleneck faster, but there will still be this part of your app that slows everything down. 
-But this is something you might only realize when the app is fully built: pieces might be fast together, but slow when put together. 
+This bottleneck is the very thing you should be optimizing: having faster code anywhere else except this bottleneck will not make your app faster: you will just make your app reach the bottleneck faster, but there will still be this part of your app that slows everything down. 
+But this is something you might only realize when the app is fully built: pieces might be fast apart, but slow when put together. 
 It is also possible that the test dataset you have been using from the start works just fine, but when you try your app with a bigger, more realistic dataset, the application is actually way slower than it should be.
 And, maybe you have been using an example dataset so that you do not have to query the database every time you implement a new feature, but actually the SQL query to the database is very slow. 
 This is something you will discover only when the application is fully functional, not when building the parts: and realizing that when you only have 5% of the allocated time for this project left on your calendar is not a good surprise. 
+
+Or to sum up: 
+
+> Get your design right with an un-optimized, slow, memory-intensive implementation before you try to tune. Then, tune systematically, looking for the places where you can buy big performance wins with the smallest possible increases in local complexity.
+
+`r right_link("The Art of Unix Programming", "http://www.catb.org/~esr/writings/taoup/html/")`
 
 ### Do you need faster functions?
 
@@ -59,8 +69,10 @@ Yet you will only realize that once the application is up and running!
 ### Don't sacrifice readability
 
 As said in the last section, every piece of code can be rewritten to be faster, either from R to R or using a lower level language: for example C or C++. 
-You can also rebuild data manipulation code use one package to another, use complex data structures to optimizing memory usage, etc, etc.
-But that comes with a price: not keeping thing simple for the sake of local optimization makes maintenance harder, even more if you are using a lesser known language/package. 
+You can also rebuild data manipulation code switching from a package to another, use complex data structures to optimizing memory usage, etc, etc.
+But that comes with a price: not keeping thing simple for the sake of local optimization makes maintenance harder, even more if you are using a lesser known language/package.
+Refactoring a piece of code is better done when you keep in mind that "_the primary goal should be to produce human-friendly code, even at the cost of your original design. If the laser focus is on the solution rather than the process, there’s a greater chance your application will end up more more contrived and complicated than it was in the first place_" [@lemaire2020].
+
 For example, switching some portions of your code to C++ implies that you might be the only person being able to maintain that specific portion of code, or that your colleague taking over the project will have to spend hours learning the tools you have been building, or the language you have chosen to write your functions with. 
 
 Again, optimization is always a matter of trade-off: is the half-second local optimization worth the extra hours you will have to spend correcting bugs when the app will crash and when you will be the only one able to correct it?
