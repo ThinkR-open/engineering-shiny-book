@@ -1,4 +1,5 @@
 install.packages(c("attachment", "remotes", "usethis", "namer", "desc"))
+
 paks <- c(
   "cloc", "dplyr", "cyclocomp", "tidytuesday201942", "shiny", "packageMetrics2", 
   "remotes", "readr", "here", "tibble", "knitr", "desc", "attachment", "magrittr", 
@@ -18,6 +19,7 @@ paks <- c(
   'R.cache', 'glouton', 'bubble', 'roxygen2', 
   'covr', 'rcmdcheck', 'covrpage'
 )
+
 cran_paks <- tools::CRAN_package_db()
 desc_pak <- desc::desc_get_deps()$package
 remotes::install_version("subprocess", "0.8.3")
@@ -48,38 +50,4 @@ purrr::walk(
     namer::name_chunks(x)
   }
 )
-
-try({
-  gh::gh(
-    "POST /repos/:owner/:repo/issues",
-    owner = gsub("([^/]*)/.*", "\\1", Sys.getenv("GITHUB_REPOSITORY")),
-    repo = gsub("[^/]*/(.*)", "\\1", Sys.getenv("GITHUB_REPOSITORY")),
-    title = sprintf(
-      "Spellcheck GA %s - %s", 
-      Sys.getenv("GITHUB_ACTION"), Sys.Date()
-    ), 
-    .token = Sys.getenv("GH_TOKEN"),
-    body = paste(
-      capture.output(
-        knitr::kable(
-          do.call(
-            rbind, 
-            lapply(
-              list.files(
-                path = ".", 
-                pattern = ".Rmd$"
-              ), 
-              function(x){
-                spelling::spell_check_files(x)
-              }
-            )
-          )
-        )
-      ),
-      collapse = "\n"
-    )
-  )
-})
-
-
 
