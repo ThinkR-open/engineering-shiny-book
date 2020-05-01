@@ -1,4 +1,5 @@
-install.packages(c("attachment", "remotes", "usethis", "namer", "desc"))
+install.packages(c("attachment", "remotes", "usethis", "namer", "desc", "spelling"))
+remotes::install_version("subprocess", "0.8.3")
 
 paks <- c(
   "cloc", "dplyr", "cyclocomp", "tidytuesday201942", "shiny", "packageMetrics2", 
@@ -22,7 +23,7 @@ paks <- c(
 
 cran_paks <- tools::CRAN_package_db()
 desc_pak <- desc::desc_get_deps()$package
-remotes::install_version("subprocess", "0.8.3")
+
 for (pak in paks){
   if ( !(pak %in% desc_pak)){
     try({
