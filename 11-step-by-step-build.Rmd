@@ -114,7 +114,7 @@ As you can see, the difference is that `fct_*` file are more "topic centered", i
 
 Note that when building a module with `golem::add_module()`, you can add a module specific `fct_*` or  `utils_*` file:
 
-```{r 11-step-by-step-build-2-bis, eval = FALSE}
+```{r 11-step-by-step-build-4, eval = FALSE}
 golem::add_module("rendering", fct = "connect", utils = "wrapper")
 ```
 
@@ -126,7 +126,7 @@ Will create:
 
 And this can also be done the other way around, by specifying the module you want to link your file to:
 
-```{r 11-step-by-step-build-3-bis, eval = FALSE}
+```{r 11-step-by-step-build-5, eval = FALSE}
 golem::add_utils("wrapper", module = "rendering")
 ```
 
@@ -140,7 +140,7 @@ If you have followed every steps from the `01_start.R` file, you already have a 
 But as it is hard to find tests that are relevant to all applications (as every application is unique), you will have to add and fill manually the tests that will check your app. 
 And right now, to add a new testing file, you can call:
 
-```{r 11-step-by-step-build-4, eval = FALSE}
+```{r 11-step-by-step-build-6, eval = FALSE}
 usethis::use_test("app")
 ```
 
@@ -155,13 +155,13 @@ The good news is that if you have been using our "Rmd first" method, you already
 Depending on how you applied this principle, these Rmd files might live inside the `inst/` folder, or already as package Vignettes.
 If you need to add a new Vignette, be it for adding an Rmd describing the back-end or a global documentation about the application, you can call the `use_vignette()` function from `{usethis}`.
 
-```{r 11-step-by-step-build-5, eval = FALSE}
+```{r 11-step-by-step-build-7, eval = FALSE}
 usethis::use_vignette("shinyexample")
 ```
 
 Then, you can build all the Vignettes with:
 
-```{r 11-step-by-step-build-6, eval = FALSE}
+```{r 11-step-by-step-build-8, eval = FALSE}
 devtools::build_vignettes()
 ```
 
@@ -174,7 +174,7 @@ You can do this locally, or you can use online services like Appveyor, an online
 
 To add it to your application, call the `use_coverage()` function from the `{usethis}` package: 
 
-```{r 11-step-by-step-build-4-bis, eval = FALSE}
+```{r 11-step-by-step-build-9, eval = FALSE}
 usethis::use_coverage()
 ```
 
@@ -182,13 +182,17 @@ At the time of writing these lines, this function supports two services: [CodeCo
 
 Note that you can also perform code coverage locally, using the `{covr}` [@R-covr] package, and the `package_coverage()` function.
 
-```{r 11-step-by-step-build-5-bis, eval = FALSE}
+```{r 11-step-by-step-build-10, eval = FALSE}
 code_coverage <- covr::package_coverage()
 ```
 
 For example, here is the output of running the `package_coverage()` function on the `{golem}` package on the 2020-04-29 on the `dev` branch: 
 
-![](img/golemcov.png)
+(ref:golemcov) `{golem}` code coverage results
+
+```{r 11-step-by-step-build-11, echo=FALSE, fig.cap="(ref:golemcov)", out.width="100%"}
+knitr::include_graphics("img/golemcov.png")
+```
 
 As you can see, we reach a code coverage of almost 70%. 
 Deciding what the perfect percentage of coverage should be is not an easy task, and setting for an arbitrary coverage is not a smart move either, as it very much depends on the type of project you are working on. 
@@ -198,13 +202,22 @@ Another example is writing your `if/else` statement on one line `if (this) that 
 
 Note that you can also identify files with zero code coverage using the `covr::zero_coverage(covr::package_coverage())` function, which, instead of printing back a metric of coverage for each file, will point to all the lines that are not covered by tests inside your package:
 
-![](img/zerocov.png) 
+(ref:golemzerocov) `{golem}` files with zero code coverage
+
+```{r 11-step-by-step-build-12, echo=FALSE, fig.cap="(ref:golemzerocov)", out.width="100%"}
+knitr::include_graphics("img/zerocov.png")
+```
+
 
 So, to sum up: do not set an arbitrary code coverage percentage goal, but rather use it as a general metric all along your project. 
 With CodeCov, you can get a timeline of the evolution of code coverage: a good tool for judging when you need to write more tests. 
 For example, here is the general tendency for the code coverage of the `{tibble}` package over the last 6 months (November 2019 - April 2020): 
 
-![](img/codecov-tibble.png)
+(ref:codecovtibble) CodeCov.io results for the `{tibble}` package
+
+```{r 11-step-by-step-build-13, echo=FALSE, fig.cap="(ref:codecovtibble)", out.width="100%"}
+knitr::include_graphics("img/codecov-tibble.png")
+```
 
 Perfect for getting a general feeling about the code coverage during the life of the project!
 
@@ -247,12 +260,12 @@ In other words, by setting `options( "golem.app.prod" )` to `TRUE`, you will mak
 
 Some functions pre-exist in `{golem}`, for example if you need to print a message to the console only during dev, you can do it with `cat_dev()`.
 
-```{r 11-step-by-step-build-8, eval = TRUE}
+```{r 11-step-by-step-build-14, eval = TRUE}
 options( "golem.app.prod" = FALSE)
 golem::cat_dev("In dev\n")
 ```
 
-```{r 11-step-by-step-build-6-bis}
+```{r 11-step-by-step-build-15 }
 options( "golem.app.prod" = TRUE)
 golem::cat_dev("In dev\n")
 ```
@@ -261,7 +274,7 @@ Of course, chances are you do not only need to print things, you might want to u
 Good news!
 You can make any function being "dev-dependent" with the `make_dev()` function: 
 
-```{r 11-step-by-step-build-9, eval = TRUE}
+```{r 11-step-by-step-build-16, eval = TRUE}
 log_dev <- golem::make_dev(log)
 log_dev(10)
 options( "golem.app.prod" = TRUE)
