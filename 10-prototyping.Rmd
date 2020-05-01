@@ -38,22 +38,23 @@ Chances are that if you ask yourself upfront what the app bottlenecks will be, y
 So instead of losing time focusing on specific pieces of code you think need to be optimized, start by having something that works, then optimize the code. 
 In other words, "_Make It Work. Make It Right. Make It Fast_", ([KentBeck](https://wiki.c2.com/?MakeItWorkMakeItRightMakeItFast)).
 
-+ It's easier to spot mistakes when you have something the can run. 
++ It's easier to spot mistakes when you have something that can run. 
 If a piece of software runs, it is straightforward to check if a change in the codebase break the software or not: it either still run or not. 
 
 ### The "UI first" approach
 
-Using what can be called a "UI first" approach when building an app is in most cases the safest way to fo. 
+Using what can be called a "UI first" approach when building an app is in most cases the safest way to go. 
 And for two main reasons.
 
-#### Agreeing on specification
+#### Agreeing on specifications
 
 First of all, it helps everybody involved in the application to agree on what the app is supposed to do, and once the UI is set, there should be no "surprise implementation". 
-Well, at least, this is the best way to reduce the number of changes in the app, as the sooner we have a global idea of the app the better: it is hard to implement a core new feature once the app is 90% finished, while it would have been way easier to implement it if it has been detected from the very start.
+Well, at least, this is the best way to reduce the number of changes in the app, as the sooner we have a global idea of the app, the better. 
+It is hard to implement a core new feature once the app is 90% finished, while it would have been way easier to implement it if it has been detected from the very start.
 Indeed, implementing core feature once the app is very advanced can be critical, as our application might not have been thought to work the way it now needs to work, so adding certain elements might lead to a need for change in the core architecture of the app.
-
 Once we agree on what elements compose the app, there should be no sudden "oh the app needs to do that thing now, sorry I hadn't realized that before".
-And we can not blame the person ordering the app for not realizing everything needed: it is really hard to have a mental model of the whole app when we are writing specifications, not to mention when reading them. 
+
+We can not blame the person ordering the app for not realizing everything needed to build the app: it is really hard to have a mental model of the whole software when we are writing specifications, not to mention when reading them. 
 On the other hand, having a mock application with the UI really helps realizing what the app is doing and how it works, and to agree with the developer that this is actually what we want our application to do (or realizing that this is not something we actually need).
 
 Prototyping the UI first should require the least possible computation from the server-side of your application. 
@@ -62,7 +63,7 @@ At that stage of the design process, you will not be focusing on correctness of 
 At that point, the idea is to get the people ordering the app think about what they actually need, and there might be some question rising like "oh, where is the button to download that results in pdf?". 
 And at that precise moment is the perfect time for a change in specification. 
 
-#### Organising work
+#### Organizing work
 
 A pre-defined UI allows every person involved in the coding process to know which part of the app they are working on, and to be sure that you do not forget anything. 
 As you might be working on the app as a team, you will need to find a strategy for efficiently splitting the work between every coder. 
@@ -136,6 +137,8 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
+![](img/shinipsumapp.png)
+
 Other `{shinipsum}` functions include: 
 
 + tables: 
@@ -154,7 +157,7 @@ random_print(type = "model")
 
 ### Using `{fakir}` for fake data generation
 
-Generating random placeholder for Shiny might not be enough: maybe you also need example datasets.
+Generating random placeholders for Shiny might not be enough: maybe you also need example datasets.
 
 This can be accomplished using the `{fakir}` package, which was primarily created to provide fake datasets for R tutorials and exercises, but that can easily be used inside a Shiny application. 
 
@@ -164,7 +167,7 @@ At the time of writing these lines, the package is only available on GitHub, and
 remotes::install_github("Thinkr-open/fakir")
 ```
 
-This package contains three "datasets", that are randomly generated when you call the corresponding functions:
+This package contains three datasets that are randomly generated when you call the corresponding functions:
 
 + `fake_base_clients()` generates a fake dataset for a ticketing service
 
@@ -186,17 +189,17 @@ Fake datasets created with `{fakir}` can be used to build light examples on the 
 
 While on one side you are building the user interface, you (or someone from your team) can start working on the back-end implementation.
 Again, this should be done out of any reactive logic: the back-end should not depend on any reactive context. 
-And because documentation is gold, you should start with writing the back-end documentation straight as package documentation, inside your Vignettes. 
+And because documentation is gold, you should start with writing the back-end documentation straight as package documentation, inside your Vignettes, or in `inst/`. 
 Or what we call "Rmd-first".
 
 ### Define the content of the application
 
-Rmarkdown files are the perfect spot to sandbox the back-end of your application: inside the file, you are not disrupted by any reactive behavior, as you are just working with plain old R code: data wrangling operations, multi-parameters based models, summary tables outputs, graphical outputs...
+Rmarkdown files are the perfect spot to sandbox the back-end of your application: inside the file, you don't have to think about any reactive behavior, as you are just working with plain old R code: data wrangling operations, multi-parameters based models, summary tables outputs, graphical outputs...
 
-And the nice thing is that you can share the output of the rendered file as an HTML or PDF to either your client or boss, or anyone ordering the application. 
-That way, you can drive the discussion to be focused on discussing the core algorithm, not some details like "I want the button to be blue" when what you need to know is if the output of the model is correct-in other words, you are again applying the rule of the separation of concerns, i.e. you help focusing on one part of the application without adding any cognitive load to the person "reading" the outputs. 
-
-And also, last but not least, if you have to implement changes to the back-end functions, it is way easier to check and to share in a static file than in an application.
+And the nice thing is that you can share the output of the rendered file as an HTML or PDF to either your client or boss, or anyone involved in the project.
+That way, you can focus on the core algorithm, not some UI implementation like "I want the button to be blue" when what you need to know is if the output of the model is correct.
+In other words, you are applying the rule of the separation of concerns, i.e. you help focusing on one part of the application without adding any cognitive load to the person "reading" the outputs. 
+And, last but not least, if you have to implement changes to the back-end functions, it is way easier to check and to share in a static file than in an application.
 
 When doing that, the best way is again to separate things: do not be afraid of writing multiple RMarkdown files, one for each part of the end application. 
 Again, this will help everybody focus on what matter: be it you, your team, or the person ordering the application. 
