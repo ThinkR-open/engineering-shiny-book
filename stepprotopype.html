@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 11 Building app with {golem} | Engineering Production-Grade Shiny Apps</title>
+  <title>Chapter 10 Building an “ipsum-app” | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 11 Building app with {golem} | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:title" content="Chapter 10 Building an “ipsum-app” | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
   
   <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 11 Building app with {golem} | Engineering Production-Grade Shiny Apps" />
+  <meta name="twitter:title" content="Chapter 10 Building an “ipsum-app” | Engineering Production-Grade Shiny Apps" />
   
   <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="stepprotopype.html"/>
-<link rel="next" href="step-secure.html"/>
+<link rel="prev" href="setting-up-for-success-with-golem.html"/>
+<link rel="next" href="stepbuild.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
@@ -441,216 +441,259 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="stepbuild" class="section level1">
-<h1><span class="header-section-number">Chapter 11</span> Building app with <code>{golem}</code></h1>
-<p>Now that the application is prototyped inside a <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> skeleton, you can work on its integration.
-In this step of the workflow, you will be linking the back-end and front-end together, and working on the global engineering of the application, <em>i.e</em>:</p>
-<ul>
-<li>add and organize dependencies</li>
-<li>creating and including sub-modules if necessary</li>
-<li>organize utility functions and link them to the module they are used in</li>
-<li>adding testing infrastructure</li>
-<li>linking to CI / CD services</li>
-</ul>
-<p>Note that some concepts introduced here will be more extensively explored in the following chapters: the present chapter is a walkthrough of what you will find inside the <code>02_dev</code> scripts.</p>
-<div id="add-dependencies" class="section level2">
-<h2><span class="header-section-number">11.1</span> Add dependencies</h2>
-<div id="package-dependencies" class="section level3">
-<h3><span class="header-section-number">11.1.1</span> Package dependencies</h3>
-<p>When you are building a <code>{shiny}</code> <span class="citation">(Chang et al. <a href="#ref-R-shiny" role="doc-biblioref">2020</a>)</span> application, you will have to deal with dependencies.
-Well, at least with one dependency, <code>{shiny}</code>.
-But chances are that you will not only be using <code>{shiny}</code> inside your application: you will probably call functions from other packages, for example from <code>{ggplot2}</code> <span class="citation">(Wickham, Chang, et al. <a href="#ref-R-ggplot2" role="doc-biblioref">2020</a>)</span> for plotting, <code>{DT}</code> <span class="citation">(Xie, Cheng, and Tan <a href="#ref-R-DT" role="doc-biblioref">2020</a>)</span> for interactive tables, or any other packages that will be necessary to your application working.</p>
-<p>If you are building your application using <code>{golem}</code>, you will have 3 default dependencies: <code>{golem}</code> itself, <code>{shiny}</code>, and <code>{config}</code>.
-If you call <code>golem::use_recommended_deps()</code> in the first workflow script, you will also have <code>{shiny}</code>, <code>{DT}</code>, <code>{attempt}</code>, <code>{glue}</code>, <code>{htmltools}</code>, and <code>{golem}</code> as dependencies to your package<a href="#fn33" class="footnote-ref" id="fnref33"><sup>33</sup></a>
-.
-But what about other dependencies like <code>{ggplot2}</code> or <code>{DT}</code>?
-These ones need to be added by hand.</p>
-<p>Here is how to process for a new dependency:</p>
-<ul>
-<li>Open the <code>dev/02_dev.R</code> script,</li>
-<li>Call the <code>use_package()</code> function from <code>{usethis}</code>: <code>usethis::use_package("pkg.you.want.to.add")</code></li>
-<li>Detail import mechanism in the related R files</li>
-</ul>
-</div>
-<div id="importing-packages-and-functions" class="section level3">
-<h3><span class="header-section-number">11.1.2</span> Importing packages and functions</h3>
-<p>There are two places where the dependencies of your application need to be managed<a href="#fn34" class="footnote-ref" id="fnref34"><sup>34</sup></a>
-: the <code>DESCRIPTION</code> file and the <code>NAMESPACE</code></p>
-<ul>
-<li><p>The <code>DESCRIPTION</code> file, which dictates which packages have to be installed when your application is installed.
-With R, you can not install just a subset of a package (<em>i.e</em> when you install <code>{golem}</code> on your machine, you install the whole package, not only a subset of functions), and you have to list somewhere these packages you need: this is what is done when your are listing in the <code>DESCRIPTION</code> file with <code>usethis::use_package()</code>.
-What that implies is that every package listed as a dependency will be fully installed on the machine when your application is installed.
-For example, if you list <code>{DT}</code> inside the <code>DESCRIPTION</code> file, the whole package will be installed when your app is installed.</p></li>
-<li><p>The <code>NAMESPACE</code> file, which describe how your app interacts with the R session at run time, <em>i.e</em> when your application is launched.
-What this <code>NAMESPACE</code> file allows to do is to specify only a subset of functions to import from other packages: for example you can choose to import only <code>renderDT()</code> and <code>DTOutput()</code> from <code>{DT}</code>, instead of importing all the functions.
-The idea with selective import is to avoid namespace conflicts: if you remember correctly, we described a few chapters ago a namespace conflict occurring between <code>jsonlite::flatten()</code> and <code>purrr::flatten()</code><a href="#fn35" class="footnote-ref" id="fnref35"><sup>35</sup></a>
-: using a selective importation, <em>i.e</em> only importing the function we need from <code>{purrr}</code>, will prevent our code from failing because it is looking for the wrong function.
-To do so, we will need to go to every script that defines one or several function(s), and add a <code>{roxygen2}</code> <span class="citation">(Wickham, Danenberg, et al. <a href="#ref-R-roxygen2" role="doc-biblioref">2020</a>)</span> tag, in the following form : <code>#' @importFrom purrr map map_df partial</code>.
-Note that you can also use explicit namespacing, <em>i.e</em> the <code>pkg::function()</code> notation inside your code.</p></li>
-</ul>
-<p>Also, if you need a little help to identify dependencies, all the explicitly namespaced calls (<code>pkg::function()</code>) can be scraped using the <code>{attachment}</code> <span class="citation">(Guyader and Rochette <a href="#ref-R-attachment" role="doc-biblioref">2020</a>)</span> package:</p>
-<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="stepbuild.html#cb123-1"></a>attachment<span class="op">::</span><span class="kw">att_from_rscripts</span>()</span></code></pre></div>
-<p>If you are using a development package (for example one installed from GitHub), you can add it to the <code>DESCRIPTION</code> using the <code>use_dev_package()</code> function from <code>{usethis}</code>.
-This will add another field to the <code>DESCRIPTION</code> file, <code>Remotes</code>, with the location where the package is available.</p>
-<p>All of this can seem a little bit daunting at first, but that is for the best:</p>
+<div id="stepprotopype" class="section level1">
+<h1><span class="header-section-number">Chapter 10</span> Building an “ipsum-app”</h1>
+<div id="prototyping-is-crucial" class="section level2">
+<h2><span class="header-section-number">10.1</span> Prototyping is crucial</h2>
+<div id="prototype-then-polish" class="section level3">
+<h3><span class="header-section-number">10.1.1</span> Prototype, then polish</h3>
 <blockquote>
-<p>Having a high quality namespace helps encapsulate your package and makes it self-contained. This ensures that other packages won’t interfere with your code, that your code won’t interfere with other packages, and that your package works regardless of the environment in which it’s run.</p>
+<p>Prototyping first may help keep you from investing far too much time for marginal gains.</p>
 </blockquote>
-<p><em>R Packages</em>, <span class="citation">(Wickham and Bryan <a href="#ref-rpkg" role="doc-biblioref">2020</a><a href="#ref-rpkg" role="doc-biblioref">a</a>)</span></p>
-<p>To learn more about the details of dependencies, <code>DESCRIPTION</code> and <code>NAMESPACE</code>, here are some resources:</p>
+<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<style>.right{ text-align: right;}</style>
+<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<div class="right">
+<a href="http://www.catb.org/~esr/writings/taoup/html/ch01s06.html#rule_of_optimization">The Art of Unix Programming</a>
+</div>
+<p>And yet another Rule from the Art of Unix Programming: “Rule of Optimization: Prototype before polishing. <strong>Get it working before you optimize it</strong>.”</p>
+<p>Getting things to work before trying to optimize the app is always a good approach:</p>
 <ul>
-<li><a href="https://cran.r-project.org/manuals.html">Writing R Extensions</a>, the official manual from the R-Core team</li>
-<li><a href="https://r-pkgs.org/">R Packages</a>, especially the <em>Package metadata</em> and <em>Namespace</em></li>
+<li>Making things work before working on low level optimization makes the whole engineering process easier: having a “minimal viable product” that works, even if slowly and not perfectly, gives a stronger sense of success to the project.
+For example if you are building a vehicle, it feels more of a success to start with a skateboard than with a wheel: you quickly have a product that can be used to move, not waiting for the end of the project before finally having something useful.</li>
 </ul>
-</div>
-</div>
-<div id="submodules-and-utility-functions" class="section level2">
-<h2><span class="header-section-number">11.2</span> Submodules and utility functions</h2>
-<p>When building a large application, you will be splitting your code base into smaller pieces.
-We have developed in the <em>Structuring your Project</em> chapter that these utilitarian functions should be defined in files that are prefixed with a specific term.
-In the <code>{golem}</code> world, these are <code>utils_*</code> and <code>fct_*</code> files:</p>
-<ul>
-<li><code>utils_*</code> files contain small functions that might be used several times in the application</li>
-<li><code>fct_*</code> files contain larger functions that are more central to the application</li>
-</ul>
-<p>Two functions can be called to create these files:</p>
-<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="stepbuild.html#cb124-1"></a>golem<span class="op">::</span><span class="kw">add_fct</span>( <span class="st">&quot;helpers&quot;</span> ) </span>
-<span id="cb124-2"><a href="stepbuild.html#cb124-2"></a>golem<span class="op">::</span><span class="kw">add_utils</span>( <span class="st">&quot;helpers&quot;</span> )</span></code></pre></div>
-<ul>
-<li>The first will create a <code>R/fct_helpers.R</code> file</li>
-<li>The second will create a <code>R/utils_helpers.R</code> file</li>
-</ul>
-<p>The idea, as explained before, is that as soon as you open a <code>{golem}</code> based project, you are able to identify what the files contain, without having to open them<a href="#fn36" class="footnote-ref" id="fnref36"><sup>36</sup></a>
-.</p>
-<p>For example, the <code>{hexmake}</code> app has two of these files <a href="https://github.com/ColinFay/hexmake/blob/master/R/utils_ui.R"><code>R/utils_ui.R</code></a> and <a href="https://github.com/ColinFay/hexmake/blob/master/R/utils_server.R"><code>R/utils_server.R</code></a>, in which you will find small functions that are reused throughout the app.</p>
-<p>The <code>fct_*</code> files are to be used with larger functions, which are more central to the application, but that might not fit into a specific module.
-For example, in <code>{hexmake}</code>, you will find <a href="https://github.com/ColinFay/hexmake/blob/master/R/fct_mongo.R"><code>R/fct_mongo.R</code></a>, that is used to handle all the things related to connecting and interacting with the Mongodb database.</p>
-<p>As you can see, the difference is that <code>fct_*</code> file are more “topic centered”, in the sense that they gather functions that relate to a specific feature of the application (here, the database), while <code>utils_*</code> files are more used as a place where to put miscellaneous functions.</p>
-<p>Note that when building a module with <code>golem::add_module()</code>, you can add a module specific <code>fct_*</code> or <code>utils_*</code> file:</p>
-<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="stepbuild.html#cb125-1"></a>golem<span class="op">::</span><span class="kw">add_module</span>(<span class="st">&quot;rendering&quot;</span>, <span class="dt">fct =</span> <span class="st">&quot;connect&quot;</span>, <span class="dt">utils =</span> <span class="st">&quot;wrapper&quot;</span>)</span></code></pre></div>
-<p>Will create:</p>
-<ul>
-<li><code>R/mod_rendering.R</code></li>
-<li><code>R/mod_rendering_fct_connect.R</code></li>
-<li><code>R/mod_rendering_utils_wrapper.R</code></li>
-</ul>
-<p>And this can also be done the other way around, by specifying the module you want to link your file to:</p>
-<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="stepbuild.html#cb126-1"></a>golem<span class="op">::</span><span class="kw">add_utils</span>(<span class="st">&quot;wrapper&quot;</span>, <span class="dt">module =</span> <span class="st">&quot;rendering&quot;</span>)</span></code></pre></div>
-</div>
-<div id="add-tests" class="section level2">
-<h2><span class="header-section-number">11.3</span> Add tests</h2>
-<p>No piece of software should go into production if it has not been sufficiently tested.
-In this part of the building process, you will be setting tests for the application you are building.
-We will get back to the how, why and what of testing in an upcoming chapter, but as we are currently going through the <code>02_dev.R</code> script, we mention here the line that allows you to add a test skeleton to your app.</p>
-<p>If you have followed every steps from the <code>01_start.R</code> file, you already have a full testing infrastructure ready, with a set of recommended tests inserted by <code>{golem}</code>.
-But as it is hard to find tests that are relevant to all applications (as every application is unique), you will have to add and fill manually the tests that will check your app.
-And right now, to add a new testing file, you can call:</p>
-<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="stepbuild.html#cb127-1"></a>usethis<span class="op">::</span><span class="kw">use_test</span>(<span class="st">&quot;app&quot;</span>)</span></code></pre></div>
-<p>More on testing in the <em>Build yourself a safety net</em> chapter.</p>
-</div>
-<div id="documentation-and-code-coverage" class="section level2">
-<h2><span class="header-section-number">11.4</span> Documentation and Code Coverage</h2>
-<div id="vignette" class="section level3">
-<h3><span class="header-section-number">11.4.1</span> Vignette</h3>
-<p>Vignettes are long format documentation for your application, they are the one users see when they are running <code>browseVignettes()</code>, when they look at the documentation in the <code>Help</code> pane from RStudio, when they are browsing a webpage on CRAN, and it is also the files that are used when the <code>{pkgdown}</code> websites are built.
-The good news is that if you have been using our “Rmd first” method, you already have most of the Vignettes built: they are the Markdown files describing how the back-end of your application works.
-Depending on how you applied this principle, these Rmd files might live inside the <code>inst/</code> folder, or already as package Vignettes.
-If you need to add a new Vignette, be it for adding an Rmd describing the back-end or a global documentation about the application, you can call the <code>use_vignette()</code> function from <code>{usethis}</code>.</p>
-<div class="sourceCode" id="cb128"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb128-1"><a href="stepbuild.html#cb128-1"></a>usethis<span class="op">::</span><span class="kw">use_vignette</span>(<span class="st">&quot;shinyexample&quot;</span>)</span></code></pre></div>
-<p>Then, you can build all the Vignettes with:</p>
-<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb129-1"><a href="stepbuild.html#cb129-1"></a>devtools<span class="op">::</span><span class="kw">build_vignettes</span>()</span></code></pre></div>
-</div>
-<div id="code-coverage-continuous-integration" class="section level3">
-<h3><span class="header-section-number">11.4.2</span> Code Coverage &amp; Continuous Integration</h3>
-<div id="code-coverage" class="section level4">
-<h4><span class="header-section-number">11.4.2.1</span> Code Coverage</h4>
-<p>Code coverage is a way to detect the volume of code that is covered by unit testing.
-You can do this locally, or you can use online services like Appveyor, an online platform that computes and tracks the code coverage of your repository.</p>
-<p>To add it to your application, call the <code>use_coverage()</code> function from the <code>{usethis}</code> package:</p>
-<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb130-1"><a href="stepbuild.html#cb130-1"></a>usethis<span class="op">::</span><span class="kw">use_coverage</span>()</span></code></pre></div>
-<p>At the time of writing these lines, this function supports two services: <a href="https://codecov.io/">CodeCov</a> and <a href="https://coveralls.io/">coveralls</a>.</p>
-<p>Note that you can also perform code coverage locally, using the <code>{covr}</code> <span class="citation">(Hester <a href="#ref-R-covr" role="doc-biblioref">2020</a><a href="#ref-R-covr" role="doc-biblioref">b</a>)</span> package, and the <code>package_coverage()</code> function.</p>
-<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="stepbuild.html#cb131-1"></a>code_coverage &lt;-<span class="st"> </span>covr<span class="op">::</span><span class="kw">package_coverage</span>()</span></code></pre></div>
-<p>For example, here is the output of running the <code>package_coverage()</code> function on the <code>{golem}</code> package on the 2020-04-29 on the <code>dev</code> branch:</p>
 
-<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-build-11"></span>
-<img src="img/golemcov.png" alt="{golem} code coverage results" width="100%" />
+<div class="figure" style="text-align: center"><span id="fig:10-prototyping-1"></span>
+<img src="img/mvp.png" alt="Building a Minimum Viable Product" width="100%" />
 <p class="caption">
-FIGURE 11.1: <code>{golem}</code> code coverage results
+FIGURE 10.1: Building a Minimum Viable Product
 </p>
 </div>
-<p>As you can see, we reach a code coverage of almost 70%.
-Deciding what the perfect percentage of coverage should be is not an easy task, and setting for an arbitrary coverage is not a smart move either, as it very much depends on the type of project you are working on.
-For example, in <code>{golem}</code>, the <code>addins.R</code> file is not tested (0% code coverage), and that is for a good reason: these addins are linked to RStudio and are not meant to be tested/used in a non-interactive environment, and (at least at the time of writing these lines) there are no automated way to test for RStudio addins.
-Another thing to keep in mind while computing code coverage is that it counts the number of lines that are run when the tests are run, which means that if you write your whole function on one single line, you will have a 100% code coverage.
-Another example is writing your <code>if/else</code> statement on one line <code>if (this) that else that</code>: your code coverage will count this line as covered, even if your test suite only runs the <code>if(this)</code> and not the <code>else</code> ; in other words, even if your code coverage is good here, you are still not testing this algorithm extensively.</p>
-<p>Note that you can also identify files with zero code coverage using the <code>covr::zero_coverage(covr::package_coverage())</code> function, which, instead of printing back a metric of coverage for each file, will point to all the lines that are not covered by tests inside your package:</p>
-
-<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-build-12"></span>
-<img src="img/zerocov.png" alt="{golem} files with zero code coverage" width="100%" />
-<p class="caption">
-FIGURE 11.2: <code>{golem}</code> files with zero code coverage
-</p>
-</div>
-<p>So, to sum up: do not set an arbitrary code coverage percentage goal, but rather use it as a general metric all along your project.
-With CodeCov, you can get a timeline of the evolution of code coverage: a good tool for judging when you need to write more tests.
-For example, here is the general tendency for the code coverage of the <code>{tibble}</code> package over the last 6 months (November 2019 - April 2020):</p>
-
-<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-build-13"></span>
-<img src="img/codecov-tibble.png" alt="CodeCov.io results for the {tibble} package" width="100%" />
-<p class="caption">
-FIGURE 11.3: CodeCov.io results for the <code>{tibble}</code> package
-</p>
-</div>
-<p>Perfect for getting a general feeling about the code coverage during the life of the project!</p>
-<p>Note also that if you want to add the code coverage of your application inside a Vignette, you can use the <code>{covrpage}</code> <span class="citation">(Sidi <a href="#ref-R-covrpage" role="doc-biblioref">2020</a>)</span> package, that bundles the results of <code>{covr}</code> coverage report into an interactive, human readable Vignette, that you can later on use as package documentation, or as an article inside your package website.
-<code>{covrpage}</code> can be installed from GitHub with <code>remotes::install_github('metrumresearchgroup/covrpage')</code>.</p>
-</div>
-<div id="continuous-integration" class="section level4">
-<h4><span class="header-section-number">11.4.2.2</span> Continuous Integration</h4>
-<p>Continuous Integration, on the other hand, is ensuring the software is still working whenever a change is made by one of the developer.
-The idea is to add to the centralized version control system (for example Git)<a href="#fn37" class="footnote-ref" id="fnref37"><sup>37</sup></a>
-a service like Travis CI, GitHub Action (if you are on GitHub) or GitLab CI (for GitLab) that runs a series of commands whenever something is integrated to the repository, <em>i.e</em> every time a change to the codebase is made.
-In other words, every time a new piece of code is sent to the central repository, a service runs regression tests that check that the software is still in a valid, working state.</p>
-<p>You can set up various continuous integration services automatically by using functions from the <code>{usethis}</code> package:</p>
 <ul>
-<li>Travis CI is set up with <code>usethis::use_travis()</code></li>
-<li>AppVeyor with <code>usethis::use_appveyor()</code></li>
-<li>GitLab CI with <code>use_gitlab_ci()</code></li>
-<li>Circle CI with <code>use_circleci()</code></li>
-<li>Github Actions with <code>use_github_actions()</code></li>
-<li>Jenkins with <code>use_jenkins()</code></li>
+<li>Abstraction is hard, and makes the code base harder to work with.
+You have heard a lot that if you are copying and pasting something more than twice, you should write a function.
+And with Shiny, if you are writing a piece of the app more than twice, you should write modules.
+But while these kind of abstractions are elegant and optimized, they can make the software harder to work on while building it.
+So before focusing on turning something into a function, make it work first.
+As said in <em>R for Data Science</em> <span class="citation">(Wickham and Grolemund <a href="#ref-hadleywickham2017" role="doc-biblioref">2017</a>)</span> about abstraction with <code>{purrr}</code> <span class="citation">(Henry and Wickham <a href="#ref-R-purrr" role="doc-biblioref">2020</a>)</span>:</li>
 </ul>
-<p>If ever you want to add badges to your <code>README</code> files for these services, <code>{usethis}</code> also comes with a series of functions to do just that: <code>use_travis_badge()</code>, <code>use_appveyor_badge()</code>, <code>use_circleci_badge()</code> and <code>use_github_actions_badge()</code>.</p>
-<p>CI services can do a lot more, like for example deploying the application, build a container and send it to a container registry, compile RMarkdown files<a href="#fn38" class="footnote-ref" id="fnref38"><sup>38</sup></a>
-, etc.
-The possibilities are almost limitless!</p>
+<blockquote>
+<p>Once you master these functions, you’ll find it takes much less time to solve iteration problems. But you should never feel bad about using a for loop instead of a map function. The map functions are a step up a tower of abstraction, and it can take a long time to get your head around how they work. The important thing is that you solve the problem that you’re working on, not write the most concise and elegant code (although that’s definitely something you want to strive towards!).</p>
+</blockquote>
+<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<style>.right{ text-align: right;}</style>
+<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<div class="right">
+<a href="https://r4ds.had.co.nz/iteration.html">R for Data Science - 21.5 The map functions</a>
+</div>
+<p>As a small example, we can refer to the binding module from <code>{hexmake}</code> <span class="citation">(Fay <a href="#ref-R-hexmake" role="doc-biblioref">2020</a><a href="#ref-R-hexmake" role="doc-biblioref">g</a>)</span>: this module manipulates namespaces, inputs and <code>session</code> to automatically bind inputs to the R6 object containing the image (see implementation <a href="https://github.com/ColinFay/hexmake/blob/master/R/mod_binder.R#L29">here</a>, <a href="https://github.com/ColinFay/hexmake/blob/master/R/utils_server.R#L2">here</a> and <a href="https://github.com/ColinFay/hexmake/blob/master/R/mod_left.R#L60">here</a>).
+That’s an elegant solution: instead of duplicating content, we use functions to automatically bind events.
+But that is a higher level of abstraction: we manipulate different levels of namespacing and inputs, making it harder to reason about when you have to change the code base.</p>
+<ul>
+<li><p>It’s hard to identify upfront the real bottlenecks of the app.
+As long as the app is not in a working state, it is very hard to identify the real pieces of code that need to be optimized.
+Chances are that if you ask yourself upfront what the app bottlenecks will be, you will not aim right.
+So instead of losing time focusing on specific pieces of code you think need to be optimized, start by having something that works, then optimize the code.
+In other words, “<em>Make It Work. Make It Right. Make It Fast</em>”, (<a href="https://wiki.c2.com/?MakeItWorkMakeItRightMakeItFast">KentBeck</a>).</p></li>
+<li><p>It’s easier to spot mistakes when you have something that can run.
+If a piece of software runs, it is straightforward to check if a change in the codebase break the software or not: it either still run or not.</p></li>
+</ul>
+</div>
+<div id="the-ui-first-approach" class="section level3">
+<h3><span class="header-section-number">10.1.2</span> The “UI first” approach</h3>
+<p>Using what can be called a “UI first” approach when building an app is in most cases the safest way to go.
+And for two main reasons.</p>
+<div id="agreeing-on-specifications" class="section level4">
+<h4><span class="header-section-number">10.1.2.1</span> Agreeing on specifications</h4>
+<p>First of all, it helps everybody involved in the application to agree on what the app is supposed to do, and once the UI is set, there should be no “surprise implementation”.
+Well, at least, this is the best way to reduce the number of changes in the app, as the sooner we have a global idea of the app, the better.
+It is hard to implement a core new feature once the app is 90% finished, while it would have been way easier to implement it if it has been detected from the very start.
+Indeed, implementing core feature once the app is very advanced can be critical, as our application might not have been thought to work the way it now needs to work, so adding certain elements might lead to a need for change in the core architecture of the app.
+Once we agree on what elements compose the app, there should be no sudden “oh the app needs to do that thing now, sorry I hadn’t realized that before”.</p>
+<p>We can not blame the person ordering the app for not realizing everything needed to build the app: it is really hard to have a mental model of the whole software when we are writing specifications, not to mention when reading them.
+On the other hand, having a mock application with the UI really helps realizing what the app is doing and how it works, and to agree with the developer that this is actually what we want our application to do (or realizing that this is not something we actually need).</p>
+<p>Prototyping the UI first should require the least possible computation from the server-side of your application.
+You focus on the appearance of the app: buttons, figures, tables, graphs… and how they interact with each other.
+At that stage of the design process, you will not be focusing on correctness of the results or graphs: you will be placing elements on the front-end so that you can be sure that everything is there, even if some buttons do not trigger anything.
+At that point, the idea is to get the people ordering the app think about what they actually need, and there might be some question rising like “oh, where is the button to download that results in pdf?”.
+And at that precise moment is the perfect time for a change in specification.</p>
+</div>
+<div id="organizing-work" class="section level4">
+<h4><span class="header-section-number">10.1.2.2</span> Organizing work</h4>
+<p>A pre-defined UI allows every person involved in the coding process to know which part of the app they are working on, and to be sure that you do not forget anything.
+As you might be working on the app as a team, you will need to find a strategy for efficiently splitting the work between every coder.
+And it’s much easier to work on a piece of the app you can visually identify and integrate in a complete app scenario.
+In other words, it is easier to be told “you will be working on the ‘Summary’ panel from that mock UI” than “you will be working on bullet point 45 to 78 of the specifications”.</p>
 </div>
 </div>
 </div>
-<div id="using-golem-dev-functions" class="section level2">
-<h2><span class="header-section-number">11.5</span> Using <code>{golem}</code> dev functions</h2>
-<p>When building an application, you will want it to behave differently depending on where it is run, and notably if it is run in development of in production.
-We have seen that to do that, you can use the <code>golem-config.yml</code> file, or by passing arguments to <code>run_app()</code>.
-A third option is to use the <code>dev</code> functions from <code>{golem}</code>.</p>
-<p>There is a series of tools to make your app behave differently whether it is in “dev” or “prod” mode.
-Notably, the <code>app_prod()</code> and <code>app_dev()</code> function look for the value of <code>options( "golem.app.prod" )</code>, or return TRUE if this option does not exist.
-In other words, by setting <code>options( "golem.app.prod" )</code> to <code>TRUE</code>, you will make the functions that depend on this option behave in a specific way.</p>
-<p>Some functions pre-exist in <code>{golem}</code>, for example if you need to print a message to the console only during dev, you can do it with <code>cat_dev()</code>.</p>
-<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="stepbuild.html#cb132-1"></a><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">FALSE</span>)</span>
-<span id="cb132-2"><a href="stepbuild.html#cb132-2"></a>golem<span class="op">::</span><span class="kw">cat_dev</span>(<span class="st">&quot;In dev</span><span class="ch">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
-<pre><code>In dev</code></pre>
-<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="stepbuild.html#cb134-1"></a><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">TRUE</span>)</span>
-<span id="cb134-2"><a href="stepbuild.html#cb134-2"></a>golem<span class="op">::</span><span class="kw">cat_dev</span>(<span class="st">&quot;In dev</span><span class="ch">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
-<p>Of course, chances are you do not only need to print things, you might want to use other functions.
-Good news!
-You can make any function being “dev-dependent” with the <code>make_dev()</code> function:</p>
-<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="stepbuild.html#cb135-1"></a>log_dev &lt;-<span class="st"> </span>golem<span class="op">::</span><span class="kw">make_dev</span>(log)</span>
-<span id="cb135-2"><a href="stepbuild.html#cb135-2"></a><span class="kw">log_dev</span>(<span class="dv">10</span>)</span>
-<span id="cb135-3"><a href="stepbuild.html#cb135-3"></a><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">TRUE</span>)</span>
-<span id="cb135-4"><a href="stepbuild.html#cb135-4"></a><span class="kw">log_dev</span>(<span class="dv">10</span>)</span></code></pre></div>
-<p>That way, you can use functions in your back-end for development purpose, that will be ignore in production.</p>
+<div id="prototyping-shiny" class="section level2">
+<h2><span class="header-section-number">10.2</span> Prototyping Shiny</h2>
+<p>In the next section, you will be introduced to two packages that can be used when prototyping user interface: <code>{shinipsum}</code> <span class="citation">(Fay and Rochette <a href="#ref-R-shinipsum" role="doc-biblioref">2020</a><a href="#ref-R-shinipsum" role="doc-biblioref">b</a>)</span> and <code>{fakir}</code> <span class="citation">(Fay and Rochette <a href="#ref-R-fakir" role="doc-biblioref">2020</a><a href="#ref-R-fakir" role="doc-biblioref">a</a>)</span>.</p>
+<div id="fast-ui-prototyping-with-shinipsum" class="section level3">
+<h3><span class="header-section-number">10.2.1</span> Fast UI Prototyping with <code>{shinipsum}</code></h3>
+<p>When prototyping the UI for an application, we will not be focusing on building the actual computation: what we need is creating a draft with visual components, so that we can have visual clues about the end result.
+To do that, you can use the <code>{shinipsum}</code> package, which has been designed to generate random <code>{shiny}</code> <span class="citation">(Chang et al. <a href="#ref-R-shiny" role="doc-biblioref">2020</a>)</span> elements.
+If you are familiar with “lorem ipsum”, the fake text generator that is used in software design as a placeholder for text, the idea is the same: generating placeholders for Shiny outputs.</p>
+<p><code>{shinipsum}</code> can be installed from CRAN with:</p>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="stepprotopype.html#cb110-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;shinipsum&quot;</span>)</span></code></pre></div>
+<p>You can install this package from GitHub with:</p>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb111-1"><a href="stepprotopype.html#cb111-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;Thinkr-open/shinipsum&quot;</span>)</span></code></pre></div>
+<p>In this package, a series of functions that generates random placeholders.
+For example, <code>random_ggplot()</code> generates random <code>{ggplot2}</code> <span class="citation">(Wickham, Chang, et al. <a href="#ref-R-ggplot2" role="doc-biblioref">2020</a>)</span> elements.
+If we run this code two time, we should get different results<a href="#fn32" class="footnote-ref" id="fnref32"><sup>32</sup></a>
+:</p>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb112-1"><a href="stepprotopype.html#cb112-1"></a><span class="kw">library</span>(shinipsum)</span>
+<span id="cb112-2"><a href="stepprotopype.html#cb112-2"></a><span class="kw">library</span>(ggplot2)</span></code></pre></div>
 
+<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb113-1"><a href="stepprotopype.html#cb113-1"></a><span class="kw">random_ggplot</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb113-2"><a href="stepprotopype.html#cb113-2"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Random plot&quot;</span>) </span></code></pre></div>
+<pre><code>Warning: Removed 478 rows containing non-finite values
+(stat_bin2d).</code></pre>
+<div class="figure" style="text-align: center"><span id="fig:10-prototyping-5"></span>
+<img src="engineering-production-grade-shiny-apps_files/figure-html/10-prototyping-5-1.png" alt="A random plot" width="100%" />
+<p class="caption">
+FIGURE 10.2: A random plot
+</p>
+</div>
+
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="stepprotopype.html#cb115-1"></a><span class="kw">random_ggplot</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb115-2"><a href="stepprotopype.html#cb115-2"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Random plot&quot;</span>) </span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:10-prototyping-6"></span>
+<img src="engineering-production-grade-shiny-apps_files/figure-html/10-prototyping-6-1.png" alt="A random plot" width="100%" />
+<p class="caption">
+FIGURE 10.3: A random plot
+</p>
+</div>
+<p>Of course, the idea is to combine this with a Shiny interface, for example <code>random_ggplot()</code> will be used with a <code>renderPlot()</code> and <code>plotOutput()</code>.
+And as we want to prototype but still be close to what the app might look like, these functions take arguments that can shape the output: for example, <code>random_ggplot()</code> has a <code>type</code> parameter that can help you select a specific geom.</p>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="stepprotopype.html#cb116-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb116-2"><a href="stepprotopype.html#cb116-2"></a><span class="kw">library</span>(shinipsum)</span>
+<span id="cb116-3"><a href="stepprotopype.html#cb116-3"></a><span class="kw">library</span>(DT)</span>
+<span id="cb116-4"><a href="stepprotopype.html#cb116-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb116-5"><a href="stepprotopype.html#cb116-5"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random DT&quot;</span>),</span>
+<span id="cb116-6"><a href="stepprotopype.html#cb116-6"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;data_table&quot;</span>),</span>
+<span id="cb116-7"><a href="stepprotopype.html#cb116-7"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random Plot&quot;</span>),</span>
+<span id="cb116-8"><a href="stepprotopype.html#cb116-8"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>),</span>
+<span id="cb116-9"><a href="stepprotopype.html#cb116-9"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random Text&quot;</span>),</span>
+<span id="cb116-10"><a href="stepprotopype.html#cb116-10"></a>  <span class="kw">tableOutput</span>(<span class="st">&quot;text&quot;</span>)</span>
+<span id="cb116-11"><a href="stepprotopype.html#cb116-11"></a>)</span>
+<span id="cb116-12"><a href="stepprotopype.html#cb116-12"></a></span>
+<span id="cb116-13"><a href="stepprotopype.html#cb116-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb116-14"><a href="stepprotopype.html#cb116-14"></a>  output<span class="op">$</span>data_table &lt;-<span class="st"> </span>DT<span class="op">::</span><span class="kw">renderDT</span>({</span>
+<span id="cb116-15"><a href="stepprotopype.html#cb116-15"></a>    <span class="kw">random_DT</span>(<span class="dv">5</span>, <span class="dv">5</span>)</span>
+<span id="cb116-16"><a href="stepprotopype.html#cb116-16"></a>  })</span>
+<span id="cb116-17"><a href="stepprotopype.html#cb116-17"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb116-18"><a href="stepprotopype.html#cb116-18"></a>    <span class="kw">random_ggplot</span>()</span>
+<span id="cb116-19"><a href="stepprotopype.html#cb116-19"></a>  })</span>
+<span id="cb116-20"><a href="stepprotopype.html#cb116-20"></a>  output<span class="op">$</span>text &lt;-<span class="st"> </span><span class="kw">renderText</span>({</span>
+<span id="cb116-21"><a href="stepprotopype.html#cb116-21"></a>    <span class="kw">random_text</span>(<span class="dt">nwords =</span> <span class="dv">50</span>)</span>
+<span id="cb116-22"><a href="stepprotopype.html#cb116-22"></a>  })</span>
+<span id="cb116-23"><a href="stepprotopype.html#cb116-23"></a>}</span>
+<span id="cb116-24"><a href="stepprotopype.html#cb116-24"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+
+<div class="figure" style="text-align: center"><span id="fig:10-prototyping-8"></span>
+<img src="img/shinipsumapp.png" alt="An app built with {shinipsum}" width="100%" />
+<p class="caption">
+FIGURE 10.4: An app built with <code>{shinipsum}</code>
+</p>
+</div>
+<p>Other <code>{shinipsum}</code> functions include:</p>
+<ul>
+<li>tables:</li>
+</ul>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="stepprotopype.html#cb117-1"></a><span class="kw">random_table</span>(<span class="dt">nrow =</span> <span class="dv">3</span>, <span class="dt">ncol =</span> <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>               mpg cyl disp  hp drat    wt  qsec vs am
+Mazda RX4     21.0   6  160 110 3.90 2.620 16.46  0  1
+Mazda RX4 Wag 21.0   6  160 110 3.90 2.875 17.02  0  1
+Datsun 710    22.8   4  108  93 3.85 2.320 18.61  1  1
+              gear
+Mazda RX4        4
+Mazda RX4 Wag    4
+Datsun 710       4</code></pre>
+<ul>
+<li>print outputs:</li>
+</ul>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="stepprotopype.html#cb119-1"></a><span class="kw">random_print</span>(<span class="dt">type =</span> <span class="st">&quot;model&quot;</span>)</span></code></pre></div>
+<pre><code>
+Call:
+lm(formula = Sepal.Length ~ Sepal.Width, data = datasets::iris)
+
+Coefficients:
+(Intercept)  Sepal.Width  
+      6.526       -0.223  </code></pre>
+<p>… and text, image, ggplotly, dygraph, and DT.</p>
+</div>
+<div id="using-fakir-for-fake-data-generation" class="section level3">
+<h3><span class="header-section-number">10.2.2</span> Using <code>{fakir}</code> for fake data generation</h3>
+<p>Generating random placeholders for Shiny might not be enough: maybe you also need example datasets.</p>
+<p>This can be accomplished using the <code>{fakir}</code> package, which was primarily created to provide fake datasets for R tutorials and exercises, but that can easily be used inside a Shiny application.</p>
+<p>At the time of writing these lines, the package is only available on GitHub, and can be installed with:</p>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="stepprotopype.html#cb121-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;Thinkr-open/fakir&quot;</span>)</span></code></pre></div>
+<p>This package contains three datasets that are randomly generated when you call the corresponding functions:</p>
+<ul>
+<li><p><code>fake_base_clients()</code> generates a fake dataset for a ticketing service</p></li>
+<li><p><code>fake_sondage_answers()</code> is a fake survey about transportation</p></li>
+<li><p><code>fake_visits()</code> is a fake dataset for the visits on a website</p></li>
+</ul>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="stepprotopype.html#cb122-1"></a><span class="kw">library</span>(fakir)</span>
+<span id="cb122-2"><a href="stepprotopype.html#cb122-2"></a><span class="kw">fake_visits</span>(<span class="dt">from =</span> <span class="st">&quot;2017-01-01&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;2017-01-31&quot;</span>)</span></code></pre></div>
+<pre><code># A tibble: 31 x 8
+   timestamp   year month   day  home about  blog
+ * &lt;date&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+ 1 2017-01-01  2017     1     1   369   220   404
+ 2 2017-01-02  2017     1     2   159   250   414
+ 3 2017-01-03  2017     1     3   436   170   498
+ 4 2017-01-04  2017     1     4    NA   258   526
+ 5 2017-01-05  2017     1     5   362    NA   407
+ 6 2017-01-06  2017     1     6   245   145   576
+ 7 2017-01-07  2017     1     7    NA    NA   484
+ 8 2017-01-08  2017     1     8   461   103   441
+ 9 2017-01-09  2017     1     9   337   113   673
+10 2017-01-10  2017     1    10    NA   169   308
+# … with 21 more rows, and 1 more variable:
+#   contact &lt;int&gt;</code></pre>
+<p>The idea with these datasets is to combine various formats that can reflect “real life” datasets: they contain dates, numeric and character variables, and have missing values.
+They can also be manipulated with the included <code>{sf}</code> <span class="citation">(Pebesma <a href="#ref-R-sf" role="doc-biblioref">2020</a>)</span> geographical dataset <code>fra_sf</code> allowing for maps creation.</p>
+<p>Fake datasets created with <code>{fakir}</code> can be used to build light examples on the use of the inputs, for filters or interactive map, or as examples for the internal functions and their corresponding documentation.</p>
+</div>
+</div>
+<div id="proto-rmdfirst" class="section level2">
+<h2><span class="header-section-number">10.3</span> Building with RMarkdown</h2>
+<p>While on one side you are building the user interface, you (or someone from your team) can start working on the back-end implementation.
+Again, this should be done out of any reactive logic: the back-end should not depend on any reactive context.
+And because documentation is gold, you should start with writing the back-end documentation straight as package documentation, inside your Vignettes, or in <code>inst/</code>.
+Or what we call “Rmd-first”.</p>
+<div id="define-the-content-of-the-application" class="section level3">
+<h3><span class="header-section-number">10.3.1</span> Define the content of the application</h3>
+<p>Rmarkdown files are the perfect spot to sandbox the back-end of your application: inside the file, you don’t have to think about any reactive behavior, as you are just working with plain old R code: data wrangling operations, multi-parameters based models, summary tables outputs, graphical outputs…</p>
+<p>And the nice thing is that you can share the output of the rendered file as an HTML or PDF to either your client or boss, or anyone involved in the project.
+That way, you can focus on the core algorithm, not some UI implementation like “I want the button to be blue” when what you need to know is if the output of the model is correct.
+In other words, you are applying the rule of the separation of concerns, i.e. you help focusing on one part of the application without adding any cognitive load to the person “reading” the outputs.
+And, last but not least, if you have to implement changes to the back-end functions, it is way easier to check and to share in a static file than in an application.</p>
+<p>When doing that, the best way is again to separate things: do not be afraid of writing multiple RMarkdown files, one for each part of the end application.
+Again, this will help everybody focus on what matter: be it you, your team, or the person ordering the application.</p>
+<p>Building the back-end in Rmd files is also a good way to make the back-end “application independent”, in the sense that it helps documenting how the algorithms you have been building can be used outside of the application.
+In many cases, when you are building an application, you are creating functions that contain business logic/domain expertise, and that can in fact be used outside of the application.
+Writing these functions and how they work together forces you to think about these functions, and also gives a good starting point for anybody familiar with R that would want to start using this back-end toolkit.
+Of course, as you are building your application as a package, it is way easier now: you can share a package with the application inside it, along with a function to launch the app but also functions that can be used outside.</p>
+<p>And if you need some data to use as an example, feel free to pick one from <code>{fakir}</code>! (See §<a href="stepprotopype.html#stepprotopype">10</a>).</p>
+</div>
+<div id="using-the-rmd-files-as-a-laboratory-notebook" class="section level3">
+<h3><span class="header-section-number">10.3.2</span> Using the Rmd files as a laboratory notebook</h3>
+<p>Rmd can also be used as the place to keep track of what you have in mind while creating the application: most of the time, you will create the functions inside the <code>R/</code> folder, but it might not be the perfect place to document your thought process.
+On the other hand, using Markdown as a kind of “software laboratory notebook” to keep track of your idea is a good way to document all the choices you have made about your data wrangling, models, visualization, so that you can use it as a common knowledge-base all along the application life: you can share this with your client, with the rest of your team, or with anybody involved in the project.</p>
+<p>And also, developing in multiple Rmd files helps the separation of work between multiple developers, and will reduce code conflicts during development.</p>
+</div>
+<div id="rmd-vignettes-and-documentation-first" class="section level3">
+<h3><span class="header-section-number">10.3.3</span> Rmd, Vignettes, and documentation first</h3>
+<p>Working with the <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> framework implies that you will build the application as an R package.
+And of course, an R package implies writing documentation: one of the main goals of the Vignettes, in an R package, is to document how to use the package.
+And the good news is that when checking a package, <em>i.e</em> when running <code>check()</code> from <code>{devtools}</code> <span class="citation">(Wickham, Hester, and Chang <a href="#ref-R-devtools" role="doc-biblioref">2020</a>)</span> or <code>R CMD check</code>, the Vignettes are going to be built, and the process will fail if at least one of the Vignette fails to render.
+That way, you can use the documentation of the back-end as an extra tool for doing unit-testing!</p>
+<p>One radical approach to the “Rmd first” philosophy is to write <strong>everything</strong> in an Rmd from the very beginning of your project: write the function code, there roxygen tags, their tests, etc, then move everything to the correct spot in the package infrastructure once you are happy with everything. And of course, when you need to add another feature to your app, open a new markdown and start the process of development and documentation again.</p>
+
+</div>
 </div>
 </div>
 
@@ -661,39 +704,38 @@ You can make any function being “dev-dependent” with the <code>make_dev()</c
 <div id="ref-R-shiny">
 <p>Chang, Winston, Joe Cheng, JJ Allaire, Yihui Xie, and Jonathan McPherson. 2020. <em>Shiny: Web Application Framework for R</em>. <a href="https://CRAN.R-project.org/package=shiny">https://CRAN.R-project.org/package=shiny</a>.</p>
 </div>
+<div id="ref-R-hexmake">
+<p>Fay, Colin. 2020g. <em>Hexmake: Hex Stickers Maker</em>. <a href="https://github.com/colinfay/hexmake">https://github.com/colinfay/hexmake</a>.</p>
+</div>
+<div id="ref-R-fakir">
+<p>Fay, Colin, and Sebastien Rochette. 2020a. <em>Fakir: Create Fake Data in R for Tutorials</em>. <a href="https://github.com/Thinkr-open/fakir">https://github.com/Thinkr-open/fakir</a>.</p>
+</div>
+<div id="ref-R-shinipsum">
+<p>Fay, Colin, and Sebastien Rochette. 2020b. <em>Shinipsum: Lorem-Ipsum-Like Helpers for Fast Shiny Prototyping</em>. <a href="https://github.com/Thinkr-open/shinipsum">https://github.com/Thinkr-open/shinipsum</a>.</p>
+</div>
 <div id="ref-R-golem">
 <p>Guyader, Vincent, Colin Fay, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
 </div>
-<div id="ref-R-attachment">
-<p>Guyader, Vincent, and Sébastien Rochette. 2020. <em>Attachment: Deal with Dependencies</em>. <a href="https://CRAN.R-project.org/package=attachment">https://CRAN.R-project.org/package=attachment</a>.</p>
+<div id="ref-R-purrr">
+<p>Henry, Lionel, and Hadley Wickham. 2020. <em>Purrr: Functional Programming Tools</em>. <a href="https://CRAN.R-project.org/package=purrr">https://CRAN.R-project.org/package=purrr</a>.</p>
 </div>
-<div id="ref-R-covr">
-<p>Hester, Jim. 2020b. <em>Covr: Test Coverage for Packages</em>. <a href="https://CRAN.R-project.org/package=covr">https://CRAN.R-project.org/package=covr</a>.</p>
-</div>
-<div id="ref-R-covrpage">
-<p>Sidi, Jonathan. 2020. <em>Covrpage: Create a Readme Summary Page for Github Testthat and Covr Outputs</em>. <a href="https://github.com/metrumresearchgroup/covrpage">https://github.com/metrumresearchgroup/covrpage</a>.</p>
-</div>
-<div id="ref-rpkg">
-<p>Wickham, Hadley, and Jennifer Bryan. 2020a. <em>R Packages</em>. <a href="https://r-pkgs.org/">https://r-pkgs.org/</a>.</p>
+<div id="ref-R-sf">
+<p>Pebesma, Edzer. 2020. <em>Sf: Simple Features for R</em>. <a href="https://CRAN.R-project.org/package=sf">https://CRAN.R-project.org/package=sf</a>.</p>
 </div>
 <div id="ref-R-ggplot2">
 <p>Wickham, Hadley, Winston Chang, Lionel Henry, Thomas Lin Pedersen, Kohske Takahashi, Claus Wilke, Kara Woo, Hiroaki Yutani, and Dewey Dunnington. 2020. <em>Ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics</em>. <a href="https://CRAN.R-project.org/package=ggplot2">https://CRAN.R-project.org/package=ggplot2</a>.</p>
 </div>
-<div id="ref-R-roxygen2">
-<p>Wickham, Hadley, Peter Danenberg, Gábor Csárdi, and Manuel Eugster. 2020. <em>Roxygen2: In-Line Documentation for R</em>. <a href="https://CRAN.R-project.org/package=roxygen2">https://CRAN.R-project.org/package=roxygen2</a>.</p>
+<div id="ref-hadleywickham2017">
+<p>Wickham, Hadley, and Garrett Grolemund. 2017. <em>R for Data Science: Import, Tidy, Transform, Visualize, and Model Data</em>. O’Reilly Media. <a href="https://www.xarg.org/ref/a/1491910399/">https://www.xarg.org/ref/a/1491910399/</a>.</p>
 </div>
-<div id="ref-R-DT">
-<p>Xie, Yihui, Joe Cheng, and Xianying Tan. 2020. <em>DT: A Wrapper of the Javascript Library ’Datatables’</em>. <a href="https://CRAN.R-project.org/package=DT">https://CRAN.R-project.org/package=DT</a>.</p>
+<div id="ref-R-devtools">
+<p>Wickham, Hadley, Jim Hester, and Winston Chang. 2020. <em>Devtools: Tools to Make Developing R Packages Easier</em>. <a href="https://CRAN.R-project.org/package=devtools">https://CRAN.R-project.org/package=devtools</a>.</p>
 </div>
 </div>
 <div class="footnotes">
 <hr />
-<ol start="33">
-<li id="fn33"><p>The idea with this function is to provide a shortcut for adding commonly used dependencies, so that you don’t have to do it by hand<a href="stepbuild.html#fnref33" class="footnote-back">↩︎</a></p></li>
-<li id="fn34"><p>This is not <code>{shiny}</code> nor <code>{golem}</code> specific, but a requirement for any package<a href="stepbuild.html#fnref34" class="footnote-back">↩︎</a></p></li>
-<li id="fn35"><p>which can be pretty common as <code>{jsonlite}</code> might import <code>JSON</code> files as list, and <code>{purrr}</code> has pretty powerful tools for manipulating lists<a href="stepbuild.html#fnref35" class="footnote-back">↩︎</a></p></li>
-<li id="fn37"><p>We will get back to Version Control in the <em>Version Control</em> chapter<a href="stepbuild.html#fnref37" class="footnote-back">↩︎</a></p></li>
-<li id="fn38"><p>For example, the online version of this book is compiled to HTML every time something is merged into the <code>master</code> branch on GitHub<a href="stepbuild.html#fnref38" class="footnote-back">↩︎</a></p></li>
+<ol start="32">
+<li id="fn32"><p>Well, there is a probability that we will get the same plot twice, and but that is the beauty of randomness.<a href="stepprotopype.html#fnref32" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 <hr/>
@@ -705,8 +747,8 @@ You can make any function being “dev-dependent” with the <code>make_dev()</c
           </div>
         </div>
       </div>
-<a href="stepprotopype.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="step-secure.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="setting-up-for-success-with-golem.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="stepbuild.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -737,7 +779,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/11-step-by-step-build.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/10-prototyping.Rmd",
 "text": "Edit"
 },
 "history": {
