@@ -18,6 +18,13 @@ jobs:
       - uses: r-lib/actions/setup-r@v1
         with:
           crayon.enabled: 'FALSE'
+          
+      - uses: actions/cache@v1
+        with:
+          path: ~/.local/share/renv
+          key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-renv-
       
       - uses: r-lib/actions/setup-pandoc@v1
       
@@ -45,7 +52,7 @@ jobs:
         run: Rscript before-build.R
           
       - name: Render Book
-        run: Rscript -e 'bookdown::render_book("index.Rmd")'
+        run: Rscript -e 'bookdown::render_book("index.Rmd", output_dir = "_book/wip")'
       
       - uses: actions/upload-artifact@v1
         with:
@@ -75,6 +82,6 @@ jobs:
           CNAME: engineering-shiny.org
           EMAIL: ${{ secrets.EMAIL }}               # must be a verified email
           GH_TOKEN: ${{ secrets.TOKEN }} # https://github.com/settings/tokens
-          BUILD_DIR: _book/wip            
+          BUILD_DIR: _book            
     
  
