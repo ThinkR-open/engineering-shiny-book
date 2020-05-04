@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Engineering Production-Grade Shiny Apps</title>
+  <title>Chapter 15 The Need for Optimization | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Engineering Production-Grade Shiny Apps" />
+  <meta property="og:title" content="Chapter 15 The Need for Optimization | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
   
   <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Engineering Production-Grade Shiny Apps" />
+  <meta name="twitter:title" content="Chapter 15 The Need for Optimization | Engineering Production-Grade Shiny Apps" />
   
   <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-05-01" />
+<meta name="date" content="2020-05-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-
-<link rel="next" href="successfulshinyapp.html"/>
+<link rel="prev" href="deploy-golem.html"/>
+<link rel="next" href="optim-caveat.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
@@ -441,218 +441,433 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">Engineering Production-Grade Shiny Apps</h1>
-<p class="author"><em>Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard</em></p>
-<p class="date"><em>2020-05-01</em></p>
+<div id="when-optimize" class="section level1">
+<h1><span class="header-section-number">Chapter 15</span> The Need for Optimization</h1>
+<blockquote>
+<p>The most powerful optimization technique in any programmer’s toolbox is to do nothing.</p>
+</blockquote>
+<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<style>.right{ text-align: right;}</style>
+<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<div class="right">
+<a href="http://www.catb.org/~esr/writings/taoup/html/">The Art of Unix Programming</a>
 </div>
-<div id="introduction" class="section level1 unnumbered">
-<h1>Introduction</h1>
-<style>
-img.left {
-  float: left;
-  margin-right: 1em;
+<div id="build-first-then-optimize" class="section level2">
+<h2><span class="header-section-number">15.1</span> Build first, then optimize</h2>
+<div id="identifying-bottlenecks" class="section level3">
+<h3><span class="header-section-number">15.1.1</span> Identifying bottlenecks</h3>
+<p>Refactoring existing code for speed sounds like an appealing activity for a lot of us: it is always satisfying to watch our functions get faster, or finding a more elegant way to solve a problem that also results in making your code a little bit faster.
+Or as Maude Lemaire simply puts in “Refactoring at Scale” <span class="citation">(Lemaire <a href="#ref-lemaire2020" role="doc-biblioref">2020</a>)</span>, “<em>Refactoring can be a little bit like eating brownies: the first few bites are delicious, making it easy to get carried away and accidentally eat an entire dozen. When you’ve taken your last bite, a bit of regret and perhaps a twinge of nausea kick in.</em>”</p>
+<p>But beware!
+As Donald Knuth puts it <em>“Premature optimization is the root of all evil”</em>.
+What does that means?
+That focusing on optimizing small portions of your app before making it work fully is the best way to lose time along the way, even more in the context of a production application, where there are deadlines and a limited amount of time to build the application.</p>
+<p>Why?
+Here is the general idea: in the following schema below, you can make the circles travel to the bottleneck as fast as you want, the circles will still be slowed by the narrow bottleneck, hence you will just be losing time making the circles move faster, without actually gaining any time on the global performance.
+So focus on making the bottleneck larger, before focusing on making the circle travel fast.
+When?
+Once the application is ready: here in our example, we can only detect the bottleneck once the bottle is actually built, not while we are building the circle.</p>
+
+<div class="figure" style="text-align: center"><span id="fig:15-when-optimize-1-bis"></span>
+<img src="img/bottleneck.png" alt="Schema of a bottleneck, Adapted from WikiMedia https://commons.wikimedia.org/wiki/File:Effects_of_a_bottleneck_on_virus_populations.png" width="100%" />
+<p class="caption">
+FIGURE 15.1: Schema of a bottleneck, Adapted from WikiMedia <a href="https://commons.wikimedia.org/wiki/File:Effects_of_a_bottleneck_on_virus_populations.png" class="uri">https://commons.wikimedia.org/wiki/File:Effects_of_a_bottleneck_on_virus_populations.png</a>
+</p>
+</div>
+<p>This bottleneck is the very thing you should be optimizing: having faster code anywhere else except this bottleneck will not make your app faster: you will just make your app reach the bottleneck faster, but there will still be this part of your app that slows everything down.
+But this is something you might only realize when the app is fully built: pieces might be fast apart, but slow when put together.
+It is also possible that the test dataset you have been using from the start works just fine, but when you try your app with a bigger, more realistic dataset, the application is actually way slower than it should be.
+And, maybe you have been using an example dataset so that you do not have to query the database every time you implement a new feature, but actually the SQL query to the database is very slow.
+This is something you will discover only when the application is fully functional, not when building the parts: and realizing that when you only have 5% of the allocated time for this project left on your calendar is not a good surprise.</p>
+<p>Or to sum up:</p>
+<blockquote>
+<p>Get your design right with an un-optimized, slow, memory-intensive implementation before you try to tune. Then, tune systematically, looking for the places where you can buy big performance wins with the smallest possible increases in local complexity.</p>
+</blockquote>
+<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<style>.right{ text-align: right;}</style>
+<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<div class="right">
+<a href="http://www.catb.org/~esr/writings/taoup/html/">The Art of Unix Programming</a>
+</div>
+</div>
+<div id="do-you-need-faster-functions" class="section level3">
+<h3><span class="header-section-number">15.1.2</span> Do you need faster functions?</h3>
+<p>Optimizing an app is a matter of trade-offs: of course, in a perfect world, every piece of the app would be tailored to be fast, easy to maintain, and elegant.
+But in the real world, you have deadlines, limited times and resources, and we are all but humans.
+That means that at the end of the day, your app will not be completely perfect: a software can <strong>always</strong> be made better.
+No piece of code has ever reached complete perfection.</p>
+<p>Given that, do you want to spend 5 days out of the 30 you have planned optimizing a function so that it runs in a quarter of a second instead of half a second, then realize the critical bottleneck of your app is actually the SQL query and not the data manipulation?
+Of course a function running two times faster is a good thing, but think about it in context: for example, how many times is this function called ?
+We can safely bet that if your function is only called once, working on making it twice faster might not be the one function you would want to focus on (well, unless you have unlimited time to work on your project, and in that case lucky you, you can spend a massive amount of time building the perfect software).
+On the other hand, the function which is called thousands of time in your application might benefit from being optimized.</p>
+<p>And all of this is basic maths.
+Let’s assume the following:</p>
+<ul>
+<li>A current scenario takes 300 seconds to be accomplished on your application</li>
+<li>One function <code>A()</code> takes 30 seconds, and it’s called once</li>
+<li>One function <code>B()</code> takes 1 second, and it’s called 50 times</li>
+</ul>
+<p>If you divide the execution time of <code>A()</code> by two, you would be performing a local optimization of 15 seconds, and a global optimization of 15 seconds.
+On the other hand, if you divide the execution time of <code>B()</code> by two, you would be performing a local optimization of 0.5 seconds, but a global optimization of 25 seconds.</p>
+<p>Again, this kind of optimization is hard to detect until the app is functional.
+An optimization of 15 seconds is way greater that an optimization of 0.5 seconds.
+Yet you will only realize that once the application is up and running!</p>
+</div>
+<div id="dont-sacrifice-readability" class="section level3">
+<h3><span class="header-section-number">15.1.3</span> Don’t sacrifice readability</h3>
+<p>As said in the last section, every piece of code can be rewritten to be faster, either from R to R or using a lower level language: for example C or C++.
+You can also rebuild data manipulation code switching from a package to another, use complex data structures to optimizing memory usage, etc, etc.
+But that comes with a price: not keeping thing simple for the sake of local optimization makes maintenance harder, even more if you are using a lesser known language/package.
+Refactoring a piece of code is better done when you keep in mind that “<em>the primary goal should be to produce human-friendly code, even at the cost of your original design. If the laser focus is on the solution rather than the process, there’s a greater chance your application will end up more more contrived and complicated than it was in the first place</em>” <span class="citation">(Lemaire <a href="#ref-lemaire2020" role="doc-biblioref">2020</a>)</span>.</p>
+<p>For example, switching some portions of your code to C++ implies that you might be the only person being able to maintain that specific portion of code, or that your colleague taking over the project will have to spend hours learning the tools you have been building, or the language you have chosen to write your functions with.</p>
+<p>Again, optimization is always a matter of trade-off: is the half-second local optimization worth the extra hours you will have to spend correcting bugs when the app will crash and when you will be the only one able to correct it?
+Also, are the extra hours/days spent rewriting a working code-base worth the speed gain of 0.5 seconds on one function?</p>
+<p>For example, let’s compare both these implementations of the same function, one in R, and one in C++ via <code>{Rcpp}</code> <span class="citation">(Eddelbuettel et al. <a href="#ref-R-Rcpp" role="doc-biblioref">2020</a>)</span>
+Of course, the C++ function is faster than the R one—this is the very reason of using C++ with R.</p>
+<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb203-1"><a href="when-optimize.html#cb203-1"></a><span class="kw">library</span>(<span class="st">&quot;Rcpp&quot;</span>)</span>
+<span id="cb203-2"><a href="when-optimize.html#cb203-2"></a><span class="kw">cppFunction</span>(<span class="st">&quot;</span></span>
+<span id="cb203-3"><a href="when-optimize.html#cb203-3"></a><span class="st">double mean_cpp(NumericVector x) {</span></span>
+<span id="cb203-4"><a href="when-optimize.html#cb203-4"></a><span class="st">  int j;</span></span>
+<span id="cb203-5"><a href="when-optimize.html#cb203-5"></a><span class="st">  int size = x.size();</span></span>
+<span id="cb203-6"><a href="when-optimize.html#cb203-6"></a><span class="st">  double res = 0;</span></span>
+<span id="cb203-7"><a href="when-optimize.html#cb203-7"></a><span class="st">  for (j = 0; j &lt; size; j++){</span></span>
+<span id="cb203-8"><a href="when-optimize.html#cb203-8"></a><span class="st">    res = res + x[j];</span></span>
+<span id="cb203-9"><a href="when-optimize.html#cb203-9"></a><span class="st">  }</span></span>
+<span id="cb203-10"><a href="when-optimize.html#cb203-10"></a><span class="st">  return res / size;</span></span>
+<span id="cb203-11"><a href="when-optimize.html#cb203-11"></a><span class="st">}&quot;</span>)</span>
+<span id="cb203-12"><a href="when-optimize.html#cb203-12"></a></span>
+<span id="cb203-13"><a href="when-optimize.html#cb203-13"></a>benched &lt;-<span class="st"> </span>bench<span class="op">::</span><span class="kw">mark</span>(</span>
+<span id="cb203-14"><a href="when-optimize.html#cb203-14"></a>  <span class="dt">cpp =</span> <span class="kw">mean_cpp</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100000</span>),</span>
+<span id="cb203-15"><a href="when-optimize.html#cb203-15"></a>  <span class="dt">native =</span> <span class="kw">mean</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100000</span>), </span>
+<span id="cb203-16"><a href="when-optimize.html#cb203-16"></a>  <span class="dt">iterations =</span> <span class="dv">1000</span></span>
+<span id="cb203-17"><a href="when-optimize.html#cb203-17"></a>)</span>
+<span id="cb203-18"><a href="when-optimize.html#cb203-18"></a>benched</span></code></pre></div>
+<pre><code># A tibble: 2 x 6
+  expression    min median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt; &lt;bch:&gt; &lt;bch:&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
+1 cpp         192µs  249µs     3134.   783.8KB     12.6
+2 native      404µs  476µs     2024.    22.8KB      0  </code></pre>
+<p>(Note: we will come back to <code>bench::mark</code> later)</p>
+<p>Though, how much time gain is worth being sure you will get someone in your team to take over the maintenance if needed?
+In other words, given that (in our example), we are gaining around -2.27310^{-4} on the execution time of our function, is it worth switching to C++?
+Using external languages or complex data structures implies that from the start, you will need to think about who and how your code base will be maintain over the years.
+Chances are that if you plan on using a Shiny application during a span of several years, various R developers will be working on the project, and including C++ code inside your application means that these future developer will either be required to know C++, or they will not be able to maintain this piece of code.</p>
+<p>So, to sum up, there are three ways to optimize your application &amp; R code, and the bad news is that you can not optimize for all of them:</p>
+<ul>
+<li>Optimizing for speed</li>
+<li>Optimizing for memory</li>
+<li>Optimizing for readability/maintainability</li>
+</ul>
+<p>Leading a successful project means that you should, as much as possible, find the perfect balance between these three.</p>
+</div>
+</div>
+<div id="tools-for-profiling" class="section level2">
+<h2><span class="header-section-number">15.2</span> Tools for profiling</h2>
+<div id="profiling-r-code" class="section level3">
+<h3><span class="header-section-number">15.2.1</span> Profiling R code</h3>
+<div id="identifying-bottlenecks-1" class="section level4">
+<h4><span class="header-section-number">15.2.1.1</span> Identifying bottlenecks</h4>
+<p>The best way to profile R code is by using the <code>{profvis}</code> <span class="citation">(Chang, Luraschi, and Mastny <a href="#ref-R-profvis" role="doc-biblioref">2019</a>)</span> package<a href="#fn45" class="footnote-ref" id="fnref45"><sup>45</sup></a>
+, a package designed to evaluate how much time each part of a function call take.
+With <code>{profvis}</code>, you can spot the bottleneck of your function.
+Without an automated tool to do the profiling, the developers would have to profile by guessing, which will, most of the time, come with bad results:</p>
+<blockquote>
+<p>One of the lessons that the original Unix programmers learned early is that intuition is a poor guide to where the bottlenecks are, even for one who knows the code in question intimately.</p>
+</blockquote>
+<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<style>.right{ text-align: right;}</style>
+<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<div class="right">
+<a href="http://www.catb.org/~esr/writings/taoup/html/ch12s02.html">The Art of Unix Programming</a>
+</div>
+<p>Instead of guessing, it is safe bet to go for a tool like <code>{profvis}</code>, which allows to have a detailed view of what takes a long time to run in your R code.</p>
+<p>Using this package is quite straightforward: put the code you want to benchmark inside the <code>profvis()</code> function<a href="#fn46" class="footnote-ref" id="fnref46"><sup>46</sup></a>
+, wait for the code to run, and… that is it, you now have an analysis of your code running time.</p>
+<p>Here is an example with 3 nested functions, <code>top()</code>, <code>middle()</code> and <code>bottom()</code>, where <code>top()</code> calls <code>middle()</code> which calls <code>bottom()</code>:</p>
+<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="when-optimize.html#cb205-1"></a><span class="kw">library</span>(profvis)</span>
+<span id="cb205-2"><a href="when-optimize.html#cb205-2"></a>top &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb205-3"><a href="when-optimize.html#cb205-3"></a>  <span class="co"># We use profvis::pause() because Sys.sleep() doesn&#39;t </span></span>
+<span id="cb205-4"><a href="when-optimize.html#cb205-4"></a>  <span class="co"># show in the flame graph</span></span>
+<span id="cb205-5"><a href="when-optimize.html#cb205-5"></a>  <span class="kw">pause</span>(<span class="fl">0.1</span>)</span>
+<span id="cb205-6"><a href="when-optimize.html#cb205-6"></a>  <span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="cf">function</span>(x){</span>
+<span id="cb205-7"><a href="when-optimize.html#cb205-7"></a>    x <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
+<span id="cb205-8"><a href="when-optimize.html#cb205-8"></a>  })</span>
+<span id="cb205-9"><a href="when-optimize.html#cb205-9"></a>  <span class="kw">middle</span>()</span>
+<span id="cb205-10"><a href="when-optimize.html#cb205-10"></a>}</span>
+<span id="cb205-11"><a href="when-optimize.html#cb205-11"></a></span>
+<span id="cb205-12"><a href="when-optimize.html#cb205-12"></a>middle &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb205-13"><a href="when-optimize.html#cb205-13"></a>  <span class="kw">pause</span>(<span class="fl">0.2</span>)</span>
+<span id="cb205-14"><a href="when-optimize.html#cb205-14"></a>  <span class="fl">1e4</span> <span class="op">*</span><span class="st"> </span><span class="dv">9</span></span>
+<span id="cb205-15"><a href="when-optimize.html#cb205-15"></a>  <span class="kw">bottom_a</span>()</span>
+<span id="cb205-16"><a href="when-optimize.html#cb205-16"></a>  <span class="kw">bottom_b</span>()</span>
+<span id="cb205-17"><a href="when-optimize.html#cb205-17"></a>}</span>
+<span id="cb205-18"><a href="when-optimize.html#cb205-18"></a></span>
+<span id="cb205-19"><a href="when-optimize.html#cb205-19"></a>bottom_a &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb205-20"><a href="when-optimize.html#cb205-20"></a>  <span class="kw">pause</span>(<span class="fl">0.5</span>)</span>
+<span id="cb205-21"><a href="when-optimize.html#cb205-21"></a>  <span class="kw">print</span>(<span class="st">&quot;hey&quot;</span>)</span>
+<span id="cb205-22"><a href="when-optimize.html#cb205-22"></a>}</span>
+<span id="cb205-23"><a href="when-optimize.html#cb205-23"></a>bottom_b &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb205-24"><a href="when-optimize.html#cb205-24"></a>  <span class="kw">pause</span>(<span class="dv">2</span>)</span>
+<span id="cb205-25"><a href="when-optimize.html#cb205-25"></a>  <span class="kw">print</span>(<span class="st">&quot;hey&quot;</span>)</span>
+<span id="cb205-26"><a href="when-optimize.html#cb205-26"></a>}</span>
+<span id="cb205-27"><a href="when-optimize.html#cb205-27"></a><span class="kw">profvis</span>({</span>
+<span id="cb205-28"><a href="when-optimize.html#cb205-28"></a>  <span class="kw">top</span>()</span>
+<span id="cb205-29"><a href="when-optimize.html#cb205-29"></a>})</span></code></pre></div>
+<p>What you see now is what is called a <code>flame graph</code>: it is a detailed timing of how your function has run, with a clear decomposition of the call stack.
+What you see on top window is the expression evaluated, and on the bottom a detail of the call stack, with what looks like a little bit like a Gantt diagram.
+This result reads as such: the wider the function call, the more time it has taken R to computer this piece of code.
+On the very bottom, the “top” function (i.e. the function which is directly called in the console), and the more you go up, the more you enter the nested function calls.</p>
+<p>Here is how to read this graph:</p>
+<ul>
+<li><p>On the x axis, the time spent computing the function.
+Our <code>top()</code> function being the only one executed, it takes the whole record time.</p></li>
+<li><p>Then, the second level is the first level of what is called inside <code>top()</code>: first, the function pauses, then it does a series of call to <code>FUN</code> (which is the internal anonymous function from <code>lapply()</code>), then calls the <code>middle()</code> function, which spans from around 100 ms to the end of the call.
+Then, a detail of <code>middle()</code>, which calls <code>bottom_a()</code> and <code>bottom_b()</code>, which each <code>pause()</code> for a given amount of time.</p></li>
+</ul>
+
+<div class="figure" style="text-align: center"><span id="fig:15-when-optimize-2-bis"></span>
+<img src="img/profviz_flame.png" alt="{profvis} flame graph" width="100%" />
+<p class="caption">
+FIGURE 15.2: <code>{profvis}</code> flame graph
+</p>
+</div>
+<p>If you click on the “Data” tab, you will also find another view of the <code>flame graph</code>, where you can read the hierarchy of calls and the time and memory spent on each function call:</p>
+
+<div class="figure" style="text-align: center"><span id="fig:15-when-optimize-3-bis"></span>
+<img src="img/profviz_data.png" alt="{profvis} data tab" width="100%" />
+<p class="caption">
+FIGURE 15.3: <code>{profvis}</code> data tab
+</p>
+</div>
+<p>If you are working on profiling the memory usage, you can also use the <code>{profmem}</code> <span class="citation">(Bengtsson <a href="#ref-R-profmem" role="doc-biblioref">2018</a>)</span> package which, instead of focusing on execution time, will record the memory usage of calls.</p>
+<div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="when-optimize.html#cb206-1"></a><span class="kw">library</span>(profmem)</span>
+<span id="cb206-2"><a href="when-optimize.html#cb206-2"></a>p &lt;-<span class="st"> </span><span class="kw">profmem</span>({</span>
+<span id="cb206-3"><a href="when-optimize.html#cb206-3"></a>  x &lt;-<span class="st"> </span><span class="kw">raw</span>(<span class="dv">1000</span>)</span>
+<span id="cb206-4"><a href="when-optimize.html#cb206-4"></a>  A &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>), <span class="dt">ncol =</span> <span class="dv">10</span>)</span>
+<span id="cb206-5"><a href="when-optimize.html#cb206-5"></a>})</span>
+<span id="cb206-6"><a href="when-optimize.html#cb206-6"></a>p</span></code></pre></div>
+<pre><code>Rprofmem memory profiling of:
+{
+    x &lt;- raw(1000)
+    A &lt;- matrix(rnorm(100), ncol = 10)
 }
-</style>
-<p><img src="img/engineering-shiny.jpg" class = "left" width = "300px"></p>
-<p>This book is currently under development.
-It will be published in 2020 in the <a href="https://www.crcpress.com/go/the-r-series">R Series</a> by Chapman &amp; Hall.</p>
-<div id="motivation" class="section level2 unnumbered">
-<h2>Motivation</h2>
-<p>This book will not <strong>get you started with Shiny</strong>, nor <strong>talk how to work with Shiny once it is sent to production</strong>.
-What we’ll see is <strong>the process of building an application that will later be sent to production</strong>.
-Why this topic? Lots of blog posts and books talk about getting started with <code>{shiny}</code> <span class="citation">(Chang et al. <a href="#ref-R-shiny" role="doc-biblioref">2020</a>)</span> or about what to do once your application is ready to be sent to production.
-Very few (if any) talk about this area in-between: how to confidently work with Shiny once you know the basics and before you send it to the production environment.</p>
-<p>So this is what this book is going to talk about: building robust Shiny applications.
-We’ll focus on the process, the workflow, and the necessary tools for building production-grade Shiny Applications.</p>
-</div>
-<div id="who-is-this-book-for" class="section level2 unnumbered">
-<h2>Who is this book for</h2>
-<p>If you are starting to read this book, we assume you have a working knowledge of how to build a small application using <code>{shiny}</code>, and want to know how to go one step further.
-In other words, you already have some knowledge about how <code>{shiny}</code> works, are able to build a small working application, and want to know how to build a serious, production-grade application that can be sent to production.</p>
-</div>
-<div id="book-structure" class="section level2 unnumbered">
-<h2>Book structure</h2>
-<ul>
-<li><p>Part 1 (Building Successful Shiny Apps) gives a general context about what we mean by “production-grade” and “successful” Shiny Application, and what challenges arise when you are dealing with a large scale application designed for production.
-In this part, we will define what we mean by “Successful”, stress the importance of project management, develop how to structure your project for production, and introduce the <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> package
-We will finally briefly introduce to our development workflow: a workflow that will be explored in part 2 to 6.</p></li>
-<li><p>Part 2 to 6 explore the workflow for building successful applications.<br />
-<em>Step 1: Design</em> underlines the centrality of the user experience when engineering an application, emphasizes the importance of designing before coding, and gently introduces to CSS.<br />
-<em>Step 2: Prototype</em> stresses the importance of prototyping, explores the setting of a <code>{golem}</code> based application, and presents <code>{shinipsum}</code>, <code>{fakir}</code>, and the “Rmd First” development methodology.<br />
-<em>Step 3: Build</em> explores the building step of the application, <em>i.e</em> the core engineering of the application once the prototyping phase is finished.<br />
-<em>Step 4: Strengthen</em> explores in depth testing, continuous integration, and version control.<br />
-<em>Step 5: Deploy</em> develops the various possibilities for preparing your application to be deployed.</p></li>
-<li><p>Part 7 (Optimizing) tackles the question of optimization, first by introducing the general concepts about optimization, then by presenting some common caveats of Shiny Apps, and then showing how to optimize R code, and how to use JavaScript to lighten R work.</p></li>
-</ul>
-</div>
-<div id="about-the-authors" class="section level2 unnumbered">
-<h2>About the authors</h2>
-<li>
-<a href="https://colinfay.me/">Colin Fay</a>
-</li>
-<p>Colin FAY works at ThinkR, a french agency focused on everything R-related.</p>
-<p>During the day, he helps companies to take full advantage of the power of R, by building tools (packages, web apps…) and setting up infrastructure. His main areas of expertise are data &amp; software engineering, web applications (front-end and back-end), and R in production.</p>
-<p>During the night, Colin is also an hyperactive open source developer and an open data advocate. You can find a lot of his work on his GitHub account (<a href="https://github.com/ColinFay" class="uri">https://github.com/ColinFay</a>) and on ThinkR’s account (<a href="https://github.com/thinkr-open" class="uri">https://github.com/thinkr-open</a>).</p>
-<p>He is also active in the Data Science community in France, especially in his home town Rennes, where he co-founded the Breizh Data Club association, and organizes the Breizh Data Club Meetups.</p>
-<li>
-<a href="https://statnmap.com/">Sébastien Rochette</a>
-</li>
-<p>Sébastien is a data scientist at ThinkR, where he teaches anything R related from beginner to expert level, guides R developers towards implementation of best practices, and creates tailor-made R solutions for the needs of his customers.</p>
-<li>
-<a href="https://twitter.com/VincentGuyader">Vincent Guyader</a>
-</li>
-<p>ThinkR Founder, with more than 10 years of experience, and with a scientific and technical background, Vincent is an R-enthusiast. He still has his hands in the code, whether to develop applications, analyze data or build packages. When he’s not coding, he plays with Docker
-and manages servers. He strongly believes that meeting highly technical challenges is not incompatible with pedagogy: he
-passionately trains very diverse learner profiles at R.</p>
-<li>
-<a href="https://twitter.com/CervanGirard">Cervan Girard</a>
-</li>
-<p>Cervan is Data Scientist at ThinkR.
-He is enthusiastic and motivated when it comes to rolling up his sleeves for new challenges, even if it means venturing dangerously into the depths of R, learning new languages and experimenting outside your comfort zone.
-Whatever the challenge, he remains reliable, constructive and efficient when it comes to using his skills to train or develop. He also enjoys training learners of all levels in the R language.</p>
-</div>
-<div id="want-to-help" class="section level2 unnumbered">
-<h2>Want to help?</h2>
-<p>Any feedback on the book is very welcome.
-Feel free to <a href="https://github.com/ThinkR-open/building-shiny-apps-workflow/issues">open an issue</a>, or to make a PR if you spot a typo.</p>
-</div>
-<div id="other-resources" class="section level2 unnumbered">
-<h2>Other resources</h2>
-<p>One single book could not cover everything there is to know about <code>{shiny}</code>.
-Here are some resources you can use in addition to this book.
-You can also find more resources in the bibliography.</p>
-<div id="getting-started-with-shiny" class="section level3 unnumbered">
-<h3>Getting started with Shiny</h3>
-<ul>
-<li><a href="https://shiny.rstudio.com/tutorial/">Learn Shiny with RStudio</a></li>
-<li><a href="https://ourcodingclub.github.io/2017/03/07/shiny.html">Getting Started with Shiny</a></li>
-<li><a href="https://github.com/hadley/shiny-book">(WIP) Mastering Shiny</a></li>
-<li><a href="https://laderast.github.io/gradual_shiny/">A gRadual intRoduction to Shiny</a></li>
-</ul>
-</div>
-<div id="shiny-into-production" class="section level3 unnumbered">
-<h3>Shiny into production</h3>
-<ul>
-<li><a href="https://resources.rstudio.com/rstudio-conf-2019/shiny-in-production-principles-practices-and-tools-joe-cheng">Shiny in production: Principles, practices, and tools</a></li>
-<li><a href="https://kellobri.github.io/shiny-prod-book/">Shiny in Production</a></li>
-</ul>
-<p><a href="https://github.com/ThinkR-open/building-shiny-apps-workflow/issues">Suggest a Resource!</a></p>
-</div>
-</div>
-<div id="disclaimer" class="section level2 unnumbered">
-<h2>Disclaimer</h2>
-<p>Open source is moving (very) fast, and some of the tools described in this book are still under active development.
-But good news!
-A large portion of this book is about the methodology, and not purely the technology, so even if some of the packages and code sections used in this book can become obsolete, a significant part of what is described in this book will still be relevant.</p>
-<p>When reading this book, remember that they are a “snapshot” of various technologies and packages, which might some day become out of date, have breaking changes, or even disappear.
-We will try to update the online version whenever changes are made to the packages used in this book, so feel free to browse the online version for the up-to-date information.</p>
-<p>The current version of this book has been compiled on:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="index.html#cb1-1"></a><span class="kw">Sys.Date</span>()</span></code></pre></div>
-<pre><code>[1] &quot;2020-05-01&quot;</code></pre>
-<p>With the following configuration:</p>
-<details>
-<p><summary>See Session Information</summary></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="index.html#cb3-1"></a>xfun<span class="op">::</span><span class="kw">session_info</span>()</span></code></pre></div>
-<pre><code>R version 3.6.3 (2020-02-29)
-Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 18.04.4 LTS
 
-Locale:
-  LC_CTYPE=C.UTF-8       LC_NUMERIC=C          
-  LC_TIME=C.UTF-8        LC_COLLATE=C.UTF-8    
-  LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   
-  LC_PAPER=C.UTF-8       LC_NAME=C             
-  LC_ADDRESS=C           LC_TELEPHONE=C        
-  LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   
+Memory allocations:
+       what bytes               calls
+1     alloc   264          &lt;internal&gt;
+2     alloc   496          &lt;internal&gt;
+3     alloc   496          &lt;internal&gt;
+4     alloc  1072          &lt;internal&gt;
+5     alloc  1048               raw()
+6     alloc   280            matrix()
+7     alloc   560            matrix()
+8     alloc   560            matrix()
+9     alloc  1072            matrix()
+10    alloc   848 matrix() -&gt; rnorm()
+11    alloc  2552 matrix() -&gt; rnorm()
+12    alloc   848            matrix()
+13    alloc   528          &lt;internal&gt;
+14    alloc  1648          &lt;internal&gt;
+15    alloc  1648          &lt;internal&gt;
+16    alloc  1072          &lt;internal&gt;
+17    alloc   256          &lt;internal&gt;
+18    alloc   456          &lt;internal&gt;
+19    alloc   216          &lt;internal&gt;
+20    alloc   256          &lt;internal&gt;
+total       16176                    </code></pre>
+<p>You can also get the total allocated memory with:</p>
+<div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb208-1"><a href="when-optimize.html#cb208-1"></a><span class="kw">total</span>(p)</span></code></pre></div>
+<pre><code>[1] 16176</code></pre>
+<p>And extract specific values based on the memory allocation:</p>
+<div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb210-1"><a href="when-optimize.html#cb210-1"></a>p2 &lt;-<span class="st"> </span><span class="kw">subset</span>(p, bytes <span class="op">&gt;</span><span class="st"> </span><span class="dv">1000</span>)</span>
+<span id="cb210-2"><a href="when-optimize.html#cb210-2"></a><span class="kw">print</span>(p2)</span></code></pre></div>
+<pre><code>Rprofmem memory profiling of:
+{
+    x &lt;- raw(1000)
+    A &lt;- matrix(rnorm(100), ncol = 10)
+}
 
-Package version:
-  askpass_1.1       assertthat_0.2.1 
-  attempt_0.3.0     backports_1.1.6  
-  base64enc_0.1.3   BH_1.72.0.3      
-  bookdown_0.18     brew_1.0.6       
-  callr_3.4.3       cli_2.0.2        
-  clipr_0.7.0       codetools_0.2-16 
-  commonmark_1.7    compiler_3.6.3   
-  config_0.3        crayon_1.3.4     
-  curl_4.3          desc_1.2.0       
-  digest_0.6.25     dockerfiler_0.1.3
-  ellipsis_0.3.0    evaluate_0.14    
-  fansi_0.4.1       fastmap_1.0.1    
-  fs_1.4.1          gh_1.1.0         
-  git2r_0.26.1      glue_1.4.0       
-  golem_0.2.1.9010  graphics_3.6.3   
-  grDevices_3.6.3   here_0.1         
-  highr_0.8         htmltools_0.4.0  
-  httpuv_1.5.2      httr_1.4.1       
-  ini_0.3.1         jsonlite_1.6.1   
-  knitr_1.28        later_1.0.0      
-  lifecycle_0.2.0   magrittr_1.5     
-  markdown_1.1      methods_3.6.3    
-  mime_0.9          openssl_1.4.1    
-  pillar_1.4.3      pkgbuild_1.0.7   
-  pkgconfig_2.0.3   pkgload_1.0.2    
-  praise_1.0.0      prettyunits_1.1.1
-  processx_3.4.2    promises_1.1.0   
-  ps_1.3.2          purrr_0.3.4      
-  R6_2.4.1          Rcpp_1.0.4.6     
-  rematch2_2.1.2    remotes_2.1.1    
-  rlang_0.4.5       rmarkdown_2.1    
-  roxygen2_7.1.0    rprojroot_1.3-2  
-  rstudioapi_0.11   shiny_1.4.0.2    
-  sourcetools_0.1.7 stats_3.6.3      
-  stringi_1.4.6     stringr_1.4.0    
-  sys_3.3           testthat_2.3.2   
-  tibble_3.0.1      tinytex_0.22     
-  tools_3.6.3       usethis_1.6.1    
-  utf8_1.1.4        utils_3.6.3      
-  vctrs_0.2.4       whisker_0.4      
-  withr_2.2.0       xfun_0.13        
-  xml2_1.3.2        xtable_1.8-4     
-  yaml_2.2.1       </code></pre>
-</details>
+Memory allocations:
+       what bytes               calls
+4     alloc  1072          &lt;internal&gt;
+5     alloc  1048               raw()
+9     alloc  1072            matrix()
+11    alloc  2552 matrix() -&gt; rnorm()
+14    alloc  1648          &lt;internal&gt;
+15    alloc  1648          &lt;internal&gt;
+16    alloc  1072          &lt;internal&gt;
+total       10112                    </code></pre>
+<p>(Example extracted from <code>{profmem}</code> help page).</p>
+<p>Here it is, now you have a tool to identify bottlenecks!</p>
 </div>
-<div id="software-information-and-conventions" class="section level2 unnumbered">
-<h2>Software information and conventions</h2>
-<p>This book has been built with <code>{knitr}</code> <span class="citation">(Xie <a href="#ref-R-knitr" role="doc-biblioref">2020</a><a href="#ref-R-knitr" role="doc-biblioref">b</a>)</span> and <code>{bookdown}</code> <span class="citation">(Xie <a href="#ref-R-bookdown" role="doc-biblioref">2020</a><a href="#ref-R-bookdown" role="doc-biblioref">a</a>)</span>.</p>
-<p>Package names are in curly brackets in code format (e.g., <code>{rmarkdown}</code>), and inline code and filenames are formatted in a typewriter font (e.g., <code>knitr::knit('foo.Rmd')</code>).
-Function names are formatted in a typewriter font and followed by parentheses (e.g., <code>bookdown::render_book()</code>).</p>
+<div id="benchmarking-r-code" class="section level4">
+<h4><span class="header-section-number">15.2.1.2</span> Benchmarking R Code</h4>
+<p>Identifying bottlenecks is a start, but what to do now?
+In the next chapter about optimization, we will dive deeper into common strategies for optimizing R &amp; Shiny code.
+But before that, remember this rule: <strong>never start optimizing if you can not benchmark this optimization</strong>.
+Why?
+Because developers are not perfect at identifying bottlenecks and estimating if something is faster or not, and some optimization methods might lead to slower code.
+Of course, most of the time they will not, but in some cases adopting optimization methods leads to writing slower code, because we have missed a bottleneck in our new code.
+And of course, without a clear documentation of what we are doing, we will be missing it, relying only on our intuition as an rough guess of speed gain.</p>
+<p>In other words, if you want to be sure that you are actually optimizing, be sure that you have a basis to compare with.</p>
+<p>How to do that?
+One thing that can be done is to keep an RMarkdown file with your starting point: use this notebook to keep track of what you are doing, by noting where you are starting from (i.e, what’s the original function you want to optimize), and compare it with the new one.
+By using an Rmd, you can document the strategies you have been using to optimize the code, e.g: “switched from for loop to vectorize function”, “changed from x to y”, etc.
+This will also be helpful for the future: either for you in other projects (you can get back to this document), or for other developers, as it will explain why specific decisions have been made.</p>
+<p>To do the timing computation, you can use the <code>{bench}</code> <span class="citation">(Hester <a href="#ref-R-bench" role="doc-biblioref">2020</a><a href="#ref-R-bench" role="doc-biblioref">a</a>)</span> package, which compares the execution time (and other metrics) of two functions.
+This function takes a series of named elements, each containing an R expression that will be timed.
+Note that by default, the <code>mark()</code> function compares the output of each function,</p>
+<p>Once the timing is done, you will get a data.frame with various metrics about the benchmark.</p>
+<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="when-optimize.html#cb212-1"></a>x &lt;-<span class="st"> </span><span class="cf">function</span>(size){</span>
+<span id="cb212-2"><a href="when-optimize.html#cb212-2"></a>  res &lt;-<span class="st"> </span><span class="kw">numeric</span>(size)</span>
+<span id="cb212-3"><a href="when-optimize.html#cb212-3"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>size){</span>
+<span id="cb212-4"><a href="when-optimize.html#cb212-4"></a>    res[i] &lt;-<span class="st"> </span>i <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
+<span id="cb212-5"><a href="when-optimize.html#cb212-5"></a>  }</span>
+<span id="cb212-6"><a href="when-optimize.html#cb212-6"></a>  <span class="kw">return</span>(res)</span>
+<span id="cb212-7"><a href="when-optimize.html#cb212-7"></a>}</span>
+<span id="cb212-8"><a href="when-optimize.html#cb212-8"></a>y &lt;-<span class="st"> </span><span class="cf">function</span>(size){</span>
+<span id="cb212-9"><a href="when-optimize.html#cb212-9"></a>  (<span class="dv">1</span><span class="op">:</span>size) <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
+<span id="cb212-10"><a href="when-optimize.html#cb212-10"></a>}</span>
+<span id="cb212-11"><a href="when-optimize.html#cb212-11"></a>res &lt;-<span class="st"> </span>bench<span class="op">::</span><span class="kw">mark</span>(</span>
+<span id="cb212-12"><a href="when-optimize.html#cb212-12"></a>  <span class="st">`</span><span class="dt">for</span><span class="st">`</span> =<span class="st"> </span><span class="kw">x</span>(<span class="dv">1000</span>), </span>
+<span id="cb212-13"><a href="when-optimize.html#cb212-13"></a>  <span class="dt">vectorized =</span> <span class="kw">y</span>(<span class="dv">1000</span>), </span>
+<span id="cb212-14"><a href="when-optimize.html#cb212-14"></a>  <span class="dt">iterations =</span> <span class="dv">1000</span></span>
+<span id="cb212-15"><a href="when-optimize.html#cb212-15"></a>)</span>
+<span id="cb212-16"><a href="when-optimize.html#cb212-16"></a>res</span></code></pre></div>
+<pre><code># A tibble: 2 x 6
+  expression    min median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt; &lt;bch:&gt; &lt;bch:&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
+1 for        43.7µs   61µs    16606.    30.3KB        0
+2 vectorized  2.8µs  5.1µs   135591.    11.8KB        0</code></pre>
+<p>Here, we have an empiric evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest.</p>
+<p>If you want a graphical analysis, <code>{bench}</code> comes with an <code>autoplot</code> method for <code>{ggplot2}</code> <span class="citation">(Wickham, Chang, et al. <a href="#ref-R-ggplot2" role="doc-biblioref">2020</a>)</span>:</p>
+
+<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="when-optimize.html#cb214-1"></a>ggplot2<span class="op">::</span><span class="kw">autoplot</span>(res)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:15-when-optimize-7"></span>
+<img src="engineering-production-grade-shiny-apps_files/figure-html/15-when-optimize-7-1.png" alt="{bench} autoplot" width="100%" />
+<p class="caption">
+FIGURE 15.4: <code>{bench}</code> autoplot
+</p>
 </div>
-<div id="acknowledgments" class="section level2 unnumbered">
-<h2>Acknowledgments</h2>
-<div id="contributors-to-this-book" class="section level3 unnumbered">
-<h3>Contributors to this book</h3>
-<p>Thanks to them for their help on the book!</p>
+<p>And, bonus point, <code>{bench}</code> takes time to check that the two outputs are the same, so that you are sure you are comparing the very same thing, which is another crucial aspect of benchmarking: be sure you are not comparing apple with oranges!</p>
+</div>
+</div>
+<div id="profiling-shiny" class="section level3">
+<h3><span class="header-section-number">15.2.2</span> Profiling Shiny</h3>
+<p>You can profile Shiny application using the <code>{profvis}</code> package, just as any other piece of R code.
+The only thing to note if you want to use this function on an app built with <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span>, you will have to wrap the <code>run_app()</code> function in a <code>print()</code> function.
+Long story short, what make the app run is not the function itself, but the printing of the function, so the object returned by <code>run_app()</code> itself can not be profiled.
+See the discussion on this <a href="https://github.com/ThinkR-open/golem/issues/146">issue on {golem}</a> to learn more about this.</p>
+<p>One other thing that can be optimized when it comes to the user interface is the webpage rendering performance.
+To do that, we can use standard web development tools: as said several times, a Shiny application IS a web application, so tools that are language agnostic will work with Shiny.
+There are thousands of tools available to do exactly that, and going through all of them would probably not make a lot of sense.</p>
+<p>So, let’s focus on getting started with a basic but powerful tool, that comes for free inside your browser: <a href="https://developers.google.com/web/tools/lighthouse">Google Lighthouse</a>, one of the famous tool for profiling web pages, and which is bundled into recent versions of Google Chrome.
+The nice thing is that this tool not only cover what you see (i.e. not only what you are actually rendering on your personal computer), but can also audits your app with various configuration, notably on mobile, with low bandwidth and/or mimicking 3G connection.
+being able to perform audit of our application as seen on a mobile device is a real strength: we are developing application on our computer, and might not be regularly checking how our application is performing on a mobile.
+Yet a large portion of the web navigation is performed on a mobile or table.
+Already in 2016, Google <a href="https://www.thinkwithgoogle.com/data/web-traffic-from-smartphones-and-tablets/">wrote</a> that “<em>More than half of all web traffic now comes from smartphones and tablets</em>”.
+Knowing the exact number of visitors that browse through mobile is hard: the web is vast, and not all website record the traffic they receive.
+Yet many, if not all, studies around how the web is browsed are reporting the same results: more traffic is performed via mobile than via computer<a href="#fn47" class="footnote-ref" id="fnref47"><sup>47</sup></a>
+.</p>
+<p>And, the pro of running it in your browser is that it can perform the analysis on locally deployed applications: in other word, you can launch your Shiny application in your R console, open the app in Google Chrome, and run the audit.
+A lot of online services needs an URL to do the audit!</p>
+<p>Each result from the audit comes with a series of advises and changes you can make on your application to make it better, with links to know more about the specific issue.</p>
+<p>And of course, last but not least, you also got the results of the metrics you have “passed”, and it is always a good mood booster to see our app passing some audited points!</p>
+<p>Here is a quick introduction to this tool:</p>
 <ul>
-<li><a href="https://github.com/eroten" target="_blank">Liz Roten</a>, for proofreading chapter 1 and helping us with writing advice.</li>
-<li><a href="https://github.com/dan-reznik" target="_blank">Dan S. Reznik</a>, for proof-reading the JavaScript chapter.</li>
-<li><a href="https://github.com/xari" target="_blank">Harry Anderson</a>, for giving feedback on the JavaScript chapter.</li>
-<li><a href="https://github.com/julianstanley" target="_blank">Julian Stanley</a>, for proof-reading chapter 3.</li>
-<li><a href="https://github.com/aronolof">Aron Strandberg</a> for proofreading several chapters.</li>
-<li><a href="https://github.com/jpmarindiaz" target="_blank">jpmarindiaz</a> for proofreading several chapters.</li>
+<li>Open Chrome in incognito mode, so that the page performance is not influenced by any of the installed extensions in your Google Chrome</li>
+<li>Open your developer console, either by going to View &gt; Developer &gt; Developer tools, by doing right click &gt; Inspect, or with the keyboard shortcut ctrl/cmd + alt + I</li>
+<li>Go to the “Audit” tab</li>
+<li>Configure your report (or leave the default)</li>
+<li>Click on “Generate Report”</li>
+</ul>
+<p>Note that you can also install a command line tool with <code>npm install -g lighthouse</code><a href="#fn48" class="footnote-ref" id="fnref48"><sup>48</sup></a>
+, then run <code>lighthouse http://urlto.audit</code>: it will produce either a JSON (if asked) or an HTML report (the default).</p>
+
+<div class="figure" style="text-align: center"><span id="fig:15-when-optimize-4-bis"></span>
+<img src="img/lighthouse-audit.png" alt="Launching LightHouse audit from the Google Chrome" width="100%" />
+<p class="caption">
+FIGURE 15.5: Launching LightHouse audit from the Google Chrome
+</p>
+</div>
+<p>Google Lighthouse is computing a series of analysis about your webpage.</p>
+
+<div class="figure" style="text-align: center"><span id="fig:15-when-optimize-5-bis"></span>
+<img src="img/lighthouse-audit.png" alt="LightHouse audit results" width="100%" />
+<p class="caption">
+FIGURE 15.6: LightHouse audit results
+</p>
+</div>
+<p>Once the audit is finished, you have some basic but useful indications about your application:</p>
+<ul>
+<li><p>Performance. This metric mostly analyzes the rendering time of the page: for example how many time does it take to load the app in full, that is to say how many time it takes from the first byte received to the app being fully ready to be used, the time between the very first call to the server and the very first response, etc.
+With <code>{shiny}</code> <span class="citation">(Chang et al. <a href="#ref-R-shiny" role="doc-biblioref">2020</a>)</span>, you will probably get low performance here, notably due to the fact that <code>{shiny}</code> is serving external dependencies that you might not be able to control.
+For example, the report from <code>{hexmake}</code> <span class="citation">(Fay <a href="#ref-R-hexmake" role="doc-biblioref">2020</a><a href="#ref-R-hexmake" role="doc-biblioref">g</a>)</span> suggests to “Eliminate render-blocking resources”, and most of them are not controlled by the shiny developer: they come bundled with <code>shiny::fluidPage</code> itself.</p></li>
+<li><p>Accessibility. Google Lighthouse performs a series of tests about accessibility (see our chapter about accessibility for more information).</p></li>
+<li><p>Best practices bundles a list of “misc” best practices around web applications.</p></li>
+<li><p>SEO: search engine optimization, or how will your app perform when it comes to search engine indexation.</p></li>
+<li><p>Progressive Web App (PWA): a PWA is an app that can run on any device, <em>" reaching anyone, anywhere, on any device with a single codebase"</em>.
+Google audit your application to see if your application fits with this idea.</p></li>
+</ul>
+<p>Profiling web page is a wide topic and a lot of things can be done to enhance the global page performance.
+That being said, if you have a limited time to invest in optimizing the front-end performance of the application, Google Lighthouse is a perfect tool, and can be your go-to audit tool for your application.</p>
+<p>And if you want to do if from R, the npm lighthouse module allows to output the audit in JSON, which can then be brought back to R!</p>
+<div class="sourceCode" id="cb215"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb215-1"><a href="when-optimize.html#cb215-1"></a><span class="ex">lighthouse</span> --output json --output-path data-raw/output.json http://localhost:2811</span></code></pre></div>
+<p>Then, being a JSON file, you can call if from R:</p>
+<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="when-optimize.html#cb216-1"></a>lighthouse_report &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">read_json</span>(<span class="st">&quot;data-raw/output.json&quot;</span>)</span>
+<span id="cb216-2"><a href="when-optimize.html#cb216-2"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span><span class="op">$</span>displayValue</span></code></pre></div>
+<pre><code>[1] &quot;5.4 s&quot;</code></pre>
+<p>Google Lighthouse also comes with a continuous integration tool, so that you can use it as a regression testing tool for your application.
+To know more, feel free to read the <a href="https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/getting-started.md">documentation</a>!</p>
+</div>
+<div id="more-resources-about-web-page-performance" class="section level3">
+<h3><span class="header-section-number">15.2.3</span> More resources about web page performance</h3>
+<ul>
+<li><p><a href="https://developers.google.com/web/fundamentals/performance/why-performance-matters">Why Performance Matters - Google Web Fundamentals</a></p></li>
+<li><p><a href="https://developer.mozilla.org/en-US/docs/Web/Performance">Web Performance - Mozilla Web Docs</a></p></li>
 </ul>
 
-
 </div>
 </div>
 </div>
-
-
-
 <h3>References</h3>
 <div id="refs" class="references">
+<div id="ref-R-profmem">
+<p>Bengtsson, Henrik. 2018. <em>Profmem: Simple Memory Profiling for R</em>. <a href="https://CRAN.R-project.org/package=profmem">https://CRAN.R-project.org/package=profmem</a>.</p>
+</div>
 <div id="ref-R-shiny">
 <p>Chang, Winston, Joe Cheng, JJ Allaire, Yihui Xie, and Jonathan McPherson. 2020. <em>Shiny: Web Application Framework for R</em>. <a href="https://CRAN.R-project.org/package=shiny">https://CRAN.R-project.org/package=shiny</a>.</p>
+</div>
+<div id="ref-R-profvis">
+<p>Chang, Winston, Javier Luraschi, and Timothy Mastny. 2019. <em>Profvis: Interactive Visualizations for Profiling R Code</em>. <a href="https://CRAN.R-project.org/package=profvis">https://CRAN.R-project.org/package=profvis</a>.</p>
+</div>
+<div id="ref-R-Rcpp">
+<p>Eddelbuettel, Dirk, Romain Francois, JJ Allaire, Kevin Ushey, Qiang Kou, Nathan Russell, Douglas Bates, and John Chambers. 2020. <em>Rcpp: Seamless R and C++ Integration</em>. <a href="https://CRAN.R-project.org/package=Rcpp">https://CRAN.R-project.org/package=Rcpp</a>.</p>
+</div>
+<div id="ref-R-hexmake">
+<p>Fay, Colin. 2020g. <em>Hexmake: Hex Stickers Maker</em>. <a href="https://github.com/colinfay/hexmake">https://github.com/colinfay/hexmake</a>.</p>
 </div>
 <div id="ref-R-golem">
 <p>Guyader, Vincent, Colin Fay, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
 </div>
-<div id="ref-R-bookdown">
-<p>Xie, Yihui. 2020a. <em>Bookdown: Authoring Books and Technical Documents with R Markdown</em>. <a href="https://CRAN.R-project.org/package=bookdown">https://CRAN.R-project.org/package=bookdown</a>.</p>
+<div id="ref-R-bench">
+<p>Hester, Jim. 2020a. <em>Bench: High Precision Timing of R Expressions</em>. <a href="https://CRAN.R-project.org/package=bench">https://CRAN.R-project.org/package=bench</a>.</p>
 </div>
-<div id="ref-R-knitr">
-<p>Xie, Yihui. 2020b. <em>Knitr: A General-Purpose Package for Dynamic Report Generation in R</em>. <a href="https://CRAN.R-project.org/package=knitr">https://CRAN.R-project.org/package=knitr</a>.</p>
+<div id="ref-lemaire2020">
+<p>Lemaire, Maude. 2020. <em>Refactoring at Scale</em>. Henry Holt. <a href="https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/">https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/</a>.</p>
 </div>
+<div id="ref-R-ggplot2">
+<p>Wickham, Hadley, Winston Chang, Lionel Henry, Thomas Lin Pedersen, Kohske Takahashi, Claus Wilke, Kara Woo, Hiroaki Yutani, and Dewey Dunnington. 2020. <em>Ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics</em>. <a href="https://CRAN.R-project.org/package=ggplot2">https://CRAN.R-project.org/package=ggplot2</a>.</p>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="45">
+<li id="fn45"><p><code>{utils}</code> also comes with a function call <code>Rprof()</code>, but we will not be examining this one here, as <code>{profvis}</code> provides a more user-friendly and enhanced interface to this profiling function.<a href="when-optimize.html#fnref45" class="footnote-back">↩︎</a></p></li>
+<li id="fn46"><p>Do not forget to add <code>{}</code> inside <code>profvis({})</code> if you want to write several lines of code.<a href="when-optimize.html#fnref46" class="footnote-back">↩︎</a></p></li>
+<li id="fn47"><p><a href="https://www.broadbandsearch.net/blog/mobile-desktop-internet-usage-statistics">broadbandsearch</a> for example, reports a 53.3% share for mobile browsing.<a href="when-optimize.html#fnref47" class="footnote-back">↩︎</a></p></li>
+<li id="fn48"><p>Being a NodeJS application, you will need to have NodeJS installed on your machine.<a href="when-optimize.html#fnref48" class="footnote-back">↩︎</a></p></li>
+</ol>
 </div>
 <hr/>
 <footer>
@@ -663,8 +878,8 @@ Function names are formatted in a typewriter font and followed by parentheses (e
           </div>
         </div>
       </div>
-
-<a href="successfulshinyapp.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="deploy-golem.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="optim-caveat.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -695,7 +910,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/index.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/15-when_optimize.Rmd",
 "text": "Edit"
 },
 "history": {

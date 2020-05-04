@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 9 Setting up for success with {golem} | Engineering Production-Grade Shiny Apps</title>
+  <title>Chapter 8 A Gentle Introduction to CSS | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 9 Setting up for success with {golem} | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:title" content="Chapter 8 A Gentle Introduction to CSS | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
   
   <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 9 Setting up for success with {golem} | Engineering Production-Grade Shiny Apps" />
+  <meta name="twitter:title" content="Chapter 8 A Gentle Introduction to CSS | Engineering Production-Grade Shiny Apps" />
   
   <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-05-01" />
+<meta name="date" content="2020-05-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="css.html"/>
-<link rel="next" href="stepprotopype.html"/>
+<link rel="prev" href="step-design.html"/>
+<link rel="next" href="setting-up-for-success-with-golem.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
@@ -441,181 +441,294 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="setting-up-for-success-with-golem" class="section level1">
-<h1><span class="header-section-number">Chapter 9</span> Setting up for success with <code>{golem}</code></h1>
-<p>Before starting to prototype and build anything, initialize a <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> project!
-This will help you start your application on solid ground, and once the project is ready to be filled, you can start prototyping right inside it.</p>
-<p>The general workflow for “prototype and build” is the following: the project manager sets up a <code>{golem}</code> project, where the first steps are filled, the general structure (potentially with Shiny module) is set, and then the project is registered to the version control system.
-Once we have this structure, package and modules combined, we can start prototyping the UI inside the module, work on the CSS and JavaScript elements that might be needed, and prototyping the back-end functionalities inside Rmarkdown files.
-And then, once this two prototyping sides are finished, we work on the integration of everything inside the reactive context.</p>
-<p>In this chapter and in chapter 11, we will be presenting the <code>{golem}</code> package in more depth.
-<code>{golem}</code> is a framework that standardize the process of building production-ready Shiny Applications.</p>
-<div id="create-a-golem" class="section level2">
-<h2><span class="header-section-number">9.1</span> Create a <code>{golem}</code></h2>
-<p>Once <code>{golem}</code> is installed and available on your computer, you can got to File &gt; New Project… in RStudio, and choose “Package for Shiny App Using golem” input.</p>
-<p>If you want to do it through command line, you can use:</p>
-<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="setting-up-for-success-with-golem.html#cb94-1"></a>golem<span class="op">::</span><span class="kw">create_golem</span>(<span class="dt">path =</span> <span class="st">&quot;path/to/package&quot;</span>)</span></code></pre></div>
-<p>Once you have got that, a new project will be launched.
-Here is the structure of this project:</p>
-<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="setting-up-for-success-with-golem.html#cb95-1"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;golex&quot;</span>)</span></code></pre></div>
-<pre><code>golex
-├── DESCRIPTION
-├── NAMESPACE
-├── R
-│   ├── app_config.R
-│   ├── app_server.R
-│   ├── app_ui.R
-│   └── run_app.R
-├── dev
-│   ├── 01_start.R
-│   ├── 02_dev.R
-│   ├── 03_deploy.R
-│   └── run_dev.R
-├── inst
-│   ├── app
-│   │   └── www
-│   │       └── favicon.ico
-│   └── golem-config.yml
-└── man
-    └── run_app.Rd</code></pre>
-<p>If you are already familiar with R packages, most of these files will appear very familiar to you.
-That’s because a <code>{golem}</code> app IS a package.</p>
-<p>For more details about these files, please refer to the <a href="">Understanding {golem} app structure</a> part of this book.
-In this part, we will go through the <code>dev/01_start.R</code> and <code>dev/02_dev.R</code> scripts.</p>
+<div id="css" class="section level1">
+<h1><span class="header-section-number">Chapter 8</span> A Gentle Introduction to CSS</h1>
+<div id="what-is-css" class="section level2">
+<h2><span class="header-section-number">8.1</span> What is CSS</h2>
+<div id="about-css" class="section level3">
+<h3><span class="header-section-number">8.1.1</span> About CSS</h3>
+<p>CSS, for <code>Cascading Style Sheets</code>, is one of main technologies that power the web today, along with HTML and JavaScript.
+HTML is a series of tags that define your web page structure, and JavaScript is a programming language that allows you to manipulate the page (well, it can do a lot more than that, but we are simplifying to make it understandable).
+CSS is what handles the design, i.e. the visual rendering of the web page: the color of the header, the font, the background, and everything that makes a web page looks like it is not from 1983 (again, we are simplifying for the sake of clarity).
+On every browser, each HTML element has a default style: for example all <code>&lt;h1&gt;</code> have the size <code>2em</code> and are in bold, and <code>&lt;strong&gt;</code> is in bold.
+But we might not be happy with what a “standard page” (with no CSS) looks like: that is the very reason of CSS, modifying the visual rendering of the page.</p>
+<p>If you want to get an idea of the importance of CSS, try installing extensions like <a href="https://chrome.google.com/webstore/detail/web-developer/bfbameneiokkgbdmiekhjnmfkcnldhhm">Web Developer</a> for Google Chrome.
+Then, if you go on the extension and choose CSS, click “Disable All Style”, to see what a page without CSS looks like.</p>
+<p>For example, here is what <a href="https://rtask.thinkr.fr">rtask.thinkr.fr</a> looks like:</p>
+
+<div class="figure" style="text-align: center"><span id="fig:08-css-1-bis"></span>
+<img src="img/rtask_with_css.png" alt="https://rtask.thinkr.fr with CSS" width="100%" />
+<p class="caption">
+FIGURE 8.1: <a href="https://rtask.thinkr.fr" class="uri">https://rtask.thinkr.fr</a> with CSS
+</p>
 </div>
-<div id="setting-things-up-with-dev01_start.r" class="section level2">
-<h2><span class="header-section-number">9.2</span> Setting things up with <code>dev/01_start.R</code></h2>
-<p>Once you have created your project, the first file that opens is <code>dev/01_start.R</code>.
-This file contains a series of commands to run once, at the start of the project.
-These are the commands you will be using at</p>
-<div id="fill-the-description-and-set-options" class="section level3">
-<h3><span class="header-section-number">9.2.1</span> Fill the DESCRIPTION and set options</h3>
-<p>First, fill the DESCRIPTION file by adding information about the package that will contain your app:</p>
-<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="setting-up-for-success-with-golem.html#cb97-1"></a>golem<span class="op">::</span><span class="kw">fill_desc</span>(</span>
-<span id="cb97-2"><a href="setting-up-for-success-with-golem.html#cb97-2"></a>  <span class="co"># The Name of the package containing the App </span></span>
-<span id="cb97-3"><a href="setting-up-for-success-with-golem.html#cb97-3"></a>  <span class="dt">pkg_name =</span> <span class="st">&quot;ipsumapp&quot;</span>, </span>
-<span id="cb97-4"><a href="setting-up-for-success-with-golem.html#cb97-4"></a>  <span class="co"># The Title of the package containing the App </span></span>
-<span id="cb97-5"><a href="setting-up-for-success-with-golem.html#cb97-5"></a>  <span class="dt">pkg_title =</span> <span class="st">&quot;PKG_TITLE&quot;</span>, </span>
-<span id="cb97-6"><a href="setting-up-for-success-with-golem.html#cb97-6"></a>  <span class="co"># The Description of the package containing the App </span></span>
-<span id="cb97-7"><a href="setting-up-for-success-with-golem.html#cb97-7"></a>  <span class="dt">pkg_description =</span> <span class="st">&quot;PKG_DESC.&quot;</span>, </span>
-<span id="cb97-8"><a href="setting-up-for-success-with-golem.html#cb97-8"></a>  <span class="co"># Your First Name</span></span>
-<span id="cb97-9"><a href="setting-up-for-success-with-golem.html#cb97-9"></a>  <span class="dt">author_first_name =</span> <span class="st">&quot;AUTHOR_FIRST&quot;</span>, </span>
-<span id="cb97-10"><a href="setting-up-for-success-with-golem.html#cb97-10"></a>  <span class="co"># Your Last Name</span></span>
-<span id="cb97-11"><a href="setting-up-for-success-with-golem.html#cb97-11"></a>  <span class="dt">author_last_name =</span> <span class="st">&quot;AUTHOR_LAST&quot;</span>, </span>
-<span id="cb97-12"><a href="setting-up-for-success-with-golem.html#cb97-12"></a>  <span class="co"># Your Email</span></span>
-<span id="cb97-13"><a href="setting-up-for-success-with-golem.html#cb97-13"></a>  <span class="dt">author_email =</span> <span class="st">&quot;AUTHOR@MAIL.COM&quot;</span>, </span>
-<span id="cb97-14"><a href="setting-up-for-success-with-golem.html#cb97-14"></a>  <span class="co"># The URL of the GitHub Repo (optional) </span></span>
-<span id="cb97-15"><a href="setting-up-for-success-with-golem.html#cb97-15"></a>  <span class="dt">repo_url =</span> <span class="ot">NULL</span> </span>
-<span id="cb97-16"><a href="setting-up-for-success-with-golem.html#cb97-16"></a>)   </span></code></pre></div>
-<p>Then, call the <code>golem::set_golem_options()</code> function, it will add information to the <code>golem-config.yml</code> file, and notably set the <code>{here}</code> <span class="citation">(Müller <a href="#ref-R-here" role="doc-biblioref">2017</a>)</span> package root sentinel.</p>
+<p>And here is what it looks like without CSS:</p>
+
+<div class="figure" style="text-align: center"><span id="fig:08-css-2-bis"></span>
+<img src="img/rtask_without_css.png" alt="https://rtask.thinkr.fr without CSS" width="100%" />
+<p class="caption">
+FIGURE 8.2: <a href="https://rtask.thinkr.fr" class="uri">https://rtask.thinkr.fr</a> without CSS
+</p>
 </div>
-<div id="set-common-files" class="section level3">
-<h3><span class="header-section-number">9.2.2</span> Set common Files</h3>
-<p>If you want to use the MIT license, add README, a code of conduct, a lifecycle badge, and NEWS</p>
-<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="setting-up-for-success-with-golem.html#cb98-1"></a><span class="co"># You can set another license here</span></span>
-<span id="cb98-2"><a href="setting-up-for-success-with-golem.html#cb98-2"></a>usethis<span class="op">::</span><span class="kw">use_mit_license</span>( <span class="dt">name =</span> <span class="st">&quot;Golem User&quot;</span> )  </span>
-<span id="cb98-3"><a href="setting-up-for-success-with-golem.html#cb98-3"></a>usethis<span class="op">::</span><span class="kw">use_readme_rmd</span>( <span class="dt">open =</span> <span class="ot">FALSE</span> )</span>
-<span id="cb98-4"><a href="setting-up-for-success-with-golem.html#cb98-4"></a>usethis<span class="op">::</span><span class="kw">use_code_of_conduct</span>()</span>
-<span id="cb98-5"><a href="setting-up-for-success-with-golem.html#cb98-5"></a>usethis<span class="op">::</span><span class="kw">use_lifecycle_badge</span>( <span class="st">&quot;Experimental&quot;</span> )</span>
-<span id="cb98-6"><a href="setting-up-for-success-with-golem.html#cb98-6"></a>usethis<span class="op">::</span><span class="kw">use_news_md</span>( <span class="dt">open =</span> <span class="ot">FALSE</span> )</span></code></pre></div>
-<p>It’s also where you will be invited to use <code>git</code>:</p>
-<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="setting-up-for-success-with-golem.html#cb99-1"></a>usethis<span class="op">::</span><span class="kw">use_git</span>()</span></code></pre></div>
+
+<div class="figure" style="text-align: center"><span id="fig:08-css-3-bis"></span>
+<img src="img/rtask_without_css2.png" alt="https://rtask.thinkr.fr without CSS" width="100%" />
+<p class="caption">
+FIGURE 8.3: <a href="https://rtask.thinkr.fr" class="uri">https://rtask.thinkr.fr</a> without CSS
+</p>
 </div>
-<div id="use-recommended-elements" class="section level3">
-<h3><span class="header-section-number">9.2.3</span> Use Recommended Elements</h3>
-<p><code>golem::use_recommended_tests()</code> and <code>golem::use_recommended_deps()</code> sets a default testing infrastructure and adds dependencies to the application.</p>
+<p>CSS now seems pretty useful right?</p>
 </div>
-<div id="add-utilitary-functions" class="section level3">
-<h3><span class="header-section-number">9.2.4</span> Add utilitary functions</h3>
-<p>These two functions add a file with various functions that can be used along the process of building your app.</p>
-<p>See each file in details for a description of the functions.</p>
-<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="setting-up-for-success-with-golem.html#cb100-1"></a>golem<span class="op">::</span><span class="kw">use_utils_ui</span>()</span>
-<span id="cb100-2"><a href="setting-up-for-success-with-golem.html#cb100-2"></a>golem<span class="op">::</span><span class="kw">use_utils_server</span>()</span></code></pre></div>
+<div id="shinys-default-fluidpage" class="section level3">
+<h3><span class="header-section-number">8.1.2</span> Shiny’s default: <code>fluidPage()</code></h3>
+<p>In Shiny, there is a default CSS: the one from Bootstrap 3.
+As you can see if you have created a <code>fluidPage()</code> before, there is already styling applied.</p>
+<p>Compare:</p>
+<p>(no <code>fluidPage</code>)</p>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="css.html#cb89-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb89-2"><a href="css.html#cb89-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
+<span id="cb89-3"><a href="css.html#cb89-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb89-4"><a href="css.html#cb89-4"></a>    <span class="kw">h1</span>(<span class="st">&quot;Hey&quot;</span>), </span>
+<span id="cb89-5"><a href="css.html#cb89-5"></a>    <span class="kw">h2</span>(<span class="st">&quot;You&quot;</span>), </span>
+<span id="cb89-6"><a href="css.html#cb89-6"></a>    <span class="kw">p</span>(<span class="st">&quot;You rock!&quot;</span>), </span>
+<span id="cb89-7"><a href="css.html#cb89-7"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;what&quot;</span>, <span class="st">&quot;Do you&quot;</span>, <span class="kw">unique</span>(iris<span class="op">$</span>Species))</span>
+<span id="cb89-8"><a href="css.html#cb89-8"></a>  )</span>
+<span id="cb89-9"><a href="css.html#cb89-9"></a>}</span>
+<span id="cb89-10"><a href="css.html#cb89-10"></a></span>
+<span id="cb89-11"><a href="css.html#cb89-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb89-12"><a href="css.html#cb89-12"></a>  input, </span>
+<span id="cb89-13"><a href="css.html#cb89-13"></a>  output, </span>
+<span id="cb89-14"><a href="css.html#cb89-14"></a>  session</span>
+<span id="cb89-15"><a href="css.html#cb89-15"></a>){</span>
+<span id="cb89-16"><a href="css.html#cb89-16"></a></span>
+<span id="cb89-17"><a href="css.html#cb89-17"></a>}</span>
+<span id="cb89-18"><a href="css.html#cb89-18"></a></span>
+<span id="cb89-19"><a href="css.html#cb89-19"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+
+<div class="figure" style="text-align: center"><span id="fig:08-css-4-bis"></span>
+<img src="img/no-css-shiny.png" alt="Shiny without CSS" width="100%" />
+<p class="caption">
+FIGURE 8.4: Shiny without CSS
+</p>
 </div>
-<div id="if-you-want-to-change-the-default-favicon" class="section level3">
-<h3><span class="header-section-number">9.2.5</span> If you want to change the default favicon</h3>
-<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="setting-up-for-success-with-golem.html#cb101-1"></a>golem<span class="op">::</span><span class="kw">use_favicon</span>( <span class="dt">path =</span> <span class="st">&quot;path/to/favicon&quot;</span>)</span></code></pre></div>
-<p>You’re now set!
-You’ve successfully initiated the project and can go to <code>dev/02_dev.R</code>.</p>
+<p>to (with <code>fluidPage</code>):</p>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="css.html#cb90-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb90-2"><a href="css.html#cb90-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
+<span id="cb90-3"><a href="css.html#cb90-3"></a>  <span class="kw">fluidPage</span>(</span>
+<span id="cb90-4"><a href="css.html#cb90-4"></a>    <span class="kw">h1</span>(<span class="st">&quot;Hey&quot;</span>), </span>
+<span id="cb90-5"><a href="css.html#cb90-5"></a>    <span class="kw">h2</span>(<span class="st">&quot;You&quot;</span>), </span>
+<span id="cb90-6"><a href="css.html#cb90-6"></a>    <span class="kw">p</span>(<span class="st">&quot;You rock!&quot;</span>), </span>
+<span id="cb90-7"><a href="css.html#cb90-7"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;what&quot;</span>, <span class="st">&quot;Do you&quot;</span>, <span class="kw">unique</span>(iris<span class="op">$</span>Species))</span>
+<span id="cb90-8"><a href="css.html#cb90-8"></a>  )</span>
+<span id="cb90-9"><a href="css.html#cb90-9"></a>}</span>
+<span id="cb90-10"><a href="css.html#cb90-10"></a></span>
+<span id="cb90-11"><a href="css.html#cb90-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb90-12"><a href="css.html#cb90-12"></a>  input, </span>
+<span id="cb90-13"><a href="css.html#cb90-13"></a>  output, </span>
+<span id="cb90-14"><a href="css.html#cb90-14"></a>  session</span>
+<span id="cb90-15"><a href="css.html#cb90-15"></a>){</span>
+<span id="cb90-16"><a href="css.html#cb90-16"></a></span>
+<span id="cb90-17"><a href="css.html#cb90-17"></a>}</span>
+<span id="cb90-18"><a href="css.html#cb90-18"></a></span>
+<span id="cb90-19"><a href="css.html#cb90-19"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+
+<div class="figure" style="text-align: center"><span id="fig:08-css-5"></span>
+<img src="img/css-shiny.png" alt="Shiny with its default CSS" width="100%" />
+<p class="caption">
+FIGURE 8.5: Shiny with its default CSS
+</p>
+</div>
+<p>Yes, that is subtle, but you can see how it makes the difference on larger apps.</p>
 </div>
 </div>
-<div id="setting-infrastructure-for-prototyping" class="section level2">
-<h2><span class="header-section-number">9.3</span> Setting infrastructure for prototyping</h2>
-<div id="add-modules-in-dev02_dev.r" class="section level3">
-<h3><span class="header-section-number">9.3.1</span> Add modules in <code>dev/02_dev.R</code></h3>
-<p>The <code>golem::add_module()</code> functions creates a module in the <code>R</code> folder.
-The file and the modules will be named after the <code>name</code> parameter, by adding <code>mod_</code> to the R file, and <code>mod_*_ui</code> and <code>mod_*_server</code> to the UI and server functions.</p>
-<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="setting-up-for-success-with-golem.html#cb102-1"></a>golem<span class="op">::</span><span class="kw">add_module</span>(<span class="dt">name =</span> <span class="st">&quot;my_first_module&quot;</span>) <span class="co"># Name of the module</span></span></code></pre></div>
-<pre><code>✔ File created at R/mod_my_first_module.R
-● Go to R/mod_my_first_module.R</code></pre>
-<p>The new file will contain:</p>
-<pre><code>#&#39; my_first_module UI Function
-#&#39;
-#&#39; @description A shiny Module.
-#&#39;
-#&#39; @param id,input,output,session Internal parameters for {shiny}.
-#&#39;
-#&#39; @noRd 
-#&#39;
-#&#39; @importFrom shiny NS tagList 
-mod_my_first_module_ui &lt;- function(id){
-  ns &lt;- NS(id)
-  tagList(
- 
-  )
-}
-    
-#&#39; my_first_module Server Function
-#&#39;
-#&#39; @noRd 
-mod_my_first_module_server &lt;- function(input, output, session){
-  ns &lt;- session$ns
- 
-}
-    
-## To be copied in the UI
-# mod_my_first_module_ui(&quot;my_first_module_ui_1&quot;)
-    
-## To be copied in the server
-# callModule(mod_my_first_module_server, &quot;my_first_module_ui_1&quot;)
- </code></pre>
-<p>Note that in order not to make errors when putting these into your app, the end of the file will contain code that has to be copied and pasted inside your UI and server functions.</p>
-<p>This is where you will be adding the core of your app.
-In a first time, these modules will contain prototyped UI for the application, and once the application is ready to be integrated, you will add the core logic here.</p>
+<div id="getting-started-with-css" class="section level2">
+<h2><span class="header-section-number">8.2</span> Getting started with CSS</h2>
+<p>CSS is a descriptive language, meaning that you will have to declare the style either on a tag or inside an external file.
+We will see how to integrate CSS inside your Shiny application in the next section, but before that, let’s start with a short introduction to CSS<a href="#fn30" class="footnote-ref" id="fnref30"><sup>30</sup></a>
+.</p>
+<div id="about-css-syntax" class="section level3">
+<h3><span class="header-section-number">8.2.1</span> About CSS syntax</h3>
+<p>CSS syntax is composed of two elements: a selector, and a declaration block.
+The CSS selector describes how to identify the HTML tags that will be affected by the style declared with key-value pairs in the declaration block that follows.
+And because an example will be easier to understand, here is a simple CSS rule:</p>
+<div class="sourceCode" id="cb91"><pre class="sourceCode css"><code class="sourceCode css"><span id="cb91-1"><a href="css.html#cb91-1"></a>h2 {</span>
+<span id="cb91-2"><a href="css.html#cb91-2"></a>  <span class="kw">color</span>:<span class="cn">red</span><span class="op">;</span></span>
+<span id="cb91-3"><a href="css.html#cb91-3"></a>}</span></code></pre></div>
+<p>Here, the selector is <code>h2</code>, meaning that the HTML tags aimed by the style are the <code>&lt;h2&gt;</code> tags.
+The declaration block contains the key-value pair telling that the <code>color</code> will be <code>red</code>.
+Note that each key-value pair must end with a semicolon.</p>
 </div>
-<div id="add-css-js-files" class="section level3">
-<h3><span class="header-section-number">9.3.2</span> Add CSS &amp; JS Files</h3>
-<p>Adding some infrastructure for JavaScript and CSS file from the very beginning can also formalize the set-up: you are giving the rest of your team a</p>
-<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="setting-up-for-success-with-golem.html#cb105-1"></a>golem<span class="op">::</span><span class="kw">add_js_file</span>( <span class="st">&quot;script&quot;</span> )</span></code></pre></div>
-<p>Will generate the following file:</p>
-<pre><code>$( document ).ready(function() {
-  
-});</code></pre>
-<p>Here, you will have an infrastructure for launching JavaScript code once the application is ready (this code is standard <code>jQuery</code> format: we will be back to JavaScript at the end of this book).</p>
-<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="setting-up-for-success-with-golem.html#cb107-1"></a>golem<span class="op">::</span><span class="kw">add_js_handler</span>( <span class="st">&quot;handlers&quot;</span> )</span></code></pre></div>
-<p>Will generate the following file:</p>
-<pre><code>$( document ).ready(function() {
-  Shiny.addCustomMessageHandler(&#39;fun&#39;, function(arg) {
-  
-  })
-});</code></pre>
-<p>As you can see, there is already a skeleton for building Shiny JavaScript handlers.
-More on that structure in the last chapter of the book!</p>
-<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="setting-up-for-success-with-golem.html#cb109-1"></a>golem<span class="op">::</span><span class="kw">add_css_file</span>( <span class="st">&quot;custom&quot;</span> )</span></code></pre></div>
-<p>Will create a blank CSS file inside the <code>inst/app/www</code> folder.</p>
-<p>Note that if you are building your application with <code>{golem}</code>, these files will be linked automatically to your application.</p>
+<div id="css-selectors" class="section level3">
+<h3><span class="header-section-number">8.2.2</span> CSS selectors</h3>
+<p>CSS selectors are a wide topic, as there are many combinations of things you might want to select inside an HTML page.</p>
+<p>The first type of selectors are the “standard” ones <code>name</code>, <code>id</code>, or <code>class</code>.
+These refer to the elements composing an HTML tag: for example, with <code>&lt;h2 id = "tileone" class = "standard"&gt;One&lt;/h2&gt;</code>, the name is <code>h2</code>, the id <code>tileone</code>, and the class <code>standard</code><a href="#fn31" class="footnote-ref" id="fnref31"><sup>31</sup></a>
+.</p>
+<p>To select these three elements in CSS:</p>
+<ul>
+<li>Write the name as-is: <code>h2</code></li>
+<li>Prefix the id with <code>#</code>: <code>#tileone</code></li>
+<li>Prefix the class with <code>.</code>: <code>.standard</code></li>
+</ul>
+<p>You can also combine these elements, for example <code>h2.standard</code> will select all the <code>h2</code> tags with a class <code>standard</code>, and <code>h2,h3</code> will select the <code>h2</code> and the <code>h3</code>.</p>
+<p>You can build more complex selectors: for example <code>div.standard &gt; p</code> will select all the <code>&lt;p&gt;</code> tags that are contained inside a <code>div</code> of class <code>standard</code> (CSS combinator), or <code>a:hover</code>, which dictates the style of the <code>a</code> tags when they are hovered by the mouse (CSS pseudo-class), <code>div.standard::first-letter</code>, that select the first letter of the <code>div</code> of class <code>standard</code> (CSS pseudo-elements), and <code>h2[data-value="hey"]</code>, which selects all the <code>h2</code> with a <code>data-value</code> attribute set to <code>"hey"</code> (CSS attribute selector).</p>
+<p>As you can see, lots of complex selectors can be built with CSS, to target very specific elements of your UI.
+But mastering these complex selectors is not the main goal of this chapter, hence we will just be using standard selectors in the rest of the examples in this book.</p>
+</div>
+<div id="css-properties" class="section level3">
+<h3><span class="header-section-number">8.2.3</span> CSS properties</h3>
+<p>Now that you have selected elements, it is time to apply some styles!
+Between the brackets of the declaration block, you will have to define a series of key-value elements defining the properties of the style: the key here is the css property, followed by its value.</p>
+<p>For example, <code>color: red;</code> or <code>text-align: center;</code> define that for the selected HTML elements, the color will be red, or the text centered.
+We will not cover all the possible properties, as there hundreds of them.
+Feel free to refer to the <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference">CSS Reference</a> page from Mozilla for an exhaustive list of available properties.</p>
+</div>
+</div>
+<div id="integrate-css-files-to-your-shiny-app" class="section level2">
+<h2><span class="header-section-number">8.3</span> Integrate CSS files to your Shiny App</h2>
+<p>Now you have got a grasp on how to getting started writing your own CSS, how do you integrate it inside your Shiny Application?
+There are three methods that can be used: writing it inline, integrating it inside a <code>tags$script()</code> straight into you application UI code, or by writing it into an external file.
+Note that the good practice is considered to be the integration of an external file.</p>
+<div id="inline-css" class="section level3">
+<h3><span class="header-section-number">8.3.1</span> Inline CSS</h3>
+<p>If you need to add style to one specific element, you can write it straight inside the HTML tag:</p>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="css.html#cb92-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb92-2"><a href="css.html#cb92-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
+<span id="cb92-3"><a href="css.html#cb92-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb92-4"><a href="css.html#cb92-4"></a>    <span class="kw">h2</span>(<span class="dt">style =</span> <span class="st">&quot;color:red;&quot;</span>, <span class="st">&quot;This is red&quot;</span>)</span>
+<span id="cb92-5"><a href="css.html#cb92-5"></a>  )</span>
+<span id="cb92-6"><a href="css.html#cb92-6"></a>}</span>
+<span id="cb92-7"><a href="css.html#cb92-7"></a></span>
+<span id="cb92-8"><a href="css.html#cb92-8"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb92-9"><a href="css.html#cb92-9"></a>  input, </span>
+<span id="cb92-10"><a href="css.html#cb92-10"></a>  output, </span>
+<span id="cb92-11"><a href="css.html#cb92-11"></a>  session</span>
+<span id="cb92-12"><a href="css.html#cb92-12"></a>){</span>
+<span id="cb92-13"><a href="css.html#cb92-13"></a></span>
+<span id="cb92-14"><a href="css.html#cb92-14"></a>}</span>
+<span id="cb92-15"><a href="css.html#cb92-15"></a></span>
+<span id="cb92-16"><a href="css.html#cb92-16"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+
+<div class="figure" style="text-align: center"><span id="fig:08-css-6"></span>
+<img src="img/css-red.png" alt="Shiny with a red title" width="100%" />
+<p class="caption">
+FIGURE 8.6: Shiny with a red title
+</p>
+</div>
+<p>But this method loses all the advantages of CSS, notably the possibility to apply style to multiple elements.
+Use it with caution.</p>
+</div>
+<div id="writing-in-a-tagsstyle" class="section level3">
+<h3><span class="header-section-number">8.3.2</span> Writing in a <code>tags$style()</code></h3>
+<p>If you had a <code>tags$style()</code> somewhere inside your UI code (generally at the very beginning of your UI), you can then add CSS code straight to your application.</p>
+<p>Here is an example:</p>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="css.html#cb93-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb93-2"><a href="css.html#cb93-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
+<span id="cb93-3"><a href="css.html#cb93-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb93-4"><a href="css.html#cb93-4"></a>    tags<span class="op">$</span><span class="kw">style</span>(</span>
+<span id="cb93-5"><a href="css.html#cb93-5"></a>      <span class="st">&quot;h2{</span></span>
+<span id="cb93-6"><a href="css.html#cb93-6"></a><span class="st">        color:red;</span></span>
+<span id="cb93-7"><a href="css.html#cb93-7"></a><span class="st">      }&quot;</span></span>
+<span id="cb93-8"><a href="css.html#cb93-8"></a>    ), </span>
+<span id="cb93-9"><a href="css.html#cb93-9"></a>    <span class="kw">h2</span>(<span class="st">&quot;This is red&quot;</span>)</span>
+<span id="cb93-10"><a href="css.html#cb93-10"></a>  )</span>
+<span id="cb93-11"><a href="css.html#cb93-11"></a>}</span>
+<span id="cb93-12"><a href="css.html#cb93-12"></a></span>
+<span id="cb93-13"><a href="css.html#cb93-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb93-14"><a href="css.html#cb93-14"></a>  input, </span>
+<span id="cb93-15"><a href="css.html#cb93-15"></a>  output, </span>
+<span id="cb93-16"><a href="css.html#cb93-16"></a>  session</span>
+<span id="cb93-17"><a href="css.html#cb93-17"></a>){</span>
+<span id="cb93-18"><a href="css.html#cb93-18"></a></span>
+<span id="cb93-19"><a href="css.html#cb93-19"></a>}</span>
+<span id="cb93-20"><a href="css.html#cb93-20"></a></span>
+<span id="cb93-21"><a href="css.html#cb93-21"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+
+<div class="figure" style="text-align: center"><span id="fig:08-css-7"></span>
+<img src="img/css-red.png" alt="Shiny with a red title" width="100%" />
+<p class="caption">
+FIGURE 8.7: Shiny with a red title
+</p>
+</div>
+<p>This works, but should not be considered as the best option: indeed, if you have a large amount of CSS code to insert to your app, it can make the code harder to read as it adds a large amount of visual noise.</p>
+<p>The best solution then is to go with the alternative of writing the CSS inside a separate file: it allows to separate things and to make the UI code lighter, as it is easier to maintain a separate CSS file than CSS written straight into R code.</p>
+</div>
+<div id="including-external-files" class="section level3">
+<h3><span class="header-section-number">8.3.3</span> Including External Files</h3>
+<p>To include an external CSS file, you will have to use another tags: <code>tags$link()</code>.
+What this tag will contain is these three elements:</p>
+<ul>
+<li><code>rel="stylesheet"</code></li>
+<li><code>type="text/css"</code></li>
+<li><code>href="www/custom.css"</code></li>
+</ul>
+<p>The first two are standard: you do not need to change them, they are necessary to indicate to the HTML page that you are creating a stylesheet, with the type being text/css.
+The <code>href</code> is the one you will need to change: this path points to where your style file is located.</p>
+<p>If you are building your application with <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span>, the good news is that this file creation and linking is transparent: if you call <code>golem::add_css_file("name")</code>, a file will be created at <code>inst/app/www</code>, and this file will be automatically linked inside your UI thanks to the <code>bundle_resouces()</code> function.</p>
+</div>
+<div id="using-r-packages" class="section level3">
+<h3><span class="header-section-number">8.3.4</span> Using R packages</h3>
+<p>If you want to use external CSS template, there are several packages that exist that can implement new custom UI designs for your application.
+Here are some:</p>
+<ul>
+<li><p><code>{resume}</code><span class="citation">(Fay <a href="#ref-R-resume" role="doc-biblioref">2020</a><a href="#ref-R-resume" role="doc-biblioref">i</a>)</span>, provides an implementation of the <a href="https://github.com/BlackrockDigital/startbootstrap-resume">Bootstrap Resume Template</a>.</p></li>
+<li><p><code>{nessy}</code> <span class="citation">(Fay <a href="#ref-R-nessy" role="doc-biblioref">2020</a><a href="#ref-R-nessy" role="doc-biblioref">h</a>)</span>, a port of <a href="https://github.com/nostalgic-css/NES.css">NES CSS</a>.</p></li>
+<li><p><code>{skeleton}</code> <span class="citation">(Fay <a href="#ref-R-skeleton" role="doc-biblioref">2020</a><a href="#ref-R-skeleton" role="doc-biblioref">j</a>)</span>, <a href="http://getskeleton.com/">Skeleton CSS</a>.</p></li>
+<li><p><code>{shinyMobile}</code> <span class="citation">(Granjon, Perrier, and Rudolf <a href="#ref-R-shinyMobile" role="doc-biblioref">2019</a>)</span>, shiny API for Framework7 (IOS/android).</p></li>
+<li><p><code>{shinydashboardPlus}</code> <span class="citation">(Granjon <a href="#ref-R-shinydashboardPlus" role="doc-biblioref">2019</a><a href="#ref-R-shinydashboardPlus" role="doc-biblioref">b</a>)</span>, extensions for shinydashboard.</p></li>
+<li><p><code>{bs4Dash}</code> <span class="citation">(Granjon <a href="#ref-R-bs4Dash" role="doc-biblioref">2019</a><a href="#ref-R-bs4Dash" role="doc-biblioref">a</a>)</span>, Bootstrap 4 shinydashboard using AdminLTE3.</p></li>
+<li><p><code>{fullPage}</code><span class="citation">(Coene <a href="#ref-R-fullPage" role="doc-biblioref">2020</a>)</span>, fullPage.js, pagePiling.js and multiScroll.js for shiny.</p></li>
+</ul>
+<p>And all the amazing things done at <a href="https://github.com/RinteRface">RinteRface</a>.</p>
+</div>
+</div>
+<div id="external-resources" class="section level2">
+<h2><span class="header-section-number">8.4</span> External resources</h2>
+<p>If you want to learn more about CSS, there are three places where you can get started:</p>
+<ul>
+<li><p><a href="https://www.freecodecamp.org/learn">FreeCodeCamp</a>, with contains many hours of course around HTML and CSS.</p></li>
+<li><p><a href="https://www.w3schools.com/css/">W3 Schools CSS Tutorial</a></p></li>
+<li><p><a href="https://developer.mozilla.org/en-US/docs/Learn/CSS">Learn to style HTML using CSS</a></p></li>
+</ul>
 
 </div>
 </div>
-</div>
+
+
+
 <h3>References</h3>
 <div id="refs" class="references">
+<div id="ref-R-fullPage">
+<p>Coene, John. 2020. <em>FullPage: Three Families of Functions for Three Different Single Page ’Shiny’ Apps</em>. <a href="https://github.com/RinteRface/fullPage">https://github.com/RinteRface/fullPage</a>.</p>
+</div>
+<div id="ref-R-nessy">
+<p>Fay, Colin. 2020h. <em>Nessy: A ’Nes’ Css for ’Shiny’</em>. <a href="https://github.com/ColinFay/nessy">https://github.com/ColinFay/nessy</a>.</p>
+</div>
+<div id="ref-R-resume">
+<p>Fay, Colin. 2020i. <em>Resume: Bootstrap Resume Template for ’Shiny’</em>.</p>
+</div>
+<div id="ref-R-skeleton">
+<p>Fay, Colin. 2020j. <em>Skeleton: Skeleton Css for Shiny</em>.</p>
+</div>
+<div id="ref-R-bs4Dash">
+<p>Granjon, David. 2019a. <em>Bs4Dash: A ’Bootstrap 4’ Version of ’Shinydashboard’</em>. <a href="https://CRAN.R-project.org/package=bs4Dash">https://CRAN.R-project.org/package=bs4Dash</a>.</p>
+</div>
+<div id="ref-R-shinydashboardPlus">
+<p>Granjon, David. 2019b. <em>ShinydashboardPlus: Add More ’Adminlte2’ Components to ’Shinydashboard’</em>. <a href="https://CRAN.R-project.org/package=shinydashboardPlus">https://CRAN.R-project.org/package=shinydashboardPlus</a>.</p>
+</div>
+<div id="ref-R-shinyMobile">
+<p>Granjon, David, Victor Perrier, and Isabelle Rudolf. 2019. <em>ShinyMobile: Mobile Ready ’Shiny’ Apps with Standalone Capabilities</em>. <a href="https://CRAN.R-project.org/package=shinyMobile">https://CRAN.R-project.org/package=shinyMobile</a>.</p>
+</div>
 <div id="ref-R-golem">
 <p>Guyader, Vincent, Colin Fay, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
 </div>
-<div id="ref-R-here">
-<p>Müller, Kirill. 2017. <em>Here: A Simpler Way to Find Your Files</em>. <a href="https://CRAN.R-project.org/package=here">https://CRAN.R-project.org/package=here</a>.</p>
 </div>
+<div class="footnotes">
+<hr />
+<ol start="30">
+<li id="fn30"><p>Of course, this part will not make you an expert CSS programmer, but we hope you will get an idea of how it works, enough to get you started and want to learn more!<a href="css.html#fnref30" class="footnote-back">↩︎</a></p></li>
+<li id="fn31"><p>Note that in HTML, id must be unique, but class must not.<a href="css.html#fnref31" class="footnote-back">↩︎</a></p></li>
+</ol>
 </div>
 <hr/>
 <footer>
@@ -626,8 +739,8 @@ More on that structure in the last chapter of the book!</p>
           </div>
         </div>
       </div>
-<a href="css.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="stepprotopype.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="step-design.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="setting-up-for-success-with-golem.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -658,7 +771,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/09-step-by-step-prototype.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/08-css.Rmd",
 "text": "Edit"
 },
 "history": {

@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 2 Planning Ahead | Engineering Production-Grade Shiny Apps</title>
+  <title>Chapter 13 Version Control | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 2 Planning Ahead | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:title" content="Chapter 13 Version Control | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
   
   <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 2 Planning Ahead | Engineering Production-Grade Shiny Apps" />
+  <meta name="twitter:title" content="Chapter 13 Version Control | Engineering Production-Grade Shiny Apps" />
   
   <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-05-01" />
+<meta name="date" content="2020-05-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="successfulshinyapp.html"/>
-<link rel="next" href="structure.html"/>
+<link rel="prev" href="step-secure.html"/>
+<link rel="next" href="deploy-golem.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
@@ -441,142 +441,306 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="planning" class="section level1">
-<h1><span class="header-section-number">Chapter 2</span> Planning Ahead</h1>
-<div id="working-with-a-long-term-mindset" class="section level2">
-<h2><span class="header-section-number">2.1</span> Working with a “long-term” mindset</h2>
-<blockquote>
-<p>“Rome ne fut pas faite toute en un jour”</p>
-</blockquote>
-<p>French proverb</p>
-<div id="prepare-for-success" class="section level3">
-<h3><span class="header-section-number">2.1.1</span> Prepare for success</h3>
-<p>Whatever your ambitions for your Shiny application are, you should take time today to set robust foundations that will save a lot of time in the future.</p>
-<p>A common thing you will hear about Shiny is that it is a good prototyping tool.
-This can not be denied.
-Building a Proof of Concept (POC) for an app is relatively straightforward if you compare to what it needs to build applications in other languages.
-With Shiny, you can build a “it works on my machine” web application in a couple of hours, and show it to your team, your boss, your investors…
-Thanks to the way Shiny was designed, you do not have to care about websockets, ports, HTML, JavaScript libraries, and all the things that are elegantly bundled into Shiny.</p>
-<p>Hence, you can have a quick, hacky application that will work on your machine, and that, very rapidly.
-But that is not the way you should start.
-Indeed, starting with hacky foundations will lead to two possibilities:</p>
+<div id="secure" class="section level1">
+<h1><span class="header-section-number">Chapter 13</span> Version Control</h1>
+<div id="using-version-control-with-git" class="section level2">
+<h2><span class="header-section-number">13.1</span> Using Version Control with <code>git</code></h2>
+<p>“Friends do not let friends work on a coding project without version control.”
+You might have heard this before, without really considering what this means.
+Or maybe you are convinced about this saying, but have not had the opportunity to use git, GitHub or Gitlab for versioning your applications.
+If so, now is the time for a workflow change!</p>
+<div id="why-version-control" class="section level3">
+<h3><span class="header-section-number">13.1.1</span> Why Version Control?</h3>
+<p>Have you ever experienced a piece of code disappearing?
+Or the unsolvable problem of integrating changes when several people have been working on the same piece of code?
+Or the inability to find back something you have written a while back?</p>
+<p>If so, you might have been missing Version Control (also shortened as VC).
+In this chapter, we’ll be focusing on <code>git</code>, but you should be aware that other VC system exist.
+As they are less popular than <code>git</code>, we will not cover them here.
+<code>Git</code> was designed to handle collaboration on code projects<a href="#fn41" class="footnote-ref" id="fnref41"><sup>41</sup></a>
+where potentially a lot of people have to interact and make changes to the codebase.
+<code>Git</code> might feel a little bit daunting at first, and even seasoned developers still misuse it, or do not understand it completely, but getting at ease with the basics will significantly improve the way you build software, so do not give up: the benefits from learning it really outweigh the (apparent) complexity.</p>
+<p>There are many advantages to VC, including:</p>
 <ul>
-<li>You will have to rewrite everything from scratch to have a robust application for production.</li>
-<li>If you do not want to rewrite all the code, you will get stuck with a legacy codebase for the application, built on top of hacky functions, and sent to production using hacky solutions.</li>
+<li><p><strong>You can go back in time</strong>.
+With a VC system like <code>git</code>, every change is recorded (well, every <strong>committed</strong> change), meaning that you can potentially go back in time to a previous version of a project, and see the complete history of a file.
+This feature is very important: if you accidentally made changes that break your application, or if you deleted a feature you thought you would never need, you can go back to where you were a few hours, a few days, a few months back.</p></li>
+<li><p><strong>Several people can work on the same file</strong>.
+<code>Git</code> relies on a system of branches.
+Within this branch pattern, there is one main branch, called “master”, which contains the stable, main version of the code-base.
+By “forking” this branch (or any other branch), developers will have a copy of the base branch, where they can safely work on changing (and breaking) things, without impacting the origin branch.
+This allows to try things in a safe environment, without touching what works.</p></li>
+<li><p><strong>You can safely track changes</strong>.
+Every time a developer records something to <code>git</code>, changes are listed.
+In other words, you can see what changes are made to a specific file in your codebase.</p></li>
+<li><p><strong>It centralizes the codebase</strong>.
+You can use <code>git</code> locally, but its strength also relies on the ability to synchronize your local project with a distant server.
+This also means that <em>several</em> people can synchronize with this server and collaborate on a project.
+That way, changes on a branch on a server can be downloaded (it is called <code>pull</code> in <code>git</code> terminology) by all the members of the team, and synchronized locally, <em>i.e</em> if someone makes changes to a branch and send them to the main server, all the other developers can retrieve these change on their machine.</p></li>
 </ul>
-<p>Either way, that is a heavy technical debt.</p>
-<p>Shiny is a good tool for prototyping, but there is no harm in starting your application on solid ground, even for a prototype: the sooner you start with a robust framework the better, and the longer you wait the harder it gets to convert your application to a production-ready one.
-The larger the codebase, the harder it is to untangle everything and make it work.</p>
-<p>In this book, we will present a framework called <code>{golem}</code>, which is a toolbox for building production-grade Shiny applications.
-Even if <code>{golem}</code> is focused on production, there is no reason not to use it for your proof of concepts: starting a new <code>{golem}</code> project is relatively straightforward, and even if you do not use the advanced features, you can use it for very small apps.
-That way, you are getting ready for complexity, and if, one day, you need to turn this small app into a production app, the foundations are there.</p>
 </div>
-<div id="develop-with-the-kiss-principle" class="section level3">
-<h3><span class="header-section-number">2.1.2</span> Develop with the KISS principle</h3>
-<blockquote>
-<p>The KISS principle states that most systems work best if they are kept simple rather than made complicated; therefore, simplicity should be a key goal in design, and unnecessary complexity should be avoided.</p>
-</blockquote>
-<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
-<style>.right{ text-align: right;}</style>
-<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
-<div class="right">
-<a href="https://en.wikipedia.org/wiki/KISS_principle">KISS principle</a>
+<div id="git-basics-add---commit---push---pull" class="section level3">
+<h3><span class="header-section-number">13.1.2</span> <code>Git</code> basics: <code>add</code> - <code>commit</code> - <code>push</code> - <code>pull</code></h3>
+<p>These are the four main actions you will be performing in <code>git</code>: if you just need to learn the minimum to get started, they are the four essential ones.</p>
+<div id="add" class="section level4">
+<h4><span class="header-section-number">13.1.2.1</span> <code>add</code></h4>
+<p>When using <code>add</code>, you are choosing which elements of your project you want to track, be it new files or modifications of an already versionned file.
+This action does not save the file in the git repository, but flags the changes to be added to the next commit.</p>
 </div>
-<p>The KISS principle, as “Keep It Simple, Stupid”, should drive the implementation of features in the application to allow anyone in the future, including original developers, to take over on the development.</p>
-<p>The story behind this principle is supposed to be that Kelly Johnson, lead engineer at the Lockheed Skunk Works, gave his workers a set of very common tools and said that every airplanes should be repairable with these tools, and these tools only, so that repairing an aircraft should be possible for any average engineer.</p>
-<p>This should be a principle to keep in mind when building application.
-Indeed, large scale Shiny projects can lead to many people working on the code base, for a long period of time.
-A large team means a variety of skills, with some common ground in Shiny development, but potentially various level when it comes to R, web development, or production engineering.
-So when choosing how and what to implement, try to make a rule to go for the simplest solution,<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a> <em>i.e.</em> the one that any common Shiny Developer would be able to understand and maintain.
-If you go for an exotic solution or a complex technology, be sure that you are doing it for a good reason: unknown or hard to grasp technology reduces the chance of finding someone that will be able to maintain that piece of code in the future, and lower the smoothness of collaboration, as “<em>Code you can easily comprehend elevates absolutely everyone on your team, no matter their tenure or experience level</em>” <span class="citation">(Lemaire <a href="#ref-lemaire2020" role="doc-biblioref">2020</a>)</span>.</p>
+<div id="commit" class="section level4">
+<h4><span class="header-section-number">13.1.2.2</span> <code>commit</code></h4>
+<p>A <code>commit</code> is a photography of a codebase at a given moment in time.
+Each commit is associated with two things: a <code>sha1</code>, which is a unique reference in the history of the project and that allows you to identify this precise state when you need to get back in time, and a <code>message</code>, which is a piece of text that describes the commit<a href="#fn42" class="footnote-ref" id="fnref42"><sup>42</sup></a>
+.
+Note that messages are mandatory, you can not commit without them, and that the <code>sha1</code> are automatically generated by <code>git</code>.
+Do not overlook these messages: they might seem like a constraint at first but they are a life saver when you need to understand the history of a project.</p>
+<p>There is no strict rule about what and when to commit.
+Keep in mind that commits are what allow you to go back in time, so a commit is a complete state of your codebase to which it would make sense to go back to.
+A good practice is to state in the commit message which choices you made and why (but not how you implemented these changes), so that other developers (and you in the future) will be able to understand changes.</p>
 </div>
-</div>
-<div id="working-as-a-team-tools-structure" class="section level2">
-<h2><span class="header-section-number">2.2</span> Working as a team: Tools &amp; Structure</h2>
-<p>Working as a team, whatever the coding project, requires adequate tools, discipline and organization.
-Complex Shiny Apps usually imply that several people will work on the application.
-For example, at <a href="//rtask.thinkr.fr">ThinkR</a>, 3 to 4 people usually work in parallel on the same application, but there might be more people involved on larger projects.
-The choice of tools and how the team is structured is crucial for a successful application.</p>
-<div id="from-the-tools-point-of-view" class="section level3">
-<h3><span class="header-section-number">2.2.1</span> From the tools point of view</h3>
-<div id="version-control-test-all-the-things" class="section level4">
-<h4><span class="header-section-number">2.2.1.1</span> Version Control &amp; Test all the things</h4>
-<p>To get informed about a code break during development, you will need to write tests for your app, and use continuous integration (CI) so that you are sure this is automatically detected.<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a>
-When you are working on a complex application, chances are that you will be working on it for a significant period of time, meaning that you will write code, modify it, use it, go back to it after a few weeks, change some other things, and probably break things.
-Breaking things is a natural process of software engineering, notably when working on a piece of code during a long period.
-Remember the last chapter where we defined that complex applications are too large to be understood fully?
-Adding code that breaks the codebase will happen with complex app, so the sooner you take measure to solve these changes, the better.</p>
-<p>As you can not prevent code to break, you should at least get the tooling to:</p>
+<div id="push" class="section level4">
+<h4><span class="header-section-number">13.1.2.3</span> <code>push</code></h4>
+<p>Once you have get a set of commits ready, you are ready to <code>push</code> it to the server.
+In other word, you will permanently record these commits (so the series of changes) to the server.</p>
+<p>Making a push implies three things:</p>
 <ul>
-<li>Be informed that the codebase is broken: this is the role of tests combined with CI</li>
-<li>Be able to identify changes between versions, and potentially, get back in time to a previous code base: this is the role of version control</li>
+<li><p>Other people in the team will be able to retrieve the changes you have made</p></li>
+<li><p>These changes will be recorded permanently in the project history</p></li>
+<li><p>You can not modify commits once they were sent to the server<a href="#fn43" class="footnote-ref" id="fnref43"><sup>43</sup></a></p></li>
 </ul>
-<p>We will go deeper into testing and version control in <a href="step-secure.html#step-secure">chapter 14</a>.</p>
 </div>
-<div id="small-is-beautiful" class="section level4">
-<h4><span class="header-section-number">2.2.1.2</span> Small is beautiful</h4>
-<p>Building an application with multiple small and independent pieces will lighten your development process and your mental load.
-Previous chapter introduced the notion of complexity in size, where the app grows so large that it is very hard to have a good grasp of it.
-A large code base implies that the safe way to work is to split the app into pieces.<br />
-Splitting a Shiny project is made possible by following two methods:</p>
-<ul>
-<li>Split your app into Shiny Modules, so that your app can be though of as a tree, making it possible for every developer to concentrate on one node, and only one, instead of having to think about the global infrastructure when implementing features</li>
-</ul>
+<div id="pull" class="section level4">
+<h4><span class="header-section-number">13.1.2.4</span> <code>pull</code></h4>
+<p>Once changes have be recorded in the main server, everybody synchronized with the project can <code>pull</code> the commits to their local project.</p>
+</div>
+</div>
+<div id="about-branches" class="section level3">
+<h3><span class="header-section-number">13.1.3</span> About branches</h3>
+<p>Branches are <code>git</code> way to organize work and ideas, notably when several people are collaborating on the same project (which might be the case when building large web applications with R).</p>
+<p>How does it work?
+When your start a project, you are in the main branch, which is called the “master”.
+In a perfect world, you never work directly on this branch: it should always contain a working, deployable version of the application.</p>
+<p>Other branches are to be thought as work areas, where developers fix bugs or add features.
+The modifications made in these development branches will then be transferred (directly or indirectly) to the master branch.</p>
 
-<div class="figure" style="text-align: center"><span id="fig:02-planning-ahead-1"></span>
-<img src="img/app_tree.png" alt="Representation of a Shiny application with its modules and sub-modules." width="100%" />
+<div class="figure" style="text-align: center"><span id="fig:13-secure-1"></span>
+<img src="img/Git_branches_fork.png" alt="Branches in git." width="100%" />
 <p class="caption">
-FIGURE 2.1: Representation of a Shiny application with its modules and sub-modules.
+FIGURE 13.1: Branches in git.
 </p>
 </div>
+<p>In practice, you might want to use a workflow where each branch is designed to fix a small issue or implement a feature, so that it is easier to separate each small part of the work.
+Even when working alone.</p>
+</div>
+<div id="issues" class="section level3">
+<h3><span class="header-section-number">13.1.4</span> Issues</h3>
+<p>If you are working with a remote tool with a graphical interface like Gitlab, GitHub or Bitbucket, there is a good chance you will be using issues.
+Issues are “notes” or “tickets” that can be used to track a bug or to suggest a feature.
+This tool is crucial when it comes to project management: they are the perfect spot for organizing and discussing ideas, but also to have an overview of what has been done, what is currently done and what is left to be done.
+Issue can also be used as a discussion medium with beta testers, clients or sponsors.</p>
+<p>One other valuable feature of issues is that they can be referenced inside commits using a hashtag and its number: <code>#123</code>. .
+In other words, when you send code to the centralized server, you can link this code to one or more issues and corresponding commits appear in the issue discussions.</p>
+</div>
+</div>
+<div id="git-integration" class="section level2">
+<h2><span class="header-section-number">13.2</span> Git integration</h2>
+<div id="with-rstudio" class="section level3">
+<h3><span class="header-section-number">13.2.1</span> With RStudio</h3>
+<p>Git is very well integrated to the Rstudio IDE, and using <code>git</code> can be as simple as clicking on a button from time to time.
+If you are using RStudio, you will find a pull/push button, a stage &amp; commit interface, a tool for visualizing differences in files.
+Everything you need to get started is there.</p>
+</div>
+<div id="as-part-of-a-larger-world" class="section level3">
+<h3><span class="header-section-number">13.2.2</span> As part of a larger world</h3>
+<p><code>Git</code> is not reserved for team work: even if you are working alone on a project, using <code>git</code> is definitely worth the effort.
+Using git, and particularly issues, helps you organize your train of thoughts, especially upfront when you need to plan what you will be doing.</p>
+<p>And of course, remember that <code>git</code> is not reserved to Shiny Applications: it can be used for any other R related projects, and at the end of the day for any code related projects, making it a valuable skill to have in your toolbox, whatever language you will be working with in 10 years!</p>
+</div>
+<div id="about-git-flow" class="section level3">
+<h3><span class="header-section-number">13.2.3</span> About <code>git-flow</code></h3>
+<p>There are a lot of different ways and methodologies to organize your Git workflow.
+One of the most popular one is called <code>git flow</code>, and we will give you here a quick introduction to how you can manage your work using this approach.
+Please note that this is a quick introduction, not a complete guide: we will link to some further reading just at the end of this section.</p>
+<p>So, here are the key concept of <code>git flow</code>:</p>
 <ul>
-<li>Extract your core “non-reactive” functions, that we will also call the “business logic”, and include them in external files, so that you can work on these outside of the app.
-Working on independent functions to implement features will prevent you to relaunch the whole application every time you need to add something new.</li>
+<li><p>The <code>master</code> branch only contains stable code: most of the time is matches a tagged, fixed version (v0.0.1, 0.1.0, v1.0.0, etc).
+A very small subset of developers involved in the project have writing access to the <code>master</code> branch, and no developer should ever push code straight to this branch: new code to <code>master</code> only comes either from the <code>dev</code> branch, or from a <code>hotfix</code> branch.
+For an app in production, the last commit of this branch should be the version that is currently in production.</p></li>
+<li><p>The <code>dev</code> branch, on the other hand, is the “Work in progress” branch: the one that contains the latest changes before they are merged into master.
+This is the common working branch for every developers.
+Most of the time, developers do not push code into these branch either: they make merge/pull request (MR) to <code>dev</code> from one of their <code>feature branch</code>.</p></li>
+<li><p>A <code>feature branch</code> is one branch, forked from <code>dev</code>, that implements one of the feature of the application.
+To keep a clean track of what each branch is doing, a good practice is to use <code>issue-XXX</code>, where <code>XXX</code> is the corresponding issue you plan to solve in this branch.</p></li>
+<li><p>A <code>hot fix</code> branch is a branch to correct a critical issue in <code>master</code>.
+If forks from master, and is merged straight into <code>master</code> using a MR.</p></li>
 </ul>
-<p>We will get back to Shiny modules and how to organized your project in the next chapter.</p>
+<p>Here is a summary of this process:</p>
+
+<div class="figure" style="text-align: center"><span id="fig:13-secure-2"></span>
+<img src="img/GitFlowHotfixBranch.png" alt="Presentation of a git flow (Vincent Driessen, http://nvie.com)." width="100%" />
+<p class="caption">
+FIGURE 13.2: Presentation of a git flow (Vincent Driessen, <a href="http://nvie.com" class="uri">http://nvie.com</a>).
+</p>
+</div>
+<p>From a software engineer point of view, here is how daily work goes:</p>
+<ul>
+<li><p>Identify an issue to work on</p></li>
+<li><p>Fork dev into <code>issue-XXX</code></p></li>
+<li><p>Develop feature inside the branch</p></li>
+<li><p>Regularly, run <code>git stash</code>, <code>git rebase dev</code>, and <code>git stash apply</code> to include the latest changes from <code>dev</code> to stay synchronized with <code>dev</code><a href="#fn44" class="footnote-ref" id="fnref44"><sup>44</sup></a></p></li>
+<li><p>Make a pull request to <code>dev</code> so that the feature is included</p></li>
+<li><p>Once the PR is accepted by the project manager, notify the rest of the team that there have been changes to <code>dev</code>, so they can rebase it to the branch they are working on</p></li>
+<li><p>Start working on a new feature</p></li>
+</ul>
+<p>Of course, there are way more subtleties to this flow of work, but this gives you a good starting point.
+Generally speaking, a good communication between developers is essential for a successful collaborative development project.</p>
+</div>
+<div id="further-readings-on-git" class="section level3">
+<h3><span class="header-section-number">13.2.4</span> Further readings on <code>git</code></h3>
+<p>Git can be used in different ways and different approaches exist.
+The comprehensiveness of the different possible approaches is beyond the scope of this book, and other resources exist as well.
+You can find more under these links:</p>
+<ul>
+<li><a href="https://happygitwithr.com/" class="uri">https://happygitwithr.com/</a></li>
+<li><a href="https://git-scm.com/book" class="uri">https://git-scm.com/book</a></li>
+<li><a href="https://www.git-tower.com/blog/git-cheat-sheet/" class="uri">https://www.git-tower.com/blog/git-cheat-sheet/</a></li>
+</ul>
 </div>
 </div>
-<div id="from-the-team-point-of-view" class="section level3">
-<h3><span class="header-section-number">2.2.2</span> From the Team Point of View</h3>
-<p>We recommend to define two kind of developers: a unique person (or maybe two) to be in charge of supervising the whole project and developers that will work on specific features.</p>
-<div id="a-person-in-charge" class="section level4">
-<h4><span class="header-section-number">2.2.2.1</span> A person in charge</h4>
-<p>The person in charge of the development will have an complete view of the entire project and manage the team so that all developers implement features that fit together.</p>
-<p>With complex applications, it can be hard to have the complete understanding of what the entire app is doing.
-Most of the time, it is not necessary for all developers to have this complete picture.
-By defining one person in charge, this “manager” will have to get the whole picture: what each part of the software is doing, how to make everything work together, avoid development conflicts, and of course check that, at the end of the day, the results returned by the built application are the correct ones.</p>
-<p>The project manager will be the one that kicks off the project, and write the first draft of the application.
-If you follow this book’s workflow, this person will first create a <code>{golem}</code> project, fill the information, and define the application structure by providing the main modules, and potentially work on the prototyped UI of the app.</p>
-<p>Once the skeleton of the app is created, this person in charge will list all the things that have to be done.
-We strongly suggest to use git with a graphical interface (Gitlab, Github, Bitbucket, …), as the graphical interface of these services will help you manage the project.
-These tasks are defined as issues, and will be closed during development.
-These interfaces can also be used to set continuous integration.</p>
-<p>If the team follows a <code>git flow</code> (described in chapter \@(ref: secure)), the manager will also be in charge of reviewing and accepting the pull/merge requests to the main <code>dev</code> branch if they solve the associated issues.</p>
-<p>Do not worry if this sounds like a foreign language to you, we will get back to this method later in this book (chapter \@(ref: secure)).</p>
-</div>
-<div id="developers" class="section level4">
-<h4><span class="header-section-number">2.2.2.2</span> Developers</h4>
-<p>Developers will focus on small features.<br />
-If the person in charge has correctly separated the work between developers of the team, they will be focusing on one or more parts of the application, but do not need to know every single bit of what the application is doing.
-In a perfect world, the application is split in various Shiny Modules, one module equals one file and each member of the team will be assigned to the development of one or more modules.</p>
-<p>It is simpler to work in this context where one developer is assigned to one module, although we know that in reality it may be a little more complex, and several members of the team might go back and forth working on a common module.
-But, the person in charge will be there to help make all the pieces to fit together.</p>
+<div id="automated-testing" class="section level2">
+<h2><span class="header-section-number">13.3</span> Automated testing</h2>
+<p>We have seen in chapter <a href="step-secure.html#step-secure">12</a> how to build a testing infrastructure for your app, notably using the <code>{testthat}</code> <span class="citation">(Wickham <a href="#ref-R-testthat" role="doc-biblioref">2020</a>)</span> package.
+What we have described is a way to build it locally, before running your test on your own machine.
+But there is a big flaw to this approach: you have to remember to run the tests, be it regularly or before making a pull request/pushing to the server.
+To do this kind of job, you will be looking for a tool to do automated testing at the repository level: in other words, a software that can test your application whenever a piece of code is pushed/moved on the repository.</p>
+<p>To do this, various tools are available, each with there own features.
+Here is a non exhaustive list of the one you can choose:</p>
+<p><a href="https://travis-ci.org/">travis-ci</a> is a software that can be synced with your <code>git</code> repositories (GitHub or Bitbucket), and whenever something happens on the repo, the events described in the travis configuration file (<code>.travis.yml</code>) are executed.
+If they exit with a code 0, the test passes.
+If they do not, the integrated tests have failed.
+This Travis CI integration can be used internally and externally: internally, in the sense that before merging any pull request, the project manager have access to a series of tests that are automatically launched.
+Externally, as a “health check” before installing a software: if you visit a GitHub repository that has Travis badges included, you can check if the current state of the package/software is stable, <em>i.e.</em> if it passes the automated tests.</p>
+<p>Travis CI can do a lot more than just testing your app: it can be used to build documentation, deploy to production, or to run any other scripts you want to be run before/after the tests have passed.
+And the nice thing is that you can test for various versions of R, so that you are sure that you are supporting current, future and previous versions of R.</p>
+<p>All of this is defined in the <code>.travis.yml</code> file, which is to be put at the root of your source directory, a file that is automatically generated when calling <code>usethis::use_travis()</code>.
+Here is an example of one of this file, for the <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> package:</p>
+<pre><code># R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+language: R
+sudo: false
+cache: packages
+
+r_github_packages:
+  - ThinkR-open/golem  # pre-install to avoid vignette package errors
+
+# build matrix; turn on vdiffr only on r release
+matrix:
+  include:
+  - r: devel
+  - r: release
+    env: VDIFFR_RUN_TESTS=true
+    before_cache:
+    - Rscript -e &#39;remotes::install_cran(&quot;pkgdown&quot;)&#39;
+    - Rscript -e &#39;remotes::install_github(&quot;ThinkR-open/thinkrtemplate&quot;)&#39;
+    deploy:
+      provider: pages
+      skip-cleanup: true
+      github-token: $GITHUB_PAT
+      keep-history: true
+      local-dir: docs
+      on:
+        branch: master
+      skip_cleanup: true
+  - r: oldrel
+  - r: 3.3
+  - r: 3.4
+
+before_install:
+  - Rscript -e &#39;update.packages(ask = FALSE)&#39;
+  
+after_success:
+  - Rscript -e &#39;covr::codecov()&#39;
+  - Rscript -e &#39;pkgdown::build_site()&#39;
+  </code></pre>
+<p>Note that Travis CI can run tests on GNU/Linux or MacOS operating systems.</p>
+<p><a href="https://www.appveyor.com/">Appveyor</a> has the same functionalities as Travis CI.
+This service can integrate with GitHub, GitHub Enterprise, Bitbucket, GitLab, Azure Repos, Kiln, Gitea.
+It supports Windows, Linux and macOS.</p>
+<p><a href="https://github.com/features/actions">GitHub actions</a> serve a related purpose: defining actions to be performed as responses to events on the GitHub repository.
+Testing, building documentation, push to another repository, deploy on the server… all these actions can be automatically performed.
+As with Travis CI, these actions are defined in a <code>yaml</code> file.
+Examples for these configuration can be find at <a href="https://github.com/r-lib/actions">r-lib/actions</a>, and some can be automatically linked to your project using functions from <code>{usethis}</code>: <code>use_github_action_check_release()</code>, <code>use_github_action_check_standard()</code>, <code>use_github_action_check_full()</code> and <code>use_github_action_pr_commands()</code>.
+The three first perform a standard <code>R CMD check</code>, under various conditions:</p>
+<ul>
+<li>the <code>release</code> tests on MacOS, with the latest version of R, and runs the check via the <code>{rcmdcheck}</code> <span class="citation">(Csárdi <a href="#ref-R-rcmdcheck" role="doc-biblioref">2019</a><a href="#ref-R-rcmdcheck" role="doc-biblioref">b</a>)</span> package</li>
+<li><code>standard</code> does the check for 3 OS (Windows, Mac and Linux), and for R and R-devel</li>
+<li><code>full</code> does <code>standard</code> but for the last 5 minors version of R</li>
+</ul>
+<p>Finally, <code>use_github_action_pr_commands()</code>, sets checks to be performed when a Pull Request is made to the repository.</p>
+<p>If you are working with GitLab, you can use the integrated <code>GitLab CI</code> service: it serves the same purpose, with the little difference that it is completely docker-based: you define a <code>yaml</code> with a series of stages that are performed (concurrently or sequentially), and they are all launched inside a docker container.
+To help you with this, the <a href="https://hub.docker.com/r/colinfay/r-ci-tidyverse"><code>colinfay/r-ci-tidyverse</code></a> docker image comes with pre-installed packages for testing: <code>{remotes}</code> <span class="citation">(Hester et al. <a href="#ref-R-remotes" role="doc-biblioref">2020</a>)</span>, <code>{testthat}</code> <span class="citation">(Wickham <a href="#ref-R-testthat" role="doc-biblioref">2020</a>)</span>, <code>{config}</code> <span class="citation">(Allaire <a href="#ref-R-config" role="doc-biblioref">2018</a>)</span>… and is available for several R versions.
+This docker image can be used as the source image for your <code>GitLab CI</code> yaml file.</p>
+<p>Here is an example of one of these files</p>
+<div class="sourceCode" id="cb202"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb202-1"><a href="secure.html#cb202-1"></a><span class="fu">image</span><span class="kw">:</span><span class="at"> colinfay/r-ci-tidyverse:3.6.0</span></span>
+<span id="cb202-2"><a href="secure.html#cb202-2"></a></span>
+<span id="cb202-3"><a href="secure.html#cb202-3"></a><span class="fu">cache</span><span class="kw">:</span></span>
+<span id="cb202-4"><a href="secure.html#cb202-4"></a><span class="at">  </span><span class="fu">paths</span><span class="kw">:</span></span>
+<span id="cb202-5"><a href="secure.html#cb202-5"></a><span class="at">    </span><span class="kw">-</span><span class="at"> ci/</span></span>
+<span id="cb202-6"><a href="secure.html#cb202-6"></a></span>
+<span id="cb202-7"><a href="secure.html#cb202-7"></a><span class="fu">stages</span><span class="kw">:</span></span>
+<span id="cb202-8"><a href="secure.html#cb202-8"></a><span class="at">  </span><span class="kw">-</span><span class="at"> test</span></span>
+<span id="cb202-9"><a href="secure.html#cb202-9"></a><span class="at">  </span><span class="kw">-</span><span class="at"> document</span></span>
+<span id="cb202-10"><a href="secure.html#cb202-10"></a></span>
+<span id="cb202-11"><a href="secure.html#cb202-11"></a><span class="fu">building</span><span class="kw">:</span></span>
+<span id="cb202-12"><a href="secure.html#cb202-12"></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> test</span></span>
+<span id="cb202-13"><a href="secure.html#cb202-13"></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span></span>
+<span id="cb202-14"><a href="secure.html#cb202-14"></a><span class="at">    </span><span class="kw">-</span><span class="at"> R -e &quot;remotes::install_deps(dependencies = TRUE)&quot;</span></span>
+<span id="cb202-15"><a href="secure.html#cb202-15"></a><span class="at">    </span><span class="kw">-</span><span class="at"> R -e &#39;devtools::check()&#39;</span></span>
+<span id="cb202-16"><a href="secure.html#cb202-16"></a></span>
+<span id="cb202-17"><a href="secure.html#cb202-17"></a><span class="fu">documenting</span><span class="kw">:</span></span>
+<span id="cb202-18"><a href="secure.html#cb202-18"></a><span class="at">    </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> document</span></span>
+<span id="cb202-19"><a href="secure.html#cb202-19"></a><span class="at">    </span><span class="fu">allow_failure</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb202-20"><a href="secure.html#cb202-20"></a><span class="at">    </span><span class="fu">when</span><span class="kw">:</span><span class="at"> on_success</span></span>
+<span id="cb202-21"><a href="secure.html#cb202-21"></a><span class="at">    </span><span class="fu">only</span><span class="kw">:</span></span>
+<span id="cb202-22"><a href="secure.html#cb202-22"></a><span class="at">        </span><span class="kw">-</span><span class="at"> master</span></span>
+<span id="cb202-23"><a href="secure.html#cb202-23"></a><span class="at">    </span><span class="fu">script</span><span class="kw">:</span></span>
+<span id="cb202-24"><a href="secure.html#cb202-24"></a><span class="at">        </span><span class="kw">-</span><span class="at"> Rscript -e &#39;install.packages(&quot;DT&quot;)&#39;</span></span>
+<span id="cb202-25"><a href="secure.html#cb202-25"></a><span class="at">        </span><span class="kw">-</span><span class="at"> Rscript -e &#39;covr::gitlab(quiet = FALSE)&#39;</span></span>
+<span id="cb202-26"><a href="secure.html#cb202-26"></a><span class="at">    </span><span class="fu">artifacts</span><span class="kw">:</span></span>
+<span id="cb202-27"><a href="secure.html#cb202-27"></a><span class="at">        </span><span class="fu">paths</span><span class="kw">:</span></span>
+<span id="cb202-28"><a href="secure.html#cb202-28"></a><span class="at">            </span><span class="kw">-</span><span class="at"> public</span></span></code></pre></div>
+<p>Automated testing, continuous integration and continuous deployment is a vast topic that can not be covered in a few pages inside this book, but spending some time learning about this methodologies is definitely worth the time spent: the more you can automate these processes, and the more you test, the more your application will be resilient, easy to maintain and easy to enhance: the more you check, the quicker you will discover bugs.</p>
+<p>And the quicker you detect bugs, the easier it is to correct them!</p>
 
 </div>
 </div>
-</div>
-</div>
+
+
+
 <h3>References</h3>
 <div id="refs" class="references">
-<div id="ref-lemaire2020">
-<p>Lemaire, Maude. 2020. <em>Refactoring at Scale</em>. Henry Holt. <a href="https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/">https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/</a>.</p>
+<div id="ref-R-config">
+<p>Allaire, JJ. 2018. <em>Config: Manage Environment Specific Configuration Values</em>. <a href="https://CRAN.R-project.org/package=config">https://CRAN.R-project.org/package=config</a>.</p>
+</div>
+<div id="ref-R-rcmdcheck">
+<p>Csárdi, Gábor. 2019b. <em>Rcmdcheck: Run ’R Cmd Check’ from ’R’ and Capture Results</em>. <a href="https://CRAN.R-project.org/package=rcmdcheck">https://CRAN.R-project.org/package=rcmdcheck</a>.</p>
+</div>
+<div id="ref-R-golem">
+<p>Guyader, Vincent, Colin Fay, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
+</div>
+<div id="ref-R-remotes">
+<p>Hester, Jim, Gábor Csárdi, Hadley Wickham, Winston Chang, Martin Morgan, and Dan Tenenbaum. 2020. <em>Remotes: R Package Installation from Remote Repositories, Including ’Github’</em>. <a href="https://CRAN.R-project.org/package=remotes">https://CRAN.R-project.org/package=remotes</a>.</p>
+</div>
+<div id="ref-R-testthat">
+<p>Wickham, Hadley. 2020. <em>Testthat: Unit Testing for R</em>. <a href="https://CRAN.R-project.org/package=testthat">https://CRAN.R-project.org/package=testthat</a>.</p>
 </div>
 </div>
 <div class="footnotes">
 <hr />
-<ol start="12">
-<li id="fn12"><p>Which might not be the most “elegant” solution, but production code requires pragmatism.<a href="planning.html#fnref12" class="footnote-back">↩︎</a></p></li>
-<li id="fn13"><p>Relying on automatic tooling for monitoring code base is way safer than relying on developers to do manual checks every time they commit code.<a href="planning.html#fnref13" class="footnote-back">↩︎</a></p></li>
+<ol start="41">
+<li id="fn41"><p>It was first developed by Linus Torvalds, the very same man behind Linux.<a href="secure.html#fnref41" class="footnote-back">↩︎</a></p></li>
+<li id="fn42"><p>For example: “Added a graph in the analysis tab”, or “Fixed the docx export bug”<a href="secure.html#fnref42" class="footnote-back">↩︎</a></p></li>
+<li id="fn43"><p>If you want to modify some code or have to go back in time, the best way to do it is to create a new commit with these changes or use adequate git commands.<a href="secure.html#fnref43" class="footnote-back">↩︎</a></p></li>
+<li id="fn44"><p>There are two strategies for merging <code>dev</code>: either a “merge strategy” or a “rebase strategy”. Both strategies have pros and cons. We work with the “rebase strategy” to force ourselves to stay updated. We also noticed that this strategy lower the risk of bad merging that can cause code loss. However, this requires a lot of communication between developers and a good knowledge of git.<a href="secure.html#fnref44" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 <hr/>
@@ -588,8 +752,8 @@ But, the person in charge will be there to help make all the pieces to fit toget
           </div>
         </div>
       </div>
-<a href="successfulshinyapp.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="structure.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="step-secure.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="deploy-golem.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -620,7 +784,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/02-planning-ahead.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/13-secure.Rmd",
 "text": "Edit"
 },
 "history": {

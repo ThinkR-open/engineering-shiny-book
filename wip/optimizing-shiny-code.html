@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-05-01" />
+<meta name="date" content="2020-05-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -489,14 +489,14 @@ So for example, if computing your data once takes 5 seconds with the parameter <
 <span id="cb233-7"><a href="optimizing-shiny-code.html#cb233-7"></a>mfct &lt;-<span class="st"> </span><span class="kw">memoise</span>(fct)</span>
 <span id="cb233-8"><a href="optimizing-shiny-code.html#cb233-8"></a><span class="kw">tic</span>()</span>
 <span id="cb233-9"><a href="optimizing-shiny-code.html#cb233-9"></a><span class="kw">mfct</span>(<span class="dv">2</span>)</span></code></pre></div>
-<pre><code>[1] &quot;2020-05-01 15:16:31 UTC&quot;</code></pre>
+<pre><code>[1] &quot;2020-05-04 11:48:12 UTC&quot;</code></pre>
 <div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="optimizing-shiny-code.html#cb235-1"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>2.005 sec elapsed</code></pre>
+<pre><code>2.004 sec elapsed</code></pre>
 <div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="optimizing-shiny-code.html#cb237-1"></a><span class="kw">tic</span>()</span>
 <span id="cb237-2"><a href="optimizing-shiny-code.html#cb237-2"></a><span class="kw">mfct</span>(<span class="dv">2</span>)</span></code></pre></div>
-<pre><code>[1] &quot;2020-05-01 15:16:31 UTC&quot;</code></pre>
+<pre><code>[1] &quot;2020-05-04 11:48:12 UTC&quot;</code></pre>
 <div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb239-1"><a href="optimizing-shiny-code.html#cb239-1"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>0.023 sec elapsed</code></pre>
+<pre><code>0.02 sec elapsed</code></pre>
 <p>Let’s try with another example that might look more like what we can find in a Shiny App: connecting to a database, using the <code>{DBI}</code> <span class="citation">(R Special Interest Group on Databases (R-SIG-DB), Wickham, and Müller <a href="#ref-R-DBI" role="doc-biblioref">2019</a>)</span> and <code>{RSQLite}</code> <span class="citation">(Müller et al. <a href="#ref-R-RSQLite" role="doc-biblioref">2020</a>)</span> packages</p>
 <div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="optimizing-shiny-code.html#cb241-1"></a>con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</span>
 <span id="cb241-2"><a href="optimizing-shiny-code.html#cb241-2"></a>  RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), </span>
@@ -522,17 +522,17 @@ So for example, if computing your data once takes 5 seconds with the parameter <
 <span id="cb241-22"><a href="optimizing-shiny-code.html#cb241-22"></a><span class="kw">tic</span>()</span>
 <span id="cb241-23"><a href="optimizing-shiny-code.html#cb241-23"></a>res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</span>
 <span id="cb241-24"><a href="optimizing-shiny-code.html#cb241-24"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>0.515 sec elapsed</code></pre>
+<pre><code>0.428 sec elapsed</code></pre>
 <div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="optimizing-shiny-code.html#cb243-1"></a><span class="kw">tic</span>()</span>
 <span id="cb243-2"><a href="optimizing-shiny-code.html#cb243-2"></a>res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</span>
 <span id="cb243-3"><a href="optimizing-shiny-code.html#cb243-3"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>0.022 sec elapsed</code></pre>
+<pre><code>0.018 sec elapsed</code></pre>
 <div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="optimizing-shiny-code.html#cb245-1"></a><span class="kw">all.equal</span>(res_a, res_b)</span></code></pre></div>
 <pre><code>[1] TRUE</code></pre>
 <div class="sourceCode" id="cb247"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb247-1"><a href="optimizing-shiny-code.html#cb247-1"></a><span class="kw">tic</span>()</span>
 <span id="cb247-2"><a href="optimizing-shiny-code.html#cb247-2"></a>res_c &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</span>
 <span id="cb247-3"><a href="optimizing-shiny-code.html#cb247-3"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>0.159 sec elapsed</code></pre>
+<pre><code>0.142 sec elapsed</code></pre>
 <div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb249-1"><a href="optimizing-shiny-code.html#cb249-1"></a><span class="kw">setequal</span>(res_a, res_c)</span></code></pre></div>
 <pre><code>[1] FALSE</code></pre>
 <p>Note that you can change where the cache is stored by <code>{memoise}</code>.
@@ -544,9 +544,9 @@ Here, we will save it in a temp directory (but do not do this in production).</p
 <span id="cb252-4"><a href="optimizing-shiny-code.html#cb252-4"></a>res_a &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Ideal&#39;&quot;</span>, con)</span>
 <span id="cb252-5"><a href="optimizing-shiny-code.html#cb252-5"></a>res_b &lt;-<span class="st"> </span><span class="kw">mfct</span>(<span class="st">&quot;SELECT * FROM diams WHERE cut = &#39;Good&#39;&quot;</span>, con)</span>
 <span id="cb252-6"><a href="optimizing-shiny-code.html#cb252-6"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(tpd)</span></code></pre></div>
-<pre><code>wjvmspecly
-├── 4f4a9ae9c6c2f12a
-└── a3bc21e887c6e4ab</code></pre>
+<pre><code>crhsvfugea
+├── 56f929f935a78917
+└── d7cb8d89afe1dc0f</code></pre>
 <p>As you can see, we now have two cache objects inside the directory we have specified as a <code>cache_filesystem</code>.</p>
 </div>
 <div id="caching-shiny" class="section level3">
@@ -640,15 +640,15 @@ To do that, you will need the development version of <code>{memoise}</code> (ver
 <p>For example, from our stored cache from before:</p>
 <div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb256-1"><a href="optimizing-shiny-code.html#cb256-1"></a>fs<span class="op">::</span><span class="kw">dir_info</span>(tpd)[, <span class="st">&quot;size&quot;</span>, drop  =<span class="st"> </span><span class="ot">FALSE</span>]</span></code></pre></div>
 <pre><code>     size
-1   1.86M
-2 462.31K</code></pre>
+1 462.31K
+2   1.86M</code></pre>
 <p>Managing cache at a system level is out of scope for this book, but note that the most commonly accepted rule for deleting cache is called <strong>LRU</strong>, for <strong>Least Recently Used</strong>.
 The underlying principle of this approach is that users tend to need what they have needed recently: hence the more a piece of data has been used recently, the more likely it is that it will be needed soon.</p>
 <p>And this can be retrieved with:</p>
 <div class="sourceCode" id="cb258"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb258-1"><a href="optimizing-shiny-code.html#cb258-1"></a>fs<span class="op">::</span><span class="kw">dir_info</span>(tpd)[, <span class="st">&quot;access_time&quot;</span>, drop  =<span class="st"> </span><span class="ot">FALSE</span>]</span></code></pre></div>
 <pre><code>          access_time
-1 2020-05-01 15:16:43
-2 2020-05-01 15:16:37</code></pre>
+1 2020-05-04 11:48:17
+2 2020-05-04 11:48:23</code></pre>
 <p>Hence, when using cache, it might be interesting to periodically removed the oldest used cache, so that you can regain some space on the server running the application.</p>
 </div>
 </div>
