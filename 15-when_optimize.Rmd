@@ -2,9 +2,9 @@
 
 # The Need for Optimization {#when-optimize}
 
-> The most powerful optimization technique in any programmer’s toolbox is to do nothing.
+> Only once we have a solid characterization of the surface area we want to improve can we begin to identify the best way to improve it.
 
-`r right_link("The Art of Unix Programming", "http://www.catb.org/~esr/writings/taoup/html/")`
+`r right_link("Refactoring at Scale", "https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/")`
 
 ## Build first, then optimize
 
@@ -287,10 +287,14 @@ And, bonus point, `{bench}` takes time to check that the two outputs are the sam
 
 ### Profiling Shiny
 
+#### Shiny back-end
+
 You can profile Shiny application using the `{profvis}` package, just as any other piece of R code. 
 The only thing to note if you want to use this function on an app built with `{golem}` [@R-golem], you will have to wrap the `run_app()` function in a `print()` function. 
 Long story short, what make the app run is not the function itself, but the printing of the function, so the object returned by `run_app()` itself can not be profiled. 
 See the discussion on this [issue on {golem}](https://github.com/ThinkR-open/golem/issues/146) to learn more about this.
+
+#### Shiny front-end
 
 One other thing that can be optimized when it comes to the user interface is the webpage rendering performance. 
 To do that, we can use standard web development tools: as said several times, a Shiny application IS a web application, so tools that are language agnostic will work with Shiny. 
@@ -370,6 +374,78 @@ Then, being a JSON file, you can call if from R:
 ```{r 15-when-optimize-8 }
 lighthouse_report <- jsonlite::read_json("data-raw/output.json")
 lighthouse_report$audits$`speed-index`$displayValue
+```
+
+The results are contained in the `audits` sections of this object, and each of these sub-elements contains a `description` field, detailing what the metric means.
+
+Here are for example some of the results, focused on performance, with there respective description: 
+
+##### "First Meaningful Paint"
+
+```{r result = 'asis'}
+lighthouse_report$audits$`first-meaningful-paint`$description
+```
+
+```{r}
+lighthouse_report$audits$`first-meaningful-paint` %>%
+  as.data.frame() %>%
+  dplyr::select(title, score, displayValue) %>%
+  knitr::kable()
+```
+
+##### "Speed Index"
+
+```{r}
+lighthouse_report$audits$`speed-index`$description
+```
+
+
+```{r}
+lighthouse_report$audits$`speed-index` %>%
+  as.data.frame() %>%
+  dplyr::select(title, score, displayValue) %>%
+  knitr::kable()
+```
+
+##### "Speed Index"
+
+```{r}
+lighthouse_report$audits$`estimated-input-latency`$description 
+```
+
+
+```{r}
+lighthouse_report$audits$`estimated-input-latency` %>%
+  as.data.frame() %>%
+  dplyr::select(title, score, displayValue) %>%
+  knitr::kable()
+```
+
+##### "Total Blocking Time"
+
+```{r}
+lighthouse_report$audits$`total-blocking-time`$description 
+```
+
+
+```{r}
+lighthouse_report$audits$`total-blocking-time` %>%
+  as.data.frame() %>%
+  dplyr::select(title, score, displayValue) %>%
+  knitr::kable()
+```
+
+##### "Time to first Byte"
+
+```{r}
+lighthouse_report$audits$`time-to-first-byte`$description 
+```
+
+```{r}
+lighthouse_report$audits$`time-to-first-byte` %>%
+  .[c("title", "score", "displayValue")] %>%
+  as.data.frame() %>%
+  knitr::kable()
 ```
 
 Google Lighthouse also comes with a continuous integration tool, so that you can use it as a regression testing tool for your application. 
