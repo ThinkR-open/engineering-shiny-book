@@ -26,7 +26,7 @@ Once the application is ready: here in our example, we can only detect the bottl
 
 (ref:bottleneck) Schema of a bottleneck, Adapted from WikiMedia <https://commons.wikimedia.org/wiki/File:Effects_of_a_bottleneck_on_virus_populations.png>
 
-```{r 15-when-optimize-1-bis, echo=FALSE, fig.cap="(ref:bottleneck)", out.width="100%"}
+```{r 15-when-optimize-1, echo=FALSE, fig.cap="(ref:bottleneck)", out.width="100%"}
 knitr::include_graphics("img/bottleneck.png")
 ```
 
@@ -83,7 +83,7 @@ Also, are the extra hours/days spent rewriting a working code-base worth the spe
 For example, let's compare both these implementations of the same function, one in R, and one in C++ via `{Rcpp}` [@R-Rcpp]
 Of course, the C++ function is faster than the R one—this is the very reason of using C++ with R. 
 
-```{r 15-when-optimize-1 }
+```{r 15-when-optimize-2 }
 library("Rcpp")
 cppFunction("
 double mean_cpp(NumericVector x) {
@@ -143,7 +143,7 @@ Using this package is quite straightforward: put the code you want to benchmark 
 
 Here is an example with 3 nested functions, `top()`, `middle()` and `bottom()`, where `top()` calls `middle()` which calls `bottom()`:
 
-```{r 15-when-optimize-2, eval = FALSE}
+```{r 15-when-optimize-3, eval = FALSE}
 library(profvis)
 top <- function(){
   # We use profvis::pause() because Sys.sleep() doesn't 
@@ -190,7 +190,7 @@ Then, a detail of `middle()`, which calls `bottom_a()` and `bottom_b()`, which e
 
 (ref:profvizflame) `{profvis}` flame graph 
 
-```{r 15-when-optimize-2-bis, echo=FALSE, fig.cap="(ref:profvizflame)", out.width="100%"}
+```{r 15-when-optimize-4, echo=FALSE, fig.cap="(ref:profvizflame)", out.width="100%"}
 knitr::include_graphics("img/profviz_flame.png")
 ```
 
@@ -198,14 +198,14 @@ If you click on the "Data" tab, you will also find another view of the `flame gr
 
 (ref:profvizdata) `{profvis}` data tab
 
-```{r 15-when-optimize-3-bis, echo=FALSE, fig.cap="(ref:profvizdata)", out.width="100%"}
+```{r 15-when-optimize-5, echo=FALSE, fig.cap="(ref:profvizdata)", out.width="100%"}
 knitr::include_graphics("img/profviz_data.png")
 ```
 
 
 If you are working on profiling the memory usage, you can also use the `{profmem}` [@R-profmem] package which, instead of focusing on execution time, will record the memory usage of calls. 
 
-```{r 15-when-optimize-3 }
+```{r 15-when-optimize-6 }
 library(profmem)
 p <- profmem({
   x <- raw(1000)
@@ -216,13 +216,13 @@ p
 
 You can also get the total allocated memory with:
 
-```{r 15-when-optimize-4 }
+```{r 15-when-optimize-7 }
 total(p)
 ```
 
 And extract specific values based on the memory allocation:
 
-```{r 15-when-optimize-5 }
+```{r 15-when-optimize-8 }
 p2 <- subset(p, bytes > 1000)
 print(p2)
 ```
@@ -254,7 +254,7 @@ Note that by default, the `mark()` function compares the output of each function
 
 Once the timing is done, you will get a data.frame with various metrics about the benchmark.
 
-```{r 15-when-optimize-6 }
+```{r 15-when-optimize-9 }
 x <- function(size){
   res <- numeric(size)
   for (i in 1:size){
@@ -279,7 +279,7 @@ If you want a graphical analysis, `{bench}` comes with an `autoplot` method for 
 
 (ref:benchautoplot) `{bench}` autoplot 
 
-```{r 15-when-optimize-7, fig.cap="(ref:benchautoplot)", out.width="100%"}
+```{r 15-when-optimize-10, fig.cap="(ref:benchautoplot)", out.width="100%"}
 ggplot2::autoplot(res)
 ```
 
@@ -331,7 +331,7 @@ Note that you can also install a command line tool with `npm install -g lighthou
 
 (ref:lighthouseaudit) Launching LightHouse audit from the Google Chrome
 
-```{r 15-when-optimize-4-bis, echo=FALSE, fig.cap="(ref:lighthouseaudit)", out.width="100%"}
+```{r 15-when-optimize-11, echo=FALSE, fig.cap="(ref:lighthouseaudit)", out.width="100%"}
 knitr::include_graphics("img/lighthouse-audit.png")
 ```
 
@@ -340,7 +340,7 @@ Google Lighthouse is computing a series of analysis about your webpage.
 
 (ref:lighthouseres) LightHouse audit results
 
-```{r 15-when-optimize-5-bis, echo=FALSE, fig.cap="(ref:lighthouseres)", out.width="100%"}
+```{r 15-when-optimize-12, echo=FALSE, fig.cap="(ref:lighthouseres)", out.width="100%"}
 knitr::include_graphics("img/lighthouse-audit.png")
 ```
 
@@ -371,7 +371,7 @@ lighthouse --output json --output-path data-raw/output.json http://localhost:281
 
 Then, being a JSON file, you can call if from R:
 
-```{r 15-when-optimize-8 }
+```{r 15-when-optimize-13 }
 lighthouse_report <- jsonlite::read_json("data-raw/output.json")
 lighthouse_report$audits$`speed-index`$displayValue
 ```
@@ -382,11 +382,11 @@ Here are for example some of the results, focused on performance, with there res
 
 ##### "First Meaningful Paint"
 
-```{r result = 'asis'}
+```{r 15-when-optimize-14}
 lighthouse_report$audits$`first-meaningful-paint`$description
 ```
 
-```{r}
+```{r 15-when-optimize-15}
 lighthouse_report$audits$`first-meaningful-paint` %>%
   as.data.frame() %>%
   dplyr::select(title, score, displayValue) %>%
@@ -395,12 +395,12 @@ lighthouse_report$audits$`first-meaningful-paint` %>%
 
 ##### "Speed Index"
 
-```{r}
+```{r 15-when-optimize-16}
 lighthouse_report$audits$`speed-index`$description
 ```
 
 
-```{r}
+```{r 15-when-optimize-17}
 lighthouse_report$audits$`speed-index` %>%
   as.data.frame() %>%
   dplyr::select(title, score, displayValue) %>%
@@ -409,12 +409,12 @@ lighthouse_report$audits$`speed-index` %>%
 
 ##### "Speed Index"
 
-```{r}
+```{r 15-when-optimize-18}
 lighthouse_report$audits$`estimated-input-latency`$description 
 ```
 
 
-```{r}
+```{r 15-when-optimize-19}
 lighthouse_report$audits$`estimated-input-latency` %>%
   as.data.frame() %>%
   dplyr::select(title, score, displayValue) %>%
@@ -423,12 +423,12 @@ lighthouse_report$audits$`estimated-input-latency` %>%
 
 ##### "Total Blocking Time"
 
-```{r}
+```{r 15-when-optimize-20}
 lighthouse_report$audits$`total-blocking-time`$description 
 ```
 
 
-```{r}
+```{r 15-when-optimize-21}
 lighthouse_report$audits$`total-blocking-time` %>%
   as.data.frame() %>%
   dplyr::select(title, score, displayValue) %>%
@@ -437,11 +437,11 @@ lighthouse_report$audits$`total-blocking-time` %>%
 
 ##### "Time to first Byte"
 
-```{r}
+```{r 15-when-optimize-22}
 lighthouse_report$audits$`time-to-first-byte`$description 
 ```
 
-```{r}
+```{r 15-when-optimize-23 }
 lighthouse_report$audits$`time-to-first-byte` %>%
   .[c("title", "score", "displayValue")] %>%
   as.data.frame() %>%
