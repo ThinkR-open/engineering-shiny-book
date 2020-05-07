@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-05-04" />
+<meta name="date" content="2020-05-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -486,7 +486,7 @@ But things change when your application reaches “the cliff of complexity”<a 
 <p>But what do we mean by complexity?
 Getting a clear definition is not an easy task<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>
 as it very much depends on who is concerned and who you are talking to.
-But a good definition can be found in <em>The DevOps Handbook</em> <span class="citation">(Kim <a href="#ref-genekim2016" role="doc-biblioref">2016</a>)</span> : <em>“One of the defining characteristics of a complex system is that it <strong>defies any single person’s ability to see the system as a whole and understand how all the pieces fit together</strong>. Complex system typically have a high degree of interconnectedness of tightly coupled components, and system-level behavior cannot be explained merely in terms of the behavior of the system components.”</em> (we underlined).</p>
+But a good definition can be found in <em>The DevOps Handbook</em> <span class="citation">(Kim <a href="#ref-genekim2016" role="doc-biblioref">2016</a>)</span>: <em>“One of the defining characteristics of a complex system is that it <strong>defies any single person’s ability to see the system as a whole and understand how all the pieces fit together</strong>. Complex system typically have a high degree of interconnectedness of tightly coupled components, and system-level behavior cannot be explained merely in terms of the behavior of the system components.”</em> (we underlined).</p>
 <p>Or as noted in “Refactoring at Scale” <span class="citation">(Lemaire <a href="#ref-lemaire2020" role="doc-biblioref">2020</a>)</span>, “<em>It becomes nearly impossible to reason about the effect a change might have when applied uniformly across a sprawling, complex system. Many tools exist to identify code smells or automatically detect improvements within subsections of code, but we are largely unable to automate human reasoning about how to restructure large applications,in codebases that are growing at an increasingly rapid pace.</em>”</p>
 <p>Building on top of these quotes, let’s try to come up with a definition that will serve us in the context of engineering Shiny applications.</p>
 <p>When building software, we can think of complexity from two points of view: the complexity as it is seen by the developer, and the complexity as it is seen by the customer/end-user<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>
@@ -507,7 +507,7 @@ One of the goal of this book is to present you a methodology and toolkit that wi
 </div>
 <div id="customers-and-users-complexity" class="section level4">
 <h4><span class="header-section-number">1.2.1.2</span> Customers and users complexity</h4>
-<p>Customers and end user see complexity as <em>interface complexity</em>.</p>
+<p>Customers and end users see complexity as <em>interface complexity</em>.</p>
 <p>Interface complexity can be driven by a lot of elements, for example the probability of making an error while using the app, the difficulty to understand the logical progression in the app, the presence of unfamiliar behavior or terms, visual distractions…
 This book will also bring you strategy to help you cope with the need for simplification when it comes to designing interface.</p>
 </div>
@@ -522,7 +522,7 @@ In some cases, developers try to make everything reactive: <em>e.g.</em>, three 
 This behavior lowers the interface complexity: users do not have to really think about what they are doing, they move sliders, change the inputs, and boom! the plot updates.
 But this kind of pattern can make the application perform too much computation, for example because users rarely go to the value they need on their first try: they usually miss what value they actually want to select.</p>
 <p>One solution can be to delay reactivity or to cache things so that R computes fewer things.
-But that comes with a cost: handling delayed reactivity and caching elements increases implementation complexity.
+But that comes with a cost: handling delayed reactivity and caching elements increase implementation complexity.
 Another solution is to add an “update plot” button, which updates the plot only when the user clicks on it.
 This pattern makes it easier to control reactivity from an implementation side.
 But this can make the interface a little bit more complex for the users, who have to perform another action, on top of changing their inputs.
@@ -533,7 +533,7 @@ However, the function allows to choose a start date which is posterior to the en
 But allowing this behavior leads to bugs, notably in a context of full reactivity.
 Handling this special case is completely doable: with a little bit of craft, you can watch what the user inputs and throw an error if the start is after the end<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>
 .
-On one hand that solution increases implementation complexity, while on the other leaving this naive behavior requires the user to think carefully about what they are selecting, thus increasing the interface complexity.</p>
+On one hand that solution increases implementation complexity, while on the other hand letting this naive behavior requires the user to think carefully about what they are selecting, thus increasing the interface complexity.</p>
 <p>So what should we do?
 It’s up to you: deciding where to draw the line between interface &amp; implementation complexity very much depends of the project, but that is something that you should keep in mind all along the project’s life.</p>
 </div>
@@ -547,11 +547,11 @@ Finding these sources of complexity is not an easy task, as it requires some pro
 But before that, let’s dive into code complexity.</p>
 <div id="codebase-size" class="section level4">
 <h4><span class="header-section-number">1.2.3.1</span> Codebase size</h4>
-<p>The total number of lines of code, or the number of files, can be good clue of potential complexity, but only if used as order of magnitude (for example a 10.000-line codebase is potentially more complex than a 100-line codebase), but should not be relied on if used strictly: even more if you try to reduce this number of line by sacrificing code readability.</p>
+<p>The total number of lines of code, or the number of files, can be good clue of potential complexity, but only if used as order of magnitude (for example a 10,000-line codebase is potentially more complex than a 100-line codebase), but should not be relied on if used strictly, even more if you try to reduce this number of line by sacrificing code readability.</p>
 <p>R is very permissive when it comes to indentation and line breaks, and, unlike JavaScript or CSS, it is generally not minified<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>
 .<br />
 In R, the number of lines of code depends on your coding style and the packages you are using.
-For example, the <code>{tidyverse}</code> <span class="citation">(Wickham, Averick, et al. <a href="#ref-tidyverse2019" role="doc-biblioref">2019</a>)</span> style guide encourages the use of <code>%&gt;%</code> (called “pipe”), with one function by line, producing more lines in the end code : “<em><code>%&gt;%</code> should always have a space before it, and should usually be followed by a new line</em>” <a href="https://style.tidyverse.org/pipes.html" target="_blank">tidyverse style guide</a>.
+For example, the <code>{tidyverse}</code> <span class="citation">(Wickham, Averick, et al. <a href="#ref-tidyverse2019" role="doc-biblioref">2019</a>)</span> style guide encourages the use of <code>%&gt;%</code> (called “pipe”), with one function by line, producing more lines in the end code: “<em><code>%&gt;%</code> should always have a space before it, and should usually be followed by a new line</em>” <a href="https://style.tidyverse.org/pipes.html" target="_blank">tidyverse style guide</a>.
 So you can expect a “tidyverse-centric” package to contain more lines of code, yet the pipe itself has been thought as a tool to lower code complexity by enhancing its readability<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>.</p>
 <p>For example, the two following pieces of code do the same thing.
 Both have a different number of lines, and a different level of reading complexity.</p>
@@ -588,13 +588,13 @@ Levels: setosa versicolor virginica</code></pre>
 <pre><code>[1] setosa setosa setosa setosa setosa
 Levels: setosa versicolor virginica</code></pre>
 <p>In other words, using this kind of writing style can make the code base larger in term of lines, without really adding complexity to the general program.</p>
-<p>Another drawback of this metric is that it focuses on numbers instead of readability, and in the long run, yes, readability matters
+<p>Another drawback of this metric is that it focuses on numbers instead of readability, and in the long run, yes, readability matters.
 As noted in <em>The Art of Unix Programming</em> <span class="citation">(Raymond <a href="#ref-ericraymond2003" role="doc-biblioref">2003</a>)</span>, “Chapter 13: Speaking of Complexity”, “<em>Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess</em>”.</p>
 <p>Still, this metric can be useful to reinforce what you have learned from other metrics.
 It is rather unlikely that you will find this “extreme” coding style we showed above, and even if it might not make sense to compare two codebases that just differ by 1 or 2 % of lines of code, it is very likely that a codebase which is ten, one hundred, one thousand times larger is a more complex software.</p>
 <p>Another good metric related to this metric is the number of files in the project: R developers tend to split their functions into several files, so the more files you will find in a project, the larger the codebase is.
 And numerous files can also be a sign of maintenance complexity, as it may be harder to reason about an app logic split into several files than about something that fits into one linear code inside one file.<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>
-On the other hand, one big 10.000-lines file which is standing alone in the project is not a good sign either.</p>
+On the other hand, one big 10,000-lines file which is standing alone in the project is not a good sign either.</p>
 <p>If you want to use the number of lines metric, you can do it from R with the <code>{cloc}</code> <span class="citation">(Rudis and Danial <a href="#ref-R-cloc" role="doc-biblioref">2020</a>)</span> package, available at <a href="https://github.com/hrbrmstr/cloc" class="uri">https://github.com/hrbrmstr/cloc</a>.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="successfulshinyapp.html#cb13-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;hrbrmstr/cloc&quot;</span>)</span></code></pre></div>
 <p>For example, let’s compare a rather big package (<code>{shiny}</code>) with a small one (<code>{attempt}</code> <span class="citation">(Fay <a href="#ref-R-attempt" role="doc-biblioref">2020</a><a href="#ref-R-attempt" role="doc-biblioref">a</a>)</span>):</p>
@@ -654,8 +654,8 @@ FIGURE 1.1: Control-flow graph representation of an algorithm.
 </p>
 </div>
 <p><em>(The following paragraph details the algorithm implementation, feel free to skip it if you are not interested in the implementation details)</em><br />
-The complexity number is then computed by taking the number of nodes, subtracting the number of edges, plus two times the number of connected components of this graph.
-The algorithm is then <span class="math inline">\(M = E − N + 2P\)</span>, where <span class="math inline">\(M\)</span> is the measure, <span class="math inline">\(E\)</span> the number of edges, <span class="math inline">\(N\)</span> the number of nodes and <span class="math inline">\(2P\)</span> is 2 time the number of connected components.
+The complexity number is then computed by taking the number of nodes, subtracting the number of edges, and adding twice the number of connected components of this graph.
+The algorithm is then <span class="math inline">\(M = E − N + 2P\)</span>, where <span class="math inline">\(M\)</span> is the measure, <span class="math inline">\(E\)</span> the number of edges, <span class="math inline">\(N\)</span> the number of nodes and <span class="math inline">\(2P\)</span> is twice the number of connected components.
 We will not go deep into this topic, as there are a lot things going on in this computation and you can find many documentation about this online.
 Please refer to the bibliography for further readings about the theory behind this measurement.</p>
 <p>In R, the cyclomatic complexity can be computed using the <code>{cyclocomp}</code> <span class="citation">(Csardi <a href="#ref-R-cyclocomp" role="doc-biblioref">2016</a>)</span> package.
@@ -955,7 +955,7 @@ In the end of the day splitting into smaller functions is not a magic solution b
 </tr>
 </tbody>
 </table>
-<p>If you are building you Shiny application with <code>{golem}</code>, you can use the <code>DESCRIPTION</code> file, which contains the list of dependencies, as a starting point to explore these metrics for your dependencies, for example using <code>{desc}</code> <span class="citation">(Csárdi, Müller, and Hester <a href="#ref-R-desc" role="doc-biblioref">2018</a>)</span> or <code>{attachment}</code> <span class="citation">(Guyader and Rochette <a href="#ref-R-attachment" role="doc-biblioref">2020</a>)</span>:</p>
+<p>If you are building your Shiny application with <code>{golem}</code>, you can use the <code>DESCRIPTION</code> file, which contains the list of dependencies, as a starting point to explore these metrics for your dependencies, for example using <code>{desc}</code> <span class="citation">(Csárdi, Müller, and Hester <a href="#ref-R-desc" role="doc-biblioref">2018</a>)</span> or <code>{attachment}</code> <span class="citation">(Guyader and Rochette <a href="#ref-R-attachment" role="doc-biblioref">2020</a>)</span>:</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="successfulshinyapp.html#cb28-1"></a>desc<span class="op">::</span><span class="kw">desc_get_deps</span>(<span class="st">&quot;golex/DESCRIPTION&quot;</span>)</span></code></pre></div>
 <pre><code>     type package version
 1 Imports  config       *
@@ -999,7 +999,7 @@ This is what this book is about: how to organize your Shiny App in a way that is
 <p>First of all, an app is successful if it was delivered.
 In other words, the developer team was able to move from specification to implementation to testing to delivering.
 This is a very engineering-oriented definition of success, but it is a pragmatic one: an app that never reaches the state of usability is not a successful app, and something along the way has blocked the process of finishing the software.</p>
-<p>This condition implies a lot of things, but mostly it implies that the team was able to organize itself in an efficient way, so that they were able to work together in making the project a success.
+<p>This condition implies a lot of things, but mostly it implies that the team members were able to organize themselves in an efficient way, so that they were able to work together in making the project a success.
 Anybody that has already worked on a code base as a team knows it is not an easy task.</p>
 </div>
 <div id="it-is-accurate" class="section level3">
@@ -1012,7 +1012,7 @@ Delivering is not the only thing to keep in mind: you can deliver a working app 
 <h3><span class="header-section-number">1.3.3</span> It is usable</h3>
 <p>Being usable means that the app was delivered, it serves the purpose, and it is user-friendly.</p>
 <p>Unless you are just coding for the joy of coding, there will always be one or more end users.
-And if these people cannot use the application because it is too hard to use, too hard to understand, because it is too slow or there is no inherent logic in how the user experience is designed, then it is inappropriate to call the app is a success.</p>
+And if these people cannot use the application because it is too hard to use, too hard to understand, because it is too slow or there is no inherent logic in how the user experience is designed, then it is inappropriate to call the app a success.</p>
 </div>
 <div id="it-is-immortal" class="section level3">
 <h3><span class="header-section-number">1.3.4</span> It is immortal</h3>
@@ -1072,7 +1072,7 @@ And this, again, is hard to do without effective planning and efficient engineer
 <ol start="1">
 <li id="fn1"><p>Of course you can specify one if you need to, but by default the package picks one;<a href="successfulshinyapp.html#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>We borrow this term from Charity Major, as heard in <em>Test in Production with Charity Majors</em>, <a href="https://corecursive.com/019-test-in-production-with-charity-majors/" target="_blank">CoRecursive</a><a href="successfulshinyapp.html#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p>Ironic right?<a href="successfulshinyapp.html#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Ironic, right?<a href="successfulshinyapp.html#fnref3" class="footnote-back">↩︎</a></p></li>
 <li id="fn4"><p>From <em>The Art of Unix Programming</em>, “Chapter 13: Speaking of Complexity”, <span class="citation">(Raymond <a href="#ref-ericraymond2003" role="doc-biblioref">2003</a>)</span><a href="successfulshinyapp.html#fnref4" class="footnote-back">↩︎</a></p></li>
 <li id="fn5"><p>See <a href="https://github.com/rstudio/shiny/issues/2043#issuecomment-525640738" target="_blank">shiny/issues/2043#issuecomment-525640738</a> for an example<a href="successfulshinyapp.html#fnref5" class="footnote-back">↩︎</a></p></li>
 <li id="fn6"><p>The minification process is the process of removing all blank characters and put everything on one line so that the file in the output is much smaller.<a href="successfulshinyapp.html#fnref6" class="footnote-back">↩︎</a></p></li>
