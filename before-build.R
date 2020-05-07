@@ -18,7 +18,8 @@ paks <- c(
   'gargoyle', 'dplyr', 'dbplyr', 'vroom',
   'data.table', 'jsonlite', 'readxl', 
   'R.cache', 'glouton', 'bubble', 'roxygen2', 
-  'covr', 'rcmdcheck', 'covrpage'
+  'covr', 'rcmdcheck', 'covrpage', 
+  'dccvalidator'
 )
 
 cran_paks <- tools::CRAN_package_db()
