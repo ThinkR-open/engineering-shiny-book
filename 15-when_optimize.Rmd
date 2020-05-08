@@ -296,6 +296,8 @@ See the discussion on this [issue on `{golem}`](https://github.com/ThinkR-open/g
 
 #### Shiny front-end
 
+##### Google LightHouse
+
 One other thing that can be optimized when it comes to the user interface is the webpage rendering performance. 
 To do that, we can use standard web development tools: as said several times, a Shiny application IS a web application, so tools that are language agnostic will work with Shiny. 
 There are thousands of tools available to do exactly that, and going through all of them would probably not make a lot of sense.
@@ -450,6 +452,95 @@ lighthouse_report$audits$`time-to-first-byte` %>%
 
 Google Lighthouse also comes with a continuous integration tool, so that you can use it as a regression testing tool for your application. 
 To know more, feel free to read the [documentation](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/getting-started.md)!
+
+##### Side note on minification
+
+Chances are that right now you are not using _minification_ in your Shiny application.
+Minification is the process of removing unnecessary characters from files, without changing the way the code works, in order to make the file size lighter. 
+The general idea being that line breaks, spaces and a specific set of characters are used inside scripts for human readability, and are not useful when it comes to the way a computer reads a piece of code. 
+So why not removing them when they are served in a larger software?
+This is what _minification_ does.
+
+Here is an example of how minification works, taken from _Empirical Study on Effects of Script Minification and HTTP Compression for Traffic Reduction_ [@Sakamoto2015]:
+
+``` javascript
+var sum = 0;
+for ( var i = 0; i <=10; i ++ ) {
+  sum += i ;
+}
+alert( sum ) ;
+```
+
+is minified into:
+
+``` javascript
+var sum=0;for(var i=0;i<=10;i++){sum+=i};alert(sum);
+```
+
+Both these code blocks behave the same way, but the second one will be lighter when saved to a file: this is the very core principle of minification of files.
+It is something pretty common to do when building web applications: on the web, every byte count, so the lighter your external resources the better.
+Minifiction is something important as the heavier your resources, the longer your application will take to launch, and: 
+
++ Page launch time is crucial when it comes to ranking the pages on the web
+
++ The heavier the resources, the longer it will be to launch the application on a mobile, notably if users are visiting your application from a 3G/4G network
+
+And do not forget, 
+
+> Extremely high-speed network infrastructures are becoming more and more popular in developed countries. However, we still face crowded and low-speed Wi-Fi environments on airport, cafe, international conference, etc. Especially, a network environment of mobile devices requires efficient usage of network bandwidth. 
+ 
+Taken from [@Sakamoto2015]
+
+To minify JavaScript, HTML and CSS files from R, you can use the `{minifyr}` [@R-minifyr] package, that wraps the `node-minify` NodeJS library. 
+For example, compare the size of this file from `{shiny}`:
+
+```{r}
+fs::file_size(
+  system.file("www/shared/shiny.css", package = "shiny")
+) 
+```
+
+To its minified version: 
+
+```{r}
+minified <- minifyr::minifyr_css_cleancss(
+  system.file("www/shared/shiny.css", package = "shiny"), 
+  "shinyminifed.css"
+) 
+```
+
+```{r}
+fs::file_size(minified)
+```
+
+That might not seem like much (a couple of KB) at a small scale, but as it can be done automatically, why not leverage these small performances gain when building larger applications?
+Of course, minification will not suddenly make your application blazing fast, but that's something you should consider when deploying an application to production, notably if you use a lot of packages with interactive widget: they might contain CSS and JavaScript files that are not minified. 
+
+Note that `{shiny}` files are minifed by default, so you will not have to re-minify them. 
+But most package that extend `{shiny}` are not, so minifying the CSS and JavaScript from these packages might help you win some points on Google LightHouse report!
+
+To do this automatically, you can add the `{minifyr}` commands to your deployment, be it on your CD/CI platform, or as a Dockerfile step. 
+`{minifyr}` comes with a series of functions to do that: 
+
++ `minify_folder_css()`, `minify_folder_js()`, `minify_folder_html()` and `minify_folder_json()` do a bulk minification of the files found in a folder that match the extension
++ `minify_package_js()`, `minify_package_css()`, `minify_package_html()` and `minify_package_json()` will minify the CSS and JavaScript files contained inside a package installed on the machine
+
+Here is what it can look like inside a `Dockerfile`
+^[Note that you will need to install NodeJS inside the container
+]: 
+
+```
+FROM rocker/shiny-verse:3.6.3
+
+RUN apt-get -y install curl
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get install -y nodejs
+
+RUN Rscript -e 'remotes::install_github("colinfay/minifyr")'
+RUN Rscript -e 'remotes::install_cran("cicerone")'
+RUN Rscript -e 'library(minifyr);minifyr_npm_install(TRUE);minify_package_js("cicerone", minifyr_js_uglify)'
+```
+
 
 ### More resources about web page performance
 

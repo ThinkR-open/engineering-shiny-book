@@ -19,7 +19,7 @@ paks <- c(
   'data.table', 'jsonlite', 'readxl', 
   'R.cache', 'glouton', 'bubble', 'roxygen2', 
   'covr', 'rcmdcheck', 'covrpage', 
-  'dccvalidator'
+  'dccvalidator', 'minifyr'
 )
 
 cran_paks <- tools::CRAN_package_db()
