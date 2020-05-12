@@ -674,6 +674,55 @@ golem::invoke_js("showhref", "panel2")
 
 See `?golem::activate_js` for a full list of built-in functions.
 
+## One Last Thing: API calls
+
+If your application does API calls, chances are that right now you have being doing them straight from R. 
+But there are downsides to that approach. 
+Notably if the API limits requests based on an IP and your application gets a lot of traffic, your users will end up being unable to use the app because of this restriction. 
+
+So, why not switch to writing these API calls in JavaScript? 
+As JavaScript is run inside the users' browser, the limitation will apply to the users' IPs, not the one where the application is deployed, allowing you to scale more easily your application. 
+
+You can write this API call using the `fetch()` JavaScript function. 
+It can then be used inside a Shiny JavaScript handler, or as a response to a DOM event (for example, with `tags$button("Get Me One!", onclick = "get_rand_beer()")`, as we will see below). 
+
+Here is the general skeleton, that would work when the API does not need authentication and returns JSON. 
+
++ Inside JavaScript (here, we create a function  that will be available on an `onclick` event)
+
+``` javascript
+// FUNCTION definition
+const get_rand_beer = () => {
+    // FETCHING THE API DATA
+    fetch("https://api.punkapi.com/v2/beers/random")
+      // DEFINE WHAT HAPPENS WHEN JAVASCRIPT RECEIVES THE DATA
+      .then((data) =>{
+        // TURN THE DATA TO JSON
+        data.json().then((res) => {
+          // SEND THE JSON TO R
+          Shiny.setInputValue("beer", res, {priority: 'event'})
+        })
+      })
+      // DEFINE WHAT HAPPENS WHEN THERE IS AN ERROR FETCHING THE API
+      .catch((error) => {
+        alert("Error catchin result from API")
+      })
+  };
+```
+
++ Observe the event in your server:
+
+```{r 18-javascript-1-bis, eval = FALSE}
+observeEvent( input$beer , {
+  # Do things with beer
+})
+
+```
+
+Note that the data shared between R and JavaScript is serialized to JSON, so you will have to manipulate that format once you receive it in R. 
+
+Learn more about `fetch()` at [Using Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch).
+
 ## Learn more about JavaScript
 
 If you want to interact straight from R with NodeJS (JavaScript in the terminal), you can try the `{bubble}` [@R-bubble] package. 
