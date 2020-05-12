@@ -1,6 +1,6 @@
 install.packages(c("attachment", "remotes", "usethis", "namer", "desc", "spelling"))
 remotes::install_version("subprocess", "0.8.3")
-
+remotes::install_github("rstudio/websocket", "rc-v1.2.0")
 paks <- c(
   "cloc", "dplyr", "cyclocomp", "tidytuesday201942", "shiny", "packageMetrics2", 
   "remotes", "readr", "here", "tibble", "knitr", "desc", "attachment", "magrittr", 
@@ -12,13 +12,15 @@ paks <- c(
   'testthat', 'usethis', 'config', 'hexmake', 'shinyalert', 
   'plotly', 'shinyMobile', 'resume', 'nessy','skeleton',
   'fullPage', 'bs4Dash', 'shinydashboardPlus', 
-  'sf', 'devtools', 'crrri', 'chromote', 
+  'sf', 'devtools', 'crrri', 
+  'chromote', 
   'crrry', 'shinytest', 'processx', 
   'renv', 'geojsonsf', 'pkgbuild', 'profvis', 
   'gargoyle', 'dplyr', 'dbplyr', 'vroom',
   'data.table', 'jsonlite', 'readxl', 
   'R.cache', 'glouton', 'bubble', 'roxygen2', 
-  'covr', 'rcmdcheck', 'covrpage'
+  'covr', 'rcmdcheck', 'covrpage', 
+  'dccvalidator', 'minifyr'
 )
 
 cran_paks <- tools::CRAN_package_db()
