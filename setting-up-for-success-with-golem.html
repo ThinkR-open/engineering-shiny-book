@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>References | Engineering Production-Grade Shiny Apps</title>
+  <title>Chapter 9 Setting up for success with {golem} | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="References | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:title" content="Chapter 9 Setting up for success with {golem} | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
   
   <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="References | Engineering Production-Grade Shiny Apps" />
+  <meta name="twitter:title" content="Chapter 9 Setting up for success with {golem} | Engineering Production-Grade Shiny Apps" />
   
   <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-05-11" />
+<meta name="date" content="2020-05-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="optimjs.html"/>
-
+<link rel="prev" href="css.html"/>
+<link rel="next" href="stepprotopype.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
@@ -442,405 +442,182 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="references" class="section level1 unnumbered">
-<h1>References</h1>
+<div id="setting-up-for-success-with-golem" class="section level1">
+<h1><span class="header-section-number">Chapter 9</span> Setting up for success with <code>{golem}</code></h1>
+<p>Before starting to prototype and build anything, initialize a <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> project!
+This will help you start your application on solid ground, and once the project is ready to be filled, you can start prototyping right inside it.</p>
+<p>The general workflow for “prototype and build” is the following: the project manager sets up a <code>{golem}</code> project, where the first steps are filled, the general structure (potentially with Shiny module) is set, and then the project is registered to the version control system.
+Once we have this structure, package and modules combined, we can start prototyping the UI inside the module, work on the CSS and JavaScript elements that might be needed, and prototyping the back-end functionalities inside Rmarkdown files.
+And then, once this two prototyping sides are finished, we work on the integration of everything inside the reactive context.</p>
+<p>In this chapter and in chapter 11, we will be presenting the <code>{golem}</code> package in more depth.
+<code>{golem}</code> is a framework that standardize the process of building production-ready Shiny Applications.</p>
+<div id="create-a-golem" class="section level2">
+<h2><span class="header-section-number">9.1</span> Create a <code>{golem}</code></h2>
+<p>Once <code>{golem}</code> is installed and available on your computer, you can got to File &gt; New Project… in RStudio, and choose “Package for Shiny App Using golem” input.</p>
+<p>If you want to do it through command line, you can use:</p>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="setting-up-for-success-with-golem.html#cb94-1"></a>golem<span class="op">::</span><span class="kw">create_golem</span>(<span class="dt">path =</span> <span class="st">&quot;path/to/package&quot;</span>)</span></code></pre></div>
+<p>Once you have got that, a new project will be launched.
+Here is the structure of this project:</p>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="setting-up-for-success-with-golem.html#cb95-1"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;golex&quot;</span>)</span></code></pre></div>
+<pre><code>golex
+├── DESCRIPTION
+├── NAMESPACE
+├── R
+│   ├── app_config.R
+│   ├── app_server.R
+│   ├── app_ui.R
+│   └── run_app.R
+├── dev
+│   ├── 01_start.R
+│   ├── 02_dev.R
+│   ├── 03_deploy.R
+│   └── run_dev.R
+├── inst
+│   ├── app
+│   │   └── www
+│   │       └── favicon.ico
+│   └── golem-config.yml
+└── man
+    └── run_app.Rd</code></pre>
+<p>If you are already familiar with R packages, most of these files will appear very familiar to you.
+That’s because a <code>{golem}</code> app IS a package.</p>
+<p>For more details about these files, please refer to the <a href="">Understanding <code>{golem}</code> app structure</a> part of this book.
+In this part, we will go through the <code>dev/01_start.R</code> and <code>dev/02_dev.R</code> scripts.</p>
+</div>
+<div id="setting-things-up-with-dev01_start.r" class="section level2">
+<h2><span class="header-section-number">9.2</span> Setting things up with <code>dev/01_start.R</code></h2>
+<p>Once you have created your project, the first file that opens is <code>dev/01_start.R</code>.
+This file contains a series of commands to run once, at the start of the project.
+These are the commands you will be using at</p>
+<div id="fill-the-description-and-set-options" class="section level3">
+<h3><span class="header-section-number">9.2.1</span> Fill the DESCRIPTION and set options</h3>
+<p>First, fill the DESCRIPTION file by adding information about the package that will contain your app:</p>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="setting-up-for-success-with-golem.html#cb97-1"></a>golem<span class="op">::</span><span class="kw">fill_desc</span>(</span>
+<span id="cb97-2"><a href="setting-up-for-success-with-golem.html#cb97-2"></a>  <span class="co"># The Name of the package containing the App </span></span>
+<span id="cb97-3"><a href="setting-up-for-success-with-golem.html#cb97-3"></a>  <span class="dt">pkg_name =</span> <span class="st">&quot;ipsumapp&quot;</span>, </span>
+<span id="cb97-4"><a href="setting-up-for-success-with-golem.html#cb97-4"></a>  <span class="co"># The Title of the package containing the App </span></span>
+<span id="cb97-5"><a href="setting-up-for-success-with-golem.html#cb97-5"></a>  <span class="dt">pkg_title =</span> <span class="st">&quot;PKG_TITLE&quot;</span>, </span>
+<span id="cb97-6"><a href="setting-up-for-success-with-golem.html#cb97-6"></a>  <span class="co"># The Description of the package containing the App </span></span>
+<span id="cb97-7"><a href="setting-up-for-success-with-golem.html#cb97-7"></a>  <span class="dt">pkg_description =</span> <span class="st">&quot;PKG_DESC.&quot;</span>, </span>
+<span id="cb97-8"><a href="setting-up-for-success-with-golem.html#cb97-8"></a>  <span class="co"># Your First Name</span></span>
+<span id="cb97-9"><a href="setting-up-for-success-with-golem.html#cb97-9"></a>  <span class="dt">author_first_name =</span> <span class="st">&quot;AUTHOR_FIRST&quot;</span>, </span>
+<span id="cb97-10"><a href="setting-up-for-success-with-golem.html#cb97-10"></a>  <span class="co"># Your Last Name</span></span>
+<span id="cb97-11"><a href="setting-up-for-success-with-golem.html#cb97-11"></a>  <span class="dt">author_last_name =</span> <span class="st">&quot;AUTHOR_LAST&quot;</span>, </span>
+<span id="cb97-12"><a href="setting-up-for-success-with-golem.html#cb97-12"></a>  <span class="co"># Your Email</span></span>
+<span id="cb97-13"><a href="setting-up-for-success-with-golem.html#cb97-13"></a>  <span class="dt">author_email =</span> <span class="st">&quot;AUTHOR@MAIL.COM&quot;</span>, </span>
+<span id="cb97-14"><a href="setting-up-for-success-with-golem.html#cb97-14"></a>  <span class="co"># The URL of the GitHub Repo (optional) </span></span>
+<span id="cb97-15"><a href="setting-up-for-success-with-golem.html#cb97-15"></a>  <span class="dt">repo_url =</span> <span class="ot">NULL</span> </span>
+<span id="cb97-16"><a href="setting-up-for-success-with-golem.html#cb97-16"></a>)   </span></code></pre></div>
+<p>Then, call the <code>golem::set_golem_options()</code> function, it will add information to the <code>golem-config.yml</code> file, and notably set the <code>{here}</code> <span class="citation">(Müller <a href="#ref-R-here" role="doc-biblioref">2017</a>)</span> package root sentinel.</p>
+</div>
+<div id="set-common-files" class="section level3">
+<h3><span class="header-section-number">9.2.2</span> Set common Files</h3>
+<p>If you want to use the MIT license, add README, a code of conduct, a lifecycle badge, and NEWS</p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="setting-up-for-success-with-golem.html#cb98-1"></a><span class="co"># You can set another license here</span></span>
+<span id="cb98-2"><a href="setting-up-for-success-with-golem.html#cb98-2"></a>usethis<span class="op">::</span><span class="kw">use_mit_license</span>( <span class="dt">name =</span> <span class="st">&quot;Golem User&quot;</span> )  </span>
+<span id="cb98-3"><a href="setting-up-for-success-with-golem.html#cb98-3"></a>usethis<span class="op">::</span><span class="kw">use_readme_rmd</span>( <span class="dt">open =</span> <span class="ot">FALSE</span> )</span>
+<span id="cb98-4"><a href="setting-up-for-success-with-golem.html#cb98-4"></a>usethis<span class="op">::</span><span class="kw">use_code_of_conduct</span>()</span>
+<span id="cb98-5"><a href="setting-up-for-success-with-golem.html#cb98-5"></a>usethis<span class="op">::</span><span class="kw">use_lifecycle_badge</span>( <span class="st">&quot;Experimental&quot;</span> )</span>
+<span id="cb98-6"><a href="setting-up-for-success-with-golem.html#cb98-6"></a>usethis<span class="op">::</span><span class="kw">use_news_md</span>( <span class="dt">open =</span> <span class="ot">FALSE</span> )</span></code></pre></div>
+<p>It’s also where you will be invited to use <code>git</code>:</p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="setting-up-for-success-with-golem.html#cb99-1"></a>usethis<span class="op">::</span><span class="kw">use_git</span>()</span></code></pre></div>
+</div>
+<div id="use-recommended-elements" class="section level3">
+<h3><span class="header-section-number">9.2.3</span> Use Recommended Elements</h3>
+<p><code>golem::use_recommended_tests()</code> and <code>golem::use_recommended_deps()</code> sets a default testing infrastructure and adds dependencies to the application.</p>
+</div>
+<div id="add-utilitary-functions" class="section level3">
+<h3><span class="header-section-number">9.2.4</span> Add utilitary functions</h3>
+<p>These two functions add a file with various functions that can be used along the process of building your app.</p>
+<p>See each file in details for a description of the functions.</p>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="setting-up-for-success-with-golem.html#cb100-1"></a>golem<span class="op">::</span><span class="kw">use_utils_ui</span>()</span>
+<span id="cb100-2"><a href="setting-up-for-success-with-golem.html#cb100-2"></a>golem<span class="op">::</span><span class="kw">use_utils_server</span>()</span></code></pre></div>
+</div>
+<div id="if-you-want-to-change-the-default-favicon" class="section level3">
+<h3><span class="header-section-number">9.2.5</span> If you want to change the default favicon</h3>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="setting-up-for-success-with-golem.html#cb101-1"></a>golem<span class="op">::</span><span class="kw">use_favicon</span>( <span class="dt">path =</span> <span class="st">&quot;path/to/favicon&quot;</span>)</span></code></pre></div>
+<p>You’re now set!
+You’ve successfully initiated the project and can go to <code>dev/02_dev.R</code>.</p>
+</div>
+</div>
+<div id="setting-infrastructure-for-prototyping" class="section level2">
+<h2><span class="header-section-number">9.3</span> Setting infrastructure for prototyping</h2>
+<div id="add-modules-in-dev02_dev.r" class="section level3">
+<h3><span class="header-section-number">9.3.1</span> Add modules in <code>dev/02_dev.R</code></h3>
+<p>The <code>golem::add_module()</code> functions creates a module in the <code>R</code> folder.
+The file and the modules will be named after the <code>name</code> parameter, by adding <code>mod_</code> to the R file, and <code>mod_*_ui</code> and <code>mod_*_server</code> to the UI and server functions.</p>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="setting-up-for-success-with-golem.html#cb102-1"></a>golem<span class="op">::</span><span class="kw">add_module</span>(<span class="dt">name =</span> <span class="st">&quot;my_first_module&quot;</span>) <span class="co"># Name of the module</span></span></code></pre></div>
+<pre><code>✔ File created at R/mod_my_first_module.R
+● Go to R/mod_my_first_module.R</code></pre>
+<p>The new file will contain:</p>
+<pre><code>#&#39; my_first_module UI Function
+#&#39;
+#&#39; @description A shiny Module.
+#&#39;
+#&#39; @param id,input,output,session Internal parameters for {shiny}.
+#&#39;
+#&#39; @noRd 
+#&#39;
+#&#39; @importFrom shiny NS tagList 
+mod_my_first_module_ui &lt;- function(id){
+  ns &lt;- NS(id)
+  tagList(
+ 
+  )
+}
+    
+#&#39; my_first_module Server Function
+#&#39;
+#&#39; @noRd 
+mod_my_first_module_server &lt;- function(input, output, session){
+  ns &lt;- session$ns
+ 
+}
+    
+## To be copied in the UI
+# mod_my_first_module_ui(&quot;my_first_module_ui_1&quot;)
+    
+## To be copied in the server
+# callModule(mod_my_first_module_server, &quot;my_first_module_ui_1&quot;)
+ </code></pre>
+<p>Note that in order not to make errors when putting these into your app, the end of the file will contain code that has to be copied and pasted inside your UI and server functions.</p>
+<p>This is where you will be adding the core of your app.
+In a first time, these modules will contain prototyped UI for the application, and once the application is ready to be integrated, you will add the core logic here.</p>
+</div>
+<div id="add-css-js-files" class="section level3">
+<h3><span class="header-section-number">9.3.2</span> Add CSS &amp; JS Files</h3>
+<p>Adding some infrastructure for JavaScript and CSS file from the very beginning can also formalize the set-up: you are giving the rest of your team a</p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="setting-up-for-success-with-golem.html#cb105-1"></a>golem<span class="op">::</span><span class="kw">add_js_file</span>( <span class="st">&quot;script&quot;</span> )</span></code></pre></div>
+<p>Will generate the following file:</p>
+<pre><code>$( document ).ready(function() {
+  
+});</code></pre>
+<p>Here, you will have an infrastructure for launching JavaScript code once the application is ready (this code is standard <code>jQuery</code> format: we will be back to JavaScript at the end of this book).</p>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="setting-up-for-success-with-golem.html#cb107-1"></a>golem<span class="op">::</span><span class="kw">add_js_handler</span>( <span class="st">&quot;handlers&quot;</span> )</span></code></pre></div>
+<p>Will generate the following file:</p>
+<pre><code>$( document ).ready(function() {
+  Shiny.addCustomMessageHandler(&#39;fun&#39;, function(arg) {
+  
+  })
+});</code></pre>
+<p>As you can see, there is already a skeleton for building Shiny JavaScript handlers.
+More on that structure in the last chapter of the book!</p>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="setting-up-for-success-with-golem.html#cb109-1"></a>golem<span class="op">::</span><span class="kw">add_css_file</span>( <span class="st">&quot;custom&quot;</span> )</span></code></pre></div>
+<p>Will create a blank CSS file inside the <code>inst/app/www</code> folder.</p>
+<p>Note that if you are building your application with <code>{golem}</code>, these files will be linked automatically to your application.</p>
 
+</div>
+</div>
+</div>
+<h3>References</h3>
 <div id="refs" class="references">
-<div>
-<p>Allaire, JJ. 2018. <em>Config: Manage Environment Specific Configuration Values</em>. <a href="https://CRAN.R-project.org/package=config">https://CRAN.R-project.org/package=config</a>.</p>
-</div>
-<div>
-<p>Allaire, JJ, Yihui Xie, Jonathan McPherson, Javier Luraschi, Kevin Ushey, Aron Atkins, Hadley Wickham, Joe Cheng, Winston Chang, and Richard Iannone. 2020. <em>Rmarkdown: Dynamic Documents for R</em>. <a href="https://CRAN.R-project.org/package=rmarkdown">https://CRAN.R-project.org/package=rmarkdown</a>.</p>
-</div>
-<div>
-<p>Attali, Dean, and Tristan Edwards. 2020. <em>Shinyalert: Easily Create Pretty Popup Messages (Modals) in ’Shiny’</em>. <a href="https://CRAN.R-project.org/package=shinyalert">https://CRAN.R-project.org/package=shinyalert</a>.</p>
-</div>
-<div>
-<p>Bache, Stefan Milton, and Hadley Wickham. 2014. <em>Magrittr: A Forward-Pipe Operator for R</em>. <a href="https://CRAN.R-project.org/package=magrittr">https://CRAN.R-project.org/package=magrittr</a>.</p>
-</div>
-<div>
-<p>Bengtsson, Henrik. 2018. <em>Profmem: Simple Memory Profiling for R</em>. <a href="https://CRAN.R-project.org/package=profmem">https://CRAN.R-project.org/package=profmem</a>.</p>
-</div>
-<div>
-<p>———. 2019. <em>R.cache: Fast and Light-Weight Caching (Memoization) of Objects and Results to Speed up Computations</em>. <a href="https://CRAN.R-project.org/package=R.cache">https://CRAN.R-project.org/package=R.cache</a>.</p>
-</div>
-<div>
-<p>———. 2020. <em>Future: Unified Parallel and Distributed Processing in R for Everyone</em>. <a href="https://CRAN.R-project.org/package=future">https://CRAN.R-project.org/package=future</a>.</p>
-</div>
-<div>
-<p>Boettiger, Carl, and Dirk Eddelbuettel. 2017. “An Introduction to Rocker: Docker Containers for R.” <em>The R Journal</em> 9 (2): 527–36. <a href="https://doi.org/10.32614/RJ-2017-065">https://doi.org/10.32614/RJ-2017-065</a>.</p>
-</div>
-<div>
-<p>Chang, Winston. 2020. <em>Chromote: Headless Chrome Web Browser Interface</em>.</p>
-</div>
-<div>
-<p>Chang, Winston, Joe Cheng, JJ Allaire, Yihui Xie, and Jonathan McPherson. 2020. <em>Shiny: Web Application Framework for R</em>. <a href="https://CRAN.R-project.org/package=shiny">https://CRAN.R-project.org/package=shiny</a>.</p>
-</div>
-<div>
-<p>Chang, Winston, and Gábor Csárdi. 2019. <em>Shinytest: Test Shiny Apps</em>. <a href="https://CRAN.R-project.org/package=shinytest">https://CRAN.R-project.org/package=shinytest</a>.</p>
-</div>
-<div>
-<p>Chang, Winston, Javier Luraschi, and Timothy Mastny. 2019. <em>Profvis: Interactive Visualizations for Profiling R Code</em>. <a href="https://CRAN.R-project.org/package=profvis">https://CRAN.R-project.org/package=profvis</a>.</p>
-</div>
-<div>
-<p>Cheng, Joe. 2019. <em>Promises: Abstractions for Promise-Based Asynchronous Programming</em>. <a href="https://CRAN.R-project.org/package=promises">https://CRAN.R-project.org/package=promises</a>.</p>
-</div>
-<div>
-<p>Christian, Brian, and Tom Griffiths. 2016. <em>Algorithms to Live by : The Computer Science of Human Decisions</em>. Henry Holt.</p>
-</div>
-<div>
-<p>Coene, John. 2020. <em>FullPage: Three Families of Functions for Three Different Single Page ’Shiny’ Apps</em>. <a href="https://github.com/RinteRface/fullPage">https://github.com/RinteRface/fullPage</a>.</p>
-</div>
-<div>
-<p>Collado-Torres, Leonardo, Kristen R. Maynard, and Andrew E. Jaffe. 2020. <em>LIBD Visium Spatial Transcriptomics Human Pilot Data Inspector</em>. <a href="https://doi.org/10.18129/B9.bioc.spatialLIBD">https://doi.org/10.18129/B9.bioc.spatialLIBD</a>.</p>
-</div>
-<div>
-<p>Cooley, David. 2020. <em>Geojsonsf: GeoJSON to Simple Feature Converter</em>. <a href="https://CRAN.R-project.org/package=geojsonsf">https://CRAN.R-project.org/package=geojsonsf</a>.</p>
-</div>
-<div>
-<p>Csardi, Gabor. 2016. <em>Cyclocomp: Cyclomatic Complexity of R Code</em>. <a href="https://CRAN.R-project.org/package=cyclocomp">https://CRAN.R-project.org/package=cyclocomp</a>.</p>
-</div>
-<div>
-<p>———. 2020. <em>PackageMetrics2: Collect Metrics About R Packages</em>. <a href="http://git.mango.local/gcsardi/packageMetrics2">http://git.mango.local/gcsardi/packageMetrics2</a>.</p>
-</div>
-<div>
-<p>Csárdi, Gábor. 2019a. <em>Liteq: Lightweight Portable Message Queue Using ’Sqlite’</em>. <a href="https://CRAN.R-project.org/package=liteq">https://CRAN.R-project.org/package=liteq</a>.</p>
-</div>
-<div>
-<p>———. 2019b. <em>Rcmdcheck: Run ’R Cmd Check’ from ’R’ and Capture Results</em>. <a href="https://CRAN.R-project.org/package=rcmdcheck">https://CRAN.R-project.org/package=rcmdcheck</a>.</p>
-</div>
-<div>
-<p>———. 2020. <em>Cli: Helpers for Developing Command Line Interfaces</em>. <a href="https://CRAN.R-project.org/package=cli">https://CRAN.R-project.org/package=cli</a>.</p>
-</div>
-<div>
-<p>Csárdi, Gábor, and Winston Chang. 2020. <em>Processx: Execute and Control System Processes</em>. <a href="https://CRAN.R-project.org/package=processx">https://CRAN.R-project.org/package=processx</a>.</p>
-</div>
-<div>
-<p>Csárdi, Gábor, Kirill Müller, and Jim Hester. 2018. <em>Desc: Manipulate Description Files</em>. <a href="https://CRAN.R-project.org/package=desc">https://CRAN.R-project.org/package=desc</a>.</p>
-</div>
-<div>
-<p>Dipert, Alan, Barret Schloerke, and Barbara Borges. 2020. <em>Shinyloadtest: Load Test Shiny Applications</em>. <a href="https://CRAN.R-project.org/package=shinyloadtest">https://CRAN.R-project.org/package=shinyloadtest</a>.</p>
-</div>
-<div>
-<p>Dowle, Matt, and Arun Srinivasan. 2019. <em>Data.table: Extension of ‘Data.frame‘</em>. <a href="https://CRAN.R-project.org/package=data.table">https://CRAN.R-project.org/package=data.table</a>.</p>
-</div>
-<div>
-<p>Eddelbuettel, Dirk. 2013. <em>Seamless R and C++ Integration with Rcpp</em>. New York: Springer. <a href="https://doi.org/10.1007/978-1-4614-6868-4">https://doi.org/10.1007/978-1-4614-6868-4</a>.</p>
-</div>
-<div>
-<p>Eddelbuettel, Dirk, and James Joseph Balamuta. 2017. “Extending extitR with extitC++: A Brief Introduction to extitRcpp.” <em>PeerJ Preprints</em> 5 (August): e3188v1. <a href="https://doi.org/10.7287/peerj.preprints.3188v1">https://doi.org/10.7287/peerj.preprints.3188v1</a>.</p>
-</div>
-<div>
-<p>Eddelbuettel, Dirk, Romain Francois, JJ Allaire, Kevin Ushey, Qiang Kou, Nathan Russell, Douglas Bates, and John Chambers. 2020. <em>Rcpp: Seamless R and C++ Integration</em>. <a href="https://CRAN.R-project.org/package=Rcpp">https://CRAN.R-project.org/package=Rcpp</a>.</p>
-</div>
-<div>
-<p>Eddelbuettel, Dirk, and Romain François. 2011. “Rcpp: Seamless R and C++ Integration.” <em>Journal of Statistical Software</em> 40 (8): 1–18. <a href="https://doi.org/10.18637/jss.v040.i08">https://doi.org/10.18637/jss.v040.i08</a>.</p>
-</div>
-<div>
-<p>Fay, Colin. 2019. <em>Dockerfiler: Easy Dockerfile Creation from R</em>. <a href="https://CRAN.R-project.org/package=dockerfiler">https://CRAN.R-project.org/package=dockerfiler</a>.</p>
-</div>
-<div>
-<p>———. 2020a. <em>Attempt: Tools for Defensive Programming</em>. <a href="https://CRAN.R-project.org/package=attempt">https://CRAN.R-project.org/package=attempt</a>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Bubble: Launch and Interact with a Nodejs Session</em>.</p>
-</div>
-<div>
-<p>———. 2020c. <em>Crrry: ’Crrri’ Recipes for ’Shiny’</em>. <a href="https://github.com/ColinFay/crrry">https://github.com/ColinFay/crrry</a>.</p>
-</div>
-<div>
-<p>———. 2020d. <em>Dockerstats: A Wrapper Around ’Docker Stats’</em>. <a href="https://github.com/ColinFay/dockerstats">https://github.com/ColinFay/dockerstats</a>.</p>
-</div>
-<div>
-<p>———. 2020e. <em>Gargoyle: An Event-Based Framework for ’Shiny’</em>.</p>
-</div>
-<div>
-<p>———. 2020f. <em>Glouton: ’JS-Cookies’ for ’Shiny’</em>.</p>
-</div>
-<div>
-<p>———. 2020g. <em>Hexmake: Hex Stickers Maker</em>. <a href="https://github.com/colinfay/hexmake">https://github.com/colinfay/hexmake</a>.</p>
-</div>
-<div>
-<p>———. 2020h. <em>Minifyr: Minify Css, Html and Javascript Files</em>.</p>
-</div>
-<div>
-<p>———. 2020i. <em>Nessy: A ’Nes’ Css for ’Shiny’</em>. <a href="https://github.com/ColinFay/nessy">https://github.com/ColinFay/nessy</a>.</p>
-</div>
-<div>
-<p>———. 2020j. <em>Resume: Bootstrap Resume Template for ’Shiny’</em>.</p>
-</div>
-<div>
-<p>———. 2020k. <em>Skeleton: Skeleton Css for Shiny</em>.</p>
-</div>
-<div>
-<p>———. 2020l. <em>Tidytuesday201942: A Golem App for Tidy Tuesday</em>. <a href="http://www.github.com/ColinFay/tidytuesday201942">http://www.github.com/ColinFay/tidytuesday201942</a>.</p>
-</div>
-<div>
-<p>Fay, Colin, and Sebastien Rochette. 2020a. <em>Fakir: Create Fake Data in R for Tutorials</em>. <a href="https://github.com/Thinkr-open/fakir">https://github.com/Thinkr-open/fakir</a>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Shinipsum: Lorem-Ipsum-Like Helpers for Fast Shiny Prototyping</em>. <a href="https://github.com/Thinkr-open/shinipsum">https://github.com/Thinkr-open/shinipsum</a>.</p>
-</div>
-<div>
-<p>Garnier, Simon. 2018. <em>Viridis: Default Color Maps from ’Matplotlib’</em>. <a href="https://CRAN.R-project.org/package=viridis">https://CRAN.R-project.org/package=viridis</a>.</p>
-</div>
-<div>
-<p>Gillespie, Colin, and Robin Lovelace. 2017. <em>Efficient R Programming</em>. O’Reilly Media, Inc, USA.</p>
-</div>
-<div>
-<p>Granjon, David. 2019a. <em>Bs4Dash: A ’Bootstrap 4’ Version of ’Shinydashboard’</em>. <a href="https://CRAN.R-project.org/package=bs4Dash">https://CRAN.R-project.org/package=bs4Dash</a>.</p>
-</div>
-<div>
-<p>———. 2019b. <em>ShinydashboardPlus: Add More ’Adminlte2’ Components to ’Shinydashboard’</em>. <a href="https://CRAN.R-project.org/package=shinydashboardPlus">https://CRAN.R-project.org/package=shinydashboardPlus</a>.</p>
-</div>
-<div>
-<p>Granjon, David, Victor Perrier, and Isabelle Rudolf. 2019. <em>ShinyMobile: Mobile Ready ’Shiny’ Apps with Standalone Capabilities</em>. <a href="https://CRAN.R-project.org/package=shinyMobile">https://CRAN.R-project.org/package=shinyMobile</a>.</p>
-</div>
-<div>
+<div id="ref-R-golem">
 <p>Guyader, Vincent, Colin Fay, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
 </div>
-<div>
-<p>Guyader, Vincent, and Sébastien Rochette. 2020. <em>Attachment: Deal with Dependencies</em>. <a href="https://CRAN.R-project.org/package=attachment">https://CRAN.R-project.org/package=attachment</a>.</p>
-</div>
-<div>
-<p>Henry, Lionel, and Hadley Wickham. 2020. <em>Purrr: Functional Programming Tools</em>. <a href="https://CRAN.R-project.org/package=purrr">https://CRAN.R-project.org/package=purrr</a>.</p>
-</div>
-<div>
-<p>Hester, Jim. 2020a. <em>Bench: High Precision Timing of R Expressions</em>. <a href="https://CRAN.R-project.org/package=bench">https://CRAN.R-project.org/package=bench</a>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Covr: Test Coverage for Packages</em>. <a href="https://CRAN.R-project.org/package=covr">https://CRAN.R-project.org/package=covr</a>.</p>
-</div>
-<div>
-<p>———. 2020c. <em>Glue: Interpreted String Literals</em>. <a href="https://CRAN.R-project.org/package=glue">https://CRAN.R-project.org/package=glue</a>.</p>
-</div>
-<div>
-<p>Hester, Jim, Gábor Csárdi, Hadley Wickham, Winston Chang, Martin Morgan, and Dan Tenenbaum. 2020. <em>Remotes: R Package Installation from Remote Repositories, Including ’Github’</em>. <a href="https://CRAN.R-project.org/package=remotes">https://CRAN.R-project.org/package=remotes</a>.</p>
-</div>
-<div>
-<p>Hester, Jim, and Hadley Wickham. 2020a. <em>Fs: Cross-Platform File System Operations Based on ’Libuv’</em>. <a href="https://CRAN.R-project.org/package=fs">https://CRAN.R-project.org/package=fs</a>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Vroom: Read and Write Rectangular Text Data Quickly</em>. <a href="https://CRAN.R-project.org/package=vroom">https://CRAN.R-project.org/package=vroom</a>.</p>
-</div>
-<div>
-<p>Izrailev, Sergei. 2014. <em>Tictoc: Functions for Timing R Scripts, as Well as Implementations of Stack and List Structures.</em> <a href="https://CRAN.R-project.org/package=tictoc">https://CRAN.R-project.org/package=tictoc</a>.</p>
-</div>
-<div>
-<p>Kim, Gene. 2016. <em>The Devops Handbook: How to Create World-Class Agility, Reliability, and Security in Technology Organizations</em>. IT Revolution Press. <a href="https://www.xarg.org/ref/a/1942788002/">https://www.xarg.org/ref/a/1942788002/</a>.</p>
-</div>
-<div>
-<p>Krug, Steve. 2014. <em>Don’t Make Me Think, Revisited: A Common Sense Approach to Web Usability (3rd Edition) (Voices That Matter)</em>. New Riders.</p>
-</div>
-<div>
-<p>Lemaire, Maude. 2020. <em>Refactoring at Scale</em>. Henry Holt. <a href="https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/">https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/</a>.</p>
-</div>
-<div>
-<p>Lesur, Romain, and Christophe Dervieux. 2020. <em>Crrri: An Interface with Headless Chromium/Chrome</em>.</p>
-</div>
-<div>
-<p>Lumley, Thomas. 2013. <em>Dichromat: Color Schemes for Dichromats</em>. <a href="https://CRAN.R-project.org/package=dichromat">https://CRAN.R-project.org/package=dichromat</a>.</p>
-</div>
-<div>
+<div id="ref-R-here">
 <p>Müller, Kirill. 2017. <em>Here: A Simpler Way to Find Your Files</em>. <a href="https://CRAN.R-project.org/package=here">https://CRAN.R-project.org/package=here</a>.</p>
 </div>
-<div>
-<p>Müller, Kirill, and Hadley Wickham. 2020. <em>Tibble: Simple Data Frames</em>. <a href="https://CRAN.R-project.org/package=tibble">https://CRAN.R-project.org/package=tibble</a>.</p>
 </div>
-<div>
-<p>Müller, Kirill, Hadley Wickham, David A. James, and Seth Falcon. 2020. <em>RSQLite: ’SQLite’ Interface for R</em>. <a href="https://CRAN.R-project.org/package=RSQLite">https://CRAN.R-project.org/package=RSQLite</a>.</p>
-</div>
-<div>
-<p>Nüst, Daniel, Dirk Eddelbuettel, Dom Bennett, Robrecht Cannoodt, Dav Clark, Gergely Daroczi, Mark Edmondson, et al. 2020. “The Rockerverse: Packages and Applications for Containerization with R.”</p>
-</div>
-<div>
-<p>Ooms, Jeroen. 2014. “The Jsonlite Package: A Practical and Consistent Mapping Between Json Data and R Objects.” <em>arXiv:1403.2805 [stat.CO]</em>. <a href="https://arxiv.org/abs/1403.2805">https://arxiv.org/abs/1403.2805</a>.</p>
-</div>
-<div>
-<p>———. 2020. <em>Jsonlite: A Robust, High Performance Json Parser and Generator for R</em>. <a href="https://CRAN.R-project.org/package=jsonlite">https://CRAN.R-project.org/package=jsonlite</a>.</p>
-</div>
-<div>
-<p>Pebesma, Edzer. 2018. “Simple Features for R: Standardized Support for Spatial Vector Data.” <em>The R Journal</em> 10 (1): 439–46. <a href="https://doi.org/10.32614/RJ-2018-009">https://doi.org/10.32614/RJ-2018-009</a>.</p>
-</div>
-<div>
-<p>———. 2020. <em>Sf: Simple Features for R</em>. <a href="https://CRAN.R-project.org/package=sf">https://CRAN.R-project.org/package=sf</a>.</p>
-</div>
-<div>
-<p>Raymond, Eric S. 2003. <em>The Art of Unix Programming (the Addison-Wesley Professional Computng Series)</em>. Addison-Wesley.</p>
-</div>
-<div>
-<p>Roebuck, P. 2014. <em>Matlab: MATLAB Emulation Package</em>. <a href="https://CRAN.R-project.org/package=matlab">https://CRAN.R-project.org/package=matlab</a>.</p>
-</div>
-<div>
-<p>R Special Interest Group on Databases (R-SIG-DB), Hadley Wickham, and Kirill Müller. 2019. <em>DBI: R Database Interface</em>. <a href="https://CRAN.R-project.org/package=DBI">https://CRAN.R-project.org/package=DBI</a>.</p>
-</div>
-<div>
-<p>RStudio, and Inc. 2019. <em>Htmltools: Tools for Html</em>. <a href="https://CRAN.R-project.org/package=htmltools">https://CRAN.R-project.org/package=htmltools</a>.</p>
-</div>
-<div>
-<p>Rudis, Bob, and Al Danial. 2020. <em>Cloc: Count Lines of Code, Comments and Whitespace in Source Files and Archives</em>. <a href="https://gitlab.com/hrbrmstr/cloc">https://gitlab.com/hrbrmstr/cloc</a>.</p>
-</div>
-<div>
-<p>Sakamoto, Yasutaka, Shinsuke Matsumoto, Seiki Tokunaga, Sachio Saiki, and Masahide Nakamura. 2015. “Empirical Study on Effects of Script Minification and HTTP Compression for Traffic Reduction.” In <em>2015 Third International Conference on Digital Information, Networking, and Wireless Communications (DINWC)</em>. IEEE. <a href="https://doi.org/10.1109/dinwc.2015.7054230">https://doi.org/10.1109/dinwc.2015.7054230</a>.</p>
-</div>
-<div>
-<p>Sidi, Jonathan. 2020. <em>Covrpage: Create a Readme Summary Page for Github Testthat and Covr Outputs</em>. <a href="https://github.com/metrumresearchgroup/covrpage">https://github.com/metrumresearchgroup/covrpage</a>.</p>
-</div>
-<div>
-<p>Sievert, Carson. 2020. <em>Interactive Web-Based Data Visualization with R, Plotly, and Shiny</em>. Chapman; Hall/CRC. <a href="https://plotly-r.com">https://plotly-r.com</a>.</p>
-</div>
-<div>
-<p>Sievert, Carson, Chris Parmer, Toby Hocking, Scott Chamberlain, Karthik Ram, Marianne Corvellec, and Pedro Despouy. 2020. <em>Plotly: Create Interactive Web Graphics via ’Plotly.js’</em>. <a href="https://CRAN.R-project.org/package=plotly">https://CRAN.R-project.org/package=plotly</a>.</p>
-</div>
-<div>
-<p>Ushey, Kevin. 2020. <em>Renv: Project Environments</em>. <a href="https://CRAN.R-project.org/package=renv">https://CRAN.R-project.org/package=renv</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley. 2011. “Testthat: Get Started with Testing.” <em>The R Journal</em> 3: 5–10. <a href="https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf">https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf</a>.</p>
-</div>
-<div>
-<p>———. 2016. <em>Ggplot2: Elegant Graphics for Data Analysis</em>. Springer-Verlag New York. <a href="https://ggplot2.tidyverse.org">https://ggplot2.tidyverse.org</a>.</p>
-</div>
-<div>
-<p>———. 2019a. <em>Tidyverse: Easily Install and Load the ’Tidyverse’</em>. <a href="https://CRAN.R-project.org/package=tidyverse">https://CRAN.R-project.org/package=tidyverse</a>.</p>
-</div>
-<div>
-<p>———. 2020. <em>Testthat: Unit Testing for R</em>. <a href="https://CRAN.R-project.org/package=testthat">https://CRAN.R-project.org/package=testthat</a>.</p>
-</div>
-<div>
-<p>———. 2019b. <em>Advanced R, Second Edition</em>. Chapman; Hall/CRC.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. “Welcome to the tidyverse.” <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, and Jennifer Bryan. 2019. <em>Readxl: Read Excel Files</em>. <a href="https://CRAN.R-project.org/package=readxl">https://CRAN.R-project.org/package=readxl</a>.</p>
-</div>
-<div>
-<p>———. 2020a. <em>R Packages</em>. <a href="https://r-pkgs.org/">https://r-pkgs.org/</a>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Usethis: Automate Package and Project Setup</em>. <a href="https://CRAN.R-project.org/package=usethis">https://CRAN.R-project.org/package=usethis</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Winston Chang, Lionel Henry, Thomas Lin Pedersen, Kohske Takahashi, Claus Wilke, Kara Woo, Hiroaki Yutani, and Dewey Dunnington. 2020. <em>Ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics</em>. <a href="https://CRAN.R-project.org/package=ggplot2">https://CRAN.R-project.org/package=ggplot2</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Peter Danenberg, Gábor Csárdi, and Manuel Eugster. 2020. <em>Roxygen2: In-Line Documentation for R</em>. <a href="https://CRAN.R-project.org/package=roxygen2">https://CRAN.R-project.org/package=roxygen2</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Romain François, Lionel Henry, and Kirill Müller. 2020. <em>Dplyr: A Grammar of Data Manipulation</em>. <a href="https://CRAN.R-project.org/package=dplyr">https://CRAN.R-project.org/package=dplyr</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, and Garrett Grolemund. 2017. <em>R for Data Science: Import, Tidy, Transform, Visualize, and Model Data</em>. O’Reilly Media. <a href="https://www.xarg.org/ref/a/1491910399/">https://www.xarg.org/ref/a/1491910399/</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, and Jim Hester. 2020. <em>Pkgbuild: Find Tools Needed to Build R Packages</em>. <a href="https://CRAN.R-project.org/package=pkgbuild">https://CRAN.R-project.org/package=pkgbuild</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Jim Hester, and Winston Chang. 2020. <em>Devtools: Tools to Make Developing R Packages Easier</em>. <a href="https://CRAN.R-project.org/package=devtools">https://CRAN.R-project.org/package=devtools</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Jim Hester, and Romain Francois. 2018. <em>Readr: Read Rectangular Text Data</em>. <a href="https://CRAN.R-project.org/package=readr">https://CRAN.R-project.org/package=readr</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Jim Hester, Kirill Müller, and Daniel Cook. 2017. <em>Memoise: Memoisation of Functions</em>. <a href="https://CRAN.R-project.org/package=memoise">https://CRAN.R-project.org/package=memoise</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, and Edgar Ruiz. 2020. <em>Dbplyr: A ’Dplyr’ Back End for Databases</em>. <a href="https://CRAN.R-project.org/package=dbplyr">https://CRAN.R-project.org/package=dbplyr</a>.</p>
-</div>
-<div>
-<p>Xie, Yihui. 2014. “Knitr: A Comprehensive Tool for Reproducible Research in R.” In <em>Implementing Reproducible Computational Research</em>, edited by Victoria Stodden, Friedrich Leisch, and Roger D. Peng. Chapman; Hall/CRC. <a href="http://www.crcpress.com/product/isbn/9781466561595">http://www.crcpress.com/product/isbn/9781466561595</a>.</p>
-</div>
-<div>
-<p>———. 2015. <em>Dynamic Documents with R and Knitr</em>. 2nd ed. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://yihui.org/knitr/">https://yihui.org/knitr/</a>.</p>
-</div>
-<div>
-<p>———. 2016. <em>Bookdown: Authoring Books and Technical Documents with R Markdown</em>. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://github.com/rstudio/bookdown">https://github.com/rstudio/bookdown</a>.</p>
-</div>
-<div>
-<p>———. 2020a. <em>Bookdown: Authoring Books and Technical Documents with R Markdown</em>. <a href="https://CRAN.R-project.org/package=bookdown">https://CRAN.R-project.org/package=bookdown</a>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Knitr: A General-Purpose Package for Dynamic Report Generation in R</em>. <a href="https://CRAN.R-project.org/package=knitr">https://CRAN.R-project.org/package=knitr</a>.</p>
-</div>
-<div>
-<p>———. 2020c. <em>Xfun: Miscellaneous Functions by ’Yihui Xie’</em>. <a href="https://CRAN.R-project.org/package=xfun">https://CRAN.R-project.org/package=xfun</a>.</p>
-</div>
-<div>
-<p>Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. <em>R Markdown: The Definitive Guide</em>. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://bookdown.org/yihui/rmarkdown">https://bookdown.org/yihui/rmarkdown</a>.</p>
-</div>
-<div>
-<p>Xie, Yihui, Joe Cheng, and Xianying Tan. 2020. <em>DT: A Wrapper of the Javascript Library ’Datatables’</em>. <a href="https://CRAN.R-project.org/package=DT">https://CRAN.R-project.org/package=DT</a>.</p>
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <hr/>
 <footer>
 <a href="rtask.thinkr.fr"><img src="img/logo400_129.png" alt="ThinkR Website"/></a>
@@ -850,8 +627,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="optimjs.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="css.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="stepprotopype.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -882,7 +659,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/19-references.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/09-step-by-step-prototype.Rmd",
 "text": "Edit"
 },
 "history": {

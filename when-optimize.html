@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-05-11" />
+<meta name="date" content="2020-05-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -546,11 +546,11 @@ Of course, the C++ function is faster than the R one—this is the very reason o
 <pre><code># A tibble: 2 x 6
   expression    min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:&gt; &lt;bch:&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 cpp         187µs  236µs     3158.   783.8KB     12.7
-2 native      441µs  571µs     1705.    22.8KB      0  </code></pre>
+1 cpp         180µs  207µs     3419.     784KB     13.7
+2 native      512µs  555µs     1755.        0B      0  </code></pre>
 <p>(Note: we will come back to <code>bench::mark</code> later)</p>
 <p>Though, how much time gain is worth being sure you will get someone in your team to take over the maintenance if needed?
-In other words, given that (in our example), we are gaining around -3.356510^{-4} on the execution time of our function, is it worth switching to C++?
+In other words, given that (in our example), we are gaining around -3.488610^{-4} on the execution time of our function, is it worth switching to C++?
 Using external languages or complex data structures implies that from the start, you will need to think about who and how your code base will be maintain over the years.
 Chances are that if you plan on using a Shiny application during a span of several years, various R developers will be working on the project, and including C++ code inside your application means that these future developer will either be required to know C++, or they will not be able to maintain this piece of code.</p>
 <p>So, to sum up, there are three ways to optimize your application &amp; R code, and the bad news is that you can not optimize for all of them:</p>
@@ -738,8 +738,8 @@ Note that by default, the <code>mark()</code> function compares the output of ea
 <pre><code># A tibble: 2 x 6
   expression    min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:&gt; &lt;bch:&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 for        48.5µs 58.9µs    14973.    30.3KB        0
-2 vectorized  2.6µs  3.5µs   132307.    11.8KB        0</code></pre>
+1 for        62.3µs 65.4µs    14751.    30.3KB        0
+2 vectorized  3.3µs  3.9µs   144820.    11.8KB        0</code></pre>
 <p>Here, we have an empiric evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest.</p>
 <p>If you want a graphical analysis, <code>{bench}</code> comes with an <code>autoplot</code> method for <code>{ggplot2}</code> <span class="citation">(Wickham, Chang, et al. <a href="#ref-R-ggplot2" role="doc-biblioref">2020</a>)</span>:</p>
 
@@ -760,12 +760,18 @@ FIGURE 15.4: <code>{bench}</code> autoplot
 <p>You can profile Shiny application using the <code>{profvis}</code> package, just as any other piece of R code.
 The only thing to note if you want to use this function on an app built with <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span>, you will have to wrap the <code>run_app()</code> function in a <code>print()</code> function.
 Long story short, what make the app run is not the function itself, but the printing of the function, so the object returned by <code>run_app()</code> itself can not be profiled.
-See the discussion on this <a href="https://github.com/ThinkR-open/golem/issues/146">issue on {golem}</a> to learn more about this.</p>
+See the discussion on this <a href="https://github.com/ThinkR-open/golem/issues/146">issue on <code>{golem}</code></a> to learn more about this.</p>
 </div>
 <div id="shiny-front-end" class="section level4">
 <h4><span class="header-section-number">15.2.2.2</span> Shiny front-end</h4>
 <div id="google-lighthouse" class="section level5">
 <h5><span class="header-section-number">15.2.2.2.1</span> Google LightHouse</h5>
+</div>
+</div>
+<div id="shiny-front-end-1" class="section level4">
+<h4><span class="header-section-number">15.2.2.3</span> Shiny front-end</h4>
+<div id="google-lighthouse-1" class="section level5">
+<h5><span class="header-section-number">15.2.2.3.1</span> Google LightHouse</h5>
 <p>One other thing that can be optimized when it comes to the user interface is the webpage rendering performance.
 To do that, we can use standard web development tools: as said several times, a Shiny application IS a web application, so tools that are language agnostic will work with Shiny.
 There are thousands of tools available to do exactly that, and going through all of them would probably not make a lot of sense.</p>
@@ -829,7 +835,7 @@ That being said, if you have a limited time to invest in optimizing the front-en
 <p>Here are for example some of the results, focused on performance, with there respective description:</p>
 </div>
 <div id="first-meaningful-paint" class="section level5">
-<h5><span class="header-section-number">15.2.2.2.2</span> “First Meaningful Paint”</h5>
+<h5><span class="header-section-number">15.2.2.3.2</span> “First Meaningful Paint”</h5>
 <div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb218-1"><a href="when-optimize.html#cb218-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">first-meaningful-paint</span><span class="st">`</span><span class="op">$</span>description</span></code></pre></div>
 <pre><code>[1] &quot;First Meaningful Paint measures when the primary content of a page is visible. [Learn more](https://web.dev/first-meaningful-paint).&quot;</code></pre>
 <div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="when-optimize.html#cb220-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">first-meaningful-paint</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
@@ -854,7 +860,7 @@ That being said, if you have a limited time to invest in optimizing the front-en
 </table>
 </div>
 <div id="speed-index" class="section level5">
-<h5><span class="header-section-number">15.2.2.2.3</span> “Speed Index”</h5>
+<h5><span class="header-section-number">15.2.2.3.3</span> “Speed Index”</h5>
 <div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="when-optimize.html#cb221-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span><span class="op">$</span>description</span></code></pre></div>
 <pre><code>[1] &quot;Speed Index shows how quickly the contents of a page are visibly populated. [Learn more](https://web.dev/speed-index).&quot;</code></pre>
 <div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="when-optimize.html#cb223-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
@@ -879,7 +885,7 @@ That being said, if you have a limited time to invest in optimizing the front-en
 </table>
 </div>
 <div id="speed-index-1" class="section level5">
-<h5><span class="header-section-number">15.2.2.2.4</span> “Speed Index”</h5>
+<h5><span class="header-section-number">15.2.2.3.4</span> “Speed Index”</h5>
 <div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb224-1"><a href="when-optimize.html#cb224-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">estimated-input-latency</span><span class="st">`</span><span class="op">$</span>description </span></code></pre></div>
 <pre><code>[1] &quot;Estimated Input Latency is an estimate of how long your app takes to respond to user input, in milliseconds, during the busiest 5s window of page load. If your latency is higher than 50 ms, users may perceive your app as laggy. [Learn more](https://web.dev/estimated-input-latency).&quot;</code></pre>
 <div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="when-optimize.html#cb226-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">estimated-input-latency</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
@@ -904,7 +910,7 @@ That being said, if you have a limited time to invest in optimizing the front-en
 </table>
 </div>
 <div id="total-blocking-time" class="section level5">
-<h5><span class="header-section-number">15.2.2.2.5</span> “Total Blocking Time”</h5>
+<h5><span class="header-section-number">15.2.2.3.5</span> “Total Blocking Time”</h5>
 <div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb227-1"><a href="when-optimize.html#cb227-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">total-blocking-time</span><span class="st">`</span><span class="op">$</span>description </span></code></pre></div>
 <pre><code>[1] &quot;Sum of all time periods between FCP and Time to Interactive, when task length exceeded 50ms, expressed in milliseconds.&quot;</code></pre>
 <div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="when-optimize.html#cb229-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">total-blocking-time</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
@@ -929,7 +935,7 @@ That being said, if you have a limited time to invest in optimizing the front-en
 </table>
 </div>
 <div id="time-to-first-byte" class="section level5">
-<h5><span class="header-section-number">15.2.2.2.6</span> “Time to first Byte”</h5>
+<h5><span class="header-section-number">15.2.2.3.6</span> “Time to first Byte”</h5>
 <div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="when-optimize.html#cb230-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">time-to-first-byte</span><span class="st">`</span><span class="op">$</span>description </span></code></pre></div>
 <pre><code>[1] &quot;Time To First Byte identifies the time at which your server sends a response. [Learn more](https://web.dev/time-to-first-byte).&quot;</code></pre>
 <div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb232-1"><a href="when-optimize.html#cb232-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">time-to-first-byte</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
@@ -956,7 +962,7 @@ That being said, if you have a limited time to invest in optimizing the front-en
 To know more, feel free to read the <a href="https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/getting-started.md">documentation</a>!</p>
 </div>
 <div id="side-note-on-minification" class="section level5">
-<h5><span class="header-section-number">15.2.2.2.7</span> Side note on minification</h5>
+<h5><span class="header-section-number">15.2.2.3.7</span> Side note on minification</h5>
 <p>Chances are that right now you are not using <em>minification</em> in your Shiny application.
 Minification is the process of removing unnecessary characters from files, without changing the way the code works, in order to make the file size lighter.
 The general idea being that line breaks, spaces and a specific set of characters are used inside scripts for human readability, and are not useful when it comes to the way a computer reads a piece of code.

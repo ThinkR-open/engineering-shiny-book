@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 13 Version Control | Engineering Production-Grade Shiny Apps</title>
+  <title>References | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 13 Version Control | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:title" content="References | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
   
   <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 13 Version Control | Engineering Production-Grade Shiny Apps" />
+  <meta name="twitter:title" content="References | Engineering Production-Grade Shiny Apps" />
   
   <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-05-11" />
+<meta name="date" content="2020-05-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="step-secure.html"/>
-<link rel="next" href="deploy-golem.html"/>
+<link rel="prev" href="optimjs.html"/>
+
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
@@ -442,308 +442,405 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="secure" class="section level1">
-<h1><span class="header-section-number">Chapter 13</span> Version Control</h1>
-<div id="using-version-control-with-git" class="section level2">
-<h2><span class="header-section-number">13.1</span> Using Version Control with <code>git</code></h2>
-<p>“Friends do not let friends work on a coding project without version control.”
-You might have heard this before, without really considering what this means.
-Or maybe you are convinced about this saying, but have not had the opportunity to use git, GitHub or Gitlab for versioning your applications.
-If so, now is the time for a workflow change!</p>
-<div id="why-version-control" class="section level3">
-<h3><span class="header-section-number">13.1.1</span> Why Version Control?</h3>
-<p>Have you ever experienced a piece of code disappearing?
-Or the unsolvable problem of integrating changes when several people have been working on the same piece of code?
-Or the inability to find back something you have written a while back?</p>
-<p>If so, you might have been missing Version Control (also shortened as VC).
-In this chapter, we’ll be focusing on <code>git</code>, but you should be aware that other VC system exist.
-As they are less popular than <code>git</code>, we will not cover them here.
-<code>Git</code> was designed to handle collaboration on code projects<a href="#fn41" class="footnote-ref" id="fnref41"><sup>41</sup></a>
-where potentially a lot of people have to interact and make changes to the codebase.
-<code>Git</code> might feel a little bit daunting at first, and even seasoned developers still misuse it, or do not understand it completely, but getting at ease with the basics will significantly improve the way you build software, so do not give up: the benefits from learning it really outweigh the (apparent) complexity.</p>
-<p>There are many advantages to VC, including:</p>
-<ul>
-<li><p><strong>You can go back in time</strong>.
-With a VC system like <code>git</code>, every change is recorded (well, every <strong>committed</strong> change), meaning that you can potentially go back in time to a previous version of a project, and see the complete history of a file.
-This feature is very important: if you accidentally made changes that break your application, or if you deleted a feature you thought you would never need, you can go back to where you were a few hours, a few days, a few months back.</p></li>
-<li><p><strong>Several people can work on the same file</strong>.
-<code>Git</code> relies on a system of branches.
-Within this branch pattern, there is one main branch, called “master”, which contains the stable, main version of the code-base.
-By “forking” this branch (or any other branch), developers will have a copy of the base branch, where they can safely work on changing (and breaking) things, without impacting the origin branch.
-This allows to try things in a safe environment, without touching what works.</p></li>
-<li><p><strong>You can safely track changes</strong>.
-Every time a developer records something to <code>git</code>, changes are listed.
-In other words, you can see what changes are made to a specific file in your codebase.</p></li>
-<li><p><strong>It centralizes the codebase</strong>.
-You can use <code>git</code> locally, but its strength also relies on the ability to synchronize your local project with a distant server.
-This also means that <em>several</em> people can synchronize with this server and collaborate on a project.
-That way, changes on a branch on a server can be downloaded (it is called <code>pull</code> in <code>git</code> terminology) by all the members of the team, and synchronized locally, <em>i.e</em> if someone makes changes to a branch and send them to the main server, all the other developers can retrieve these change on their machine.</p></li>
-</ul>
-</div>
-<div id="git-basics-add---commit---push---pull" class="section level3">
-<h3><span class="header-section-number">13.1.2</span> <code>Git</code> basics: <code>add</code> - <code>commit</code> - <code>push</code> - <code>pull</code></h3>
-<p>These are the four main actions you will be performing in <code>git</code>: if you just need to learn the minimum to get started, they are the four essential ones.</p>
-<div id="add" class="section level4">
-<h4><span class="header-section-number">13.1.2.1</span> <code>add</code></h4>
-<p>When using <code>add</code>, you are choosing which elements of your project you want to track, be it new files or modifications of an already versionned file.
-This action does not save the file in the git repository, but flags the changes to be added to the next commit.</p>
-</div>
-<div id="commit" class="section level4">
-<h4><span class="header-section-number">13.1.2.2</span> <code>commit</code></h4>
-<p>A <code>commit</code> is a photography of a codebase at a given moment in time.
-Each commit is associated with two things: a <code>sha1</code>, which is a unique reference in the history of the project and that allows you to identify this precise state when you need to get back in time, and a <code>message</code>, which is a piece of text that describes the commit<a href="#fn42" class="footnote-ref" id="fnref42"><sup>42</sup></a>
-.
-Note that messages are mandatory, you can not commit without them, and that the <code>sha1</code> are automatically generated by <code>git</code>.
-Do not overlook these messages: they might seem like a constraint at first but they are a life saver when you need to understand the history of a project.</p>
-<p>There is no strict rule about what and when to commit.
-Keep in mind that commits are what allow you to go back in time, so a commit is a complete state of your codebase to which it would make sense to go back to.
-A good practice is to state in the commit message which choices you made and why (but not how you implemented these changes), so that other developers (and you in the future) will be able to understand changes.</p>
-</div>
-<div id="push" class="section level4">
-<h4><span class="header-section-number">13.1.2.3</span> <code>push</code></h4>
-<p>Once you have get a set of commits ready, you are ready to <code>push</code> it to the server.
-In other word, you will permanently record these commits (so the series of changes) to the server.</p>
-<p>Making a push implies three things:</p>
-<ul>
-<li><p>Other people in the team will be able to retrieve the changes you have made</p></li>
-<li><p>These changes will be recorded permanently in the project history</p></li>
-<li><p>You can not modify commits once they were sent to the server<a href="#fn43" class="footnote-ref" id="fnref43"><sup>43</sup></a></p></li>
-</ul>
-</div>
-<div id="pull" class="section level4">
-<h4><span class="header-section-number">13.1.2.4</span> <code>pull</code></h4>
-<p>Once changes have be recorded in the main server, everybody synchronized with the project can <code>pull</code> the commits to their local project.</p>
-</div>
-</div>
-<div id="about-branches" class="section level3">
-<h3><span class="header-section-number">13.1.3</span> About branches</h3>
-<p>Branches are <code>git</code> way to organize work and ideas, notably when several people are collaborating on the same project (which might be the case when building large web applications with R).</p>
-<p>How does it work?
-When your start a project, you are in the main branch, which is called the “master”.
-In a perfect world, you never work directly on this branch: it should always contain a working, deployable version of the application.</p>
-<p>Other branches are to be thought as work areas, where developers fix bugs or add features.
-The modifications made in these development branches will then be transferred (directly or indirectly) to the master branch.</p>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
 
-<div class="figure" style="text-align: center"><span id="fig:13-secure-1"></span>
-<img src="img/Git_branches_fork.png" alt="Branches in git." width="100%" />
-<p class="caption">
-FIGURE 13.1: Branches in git.
-</p>
-</div>
-<p>In practice, you might want to use a workflow where each branch is designed to fix a small issue or implement a feature, so that it is easier to separate each small part of the work.
-Even when working alone.</p>
-</div>
-<div id="issues" class="section level3">
-<h3><span class="header-section-number">13.1.4</span> Issues</h3>
-<p>If you are working with a remote tool with a graphical interface like Gitlab, GitHub or Bitbucket, there is a good chance you will be using issues.
-Issues are “notes” or “tickets” that can be used to track a bug or to suggest a feature.
-This tool is crucial when it comes to project management: they are the perfect spot for organizing and discussing ideas, but also to have an overview of what has been done, what is currently done and what is left to be done.
-Issue can also be used as a discussion medium with beta testers, clients or sponsors.</p>
-<p>One other valuable feature of issues is that they can be referenced inside commits using a hashtag and its number: <code>#123</code>. .
-In other words, when you send code to the centralized server, you can link this code to one or more issues and corresponding commits appear in the issue discussions.</p>
-</div>
-</div>
-<div id="git-integration" class="section level2">
-<h2><span class="header-section-number">13.2</span> Git integration</h2>
-<div id="with-rstudio" class="section level3">
-<h3><span class="header-section-number">13.2.1</span> With RStudio</h3>
-<p>Git is very well integrated to the Rstudio IDE, and using <code>git</code> can be as simple as clicking on a button from time to time.
-If you are using RStudio, you will find a pull/push button, a stage &amp; commit interface, a tool for visualizing differences in files.
-Everything you need to get started is there.</p>
-</div>
-<div id="as-part-of-a-larger-world" class="section level3">
-<h3><span class="header-section-number">13.2.2</span> As part of a larger world</h3>
-<p><code>Git</code> is not reserved for team work: even if you are working alone on a project, using <code>git</code> is definitely worth the effort.
-Using git, and particularly issues, helps you organize your train of thoughts, especially upfront when you need to plan what you will be doing.</p>
-<p>And of course, remember that <code>git</code> is not reserved to Shiny Applications: it can be used for any other R related projects, and at the end of the day for any code related projects, making it a valuable skill to have in your toolbox, whatever language you will be working with in 10 years!</p>
-</div>
-<div id="about-git-flow" class="section level3">
-<h3><span class="header-section-number">13.2.3</span> About <code>git-flow</code></h3>
-<p>There are a lot of different ways and methodologies to organize your Git workflow.
-One of the most popular one is called <code>git flow</code>, and we will give you here a quick introduction to how you can manage your work using this approach.
-Please note that this is a quick introduction, not a complete guide: we will link to some further reading just at the end of this section.</p>
-<p>So, here are the key concept of <code>git flow</code>:</p>
-<ul>
-<li><p>The <code>master</code> branch only contains stable code: most of the time is matches a tagged, fixed version (v0.0.1, 0.1.0, v1.0.0, etc).
-A very small subset of developers involved in the project have writing access to the <code>master</code> branch, and no developer should ever push code straight to this branch: new code to <code>master</code> only comes either from the <code>dev</code> branch, or from a <code>hotfix</code> branch.
-For an app in production, the last commit of this branch should be the version that is currently in production.</p></li>
-<li><p>The <code>dev</code> branch, on the other hand, is the “Work in progress” branch: the one that contains the latest changes before they are merged into master.
-This is the common working branch for every developers.
-Most of the time, developers do not push code into these branch either: they make merge/pull request (MR) to <code>dev</code> from one of their <code>feature branch</code>.</p></li>
-<li><p>A <code>feature branch</code> is one branch, forked from <code>dev</code>, that implements one of the feature of the application.
-To keep a clean track of what each branch is doing, a good practice is to use <code>issue-XXX</code>, where <code>XXX</code> is the corresponding issue you plan to solve in this branch.</p></li>
-<li><p>A <code>hot fix</code> branch is a branch to correct a critical issue in <code>master</code>.
-If forks from master, and is merged straight into <code>master</code> using a MR.</p></li>
-</ul>
-<p>Here is a summary of this process:</p>
-
-<div class="figure" style="text-align: center"><span id="fig:13-secure-2"></span>
-<img src="img/GitFlowHotfixBranch.png" alt="Presentation of a git flow (Vincent Driessen, http://nvie.com)." width="100%" />
-<p class="caption">
-FIGURE 13.2: Presentation of a git flow (Vincent Driessen, <a href="http://nvie.com" class="uri">http://nvie.com</a>).
-</p>
-</div>
-<p>From a software engineer point of view, here is how daily work goes:</p>
-<ul>
-<li><p>Identify an issue to work on</p></li>
-<li><p>Fork dev into <code>issue-XXX</code></p></li>
-<li><p>Develop feature inside the branch</p></li>
-<li><p>Regularly, run <code>git stash</code>, <code>git rebase dev</code>, and <code>git stash apply</code> to include the latest changes from <code>dev</code> to stay synchronized with <code>dev</code><a href="#fn44" class="footnote-ref" id="fnref44"><sup>44</sup></a></p></li>
-<li><p>Make a pull request to <code>dev</code> so that the feature is included</p></li>
-<li><p>Once the PR is accepted by the project manager, notify the rest of the team that there have been changes to <code>dev</code>, so they can rebase it to the branch they are working on</p></li>
-<li><p>Start working on a new feature</p></li>
-</ul>
-<p>Of course, there are way more subtleties to this flow of work, but this gives you a good starting point.
-Generally speaking, a good communication between developers is essential for a successful collaborative development project.</p>
-</div>
-<div id="further-readings-on-git" class="section level3">
-<h3><span class="header-section-number">13.2.4</span> Further readings on <code>git</code></h3>
-<p>Git can be used in different ways and different approaches exist.
-The comprehensiveness of the different possible approaches is beyond the scope of this book, and other resources exist as well.
-You can find more under these links:</p>
-<ul>
-<li><a href="https://happygitwithr.com/" class="uri">https://happygitwithr.com/</a></li>
-<li><a href="https://git-scm.com/book" class="uri">https://git-scm.com/book</a></li>
-<li><a href="https://www.git-tower.com/blog/git-cheat-sheet/" class="uri">https://www.git-tower.com/blog/git-cheat-sheet/</a></li>
-</ul>
-</div>
-</div>
-<div id="automated-testing" class="section level2">
-<h2><span class="header-section-number">13.3</span> Automated testing</h2>
-<p>We have seen in chapter <a href="step-secure.html#step-secure">12</a> how to build a testing infrastructure for your app, notably using the <code>{testthat}</code> <span class="citation">(Wickham <a href="#ref-R-testthat" role="doc-biblioref">2020</a>)</span> package.
-What we have described is a way to build it locally, before running your test on your own machine.
-But there is a big flaw to this approach: you have to remember to run the tests, be it regularly or before making a pull request/pushing to the server.
-To do this kind of job, you will be looking for a tool to do automated testing at the repository level: in other words, a software that can test your application whenever a piece of code is pushed/moved on the repository.</p>
-<p>To do this, various tools are available, each with there own features.
-Here is a non exhaustive list of the one you can choose:</p>
-<p><a href="https://travis-ci.org/">travis-ci</a> is a software that can be synced with your <code>git</code> repositories (GitHub or Bitbucket), and whenever something happens on the repo, the events described in the travis configuration file (<code>.travis.yml</code>) are executed.
-If they exit with a code 0, the test passes.
-If they do not, the integrated tests have failed.
-This Travis CI integration can be used internally and externally: internally, in the sense that before merging any pull request, the project manager have access to a series of tests that are automatically launched.
-Externally, as a “health check” before installing a software: if you visit a GitHub repository that has Travis badges included, you can check if the current state of the package/software is stable, <em>i.e.</em> if it passes the automated tests.</p>
-<p>Travis CI can do a lot more than just testing your app: it can be used to build documentation, deploy to production, or to run any other scripts you want to be run before/after the tests have passed.
-And the nice thing is that you can test for various versions of R, so that you are sure that you are supporting current, future and previous versions of R.</p>
-<p>All of this is defined in the <code>.travis.yml</code> file, which is to be put at the root of your source directory, a file that is automatically generated when calling <code>usethis::use_travis()</code>.
-Here is an example of one of this file, for the <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> package:</p>
-<pre><code># R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
-language: R
-sudo: false
-cache: packages
-
-r_github_packages:
-  - ThinkR-open/golem  # pre-install to avoid vignette package errors
-
-# build matrix; turn on vdiffr only on r release
-matrix:
-  include:
-  - r: devel
-  - r: release
-    env: VDIFFR_RUN_TESTS=true
-    before_cache:
-    - Rscript -e &#39;remotes::install_cran(&quot;pkgdown&quot;)&#39;
-    - Rscript -e &#39;remotes::install_github(&quot;ThinkR-open/thinkrtemplate&quot;)&#39;
-    deploy:
-      provider: pages
-      skip-cleanup: true
-      github-token: $GITHUB_PAT
-      keep-history: true
-      local-dir: docs
-      on:
-        branch: master
-      skip_cleanup: true
-  - r: oldrel
-  - r: 3.3
-  - r: 3.4
-
-before_install:
-  - Rscript -e &#39;update.packages(ask = FALSE)&#39;
-  
-after_success:
-  - Rscript -e &#39;covr::codecov()&#39;
-  - Rscript -e &#39;pkgdown::build_site()&#39;
-  </code></pre>
-<p>Note that Travis CI can run tests on GNU/Linux or MacOS operating systems.</p>
-<p><a href="https://www.appveyor.com/">Appveyor</a> has the same functionalities as Travis CI.
-This service can integrate with GitHub, GitHub Enterprise, Bitbucket, GitLab, Azure Repos, Kiln, Gitea.
-It supports Windows, Linux and macOS.</p>
-<p><a href="https://github.com/features/actions">GitHub actions</a> serve a related purpose: defining actions to be performed as responses to events on the GitHub repository.
-Testing, building documentation, push to another repository, deploy on the server… all these actions can be automatically performed.
-As with Travis CI, these actions are defined in a <code>yaml</code> file.
-Examples for these configuration can be find at <a href="https://github.com/r-lib/actions">r-lib/actions</a>, and some can be automatically linked to your project using functions from <code>{usethis}</code>: <code>use_github_action_check_release()</code>, <code>use_github_action_check_standard()</code>, <code>use_github_action_check_full()</code> and <code>use_github_action_pr_commands()</code>.
-The three first perform a standard <code>R CMD check</code>, under various conditions:</p>
-<ul>
-<li>the <code>release</code> tests on MacOS, with the latest version of R, and runs the check via the <code>{rcmdcheck}</code> <span class="citation">(Csárdi <a href="#ref-R-rcmdcheck" role="doc-biblioref">2019</a><a href="#ref-R-rcmdcheck" role="doc-biblioref">b</a>)</span> package</li>
-<li><code>standard</code> does the check for 3 OS (Windows, Mac and Linux), and for R and R-devel</li>
-<li><code>full</code> does <code>standard</code> but for the last 5 minors version of R</li>
-</ul>
-<p>Finally, <code>use_github_action_pr_commands()</code>, sets checks to be performed when a Pull Request is made to the repository.</p>
-<p>If you are working with GitLab, you can use the integrated <code>GitLab CI</code> service: it serves the same purpose, with the little difference that it is completely docker-based: you define a <code>yaml</code> with a series of stages that are performed (concurrently or sequentially), and they are all launched inside a docker container.
-To help you with this, the <a href="https://hub.docker.com/r/colinfay/r-ci-tidyverse"><code>colinfay/r-ci-tidyverse</code></a> docker image comes with pre-installed packages for testing: <code>{remotes}</code> <span class="citation">(Hester et al. <a href="#ref-R-remotes" role="doc-biblioref">2020</a>)</span>, <code>{testthat}</code> <span class="citation">(Wickham <a href="#ref-R-testthat" role="doc-biblioref">2020</a>)</span>, <code>{config}</code> <span class="citation">(Allaire <a href="#ref-R-config" role="doc-biblioref">2018</a>)</span>… and is available for several R versions.
-This docker image can be used as the source image for your <code>GitLab CI</code> yaml file.</p>
-<p>Here is an example of one of these files</p>
-<div class="sourceCode" id="cb202"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb202-1"><a href="secure.html#cb202-1"></a><span class="fu">image</span><span class="kw">:</span><span class="at"> colinfay/r-ci-tidyverse:3.6.0</span></span>
-<span id="cb202-2"><a href="secure.html#cb202-2"></a></span>
-<span id="cb202-3"><a href="secure.html#cb202-3"></a><span class="fu">cache</span><span class="kw">:</span></span>
-<span id="cb202-4"><a href="secure.html#cb202-4"></a><span class="at">  </span><span class="fu">paths</span><span class="kw">:</span></span>
-<span id="cb202-5"><a href="secure.html#cb202-5"></a><span class="at">    </span><span class="kw">-</span><span class="at"> ci/</span></span>
-<span id="cb202-6"><a href="secure.html#cb202-6"></a></span>
-<span id="cb202-7"><a href="secure.html#cb202-7"></a><span class="fu">stages</span><span class="kw">:</span></span>
-<span id="cb202-8"><a href="secure.html#cb202-8"></a><span class="at">  </span><span class="kw">-</span><span class="at"> test</span></span>
-<span id="cb202-9"><a href="secure.html#cb202-9"></a><span class="at">  </span><span class="kw">-</span><span class="at"> document</span></span>
-<span id="cb202-10"><a href="secure.html#cb202-10"></a></span>
-<span id="cb202-11"><a href="secure.html#cb202-11"></a><span class="fu">building</span><span class="kw">:</span></span>
-<span id="cb202-12"><a href="secure.html#cb202-12"></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> test</span></span>
-<span id="cb202-13"><a href="secure.html#cb202-13"></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span></span>
-<span id="cb202-14"><a href="secure.html#cb202-14"></a><span class="at">    </span><span class="kw">-</span><span class="at"> R -e &quot;remotes::install_deps(dependencies = TRUE)&quot;</span></span>
-<span id="cb202-15"><a href="secure.html#cb202-15"></a><span class="at">    </span><span class="kw">-</span><span class="at"> R -e &#39;devtools::check()&#39;</span></span>
-<span id="cb202-16"><a href="secure.html#cb202-16"></a></span>
-<span id="cb202-17"><a href="secure.html#cb202-17"></a><span class="fu">documenting</span><span class="kw">:</span></span>
-<span id="cb202-18"><a href="secure.html#cb202-18"></a><span class="at">    </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> document</span></span>
-<span id="cb202-19"><a href="secure.html#cb202-19"></a><span class="at">    </span><span class="fu">allow_failure</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb202-20"><a href="secure.html#cb202-20"></a><span class="at">    </span><span class="fu">when</span><span class="kw">:</span><span class="at"> on_success</span></span>
-<span id="cb202-21"><a href="secure.html#cb202-21"></a><span class="at">    </span><span class="fu">only</span><span class="kw">:</span></span>
-<span id="cb202-22"><a href="secure.html#cb202-22"></a><span class="at">        </span><span class="kw">-</span><span class="at"> master</span></span>
-<span id="cb202-23"><a href="secure.html#cb202-23"></a><span class="at">    </span><span class="fu">script</span><span class="kw">:</span></span>
-<span id="cb202-24"><a href="secure.html#cb202-24"></a><span class="at">        </span><span class="kw">-</span><span class="at"> Rscript -e &#39;install.packages(&quot;DT&quot;)&#39;</span></span>
-<span id="cb202-25"><a href="secure.html#cb202-25"></a><span class="at">        </span><span class="kw">-</span><span class="at"> Rscript -e &#39;covr::gitlab(quiet = FALSE)&#39;</span></span>
-<span id="cb202-26"><a href="secure.html#cb202-26"></a><span class="at">    </span><span class="fu">artifacts</span><span class="kw">:</span></span>
-<span id="cb202-27"><a href="secure.html#cb202-27"></a><span class="at">        </span><span class="fu">paths</span><span class="kw">:</span></span>
-<span id="cb202-28"><a href="secure.html#cb202-28"></a><span class="at">            </span><span class="kw">-</span><span class="at"> public</span></span></code></pre></div>
-<p>Automated testing, continuous integration and continuous deployment is a vast topic that can not be covered in a few pages inside this book, but spending some time learning about this methodologies is definitely worth the time spent: the more you can automate these processes, and the more you test, the more your application will be resilient, easy to maintain and easy to enhance: the more you check, the quicker you will discover bugs.</p>
-<p>And the quicker you detect bugs, the easier it is to correct them!</p>
-
-</div>
-</div>
-
-
-
-<h3>References</h3>
 <div id="refs" class="references">
-<div id="ref-R-config">
+<div>
 <p>Allaire, JJ. 2018. <em>Config: Manage Environment Specific Configuration Values</em>. <a href="https://CRAN.R-project.org/package=config">https://CRAN.R-project.org/package=config</a>.</p>
 </div>
-<div id="ref-R-rcmdcheck">
-<p>Csárdi, Gábor. 2019b. <em>Rcmdcheck: Run ’R Cmd Check’ from ’R’ and Capture Results</em>. <a href="https://CRAN.R-project.org/package=rcmdcheck">https://CRAN.R-project.org/package=rcmdcheck</a>.</p>
+<div>
+<p>Allaire, JJ, Yihui Xie, Jonathan McPherson, Javier Luraschi, Kevin Ushey, Aron Atkins, Hadley Wickham, Joe Cheng, Winston Chang, and Richard Iannone. 2020. <em>Rmarkdown: Dynamic Documents for R</em>. <a href="https://CRAN.R-project.org/package=rmarkdown">https://CRAN.R-project.org/package=rmarkdown</a>.</p>
 </div>
-<div id="ref-R-golem">
+<div>
+<p>Attali, Dean, and Tristan Edwards. 2020. <em>Shinyalert: Easily Create Pretty Popup Messages (Modals) in ’Shiny’</em>. <a href="https://CRAN.R-project.org/package=shinyalert">https://CRAN.R-project.org/package=shinyalert</a>.</p>
+</div>
+<div>
+<p>Bache, Stefan Milton, and Hadley Wickham. 2014. <em>Magrittr: A Forward-Pipe Operator for R</em>. <a href="https://CRAN.R-project.org/package=magrittr">https://CRAN.R-project.org/package=magrittr</a>.</p>
+</div>
+<div>
+<p>Bengtsson, Henrik. 2018. <em>Profmem: Simple Memory Profiling for R</em>. <a href="https://CRAN.R-project.org/package=profmem">https://CRAN.R-project.org/package=profmem</a>.</p>
+</div>
+<div>
+<p>———. 2019. <em>R.cache: Fast and Light-Weight Caching (Memoization) of Objects and Results to Speed up Computations</em>. <a href="https://CRAN.R-project.org/package=R.cache">https://CRAN.R-project.org/package=R.cache</a>.</p>
+</div>
+<div>
+<p>———. 2020. <em>Future: Unified Parallel and Distributed Processing in R for Everyone</em>. <a href="https://CRAN.R-project.org/package=future">https://CRAN.R-project.org/package=future</a>.</p>
+</div>
+<div>
+<p>Boettiger, Carl, and Dirk Eddelbuettel. 2017. “An Introduction to Rocker: Docker Containers for R.” <em>The R Journal</em> 9 (2): 527–36. <a href="https://doi.org/10.32614/RJ-2017-065">https://doi.org/10.32614/RJ-2017-065</a>.</p>
+</div>
+<div>
+<p>Chang, Winston. 2020. <em>Chromote: Headless Chrome Web Browser Interface</em>.</p>
+</div>
+<div>
+<p>Chang, Winston, Joe Cheng, JJ Allaire, Yihui Xie, and Jonathan McPherson. 2020. <em>Shiny: Web Application Framework for R</em>. <a href="https://CRAN.R-project.org/package=shiny">https://CRAN.R-project.org/package=shiny</a>.</p>
+</div>
+<div>
+<p>Chang, Winston, and Gábor Csárdi. 2019. <em>Shinytest: Test Shiny Apps</em>. <a href="https://CRAN.R-project.org/package=shinytest">https://CRAN.R-project.org/package=shinytest</a>.</p>
+</div>
+<div>
+<p>Chang, Winston, Javier Luraschi, and Timothy Mastny. 2019. <em>Profvis: Interactive Visualizations for Profiling R Code</em>. <a href="https://CRAN.R-project.org/package=profvis">https://CRAN.R-project.org/package=profvis</a>.</p>
+</div>
+<div>
+<p>Cheng, Joe. 2019. <em>Promises: Abstractions for Promise-Based Asynchronous Programming</em>. <a href="https://CRAN.R-project.org/package=promises">https://CRAN.R-project.org/package=promises</a>.</p>
+</div>
+<div>
+<p>Christian, Brian, and Tom Griffiths. 2016. <em>Algorithms to Live by : The Computer Science of Human Decisions</em>. Henry Holt.</p>
+</div>
+<div>
+<p>Coene, John. 2020. <em>FullPage: Three Families of Functions for Three Different Single Page ’Shiny’ Apps</em>. <a href="https://github.com/RinteRface/fullPage">https://github.com/RinteRface/fullPage</a>.</p>
+</div>
+<div>
+<p>Collado-Torres, Leonardo, Kristen R. Maynard, and Andrew E. Jaffe. 2020. <em>LIBD Visium Spatial Transcriptomics Human Pilot Data Inspector</em>. <a href="https://doi.org/10.18129/B9.bioc.spatialLIBD">https://doi.org/10.18129/B9.bioc.spatialLIBD</a>.</p>
+</div>
+<div>
+<p>Cooley, David. 2020. <em>Geojsonsf: GeoJSON to Simple Feature Converter</em>. <a href="https://CRAN.R-project.org/package=geojsonsf">https://CRAN.R-project.org/package=geojsonsf</a>.</p>
+</div>
+<div>
+<p>Csardi, Gabor. 2016. <em>Cyclocomp: Cyclomatic Complexity of R Code</em>. <a href="https://CRAN.R-project.org/package=cyclocomp">https://CRAN.R-project.org/package=cyclocomp</a>.</p>
+</div>
+<div>
+<p>———. 2020. <em>PackageMetrics2: Collect Metrics About R Packages</em>. <a href="http://git.mango.local/gcsardi/packageMetrics2">http://git.mango.local/gcsardi/packageMetrics2</a>.</p>
+</div>
+<div>
+<p>Csárdi, Gábor. 2019a. <em>Liteq: Lightweight Portable Message Queue Using ’Sqlite’</em>. <a href="https://CRAN.R-project.org/package=liteq">https://CRAN.R-project.org/package=liteq</a>.</p>
+</div>
+<div>
+<p>———. 2019b. <em>Rcmdcheck: Run ’R Cmd Check’ from ’R’ and Capture Results</em>. <a href="https://CRAN.R-project.org/package=rcmdcheck">https://CRAN.R-project.org/package=rcmdcheck</a>.</p>
+</div>
+<div>
+<p>———. 2020. <em>Cli: Helpers for Developing Command Line Interfaces</em>. <a href="https://CRAN.R-project.org/package=cli">https://CRAN.R-project.org/package=cli</a>.</p>
+</div>
+<div>
+<p>Csárdi, Gábor, and Winston Chang. 2020. <em>Processx: Execute and Control System Processes</em>. <a href="https://CRAN.R-project.org/package=processx">https://CRAN.R-project.org/package=processx</a>.</p>
+</div>
+<div>
+<p>Csárdi, Gábor, Kirill Müller, and Jim Hester. 2018. <em>Desc: Manipulate Description Files</em>. <a href="https://CRAN.R-project.org/package=desc">https://CRAN.R-project.org/package=desc</a>.</p>
+</div>
+<div>
+<p>Dipert, Alan, Barret Schloerke, and Barbara Borges. 2020. <em>Shinyloadtest: Load Test Shiny Applications</em>. <a href="https://CRAN.R-project.org/package=shinyloadtest">https://CRAN.R-project.org/package=shinyloadtest</a>.</p>
+</div>
+<div>
+<p>Dowle, Matt, and Arun Srinivasan. 2019. <em>Data.table: Extension of ‘Data.frame‘</em>. <a href="https://CRAN.R-project.org/package=data.table">https://CRAN.R-project.org/package=data.table</a>.</p>
+</div>
+<div>
+<p>Eddelbuettel, Dirk. 2013. <em>Seamless R and C++ Integration with Rcpp</em>. New York: Springer. <a href="https://doi.org/10.1007/978-1-4614-6868-4">https://doi.org/10.1007/978-1-4614-6868-4</a>.</p>
+</div>
+<div>
+<p>Eddelbuettel, Dirk, and James Joseph Balamuta. 2017. “Extending extitR with extitC++: A Brief Introduction to extitRcpp.” <em>PeerJ Preprints</em> 5 (August): e3188v1. <a href="https://doi.org/10.7287/peerj.preprints.3188v1">https://doi.org/10.7287/peerj.preprints.3188v1</a>.</p>
+</div>
+<div>
+<p>Eddelbuettel, Dirk, Romain Francois, JJ Allaire, Kevin Ushey, Qiang Kou, Nathan Russell, Douglas Bates, and John Chambers. 2020. <em>Rcpp: Seamless R and C++ Integration</em>. <a href="https://CRAN.R-project.org/package=Rcpp">https://CRAN.R-project.org/package=Rcpp</a>.</p>
+</div>
+<div>
+<p>Eddelbuettel, Dirk, and Romain François. 2011. “Rcpp: Seamless R and C++ Integration.” <em>Journal of Statistical Software</em> 40 (8): 1–18. <a href="https://doi.org/10.18637/jss.v040.i08">https://doi.org/10.18637/jss.v040.i08</a>.</p>
+</div>
+<div>
+<p>Fay, Colin. 2019. <em>Dockerfiler: Easy Dockerfile Creation from R</em>. <a href="https://CRAN.R-project.org/package=dockerfiler">https://CRAN.R-project.org/package=dockerfiler</a>.</p>
+</div>
+<div>
+<p>———. 2020a. <em>Attempt: Tools for Defensive Programming</em>. <a href="https://CRAN.R-project.org/package=attempt">https://CRAN.R-project.org/package=attempt</a>.</p>
+</div>
+<div>
+<p>———. 2020b. <em>Bubble: Launch and Interact with a Nodejs Session</em>.</p>
+</div>
+<div>
+<p>———. 2020c. <em>Crrry: ’Crrri’ Recipes for ’Shiny’</em>. <a href="https://github.com/ColinFay/crrry">https://github.com/ColinFay/crrry</a>.</p>
+</div>
+<div>
+<p>———. 2020d. <em>Dockerstats: A Wrapper Around ’Docker Stats’</em>. <a href="https://github.com/ColinFay/dockerstats">https://github.com/ColinFay/dockerstats</a>.</p>
+</div>
+<div>
+<p>———. 2020e. <em>Gargoyle: An Event-Based Framework for ’Shiny’</em>.</p>
+</div>
+<div>
+<p>———. 2020f. <em>Glouton: ’JS-Cookies’ for ’Shiny’</em>.</p>
+</div>
+<div>
+<p>———. 2020g. <em>Hexmake: Hex Stickers Maker</em>. <a href="https://github.com/colinfay/hexmake">https://github.com/colinfay/hexmake</a>.</p>
+</div>
+<div>
+<p>———. 2020h. <em>Minifyr: Minify Css, Html and Javascript Files</em>.</p>
+</div>
+<div>
+<p>———. 2020i. <em>Nessy: A ’Nes’ Css for ’Shiny’</em>. <a href="https://github.com/ColinFay/nessy">https://github.com/ColinFay/nessy</a>.</p>
+</div>
+<div>
+<p>———. 2020j. <em>Resume: Bootstrap Resume Template for ’Shiny’</em>.</p>
+</div>
+<div>
+<p>———. 2020k. <em>Skeleton: Skeleton Css for Shiny</em>.</p>
+</div>
+<div>
+<p>———. 2020l. <em>Tidytuesday201942: A Golem App for Tidy Tuesday</em>. <a href="http://www.github.com/ColinFay/tidytuesday201942">http://www.github.com/ColinFay/tidytuesday201942</a>.</p>
+</div>
+<div>
+<p>Fay, Colin, and Sebastien Rochette. 2020a. <em>Fakir: Create Fake Data in R for Tutorials</em>. <a href="https://github.com/Thinkr-open/fakir">https://github.com/Thinkr-open/fakir</a>.</p>
+</div>
+<div>
+<p>———. 2020b. <em>Shinipsum: Lorem-Ipsum-Like Helpers for Fast Shiny Prototyping</em>. <a href="https://github.com/Thinkr-open/shinipsum">https://github.com/Thinkr-open/shinipsum</a>.</p>
+</div>
+<div>
+<p>Garnier, Simon. 2018. <em>Viridis: Default Color Maps from ’Matplotlib’</em>. <a href="https://CRAN.R-project.org/package=viridis">https://CRAN.R-project.org/package=viridis</a>.</p>
+</div>
+<div>
+<p>Gillespie, Colin, and Robin Lovelace. 2017. <em>Efficient R Programming</em>. O’Reilly Media, Inc, USA.</p>
+</div>
+<div>
+<p>Granjon, David. 2019a. <em>Bs4Dash: A ’Bootstrap 4’ Version of ’Shinydashboard’</em>. <a href="https://CRAN.R-project.org/package=bs4Dash">https://CRAN.R-project.org/package=bs4Dash</a>.</p>
+</div>
+<div>
+<p>———. 2019b. <em>ShinydashboardPlus: Add More ’Adminlte2’ Components to ’Shinydashboard’</em>. <a href="https://CRAN.R-project.org/package=shinydashboardPlus">https://CRAN.R-project.org/package=shinydashboardPlus</a>.</p>
+</div>
+<div>
+<p>Granjon, David, Victor Perrier, and Isabelle Rudolf. 2019. <em>ShinyMobile: Mobile Ready ’Shiny’ Apps with Standalone Capabilities</em>. <a href="https://CRAN.R-project.org/package=shinyMobile">https://CRAN.R-project.org/package=shinyMobile</a>.</p>
+</div>
+<div>
 <p>Guyader, Vincent, Colin Fay, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
 </div>
-<div id="ref-R-remotes">
+<div>
+<p>Guyader, Vincent, and Sébastien Rochette. 2020. <em>Attachment: Deal with Dependencies</em>. <a href="https://CRAN.R-project.org/package=attachment">https://CRAN.R-project.org/package=attachment</a>.</p>
+</div>
+<div>
+<p>Henry, Lionel, and Hadley Wickham. 2020. <em>Purrr: Functional Programming Tools</em>. <a href="https://CRAN.R-project.org/package=purrr">https://CRAN.R-project.org/package=purrr</a>.</p>
+</div>
+<div>
+<p>Hester, Jim. 2020a. <em>Bench: High Precision Timing of R Expressions</em>. <a href="https://CRAN.R-project.org/package=bench">https://CRAN.R-project.org/package=bench</a>.</p>
+</div>
+<div>
+<p>———. 2020b. <em>Covr: Test Coverage for Packages</em>. <a href="https://CRAN.R-project.org/package=covr">https://CRAN.R-project.org/package=covr</a>.</p>
+</div>
+<div>
+<p>———. 2020c. <em>Glue: Interpreted String Literals</em>. <a href="https://CRAN.R-project.org/package=glue">https://CRAN.R-project.org/package=glue</a>.</p>
+</div>
+<div>
 <p>Hester, Jim, Gábor Csárdi, Hadley Wickham, Winston Chang, Martin Morgan, and Dan Tenenbaum. 2020. <em>Remotes: R Package Installation from Remote Repositories, Including ’Github’</em>. <a href="https://CRAN.R-project.org/package=remotes">https://CRAN.R-project.org/package=remotes</a>.</p>
 </div>
-<div id="ref-R-testthat">
-<p>Wickham, Hadley. 2020. <em>Testthat: Unit Testing for R</em>. <a href="https://CRAN.R-project.org/package=testthat">https://CRAN.R-project.org/package=testthat</a>.</p>
+<div>
+<p>Hester, Jim, and Hadley Wickham. 2020a. <em>Fs: Cross-Platform File System Operations Based on ’Libuv’</em>. <a href="https://CRAN.R-project.org/package=fs">https://CRAN.R-project.org/package=fs</a>.</p>
+</div>
+<div>
+<p>———. 2020b. <em>Vroom: Read and Write Rectangular Text Data Quickly</em>. <a href="https://CRAN.R-project.org/package=vroom">https://CRAN.R-project.org/package=vroom</a>.</p>
+</div>
+<div>
+<p>Izrailev, Sergei. 2014. <em>Tictoc: Functions for Timing R Scripts, as Well as Implementations of Stack and List Structures.</em> <a href="https://CRAN.R-project.org/package=tictoc">https://CRAN.R-project.org/package=tictoc</a>.</p>
+</div>
+<div>
+<p>Kim, Gene. 2016. <em>The Devops Handbook: How to Create World-Class Agility, Reliability, and Security in Technology Organizations</em>. IT Revolution Press. <a href="https://www.xarg.org/ref/a/1942788002/">https://www.xarg.org/ref/a/1942788002/</a>.</p>
+</div>
+<div>
+<p>Krug, Steve. 2014. <em>Don’t Make Me Think, Revisited: A Common Sense Approach to Web Usability (3rd Edition) (Voices That Matter)</em>. New Riders.</p>
+</div>
+<div>
+<p>Lemaire, Maude. 2020. <em>Refactoring at Scale</em>. Henry Holt. <a href="https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/">https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/</a>.</p>
+</div>
+<div>
+<p>Lesur, Romain, and Christophe Dervieux. 2020. <em>Crrri: An Interface with Headless Chromium/Chrome</em>.</p>
+</div>
+<div>
+<p>Lumley, Thomas. 2013. <em>Dichromat: Color Schemes for Dichromats</em>. <a href="https://CRAN.R-project.org/package=dichromat">https://CRAN.R-project.org/package=dichromat</a>.</p>
+</div>
+<div>
+<p>Müller, Kirill. 2017. <em>Here: A Simpler Way to Find Your Files</em>. <a href="https://CRAN.R-project.org/package=here">https://CRAN.R-project.org/package=here</a>.</p>
+</div>
+<div>
+<p>Müller, Kirill, and Hadley Wickham. 2020. <em>Tibble: Simple Data Frames</em>. <a href="https://CRAN.R-project.org/package=tibble">https://CRAN.R-project.org/package=tibble</a>.</p>
+</div>
+<div>
+<p>Müller, Kirill, Hadley Wickham, David A. James, and Seth Falcon. 2020. <em>RSQLite: ’SQLite’ Interface for R</em>. <a href="https://CRAN.R-project.org/package=RSQLite">https://CRAN.R-project.org/package=RSQLite</a>.</p>
+</div>
+<div>
+<p>Nüst, Daniel, Dirk Eddelbuettel, Dom Bennett, Robrecht Cannoodt, Dav Clark, Gergely Daroczi, Mark Edmondson, et al. 2020. “The Rockerverse: Packages and Applications for Containerization with R.”</p>
+</div>
+<div>
+<p>Ooms, Jeroen. 2014. “The Jsonlite Package: A Practical and Consistent Mapping Between Json Data and R Objects.” <em>arXiv:1403.2805 [stat.CO]</em>. <a href="https://arxiv.org/abs/1403.2805">https://arxiv.org/abs/1403.2805</a>.</p>
+</div>
+<div>
+<p>———. 2020. <em>Jsonlite: A Robust, High Performance Json Parser and Generator for R</em>. <a href="https://CRAN.R-project.org/package=jsonlite">https://CRAN.R-project.org/package=jsonlite</a>.</p>
+</div>
+<div>
+<p>Pebesma, Edzer. 2018. “Simple Features for R: Standardized Support for Spatial Vector Data.” <em>The R Journal</em> 10 (1): 439–46. <a href="https://doi.org/10.32614/RJ-2018-009">https://doi.org/10.32614/RJ-2018-009</a>.</p>
+</div>
+<div>
+<p>———. 2020. <em>Sf: Simple Features for R</em>. <a href="https://CRAN.R-project.org/package=sf">https://CRAN.R-project.org/package=sf</a>.</p>
+</div>
+<div>
+<p>Raymond, Eric S. 2003. <em>The Art of Unix Programming (the Addison-Wesley Professional Computng Series)</em>. Addison-Wesley.</p>
+</div>
+<div>
+<p>Roebuck, P. 2014. <em>Matlab: MATLAB Emulation Package</em>. <a href="https://CRAN.R-project.org/package=matlab">https://CRAN.R-project.org/package=matlab</a>.</p>
+</div>
+<div>
+<p>R Special Interest Group on Databases (R-SIG-DB), Hadley Wickham, and Kirill Müller. 2019. <em>DBI: R Database Interface</em>. <a href="https://CRAN.R-project.org/package=DBI">https://CRAN.R-project.org/package=DBI</a>.</p>
+</div>
+<div>
+<p>RStudio, and Inc. 2019. <em>Htmltools: Tools for Html</em>. <a href="https://CRAN.R-project.org/package=htmltools">https://CRAN.R-project.org/package=htmltools</a>.</p>
+</div>
+<div>
+<p>Rudis, Bob, and Al Danial. 2020. <em>Cloc: Count Lines of Code, Comments and Whitespace in Source Files and Archives</em>. <a href="https://gitlab.com/hrbrmstr/cloc">https://gitlab.com/hrbrmstr/cloc</a>.</p>
+</div>
+<div>
+<p>Sakamoto, Yasutaka, Shinsuke Matsumoto, Seiki Tokunaga, Sachio Saiki, and Masahide Nakamura. 2015. “Empirical Study on Effects of Script Minification and HTTP Compression for Traffic Reduction.” In <em>2015 Third International Conference on Digital Information, Networking, and Wireless Communications (DINWC)</em>. IEEE. <a href="https://doi.org/10.1109/dinwc.2015.7054230">https://doi.org/10.1109/dinwc.2015.7054230</a>.</p>
+</div>
+<div>
+<p>Sidi, Jonathan. 2020. <em>Covrpage: Create a Readme Summary Page for Github Testthat and Covr Outputs</em>. <a href="https://github.com/metrumresearchgroup/covrpage">https://github.com/metrumresearchgroup/covrpage</a>.</p>
+</div>
+<div>
+<p>Sievert, Carson. 2020. <em>Interactive Web-Based Data Visualization with R, Plotly, and Shiny</em>. Chapman; Hall/CRC. <a href="https://plotly-r.com">https://plotly-r.com</a>.</p>
+</div>
+<div>
+<p>Sievert, Carson, Chris Parmer, Toby Hocking, Scott Chamberlain, Karthik Ram, Marianne Corvellec, and Pedro Despouy. 2020. <em>Plotly: Create Interactive Web Graphics via ’Plotly.js’</em>. <a href="https://CRAN.R-project.org/package=plotly">https://CRAN.R-project.org/package=plotly</a>.</p>
+</div>
+<div>
+<p>Ushey, Kevin. 2020. <em>Renv: Project Environments</em>. <a href="https://CRAN.R-project.org/package=renv">https://CRAN.R-project.org/package=renv</a>.</p>
+</div>
+<div>
+<p>Wickham, Hadley. 2011. “Testthat: Get Started with Testing.” <em>The R Journal</em> 3: 5–10. <a href="https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf">https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf</a>.</p>
+</div>
+<div>
+<p>———. 2016. <em>Ggplot2: Elegant Graphics for Data Analysis</em>. Springer-Verlag New York. <a href="https://ggplot2.tidyverse.org">https://ggplot2.tidyverse.org</a>.</p>
+</div>
+<div>
+<p>———. 2019a. <em>Tidyverse: Easily Install and Load the ’Tidyverse’</em>. <a href="https://CRAN.R-project.org/package=tidyverse">https://CRAN.R-project.org/package=tidyverse</a>.</p>
+</div>
+<div>
+<p>———. 2020. <em>Testthat: Unit Testing for R</em>. <a href="https://CRAN.R-project.org/package=testthat">https://CRAN.R-project.org/package=testthat</a>.</p>
+</div>
+<div>
+<p>———. 2019b. <em>Advanced R, Second Edition</em>. Chapman; Hall/CRC.</p>
+</div>
+<div>
+<p>Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. “Welcome to the tidyverse.” <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.</p>
+</div>
+<div>
+<p>Wickham, Hadley, and Jennifer Bryan. 2019. <em>Readxl: Read Excel Files</em>. <a href="https://CRAN.R-project.org/package=readxl">https://CRAN.R-project.org/package=readxl</a>.</p>
+</div>
+<div>
+<p>———. 2020a. <em>R Packages</em>. <a href="https://r-pkgs.org/">https://r-pkgs.org/</a>.</p>
+</div>
+<div>
+<p>———. 2020b. <em>Usethis: Automate Package and Project Setup</em>. <a href="https://CRAN.R-project.org/package=usethis">https://CRAN.R-project.org/package=usethis</a>.</p>
+</div>
+<div>
+<p>Wickham, Hadley, Winston Chang, Lionel Henry, Thomas Lin Pedersen, Kohske Takahashi, Claus Wilke, Kara Woo, Hiroaki Yutani, and Dewey Dunnington. 2020. <em>Ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics</em>. <a href="https://CRAN.R-project.org/package=ggplot2">https://CRAN.R-project.org/package=ggplot2</a>.</p>
+</div>
+<div>
+<p>Wickham, Hadley, Peter Danenberg, Gábor Csárdi, and Manuel Eugster. 2020. <em>Roxygen2: In-Line Documentation for R</em>. <a href="https://CRAN.R-project.org/package=roxygen2">https://CRAN.R-project.org/package=roxygen2</a>.</p>
+</div>
+<div>
+<p>Wickham, Hadley, Romain François, Lionel Henry, and Kirill Müller. 2020. <em>Dplyr: A Grammar of Data Manipulation</em>. <a href="https://CRAN.R-project.org/package=dplyr">https://CRAN.R-project.org/package=dplyr</a>.</p>
+</div>
+<div>
+<p>Wickham, Hadley, and Garrett Grolemund. 2017. <em>R for Data Science: Import, Tidy, Transform, Visualize, and Model Data</em>. O’Reilly Media. <a href="https://www.xarg.org/ref/a/1491910399/">https://www.xarg.org/ref/a/1491910399/</a>.</p>
+</div>
+<div>
+<p>Wickham, Hadley, and Jim Hester. 2020. <em>Pkgbuild: Find Tools Needed to Build R Packages</em>. <a href="https://CRAN.R-project.org/package=pkgbuild">https://CRAN.R-project.org/package=pkgbuild</a>.</p>
+</div>
+<div>
+<p>Wickham, Hadley, Jim Hester, and Winston Chang. 2020. <em>Devtools: Tools to Make Developing R Packages Easier</em>. <a href="https://CRAN.R-project.org/package=devtools">https://CRAN.R-project.org/package=devtools</a>.</p>
+</div>
+<div>
+<p>Wickham, Hadley, Jim Hester, and Romain Francois. 2018. <em>Readr: Read Rectangular Text Data</em>. <a href="https://CRAN.R-project.org/package=readr">https://CRAN.R-project.org/package=readr</a>.</p>
+</div>
+<div>
+<p>Wickham, Hadley, Jim Hester, Kirill Müller, and Daniel Cook. 2017. <em>Memoise: Memoisation of Functions</em>. <a href="https://CRAN.R-project.org/package=memoise">https://CRAN.R-project.org/package=memoise</a>.</p>
+</div>
+<div>
+<p>Wickham, Hadley, and Edgar Ruiz. 2020. <em>Dbplyr: A ’Dplyr’ Back End for Databases</em>. <a href="https://CRAN.R-project.org/package=dbplyr">https://CRAN.R-project.org/package=dbplyr</a>.</p>
+</div>
+<div>
+<p>Xie, Yihui. 2014. “Knitr: A Comprehensive Tool for Reproducible Research in R.” In <em>Implementing Reproducible Computational Research</em>, edited by Victoria Stodden, Friedrich Leisch, and Roger D. Peng. Chapman; Hall/CRC. <a href="http://www.crcpress.com/product/isbn/9781466561595">http://www.crcpress.com/product/isbn/9781466561595</a>.</p>
+</div>
+<div>
+<p>———. 2015. <em>Dynamic Documents with R and Knitr</em>. 2nd ed. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://yihui.org/knitr/">https://yihui.org/knitr/</a>.</p>
+</div>
+<div>
+<p>———. 2016. <em>Bookdown: Authoring Books and Technical Documents with R Markdown</em>. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://github.com/rstudio/bookdown">https://github.com/rstudio/bookdown</a>.</p>
+</div>
+<div>
+<p>———. 2020a. <em>Bookdown: Authoring Books and Technical Documents with R Markdown</em>. <a href="https://CRAN.R-project.org/package=bookdown">https://CRAN.R-project.org/package=bookdown</a>.</p>
+</div>
+<div>
+<p>———. 2020b. <em>Knitr: A General-Purpose Package for Dynamic Report Generation in R</em>. <a href="https://CRAN.R-project.org/package=knitr">https://CRAN.R-project.org/package=knitr</a>.</p>
+</div>
+<div>
+<p>———. 2020c. <em>Xfun: Miscellaneous Functions by ’Yihui Xie’</em>. <a href="https://CRAN.R-project.org/package=xfun">https://CRAN.R-project.org/package=xfun</a>.</p>
+</div>
+<div>
+<p>Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. <em>R Markdown: The Definitive Guide</em>. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://bookdown.org/yihui/rmarkdown">https://bookdown.org/yihui/rmarkdown</a>.</p>
+</div>
+<div>
+<p>Xie, Yihui, Joe Cheng, and Xianying Tan. 2020. <em>DT: A Wrapper of the Javascript Library ’Datatables’</em>. <a href="https://CRAN.R-project.org/package=DT">https://CRAN.R-project.org/package=DT</a>.</p>
 </div>
 </div>
-<div class="footnotes">
-<hr />
-<ol start="41">
-<li id="fn41"><p>It was first developed by Linus Torvalds, the very same man behind Linux.<a href="secure.html#fnref41" class="footnote-back">↩︎</a></p></li>
-<li id="fn42"><p>For example: “Added a graph in the analysis tab”, or “Fixed the docx export bug”<a href="secure.html#fnref42" class="footnote-back">↩︎</a></p></li>
-<li id="fn43"><p>If you want to modify some code or have to go back in time, the best way to do it is to create a new commit with these changes or use adequate git commands.<a href="secure.html#fnref43" class="footnote-back">↩︎</a></p></li>
-<li id="fn44"><p>There are two strategies for merging <code>dev</code>: either a “merge strategy” or a “rebase strategy”. Both strategies have pros and cons. We work with the “rebase strategy” to force ourselves to stay updated. We also noticed that this strategy lower the risk of bad merging that can cause code loss. However, this requires a lot of communication between developers and a good knowledge of git.<a href="secure.html#fnref44" class="footnote-back">↩︎</a></p></li>
-</ol>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <hr/>
 <footer>
 <a href="rtask.thinkr.fr"><img src="img/logo400_129.png" alt="ThinkR Website"/></a>
@@ -753,8 +850,8 @@ This docker image can be used as the source image for your <code>GitLab CI</code
           </div>
         </div>
       </div>
-<a href="step-secure.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="deploy-golem.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="optimjs.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -785,7 +882,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/13-secure.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/19-references.Rmd",
 "text": "Edit"
 },
 "history": {

@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 14 Deploy your application | Engineering Production-Grade Shiny Apps</title>
+  <title>Chapter 2 Planning Ahead | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 14 Deploy your application | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:title" content="Chapter 2 Planning Ahead | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
   
   <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 14 Deploy your application | Engineering Production-Grade Shiny Apps" />
+  <meta name="twitter:title" content="Chapter 2 Planning Ahead | Engineering Production-Grade Shiny Apps" />
   
   <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-05-11" />
+<meta name="date" content="2020-05-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="secure.html"/>
-<link rel="next" href="when-optimize.html"/>
+<link rel="prev" href="successfulshinyapp.html"/>
+<link rel="next" href="structure.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
@@ -442,168 +442,144 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="deploy-golem" class="section level1">
-<h1><span class="header-section-number">Chapter 14</span> Deploy your application</h1>
+<div id="planning" class="section level1">
+<h1><span class="header-section-number">Chapter 2</span> Planning Ahead</h1>
+<div id="working-with-a-long-term-mindset" class="section level2">
+<h2><span class="header-section-number">2.1</span> Working with a “long-term” mindset</h2>
 <blockquote>
-<p>Your deploys should be as boring, straightforward, and stress-free as possible.</p>
+<p>“Rome ne fut pas faite toute en un jour”</p>
+</blockquote>
+<p>French proverb</p>
+<div id="prepare-for-success" class="section level3">
+<h3><span class="header-section-number">2.1.1</span> Prepare for success</h3>
+<p>Whatever your ambitions for your Shiny application are, you should take time today to set robust foundations that will save a lot of time in the future.</p>
+<p>A common thing you will hear about Shiny is that it is a good prototyping tool.
+This can not be denied.
+Building a Proof of Concept (PoC) for an app is relatively straightforward if you compare to what it needs to build applications in other languages.
+With Shiny, you can build a “it works on my machine” web application in a couple of hours, and show it to your team, your boss, your investors…
+Thanks to the way Shiny was designed, you do not have to care about websockets, ports, HTML, JavaScript libraries, and all the things that are elegantly bundled into Shiny.</p>
+<p>Hence, you can have a quick, hacky application that will work on your machine, and that, very rapidly.
+But that is not the way you should start.
+Indeed, starting with hacky foundations will lead to two possibilities:</p>
+<ul>
+<li>You will have to rewrite everything from scratch to have a robust application for production.</li>
+<li>If you do not want to rewrite all the code, you will get stuck with a legacy codebase for the application, built on top of hacky functions, and sent to production using hacky solutions.</li>
+</ul>
+<p>Either way, that is a heavy technical debt.</p>
+<p>Shiny is a good tool for prototyping, but there is no harm in starting your application on solid ground, even for a prototype: the sooner you start with a robust framework the better, and the longer you wait the harder it gets to convert your application to a production-ready one.
+The larger the codebase, the harder it is to untangle everything and make it work.</p>
+<p>In this book, we will present a framework called <code>{golem}</code>, which is a toolbox for building production-grade Shiny applications.
+Even if <code>{golem}</code> is focused on production, there is no reason not to use it for your proof of concepts: starting a new <code>{golem}</code> project is relatively straightforward, and even if you do not use the advanced features, you can use it for very small apps.
+The benefit of starting straight inside a <code>{golem}</code> application really outweigh the cost.
+We hear a lot the question “<em>When should I switch to <code>{golem}</code>?</em>”, and the answer is simple: do not switch to <code>{golem}</code> , start with it.
+That way, you are getting ready for complexity, and if, one day, you need to turn this small app into a production app, the foundations are there.</p>
+</div>
+<div id="develop-with-the-kiss-principle" class="section level3">
+<h3><span class="header-section-number">2.1.2</span> Develop with the KISS principle</h3>
+<blockquote>
+<p>The KISS principle states that most systems work best if they are kept simple rather than made complicated; therefore, simplicity should be a key goal in design, and unnecessary complexity should be avoided.</p>
 </blockquote>
 <!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
 <style>.right{ text-align: right;}</style>
 <!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
 <div class="right">
-<a href="https://zachholman.com/posts/deploying-software">How to Deploy Software - Zach Holman</a>
+<a href="https://en.wikipedia.org/wiki/KISS_principle">KISS principle</a>
 </div>
-<p>Once your app is built, you are ready to deploy it!
-In other words, your software is now ready to be used by other users, be it from
-There are two main ways to share your application and make it available to others: by creating a package and making it installable, or by sending it to a remote server.
-We will see in this part how you can do that using <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span>.</p>
-<div id="before-deployment-check-list" class="section level2">
-<h2><span class="header-section-number">14.1</span> Before deployment Check-list</h2>
-<p>Here is a quick checklist of things to think about once your application is ready, and before sending it to production</p>
+<p>The KISS principle, as “Keep It Simple, Stupid”, should drive the implementation of features in the application to allow anyone in the future, including original developers, to take over on the development.</p>
+<p>The story behind this principle is supposed to be that Kelly Johnson, lead engineer at the Lockheed Skunk Works, gave his workers a set of very common tools and said that every airplane should be repairable with these tools, and these tools only, so that repairing an aircraft should be possible for any average engineer.</p>
+<p>This should be a principle to keep in mind when building application.
+Indeed, large scale Shiny projects can lead to many people working on the code base, for a long period of time.
+A large team means a variety of skills, with some common ground in Shiny development, but potentially various levels when it comes to R, web development, or production engineering.
+So when choosing how and what to implement, try to make a rule to go for the simplest solution,<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a> <em>i.e.</em> the one that any common Shiny Developer would be able to understand and maintain.
+If you go for an exotic solution or a complex technology, be sure that you are doing it for a good reason: unknown or hard to grasp technology reduces the chance of finding someone that will be able to maintain that piece of code in the future, and lower the smoothness of collaboration, as “<em>Code you can easily comprehend elevates absolutely everyone on your team, no matter their tenure or experience level</em>” <span class="citation">(Lemaire <a href="#ref-lemaire2020" role="doc-biblioref">2020</a>)</span>.</p>
+</div>
+</div>
+<div id="working-as-a-team-tools-structure" class="section level2">
+<h2><span class="header-section-number">2.2</span> Working as a team: Tools &amp; Structure</h2>
+<p>Working as a team, whatever the coding project, requires adequate tools, discipline and organization.
+Complex Shiny Apps usually imply that several people will work on the application.
+For example, at <a href="//rtask.thinkr.fr">ThinkR</a>, 3 to 4 people usually work in parallel on the same application, but there might be more people involved on larger projects.
+The choice of tools and how the team is structured is crucial for a successful application.</p>
+<div id="from-the-tools-point-of-view" class="section level3">
+<h3><span class="header-section-number">2.2.1</span> From the tools point of view</h3>
+<div id="version-control-test-all-the-things" class="section level4">
+<h4><span class="header-section-number">2.2.1.1</span> Version Control &amp; Test all the things</h4>
+<p>To get informed about a code break during development, you will need to write tests for your app, and use continuous integration (CI) so that you are sure this is automatically detected.<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a>
+When you are working on a complex application, chances are that you will be working on it for a significant period of time, meaning that you will write code, modify it, use it, go back to it after a few weeks, change some other things, and probably break things.
+Breaking things is a natural process of software engineering, notably when working on a piece of code during a long period.
+Remember the last chapter where we defined that complex applications are too large to be understood fully?
+Adding code that breaks the codebase will happen with complex app, so the sooner you take measure to solve these changes, the better.</p>
+<p>As you can not prevent code to break, you should at least get the tooling to:</p>
 <ul>
-<li><p><input type="checkbox" disabled="" />
-<code>devtools::check()</code>, run from the command line, returns 0 errors, 0 warnings, 0 notes</p></li>
-<li><p><input type="checkbox" disabled="" />
-The current version number is valid, <em>i.e</em> if the current app is an update, the version number has been bumped</p></li>
-<li><p><input type="checkbox" disabled="" />
-Everything is fully documented</p></li>
-<li><p><input type="checkbox" disabled="" />
-Test coverage is good</p></li>
-<li><p><input type="checkbox" disabled="" />
-The contact and debugging processes are clear and everybody involves in the project management knows what to expect</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The server it is deployed on has all the necessary software installed (Docker, Connect, Shiny Server…) to make the application run</p></li>
-<li><p><input type="checkbox" disabled="" />
-The server has all the system requirements needed (<em>i.e</em> the system libraries), and if not, they are installed with the application (if it’s dockerized)</p></li>
-<li><p><input type="checkbox" disabled="" />
-The application, if deployed on a server, will be deployed on a port which will be accessible by the users</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The environment variables from the production server are managed inside the application</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The app is launched on the correct port, or at least this port can be configured via environment variable</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The server where the app is deployed have access to the data sources (database, API…)</p></li>
-<li><p><input type="checkbox" disabled="" />
-If the app record data, there are backups for these data.</p></li>
+<li>Be informed that the codebase is broken: this is the role of tests combined with CI</li>
+<li>Be able to identify changes between versions, and potentially, get back in time to a previous code base: this is the role of version control</li>
 </ul>
+<p>We will go deeper into testing and version control in <a href="step-secure.html#step-secure">chapter 14</a>.</p>
 </div>
-<div id="sharing-your-app-as-a-package" class="section level2">
-<h2><span class="header-section-number">14.2</span> Sharing your app as a package</h2>
-<div id="install-on-your-machine" class="section level3">
-<h3><span class="header-section-number">14.2.1</span> Install on your machine</h3>
-<p>A Shiny application built with <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> is <strong>by definition</strong> an R package.
-This Shiny App as a Package is also helpful when it comes to deploying your application: packages are designed to be shareable pieces of R code.</p>
-<p>So before sending it to a remote server or sharing it to the world, the first step is testing if the package can be installed on your own computer.
-To do that, when you are in the project corresponding to the golem you built, you can call <code>remotes::install_local()</code> to install the application on your computer.
-Of course, if you are somewhere else on your machine, you can call <code>remotes::install_local("path/to/app")</code>.
-If you are using the RStudio IDE, you can also click on the <code>Build</code> tab, then click on the <code>Install and Restart</code> button.</p>
-<p>This should restart your R session, and call <code>library(yourpackagename)</code>.
-Then, try the <code>run_app()</code> function to check that the app can be launched.</p>
-</div>
-<div id="share-as-built-package" class="section level3">
-<h3><span class="header-section-number">14.2.2</span> Share as built package</h3>
-<div id="local-build" class="section level4">
-<h4><span class="header-section-number">14.2.2.1</span> Local build</h4>
-<p>Building an app as a package also means that this app can be bundled into an archive, and then shared, either as is or using a package repository like the CRAN.</p>
-<p>To do that, you first need an bundled version of your app, which can be created using the <code>build()</code> function from <code>{pkgbuild}</code> <span class="citation">(Wickham and Hester <a href="#ref-R-pkgbuild" role="doc-biblioref">2020</a>)</span> in the same working directory as your application.
-Calling this function will create a .tar.gz file that is called <code>mygolem_0.0.1.tar.gz</code> (of course with the name of your package).
-Once you have this <code>tar.gz</code>, you can send it to your favorite package repository.</p>
-<p>You can also share the file as is with others.
-If you do so, they will have to install the app with <code>remotes::install_local("path/to/tar.gz")</code>, that will take care of doing a full installation of the app, including installing the required dependencies.<br />
-Then, they can do <code>library(yourpackagename)</code> and <code>run_app()</code> on their machine.</p>
-</div>
-<div id="send-to-a-package-repository" class="section level4">
-<h4><span class="header-section-number">14.2.2.2</span> Send to a package repository</h4>
-<p>The upside of building the application <code>{golem}</code>, <em>i.e</em> as a package, is that you can share your application on a remote package manager, the more widely used for example on the CRAN like <code>{dccvalidator}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-dccvalidator"><strong>???</strong></span>)</span>, or on BioConductor like <code>{spatialLIBD}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="R-spatialLIBD"><strong>???</strong></span>)</span>.
-But any other package manager will work: for example if the company uses RStudio Package Manager, your application can be installed here as any other package.
-If your application is open-source, the package structure also allows to install from GitHub, by using the <code>remotes::install_github()</code> function.<a href="#fn45" class="footnote-ref" id="fnref45"><sup>45</sup></a>
-For example, this is what you can do with <code>{hexmake}</code>, or <code>{tidytuesday}</code>: as they are open-source packages, they can be installed from GitHub.
-Then, once your application is installed as a package on the users’ machines, they can do <code>library(yourpackagename)</code> and <code>run_app()</code>.</p>
-<p>The advantage of this solution being that R users are familiar with package installation, so it makes using your application easier for them.
-Also, and we will see it in the next section, but making your application available as a standard R package makes it easier to deploy it: for example if your RStudio Connect is coupled with your RStudio Package Manager, the deployment file just have to contain one line launching the application.</p>
-<p>Note that releasing to CRAN or BioConductor requires extra effort: you have to comply to a series of rules.
-But good news: as you have been following the best practices from this book, you should not have to put that much extra efforts!</p>
-<p>Know more about releasing on CRAN:</p>
+<div id="small-is-beautiful" class="section level4">
+<h4><span class="header-section-number">2.2.1.2</span> Small is beautiful</h4>
+<p>Building an application with multiple small and independent pieces will lighten your development process and your mental load.
+Previous chapter introduced the notion of complexity in size, where the app grows so large that it is very hard to have a good grasp of it.
+A large code base implies that the safe way to work is to split the app into pieces.<br />
+Splitting a Shiny project is made possible by following two methods:</p>
 <ul>
-<li><a href="https://cran.r-project.org/web/packages/submission_checklist.html">Checklist for CRAN submissions</a></li>
-<li><a href="https://cran.r-project.org/web/packages/policies.html">CRAN Repository Policy</a></li>
-<li><a href="https://r-pkgs.org/release.html">R packages - Chapter 18 Releasing a package</a></li>
-<li><a href="https://kbroman.org/pkg_primer/pages/cran.html">Getting your R package on CRAN</a></li>
-<li><a href="https://github.com/ThinkR-open/prepare-for-cran">prepare-for-cran - A Collaborative list of things to know before submitting to CRAN</a></li>
+<li>Split your app into Shiny Modules, so that your app can be though of as a tree, making it possible for every developer to concentrate on one node, and only one, instead of having to think about the global infrastructure when implementing features</li>
 </ul>
+
+<div class="figure" style="text-align: center"><span id="fig:02-planning-ahead-1"></span>
+<img src="img/app_tree.png" alt="Representation of a Shiny application with its modules and sub-modules." width="100%" />
+<p class="caption">
+FIGURE 2.1: Representation of a Shiny application with its modules and sub-modules.
+</p>
+</div>
+<ul>
+<li>Extract your core “non-reactive” functions, that we will also call the “business logic”, and include them in external files, so that you can work on these outside of the app.
+Working on independent functions to implement features will prevent you to relaunch the whole application every time you need to add something new.</li>
+</ul>
+<p>We will get back to Shiny modules and how to organize your project in the next chapter.</p>
 </div>
 </div>
+<div id="from-the-team-point-of-view" class="section level3">
+<h3><span class="header-section-number">2.2.2</span> From the Team Point of View</h3>
+<p>We recommend to define two kind of developers: a unique person (or maybe two) to be in charge of supervising the whole project and developers that will work on specific features.</p>
+<div id="a-person-in-charge" class="section level4">
+<h4><span class="header-section-number">2.2.2.1</span> A person in charge</h4>
+<p>The person in charge of the development will have an complete view of the entire project and manage the team so that all developers implement features that fit together.</p>
+<p>With complex applications, it can be hard to have the complete understanding of what the entire app is doing.
+Most of the time, it is not necessary for all developers to have this complete picture.
+By defining one person in charge, this “manager” will have to get the whole picture: what each part of the software is doing, how to make everything work together, avoid development conflicts, and of course check that, at the end of the day, the results returned by the built application are the correct ones.</p>
+<p>The project manager will be the one that kicks off the project, and write the first draft of the application.
+If you follow this book’s workflow, this person will first create a <code>{golem}</code> project, fill the information, and define the application structure by providing the main modules, and potentially work on the prototyped UI of the app.</p>
+<p>Once the skeleton of the app is created, this person in charge will list all the things that have to be done.
+We strongly suggest to use git with a graphical interface (GitLab, GitHub, Bitbucket, …), as the graphical interface of these services will help you manage the project.
+These tasks are defined as issues, and will be closed during development.
+These interfaces can also be used to set continuous integration.</p>
+<p>If the team follows a <code>git flow</code> (described in chapter @(ref: secure)), the manager will also be in charge of reviewing and accepting the pull/merge requests to the main <code>dev</code> branch if they solve the associated issues.</p>
+<p>Do not worry if this sounds like a foreign language to you, we will get back to this method later in this book (chapter @(ref: secure)).</p>
 </div>
-<div id="deploying-apps-with-golem" class="section level2">
-<h2><span class="header-section-number">14.3</span> Deploying Apps with <code>{golem}</code></h2>
-<p>The other way to make your application available to others is by sending it to a remote server that can serve Shiny applications.
-In other words, instead of having to install the application on their machines, they can crack open a web browser and navigate to the URL where the application is deployed.
-Deploying to a server is the solution of choice when you want to make your application available to a wide public: on a server, visitors do not have to have R installed on their computer, they do not have to install a package or launch it, they can just browse the application like any other web application.
-This solution is also a common choice in companies that have strict security requirements: the IT team might not be willing to let everyone install software on their machine, and sharing an application on a server allows them more control over who can access the application.
-For example, deploying on a server allows to use proxy, and to filter by IP: then, only a subset of people can have access to the application.</p>
-<p>When using <code>{golem}</code>, you can open the <code>dev/03_deploy.R</code> and find the functions for server deployment.
-At the time of writing this book, there are two main ways to deploy a shiny app on a server:</p>
-<ul>
-<li>RStudio’s solutions</li>
-<li>A docker based solution</li>
-</ul>
-<div id="rstudio-environments" class="section level3">
-<h3><span class="header-section-number">14.3.1</span> RStudio Environments</h3>
-<p>Rstudio proposes three services to deploy Shiny application :</p>
-<ul>
-<li><p>shinyapps.io, an on-premise solution that can serve Shiny application (freemium)</p></li>
-<li><p>Shiny-server, a software you have to install on your own server, and that can be used to deploy multiple applications (you can find either an open source or a professional edition)</p></li>
-<li><p>Rstudio connect, a server-based solution that can deploy Shiny applications and markdown documents (and other kind of content)</p></li>
-</ul>
-<p>Each of these platforms has its own function to create an <code>app.R</code> file that is to be used as a launch script of each platform.</p>
-<ul>
-<li><p><code>golem::add_rstudioconnect_file()</code></p></li>
-<li><p><code>golem::add_shinyappsio_file()</code></p></li>
-<li><p><code>golem::add_shinyserver_file()</code></p></li>
-</ul>
-<p>What these <code>app.R</code> files do is calling a <code>pkgload::load_all()</code> function, that will mimic the launch of your package, and then call the <code>run_app()</code> function from your packaged app.
-Note that if you need to configure the way your app is launched on these platforms (for example if you need to pass arguments to the <code>run_app()</code> function), you will have to edit this file.</p>
-<p>Note that when using these functions, you will be able to use the “One click deploy” for these platforms: on the top right of these <code>app.R</code>, use the Blue Button to deploy to server.</p>
-<p>Another way to deploy your <code>{golem}</code> based app to Shiny server and to Connect is to link these two software to a local repository (for example an RStudio Package Manager), and then to only use <code>mypackage::run_app()</code> to the <code>app.R</code>.</p>
-</div>
-<div id="docker-1" class="section level3">
-<h3><span class="header-section-number">14.3.2</span> Docker</h3>
-<p>Docker is an open source software used to build and deploy applications in containers.
-Docker has become an core solution in the DevOps world and a lot of server solution are based on it.
-See the “Strengthen” chapter for a more complete introduction to Docker.</p>
-<p>You will find the function for creating a <code>Dockerfile</code> for your <code>{golem}</code> app inside the <code>03_deploy.R</code> file, which contains a series of 3 functions:</p>
-<ul>
-<li><code>golem::add_dockerfile()</code></li>
-<li><code>golem::add_dockerfile_shinyproxy()</code></li>
-<li><code>golem::add_dockerfile_heroku()</code></li>
-</ul>
-<p>The first function creates a “generic” <code>Dockerfile</code>, in the sense that it is not specific to any platform, and would work out of the box for your local machine.
-The second one is meant for <a href="https://www.shinyproxy.io/">ShinyProxy</a>, an open source solution for deploying containarized Shiny application, and the third for <a href="https://www.heroku.com/">Heroku</a>, an online service that can serve containerized applications (not specific to Shiny).</p>
-<p>Other platforms can run Docker containers, notably AWS and Google Cloud Engine.
-At the time of writing these lines, <code>{golem}</code> does not provide support for these environment, but that is on the ToDo list!</p>
-<p>Note that the <code>Dockerfile</code> creation in <code>{golem}</code> tries to replicate your local environment as precisely as possible, notably by matching your R version, and the version of the packages you have installed on your machine.
-System requirements are also added when they are found on <a href="https://sysreqs.r-hub.io/">sysreqs.r-hub.io</a>).
-Otherwise you might have to add them manually.</p>
+<div id="developers" class="section level4">
+<h4><span class="header-section-number">2.2.2.2</span> Developers</h4>
+<p>Developers will focus on small features.
+If the person in charge has correctly separated the work between developers of the team, they will be focusing on one or more parts of the application, but do not need to know every single bit of what the application is doing.
+In a perfect world, the application is split in various Shiny Modules, one module equals one file and each member of the team will be assigned to the development of one or more modules.</p>
+<p>It is simpler to work in this context where one developer is assigned to one module, although we know that in reality it may be a little more complex, and several members of the team might go back and forth working on a common module.
+But, the person in charge will be there to help make all the pieces to fit together.</p>
 
 </div>
 </div>
 </div>
-
-
-
+</div>
 <h3>References</h3>
 <div id="refs" class="references">
-<div id="ref-R-golem">
-<p>Guyader, Vincent, Colin Fay, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
-</div>
-<div id="ref-R-pkgbuild">
-<p>Wickham, Hadley, and Jim Hester. 2020. <em>Pkgbuild: Find Tools Needed to Build R Packages</em>. <a href="https://CRAN.R-project.org/package=pkgbuild">https://CRAN.R-project.org/package=pkgbuild</a>.</p>
+<div id="ref-lemaire2020">
+<p>Lemaire, Maude. 2020. <em>Refactoring at Scale</em>. Henry Holt. <a href="https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/">https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/</a>.</p>
 </div>
 </div>
 <div class="footnotes">
 <hr />
-<ol start="45">
-<li id="fn45"><p>This is also true for any other Version Control system<a href="deploy-golem.html#fnref45" class="footnote-back">↩︎</a></p></li>
+<ol start="12">
+<li id="fn12"><p>Which might not be the most “elegant” solution, but production code requires pragmatism.<a href="planning.html#fnref12" class="footnote-back">↩︎</a></p></li>
+<li id="fn13"><p>Relying on automatic tooling for monitoring code base is way safer than relying on developers to do manual checks every time they commit code.<a href="planning.html#fnref13" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 <hr/>
@@ -615,8 +591,8 @@ Otherwise you might have to add them manually.</p>
           </div>
         </div>
       </div>
-<a href="secure.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="when-optimize.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="successfulshinyapp.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="structure.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -647,7 +623,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/14-deploy-with-golem.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/02-planning-ahead.Rmd",
 "text": "Edit"
 },
 "history": {
