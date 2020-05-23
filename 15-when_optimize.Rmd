@@ -2,9 +2,9 @@
 
 # The Need for Optimization {#when-optimize}
 
-> The most powerful optimization technique in any programmer’s toolbox is to do nothing.
+> Only once we have a solid characterization of the surface area we want to improve can we begin to identify the best way to improve it.
 
-`r right_link("The Art of Unix Programming", "http://www.catb.org/~esr/writings/taoup/html/")`
+`r right_link("Refactoring at Scale", "https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/")`
 
 ## Build first, then optimize
 
@@ -26,7 +26,7 @@ Once the application is ready: here in our example, we can only detect the bottl
 
 (ref:bottleneck) Schema of a bottleneck, Adapted from WikiMedia <https://commons.wikimedia.org/wiki/File:Effects_of_a_bottleneck_on_virus_populations.png>
 
-```{r 15-when-optimize-1-bis, echo=FALSE, fig.cap="(ref:bottleneck)", out.width="100%"}
+```{r 15-when-optimize-1, echo=FALSE, fig.cap="(ref:bottleneck)", out.width="100%"}
 knitr::include_graphics("img/bottleneck.png")
 ```
 
@@ -83,7 +83,7 @@ Also, are the extra hours/days spent rewriting a working code-base worth the spe
 For example, let's compare both these implementations of the same function, one in R, and one in C++ via `{Rcpp}` [@R-Rcpp]
 Of course, the C++ function is faster than the R one—this is the very reason of using C++ with R. 
 
-```{r 15-when-optimize-1 }
+```{r 15-when-optimize-2 }
 library("Rcpp")
 cppFunction("
 double mean_cpp(NumericVector x) {
@@ -143,7 +143,7 @@ Using this package is quite straightforward: put the code you want to benchmark 
 
 Here is an example with 3 nested functions, `top()`, `middle()` and `bottom()`, where `top()` calls `middle()` which calls `bottom()`:
 
-```{r 15-when-optimize-2, eval = FALSE}
+```{r 15-when-optimize-3, eval = FALSE}
 library(profvis)
 top <- function(){
   # We use profvis::pause() because Sys.sleep() doesn't 
@@ -190,7 +190,7 @@ Then, a detail of `middle()`, which calls `bottom_a()` and `bottom_b()`, which e
 
 (ref:profvizflame) `{profvis}` flame graph 
 
-```{r 15-when-optimize-2-bis, echo=FALSE, fig.cap="(ref:profvizflame)", out.width="100%"}
+```{r 15-when-optimize-4, echo=FALSE, fig.cap="(ref:profvizflame)", out.width="100%"}
 knitr::include_graphics("img/profviz_flame.png")
 ```
 
@@ -198,14 +198,14 @@ If you click on the "Data" tab, you will also find another view of the `flame gr
 
 (ref:profvizdata) `{profvis}` data tab
 
-```{r 15-when-optimize-3-bis, echo=FALSE, fig.cap="(ref:profvizdata)", out.width="100%"}
+```{r 15-when-optimize-5, echo=FALSE, fig.cap="(ref:profvizdata)", out.width="100%"}
 knitr::include_graphics("img/profviz_data.png")
 ```
 
 
 If you are working on profiling the memory usage, you can also use the `{profmem}` [@R-profmem] package which, instead of focusing on execution time, will record the memory usage of calls. 
 
-```{r 15-when-optimize-3 }
+```{r 15-when-optimize-6 }
 library(profmem)
 p <- profmem({
   x <- raw(1000)
@@ -216,13 +216,13 @@ p
 
 You can also get the total allocated memory with:
 
-```{r 15-when-optimize-4 }
+```{r 15-when-optimize-7 }
 total(p)
 ```
 
 And extract specific values based on the memory allocation:
 
-```{r 15-when-optimize-5 }
+```{r 15-when-optimize-8 }
 p2 <- subset(p, bytes > 1000)
 print(p2)
 ```
@@ -254,7 +254,7 @@ Note that by default, the `mark()` function compares the output of each function
 
 Once the timing is done, you will get a data.frame with various metrics about the benchmark.
 
-```{r 15-when-optimize-6 }
+```{r 15-when-optimize-9 }
 x <- function(size){
   res <- numeric(size)
   for (i in 1:size){
@@ -279,7 +279,7 @@ If you want a graphical analysis, `{bench}` comes with an `autoplot` method for 
 
 (ref:benchautoplot) `{bench}` autoplot 
 
-```{r 15-when-optimize-7, fig.cap="(ref:benchautoplot)", out.width="100%"}
+```{r 15-when-optimize-10, fig.cap="(ref:benchautoplot)", out.width="100%"}
 ggplot2::autoplot(res)
 ```
 
@@ -287,10 +287,20 @@ And, bonus point, `{bench}` takes time to check that the two outputs are the sam
 
 ### Profiling Shiny
 
+#### Shiny back-end
+
 You can profile Shiny application using the `{profvis}` package, just as any other piece of R code. 
 The only thing to note if you want to use this function on an app built with `{golem}` [@R-golem], you will have to wrap the `run_app()` function in a `print()` function. 
 Long story short, what make the app run is not the function itself, but the printing of the function, so the object returned by `run_app()` itself can not be profiled. 
-See the discussion on this [issue on {golem}](https://github.com/ThinkR-open/golem/issues/146) to learn more about this.
+See the discussion on this [issue on `{golem}`](https://github.com/ThinkR-open/golem/issues/146) to learn more about this.
+
+#### Shiny front-end
+
+##### Google LightHouse
+
+#### Shiny front-end
+
+##### Google LightHouse
 
 One other thing that can be optimized when it comes to the user interface is the webpage rendering performance. 
 To do that, we can use standard web development tools: as said several times, a Shiny application IS a web application, so tools that are language agnostic will work with Shiny. 
@@ -327,7 +337,7 @@ Note that you can also install a command line tool with `npm install -g lighthou
 
 (ref:lighthouseaudit) Launching LightHouse audit from the Google Chrome
 
-```{r 15-when-optimize-4-bis, echo=FALSE, fig.cap="(ref:lighthouseaudit)", out.width="100%"}
+```{r 15-when-optimize-11, echo=FALSE, fig.cap="(ref:lighthouseaudit)", out.width="100%"}
 knitr::include_graphics("img/lighthouse-audit.png")
 ```
 
@@ -336,7 +346,7 @@ Google Lighthouse is computing a series of analysis about your webpage.
 
 (ref:lighthouseres) LightHouse audit results
 
-```{r 15-when-optimize-5-bis, echo=FALSE, fig.cap="(ref:lighthouseres)", out.width="100%"}
+```{r 15-when-optimize-12, echo=FALSE, fig.cap="(ref:lighthouseres)", out.width="100%"}
 knitr::include_graphics("img/lighthouse-audit.png")
 ```
 
@@ -367,13 +377,182 @@ lighthouse --output json --output-path data-raw/output.json http://localhost:281
 
 Then, being a JSON file, you can call if from R:
 
-```{r 15-when-optimize-8 }
+```{r 15-when-optimize-13 }
 lighthouse_report <- jsonlite::read_json("data-raw/output.json")
 lighthouse_report$audits$`speed-index`$displayValue
 ```
 
+The results are contained in the `audits` sections of this object, and each of these sub-elements contains a `description` field, detailing what the metric means.
+
+Here are for example some of the results, focused on performance, with there respective description: 
+
+##### "First Meaningful Paint"
+
+```{r 15-when-optimize-14}
+lighthouse_report$audits$`first-meaningful-paint`$description
+```
+
+```{r 15-when-optimize-15}
+lighthouse_report$audits$`first-meaningful-paint` %>%
+  as.data.frame() %>%
+  dplyr::select(title, score, displayValue) %>%
+  knitr::kable()
+```
+
+##### "Speed Index"
+
+```{r 15-when-optimize-16}
+lighthouse_report$audits$`speed-index`$description
+```
+
+
+```{r 15-when-optimize-17}
+lighthouse_report$audits$`speed-index` %>%
+  as.data.frame() %>%
+  dplyr::select(title, score, displayValue) %>%
+  knitr::kable()
+```
+
+##### "Speed Index"
+
+```{r 15-when-optimize-18}
+lighthouse_report$audits$`estimated-input-latency`$description 
+```
+
+
+```{r 15-when-optimize-19}
+lighthouse_report$audits$`estimated-input-latency` %>%
+  as.data.frame() %>%
+  dplyr::select(title, score, displayValue) %>%
+  knitr::kable()
+```
+
+##### "Total Blocking Time"
+
+```{r 15-when-optimize-20}
+lighthouse_report$audits$`total-blocking-time`$description 
+```
+
+
+```{r 15-when-optimize-21}
+lighthouse_report$audits$`total-blocking-time` %>%
+  as.data.frame() %>%
+  dplyr::select(title, score, displayValue) %>%
+  knitr::kable()
+```
+
+##### "Time to first Byte"
+
+```{r 15-when-optimize-22}
+lighthouse_report$audits$`time-to-first-byte`$description 
+```
+
+```{r 15-when-optimize-23 }
+lighthouse_report$audits$`time-to-first-byte` %>%
+  .[c("title", "score", "displayValue")] %>%
+  as.data.frame() %>%
+  knitr::kable()
+```
+
 Google Lighthouse also comes with a continuous integration tool, so that you can use it as a regression testing tool for your application. 
 To know more, feel free to read the [documentation](https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/getting-started.md)!
+
+##### Side note on minification
+
+Chances are that right now you are not using _minification_ in your Shiny application.
+Minification is the process of removing unnecessary characters from files, without changing the way the code works, in order to make the file size lighter. 
+The general idea being that line breaks, spaces and a specific set of characters are used inside scripts for human readability, and are not useful when it comes to the way a computer reads a piece of code. 
+So why not removing them when they are served in a larger software?
+This is what _minification_ does.
+
+Here is an example of how minification works, taken from _Empirical Study on Effects of Script Minification and HTTP Compression for Traffic Reduction_ [@Sakamoto2015]:
+
+``` javascript
+var sum = 0;
+for ( var i = 0; i <=10; i ++ ) {
+  sum += i ;
+}
+alert( sum ) ;
+```
+
+is minified into:
+
+``` javascript
+var sum=0;for(var i=0;i<=10;i++){sum+=i};alert(sum);
+```
+
+Both these code blocks behave the same way, but the second one will be lighter when saved to a file: this is the very core principle of minification of files.
+It is something pretty common to do when building web applications: on the web, every byte count, so the lighter your external resources the better.
+Minifiction is something important as the heavier your resources, the longer your application will take to launch, and: 
+
++ Page launch time is crucial when it comes to ranking the pages on the web
+
++ The heavier the resources, the longer it will be to launch the application on a mobile, notably if users are visiting your application from a 3G/4G network
+
+And do not forget, 
+
+> Extremely high-speed network infrastructures are becoming more and more popular in developed countries. However, we still face crowded and low-speed Wi-Fi environments on airport, cafe, international conference, etc. Especially, a network environment of mobile devices requires efficient usage of network bandwidth. 
+ 
+Taken from [@Sakamoto2015]
+
+To minify JavaScript, HTML and CSS files from R, you can use the `{minifyr}` [@R-minifyr] package, that wraps the `node-minify` NodeJS library. 
+For example, compare the size of this file from `{shiny}`:
+
+```{r 15-when-optimize-1-bis, eval = FALSE}
+fs::file_size(
+  system.file("www/shared/shiny.css", package = "shiny")
+) 
+```
+
+```{r 15-when-optimize-2-bis, echo = FALSE}
+cat("8.28K")
+```
+
+To its minified version: 
+
+```{r 15-when-optimize-3-bis, eval = FALSE}
+minified <- minifyr::minifyr_css_cleancss(
+  system.file("www/shared/shiny.css", package = "shiny"), 
+  "shinyminifed.css"
+) 
+```
+
+```{r 15-when-optimize-4-bis, eval = FALSE}
+fs::file_size(minified)
+```
+
+```{r 15-when-optimize-5-bis}
+cat("5.79K")
+```
+
+That might not seem like much (a couple of KB) at a small scale, but as it can be done automatically, why not leverage these small performances gain when building larger applications?
+Of course, minification will not suddenly make your application blazing fast, but that's something you should consider when deploying an application to production, notably if you use a lot of packages with interactive widget: they might contain CSS and JavaScript files that are not minified. 
+
+Note that `{shiny}` files are minifed by default, so you will not have to re-minify them. 
+But most package that extend `{shiny}` are not, so minifying the CSS and JavaScript from these packages might help you win some points on Google LightHouse report!
+
+To do this automatically, you can add the `{minifyr}` commands to your deployment, be it on your CD/CI platform, or as a Dockerfile step. 
+`{minifyr}` comes with a series of functions to do that: 
+
++ `minify_folder_css()`, `minify_folder_js()`, `minify_folder_html()` and `minify_folder_json()` do a bulk minification of the files found in a folder that match the extension
++ `minify_package_js()`, `minify_package_css()`, `minify_package_html()` and `minify_package_json()` will minify the CSS and JavaScript files contained inside a package installed on the machine
+
+Here is what it can look like inside a `Dockerfile`
+^[Note that you will need to install NodeJS inside the container
+]: 
+
+```
+FROM rocker/shiny-verse:3.6.3
+
+RUN apt-get -y install curl
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get install -y nodejs
+
+RUN Rscript -e 'remotes::install_github("colinfay/minifyr")'
+RUN Rscript -e 'remotes::install_cran("cicerone")'
+RUN Rscript -e 'library(minifyr);minifyr_npm_install(TRUE);minify_package_js("cicerone", minifyr_js_uglify)'
+```
+
 
 ### More resources about web page performance
 
