@@ -1,5 +1,5 @@
 install.packages(c("attachment", "remotes", "usethis", "namer", "desc", "spelling"))
-remotes::install_version("subprocess", "0.8.3")
+remotes::install_github("lbartnik/subprocess")
 remotes::install_github("rstudio/websocket", "rc-v1.2.0")
 paks <- c(
   "cloc", "dplyr", "cyclocomp", "tidytuesday201942", "shiny", "packageMetrics2", 
