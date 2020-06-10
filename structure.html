@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 3 Structuring your Project | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 3 Structuring your Project | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-05-12" />
+<meta name="date" content="2020-06-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -556,8 +556,8 @@ A Shiny App as a package can be built as a <code>tar.gz</code>, sent to your col
 It can also be installed in any R-package repository.
 You can then install your packaged application along with its dependencies using the appropriate <code>remotes::install_*()</code> command.
 And, if you built your app with <code>{golem}</code>, you can launch the app using:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="structure.html#cb32-1"></a><span class="kw">library</span>(myuberapp)</span>
-<span id="cb32-2"><a href="structure.html#cb32-2"></a><span class="kw">run_app</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="structure.html#cb36-1"></a><span class="kw">library</span>(myuberapp)</span>
+<span id="cb36-2"><a href="structure.html#cb36-2"></a><span class="kw">run_app</span>()</span></code></pre></div>
 </div>
 <div id="rstudio-connect-shiny-server-shinyapps.io" class="section level4">
 <h4><span class="header-section-number">3.1.3.2</span> RStudio Connect, Shiny Server, shinyapps.io</h4>
@@ -568,16 +568,16 @@ To integrate your “Shiny App as a package” into Connect or Shiny Server, you
 <li>Use an internal package manager like <a href="https://www.rstudio.com/products/package-manager/">RStudio Package Manager</a>, where the package app is installed.
 Once the package is available in your internal repository, you can create an <code>app.R</code> file with only this small piece of code:</li>
 </ul>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="structure.html#cb33-1"></a><span class="kw">library</span>(myuberapp)</span>
-<span id="cb33-2"><a href="structure.html#cb33-2"></a><span class="kw">run_app</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="structure.html#cb37-1"></a><span class="kw">library</span>(myuberapp)</span>
+<span id="cb37-2"><a href="structure.html#cb37-2"></a><span class="kw">run_app</span>()</span></code></pre></div>
 <ul>
 <li>Upload the complete content of the package directory to the server.
 You will need an <code>app.R</code> file at the root of the package:</li>
 </ul>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="structure.html#cb34-1"></a><span class="co"># Load all R scripts and functions</span></span>
-<span id="cb34-2"><a href="structure.html#cb34-2"></a>pkgload<span class="op">::</span><span class="kw">load_all</span>()</span>
-<span id="cb34-3"><a href="structure.html#cb34-3"></a><span class="co"># Launch the application</span></span>
-<span id="cb34-4"><a href="structure.html#cb34-4"></a>shiny<span class="op">::</span><span class="kw">shinyApp</span>(<span class="dt">ui =</span> <span class="kw">app_ui</span>(), <span class="dt">server =</span> app_server) </span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="structure.html#cb38-1"></a><span class="co"># Load all R scripts and functions</span></span>
+<span id="cb38-2"><a href="structure.html#cb38-2"></a>pkgload<span class="op">::</span><span class="kw">load_all</span>()</span>
+<span id="cb38-3"><a href="structure.html#cb38-3"></a><span class="co"># Launch the application</span></span>
+<span id="cb38-4"><a href="structure.html#cb38-4"></a>shiny<span class="op">::</span><span class="kw">shinyApp</span>(<span class="dt">ui =</span> <span class="kw">app_ui</span>(), <span class="dt">server =</span> app_server) </span></code></pre></div>
 <p>This is the file you will get if you run one of the three RStudio related functions from golem, for example <code>golem::add_rconnect_file()</code>.</p>
 </div>
 <div id="docker-containers" class="section level4">
@@ -641,40 +641,40 @@ How have you been handling that so far?
 By creating <code>validate1</code>, <code>validate2</code>, and so on and so forth.
 But if you think about it, you are mimicking a namespacing process: a <code>validate</code> in namespace <code>1</code>, another in namespace <code>2</code>.</p>
 <p>Consider the following Shiny application:</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="structure.html#cb35-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb35-2"><a href="structure.html#cb35-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
-<span id="cb35-3"><a href="structure.html#cb35-3"></a>  <span class="kw">fluidPage</span>(</span>
-<span id="cb35-4"><a href="structure.html#cb35-4"></a>    <span class="kw">sliderInput</span>(</span>
-<span id="cb35-5"><a href="structure.html#cb35-5"></a>      <span class="dt">inputId =</span> <span class="st">&quot;choice1&quot;</span>, </span>
-<span id="cb35-6"><a href="structure.html#cb35-6"></a>      <span class="dt">label =</span> <span class="st">&quot;choice 1&quot;</span>, </span>
-<span id="cb35-7"><a href="structure.html#cb35-7"></a>      <span class="dt">min =</span> <span class="dv">1</span>, <span class="dt">max =</span> <span class="dv">10</span>, <span class="dt">value =</span> <span class="dv">5</span></span>
-<span id="cb35-8"><a href="structure.html#cb35-8"></a>    ),</span>
-<span id="cb35-9"><a href="structure.html#cb35-9"></a>    <span class="kw">actionButton</span>(</span>
-<span id="cb35-10"><a href="structure.html#cb35-10"></a>      <span class="dt">inputId =</span> <span class="st">&quot;validate1&quot;</span>,</span>
-<span id="cb35-11"><a href="structure.html#cb35-11"></a>      <span class="dt">label =</span> <span class="st">&quot;Validate choice 1&quot;</span></span>
-<span id="cb35-12"><a href="structure.html#cb35-12"></a>    ),</span>
-<span id="cb35-13"><a href="structure.html#cb35-13"></a>    <span class="kw">sliderInput</span>(</span>
-<span id="cb35-14"><a href="structure.html#cb35-14"></a>      <span class="dt">inputId =</span> <span class="st">&quot;choice2&quot;</span>,</span>
-<span id="cb35-15"><a href="structure.html#cb35-15"></a>      <span class="dt">label =</span> <span class="st">&quot;choice 2&quot;</span>, </span>
-<span id="cb35-16"><a href="structure.html#cb35-16"></a>      <span class="dt">min =</span> <span class="dv">1</span>, <span class="dt">max =</span> <span class="dv">10</span>, <span class="dt">value =</span> <span class="dv">5</span></span>
-<span id="cb35-17"><a href="structure.html#cb35-17"></a>    ),</span>
-<span id="cb35-18"><a href="structure.html#cb35-18"></a>    <span class="kw">actionButton</span>(</span>
-<span id="cb35-19"><a href="structure.html#cb35-19"></a>      <span class="dt">inputId =</span> <span class="st">&quot;validate2&quot;</span>, </span>
-<span id="cb35-20"><a href="structure.html#cb35-20"></a>      <span class="dt">label =</span> <span class="st">&quot;Validate choice 2&quot;</span></span>
-<span id="cb35-21"><a href="structure.html#cb35-21"></a>    )</span>
-<span id="cb35-22"><a href="structure.html#cb35-22"></a>  )</span>
-<span id="cb35-23"><a href="structure.html#cb35-23"></a>}</span>
-<span id="cb35-24"><a href="structure.html#cb35-24"></a></span>
-<span id="cb35-25"><a href="structure.html#cb35-25"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb35-26"><a href="structure.html#cb35-26"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>validate1 , {</span>
-<span id="cb35-27"><a href="structure.html#cb35-27"></a>    <span class="kw">print</span>(input<span class="op">$</span>choice1)</span>
-<span id="cb35-28"><a href="structure.html#cb35-28"></a>  })</span>
-<span id="cb35-29"><a href="structure.html#cb35-29"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>validate2 , {</span>
-<span id="cb35-30"><a href="structure.html#cb35-30"></a>    <span class="kw">print</span>(input<span class="op">$</span>choice2)</span>
-<span id="cb35-31"><a href="structure.html#cb35-31"></a>  })</span>
-<span id="cb35-32"><a href="structure.html#cb35-32"></a>}</span>
-<span id="cb35-33"><a href="structure.html#cb35-33"></a></span>
-<span id="cb35-34"><a href="structure.html#cb35-34"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="structure.html#cb39-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb39-2"><a href="structure.html#cb39-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
+<span id="cb39-3"><a href="structure.html#cb39-3"></a>  <span class="kw">fluidPage</span>(</span>
+<span id="cb39-4"><a href="structure.html#cb39-4"></a>    <span class="kw">sliderInput</span>(</span>
+<span id="cb39-5"><a href="structure.html#cb39-5"></a>      <span class="dt">inputId =</span> <span class="st">&quot;choice1&quot;</span>, </span>
+<span id="cb39-6"><a href="structure.html#cb39-6"></a>      <span class="dt">label =</span> <span class="st">&quot;choice 1&quot;</span>, </span>
+<span id="cb39-7"><a href="structure.html#cb39-7"></a>      <span class="dt">min =</span> <span class="dv">1</span>, <span class="dt">max =</span> <span class="dv">10</span>, <span class="dt">value =</span> <span class="dv">5</span></span>
+<span id="cb39-8"><a href="structure.html#cb39-8"></a>    ),</span>
+<span id="cb39-9"><a href="structure.html#cb39-9"></a>    <span class="kw">actionButton</span>(</span>
+<span id="cb39-10"><a href="structure.html#cb39-10"></a>      <span class="dt">inputId =</span> <span class="st">&quot;validate1&quot;</span>,</span>
+<span id="cb39-11"><a href="structure.html#cb39-11"></a>      <span class="dt">label =</span> <span class="st">&quot;Validate choice 1&quot;</span></span>
+<span id="cb39-12"><a href="structure.html#cb39-12"></a>    ),</span>
+<span id="cb39-13"><a href="structure.html#cb39-13"></a>    <span class="kw">sliderInput</span>(</span>
+<span id="cb39-14"><a href="structure.html#cb39-14"></a>      <span class="dt">inputId =</span> <span class="st">&quot;choice2&quot;</span>,</span>
+<span id="cb39-15"><a href="structure.html#cb39-15"></a>      <span class="dt">label =</span> <span class="st">&quot;choice 2&quot;</span>, </span>
+<span id="cb39-16"><a href="structure.html#cb39-16"></a>      <span class="dt">min =</span> <span class="dv">1</span>, <span class="dt">max =</span> <span class="dv">10</span>, <span class="dt">value =</span> <span class="dv">5</span></span>
+<span id="cb39-17"><a href="structure.html#cb39-17"></a>    ),</span>
+<span id="cb39-18"><a href="structure.html#cb39-18"></a>    <span class="kw">actionButton</span>(</span>
+<span id="cb39-19"><a href="structure.html#cb39-19"></a>      <span class="dt">inputId =</span> <span class="st">&quot;validate2&quot;</span>, </span>
+<span id="cb39-20"><a href="structure.html#cb39-20"></a>      <span class="dt">label =</span> <span class="st">&quot;Validate choice 2&quot;</span></span>
+<span id="cb39-21"><a href="structure.html#cb39-21"></a>    )</span>
+<span id="cb39-22"><a href="structure.html#cb39-22"></a>  )</span>
+<span id="cb39-23"><a href="structure.html#cb39-23"></a>}</span>
+<span id="cb39-24"><a href="structure.html#cb39-24"></a></span>
+<span id="cb39-25"><a href="structure.html#cb39-25"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb39-26"><a href="structure.html#cb39-26"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>validate1 , {</span>
+<span id="cb39-27"><a href="structure.html#cb39-27"></a>    <span class="kw">print</span>(input<span class="op">$</span>choice1)</span>
+<span id="cb39-28"><a href="structure.html#cb39-28"></a>  })</span>
+<span id="cb39-29"><a href="structure.html#cb39-29"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>validate2 , {</span>
+<span id="cb39-30"><a href="structure.html#cb39-30"></a>    <span class="kw">print</span>(input<span class="op">$</span>choice2)</span>
+<span id="cb39-31"><a href="structure.html#cb39-31"></a>  })</span>
+<span id="cb39-32"><a href="structure.html#cb39-32"></a>}</span>
+<span id="cb39-33"><a href="structure.html#cb39-33"></a></span>
+<span id="cb39-34"><a href="structure.html#cb39-34"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>This, of course, is an approach that works.
 Well, it works as long as your code base is small.
 But how can you be sure that you are not creating <code>validate6</code> on line 55 and another on line 837?
@@ -716,46 +716,46 @@ So, you will be better off starting on solid foundations from the very beginning
 <h4><span class="header-section-number">3.2.3.1</span> Your first Shiny Module</h4>
 <p>Let’s try to transform the above example (the one with two sliders and two action buttons) into an application with a module.
 The module is a small shiny application separated from the main code:</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="structure.html#cb36-1"></a><span class="co"># Re-usable module</span></span>
-<span id="cb36-2"><a href="structure.html#cb36-2"></a>mod_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
-<span id="cb36-3"><a href="structure.html#cb36-3"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
-<span id="cb36-4"><a href="structure.html#cb36-4"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb36-5"><a href="structure.html#cb36-5"></a>    <span class="kw">sliderInput</span>(</span>
-<span id="cb36-6"><a href="structure.html#cb36-6"></a>      <span class="dt">inputId =</span> <span class="kw">ns</span>(<span class="st">&quot;choice&quot;</span>), </span>
-<span id="cb36-7"><a href="structure.html#cb36-7"></a>      <span class="dt">label =</span> <span class="st">&quot;Choice&quot;</span>,</span>
-<span id="cb36-8"><a href="structure.html#cb36-8"></a>      <span class="dt">min =</span> <span class="dv">1</span>, <span class="dt">max =</span> <span class="dv">10</span>, <span class="dt">value =</span> <span class="dv">5</span></span>
-<span id="cb36-9"><a href="structure.html#cb36-9"></a>    ),</span>
-<span id="cb36-10"><a href="structure.html#cb36-10"></a>    <span class="kw">actionButton</span>(</span>
-<span id="cb36-11"><a href="structure.html#cb36-11"></a>      <span class="dt">inputId =</span> <span class="kw">ns</span>(<span class="st">&quot;validate&quot;</span>),</span>
-<span id="cb36-12"><a href="structure.html#cb36-12"></a>      <span class="dt">label =</span> <span class="st">&quot;Validate Choice&quot;</span></span>
-<span id="cb36-13"><a href="structure.html#cb36-13"></a>    )</span>
-<span id="cb36-14"><a href="structure.html#cb36-14"></a>  )</span>
-<span id="cb36-15"><a href="structure.html#cb36-15"></a>}</span>
-<span id="cb36-16"><a href="structure.html#cb36-16"></a></span>
-<span id="cb36-17"><a href="structure.html#cb36-17"></a>mod_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb36-18"><a href="structure.html#cb36-18"></a>  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</span>
-<span id="cb36-19"><a href="structure.html#cb36-19"></a>  </span>
-<span id="cb36-20"><a href="structure.html#cb36-20"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>validate , {</span>
-<span id="cb36-21"><a href="structure.html#cb36-21"></a>    <span class="kw">print</span>(input<span class="op">$</span>choice)</span>
-<span id="cb36-22"><a href="structure.html#cb36-22"></a>  })</span>
-<span id="cb36-23"><a href="structure.html#cb36-23"></a>  </span>
-<span id="cb36-24"><a href="structure.html#cb36-24"></a>}</span>
-<span id="cb36-25"><a href="structure.html#cb36-25"></a></span>
-<span id="cb36-26"><a href="structure.html#cb36-26"></a><span class="co"># Main application</span></span>
-<span id="cb36-27"><a href="structure.html#cb36-27"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb36-28"><a href="structure.html#cb36-28"></a>app_ui &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
-<span id="cb36-29"><a href="structure.html#cb36-29"></a>  <span class="kw">fluidPage</span>(</span>
-<span id="cb36-30"><a href="structure.html#cb36-30"></a>    <span class="kw">mod_ui</span>(<span class="dt">id =</span> <span class="st">&quot;mod_ui_1&quot;</span>),</span>
-<span id="cb36-31"><a href="structure.html#cb36-31"></a>    <span class="kw">mod_ui</span>(<span class="dt">id =</span> <span class="st">&quot;mod_ui_2&quot;</span>)</span>
-<span id="cb36-32"><a href="structure.html#cb36-32"></a>  )</span>
-<span id="cb36-33"><a href="structure.html#cb36-33"></a>}</span>
-<span id="cb36-34"><a href="structure.html#cb36-34"></a></span>
-<span id="cb36-35"><a href="structure.html#cb36-35"></a>app_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb36-36"><a href="structure.html#cb36-36"></a>  <span class="kw">callModule</span>(mod_server, <span class="dt">id =</span> <span class="st">&quot;mod_ui_1&quot;</span>)</span>
-<span id="cb36-37"><a href="structure.html#cb36-37"></a>  <span class="kw">callModule</span>(mod_server, <span class="dt">id =</span> <span class="st">&quot;mod_ui_2&quot;</span>)</span>
-<span id="cb36-38"><a href="structure.html#cb36-38"></a>}</span>
-<span id="cb36-39"><a href="structure.html#cb36-39"></a></span>
-<span id="cb36-40"><a href="structure.html#cb36-40"></a><span class="kw">shinyApp</span>(app_ui, app_server)</span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="structure.html#cb40-1"></a><span class="co"># Re-usable module</span></span>
+<span id="cb40-2"><a href="structure.html#cb40-2"></a>mod_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
+<span id="cb40-3"><a href="structure.html#cb40-3"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
+<span id="cb40-4"><a href="structure.html#cb40-4"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb40-5"><a href="structure.html#cb40-5"></a>    <span class="kw">sliderInput</span>(</span>
+<span id="cb40-6"><a href="structure.html#cb40-6"></a>      <span class="dt">inputId =</span> <span class="kw">ns</span>(<span class="st">&quot;choice&quot;</span>), </span>
+<span id="cb40-7"><a href="structure.html#cb40-7"></a>      <span class="dt">label =</span> <span class="st">&quot;Choice&quot;</span>,</span>
+<span id="cb40-8"><a href="structure.html#cb40-8"></a>      <span class="dt">min =</span> <span class="dv">1</span>, <span class="dt">max =</span> <span class="dv">10</span>, <span class="dt">value =</span> <span class="dv">5</span></span>
+<span id="cb40-9"><a href="structure.html#cb40-9"></a>    ),</span>
+<span id="cb40-10"><a href="structure.html#cb40-10"></a>    <span class="kw">actionButton</span>(</span>
+<span id="cb40-11"><a href="structure.html#cb40-11"></a>      <span class="dt">inputId =</span> <span class="kw">ns</span>(<span class="st">&quot;validate&quot;</span>),</span>
+<span id="cb40-12"><a href="structure.html#cb40-12"></a>      <span class="dt">label =</span> <span class="st">&quot;Validate Choice&quot;</span></span>
+<span id="cb40-13"><a href="structure.html#cb40-13"></a>    )</span>
+<span id="cb40-14"><a href="structure.html#cb40-14"></a>  )</span>
+<span id="cb40-15"><a href="structure.html#cb40-15"></a>}</span>
+<span id="cb40-16"><a href="structure.html#cb40-16"></a></span>
+<span id="cb40-17"><a href="structure.html#cb40-17"></a>mod_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb40-18"><a href="structure.html#cb40-18"></a>  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</span>
+<span id="cb40-19"><a href="structure.html#cb40-19"></a>  </span>
+<span id="cb40-20"><a href="structure.html#cb40-20"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>validate , {</span>
+<span id="cb40-21"><a href="structure.html#cb40-21"></a>    <span class="kw">print</span>(input<span class="op">$</span>choice)</span>
+<span id="cb40-22"><a href="structure.html#cb40-22"></a>  })</span>
+<span id="cb40-23"><a href="structure.html#cb40-23"></a>  </span>
+<span id="cb40-24"><a href="structure.html#cb40-24"></a>}</span>
+<span id="cb40-25"><a href="structure.html#cb40-25"></a></span>
+<span id="cb40-26"><a href="structure.html#cb40-26"></a><span class="co"># Main application</span></span>
+<span id="cb40-27"><a href="structure.html#cb40-27"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb40-28"><a href="structure.html#cb40-28"></a>app_ui &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
+<span id="cb40-29"><a href="structure.html#cb40-29"></a>  <span class="kw">fluidPage</span>(</span>
+<span id="cb40-30"><a href="structure.html#cb40-30"></a>    <span class="kw">mod_ui</span>(<span class="dt">id =</span> <span class="st">&quot;mod_ui_1&quot;</span>),</span>
+<span id="cb40-31"><a href="structure.html#cb40-31"></a>    <span class="kw">mod_ui</span>(<span class="dt">id =</span> <span class="st">&quot;mod_ui_2&quot;</span>)</span>
+<span id="cb40-32"><a href="structure.html#cb40-32"></a>  )</span>
+<span id="cb40-33"><a href="structure.html#cb40-33"></a>}</span>
+<span id="cb40-34"><a href="structure.html#cb40-34"></a></span>
+<span id="cb40-35"><a href="structure.html#cb40-35"></a>app_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb40-36"><a href="structure.html#cb40-36"></a>  <span class="kw">callModule</span>(mod_server, <span class="dt">id =</span> <span class="st">&quot;mod_ui_1&quot;</span>)</span>
+<span id="cb40-37"><a href="structure.html#cb40-37"></a>  <span class="kw">callModule</span>(mod_server, <span class="dt">id =</span> <span class="st">&quot;mod_ui_2&quot;</span>)</span>
+<span id="cb40-38"><a href="structure.html#cb40-38"></a>}</span>
+<span id="cb40-39"><a href="structure.html#cb40-39"></a></span>
+<span id="cb40-40"><a href="structure.html#cb40-40"></a><span class="kw">shinyApp</span>(app_ui, app_server)</span></code></pre></div>
 <p>Let’s stop for a minute and decompose what we have here.</p>
 <p>The <strong>server</strong> function of the module (<code>mod_server()</code>) is pretty much the same as before: you use the same code as the one you would use in any server part of a Shiny application.</p>
 <p>The <strong>ui</strong> function of the module (<code>mod_ui()</code>) requires specific things.
@@ -765,9 +765,9 @@ Remember the previous version where we identified out two “validate” buttons
 Here, we create namespaces with the <code>ns()</code> function, built with <code>ns &lt;- NS(id)</code>.
 This line, <code>ns &lt;- NS(id)</code>, is added on top of all module ui functions and will allow building namespaces with the module id.</p>
 <p>To understand what it does, let us try and run it outside Shiny:</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="structure.html#cb37-1"></a>id &lt;-<span class="st"> &quot;mod_ui_1&quot;</span></span>
-<span id="cb37-2"><a href="structure.html#cb37-2"></a>ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
-<span id="cb37-3"><a href="structure.html#cb37-3"></a><span class="kw">ns</span>(<span class="st">&quot;choice&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="structure.html#cb41-1"></a>id &lt;-<span class="st"> &quot;mod_ui_1&quot;</span></span>
+<span id="cb41-2"><a href="structure.html#cb41-2"></a>ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
+<span id="cb41-3"><a href="structure.html#cb41-3"></a><span class="kw">ns</span>(<span class="st">&quot;choice&quot;</span>)</span></code></pre></div>
 <pre><code>[1] &quot;mod_ui_1-choice&quot;</code></pre>
 <p>And here it is, our namespaced <code>id</code>!</p>
 <p>Each call to a module with <code>callModule()</code> requires a different <code>id</code> argument that will allow creating various internal namespaces, preventing from id conflicts<a href="#fn16" class="footnote-ref" id="fnref16"><sup>16</sup></a>
@@ -780,15 +780,15 @@ Then you can have as many <code>validate</code> input as you want in your app, a
 This requires using extra arguments to generate the UI and server.
 As UI and server are functions, you can set parameters that will be used to configure the internals of the result.</p>
 <p>As you can see, the <strong>app_ui</strong> contains a series of call to <code>mod_ui(unique_id, ...)</code> function, allowing additional arguments like any other function:</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="structure.html#cb39-1"></a>mod_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id, button_label) {</span>
-<span id="cb39-2"><a href="structure.html#cb39-2"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
-<span id="cb39-3"><a href="structure.html#cb39-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb39-4"><a href="structure.html#cb39-4"></a>    <span class="kw">actionButton</span>(<span class="kw">ns</span>(<span class="st">&quot;validate&quot;</span>), button_label)</span>
-<span id="cb39-5"><a href="structure.html#cb39-5"></a>  )</span>
-<span id="cb39-6"><a href="structure.html#cb39-6"></a>}</span>
-<span id="cb39-7"><a href="structure.html#cb39-7"></a></span>
-<span id="cb39-8"><a href="structure.html#cb39-8"></a><span class="kw">mod_ui</span>(<span class="st">&quot;mod_ui_1&quot;</span>, <span class="dt">button_label =</span> <span class="st">&quot;Validate Choice&quot;</span>)</span>
-<span id="cb39-9"><a href="structure.html#cb39-9"></a><span class="kw">mod_ui</span>(<span class="st">&quot;mod_ui_2&quot;</span>, <span class="dt">button_label =</span> <span class="st">&quot;Validate Choice, again&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="structure.html#cb43-1"></a>mod_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id, button_label) {</span>
+<span id="cb43-2"><a href="structure.html#cb43-2"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
+<span id="cb43-3"><a href="structure.html#cb43-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb43-4"><a href="structure.html#cb43-4"></a>    <span class="kw">actionButton</span>(<span class="kw">ns</span>(<span class="st">&quot;validate&quot;</span>), button_label)</span>
+<span id="cb43-5"><a href="structure.html#cb43-5"></a>  )</span>
+<span id="cb43-6"><a href="structure.html#cb43-6"></a>}</span>
+<span id="cb43-7"><a href="structure.html#cb43-7"></a></span>
+<span id="cb43-8"><a href="structure.html#cb43-8"></a><span class="kw">mod_ui</span>(<span class="st">&quot;mod_ui_1&quot;</span>, <span class="dt">button_label =</span> <span class="st">&quot;Validate Choice&quot;</span>)</span>
+<span id="cb43-9"><a href="structure.html#cb43-9"></a><span class="kw">mod_ui</span>(<span class="st">&quot;mod_ui_2&quot;</span>, <span class="dt">button_label =</span> <span class="st">&quot;Validate Choice, again&quot;</span>)</span></code></pre></div>
 <pre><code>&lt;button id=&quot;mod_ui_1-validate&quot; type=&quot;button&quot; class=&quot;btn btn-default action-button&quot;&gt;Validate Choice&lt;/button&gt;
 
 &lt;button id=&quot;mod_ui_2-validate&quot; type=&quot;button&quot; class=&quot;btn btn-default action-button&quot;&gt;Validate Choice, again&lt;/button&gt;</code></pre>
@@ -804,71 +804,71 @@ FIGURE 3.1: Snapshot of the <code>{tidytuesday201942}</code> Shiny application.
 </p>
 </div>
 <p>Here, are an extract of how it works in the module UI:</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="structure.html#cb41-1"></a>mod_dataviz_ui &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb41-2"><a href="structure.html#cb41-2"></a>  id, </span>
-<span id="cb41-3"><a href="structure.html#cb41-3"></a>  <span class="dt">type =</span> <span class="kw">c</span>(<span class="st">&quot;point&quot;</span>, <span class="st">&quot;hist&quot;</span>, <span class="st">&quot;boxplot&quot;</span>, <span class="st">&quot;bar&quot;</span>)</span>
-<span id="cb41-4"><a href="structure.html#cb41-4"></a>) {</span>
-<span id="cb41-5"><a href="structure.html#cb41-5"></a>  <span class="kw">h4</span>(</span>
-<span id="cb41-6"><a href="structure.html#cb41-6"></a>    <span class="kw">sprintf</span>( <span class="st">&quot;Create a geom_%s&quot;</span>, type )</span>
-<span id="cb41-7"><a href="structure.html#cb41-7"></a>  ),</span>
-<span id="cb41-8"><a href="structure.html#cb41-8"></a>  <span class="cf">if</span> (type <span class="op">==</span><span class="st"> &quot;boxplot&quot;</span> <span class="op">|</span><span class="st"> </span>type <span class="op">==</span><span class="st">&quot;bar&quot;</span>) {</span>
-<span id="cb41-9"><a href="structure.html#cb41-9"></a>    <span class="kw">selectInput</span>(</span>
-<span id="cb41-10"><a href="structure.html#cb41-10"></a>      <span class="kw">ns</span>(<span class="st">&quot;x&quot;</span>),</span>
-<span id="cb41-11"><a href="structure.html#cb41-11"></a>      <span class="st">&quot;x&quot;</span>, </span>
-<span id="cb41-12"><a href="structure.html#cb41-12"></a>      <span class="dt">choices =</span> <span class="kw">names_that_are</span>(<span class="kw">c</span>(<span class="st">&quot;logical&quot;</span>, <span class="st">&quot;character&quot;</span>))</span>
-<span id="cb41-13"><a href="structure.html#cb41-13"></a>    )</span>
-<span id="cb41-14"><a href="structure.html#cb41-14"></a>  } <span class="cf">else</span> {</span>
-<span id="cb41-15"><a href="structure.html#cb41-15"></a>    <span class="kw">selectInput</span>(</span>
-<span id="cb41-16"><a href="structure.html#cb41-16"></a>      <span class="kw">ns</span>(<span class="st">&quot;x&quot;</span>),</span>
-<span id="cb41-17"><a href="structure.html#cb41-17"></a>      <span class="st">&quot;x&quot;</span>, </span>
-<span id="cb41-18"><a href="structure.html#cb41-18"></a>      <span class="dt">choices =</span> <span class="kw">names_that_are</span>(<span class="st">&quot;numeric&quot;</span>)</span>
-<span id="cb41-19"><a href="structure.html#cb41-19"></a>    )</span>
-<span id="cb41-20"><a href="structure.html#cb41-20"></a>  }</span>
-<span id="cb41-21"><a href="structure.html#cb41-21"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="structure.html#cb45-1"></a>mod_dataviz_ui &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb45-2"><a href="structure.html#cb45-2"></a>  id, </span>
+<span id="cb45-3"><a href="structure.html#cb45-3"></a>  <span class="dt">type =</span> <span class="kw">c</span>(<span class="st">&quot;point&quot;</span>, <span class="st">&quot;hist&quot;</span>, <span class="st">&quot;boxplot&quot;</span>, <span class="st">&quot;bar&quot;</span>)</span>
+<span id="cb45-4"><a href="structure.html#cb45-4"></a>) {</span>
+<span id="cb45-5"><a href="structure.html#cb45-5"></a>  <span class="kw">h4</span>(</span>
+<span id="cb45-6"><a href="structure.html#cb45-6"></a>    <span class="kw">sprintf</span>( <span class="st">&quot;Create a geom_%s&quot;</span>, type )</span>
+<span id="cb45-7"><a href="structure.html#cb45-7"></a>  ),</span>
+<span id="cb45-8"><a href="structure.html#cb45-8"></a>  <span class="cf">if</span> (type <span class="op">==</span><span class="st"> &quot;boxplot&quot;</span> <span class="op">|</span><span class="st"> </span>type <span class="op">==</span><span class="st">&quot;bar&quot;</span>) {</span>
+<span id="cb45-9"><a href="structure.html#cb45-9"></a>    <span class="kw">selectInput</span>(</span>
+<span id="cb45-10"><a href="structure.html#cb45-10"></a>      <span class="kw">ns</span>(<span class="st">&quot;x&quot;</span>),</span>
+<span id="cb45-11"><a href="structure.html#cb45-11"></a>      <span class="st">&quot;x&quot;</span>, </span>
+<span id="cb45-12"><a href="structure.html#cb45-12"></a>      <span class="dt">choices =</span> <span class="kw">names_that_are</span>(<span class="kw">c</span>(<span class="st">&quot;logical&quot;</span>, <span class="st">&quot;character&quot;</span>))</span>
+<span id="cb45-13"><a href="structure.html#cb45-13"></a>    )</span>
+<span id="cb45-14"><a href="structure.html#cb45-14"></a>  } <span class="cf">else</span> {</span>
+<span id="cb45-15"><a href="structure.html#cb45-15"></a>    <span class="kw">selectInput</span>(</span>
+<span id="cb45-16"><a href="structure.html#cb45-16"></a>      <span class="kw">ns</span>(<span class="st">&quot;x&quot;</span>),</span>
+<span id="cb45-17"><a href="structure.html#cb45-17"></a>      <span class="st">&quot;x&quot;</span>, </span>
+<span id="cb45-18"><a href="structure.html#cb45-18"></a>      <span class="dt">choices =</span> <span class="kw">names_that_are</span>(<span class="st">&quot;numeric&quot;</span>)</span>
+<span id="cb45-19"><a href="structure.html#cb45-19"></a>    )</span>
+<span id="cb45-20"><a href="structure.html#cb45-20"></a>  }</span>
+<span id="cb45-21"><a href="structure.html#cb45-21"></a>}</span></code></pre></div>
 <p>And in the module server:</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="structure.html#cb42-1"></a>mod_dataviz_server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb42-2"><a href="structure.html#cb42-2"></a>  input, </span>
-<span id="cb42-3"><a href="structure.html#cb42-3"></a>  output, </span>
-<span id="cb42-4"><a href="structure.html#cb42-4"></a>  session, </span>
-<span id="cb42-5"><a href="structure.html#cb42-5"></a>  type</span>
-<span id="cb42-6"><a href="structure.html#cb42-6"></a>) {</span>
-<span id="cb42-7"><a href="structure.html#cb42-7"></a>  <span class="cf">if</span> (type <span class="op">==</span><span class="st"> &quot;point&quot;</span>) {</span>
-<span id="cb42-8"><a href="structure.html#cb42-8"></a>    x &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">sym</span>(input<span class="op">$</span>x)</span>
-<span id="cb42-9"><a href="structure.html#cb42-9"></a>    y &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">sym</span>(input<span class="op">$</span>y)</span>
-<span id="cb42-10"><a href="structure.html#cb42-10"></a>    color &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">sym</span>(input<span class="op">$</span>color)</span>
-<span id="cb42-11"><a href="structure.html#cb42-11"></a>    r<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">ggplot</span>(</span>
-<span id="cb42-12"><a href="structure.html#cb42-12"></a>      big_epa_cars, </span>
-<span id="cb42-13"><a href="structure.html#cb42-13"></a>      <span class="kw">aes</span>(<span class="op">!!</span>x, <span class="op">!!</span>y, <span class="dt">color =</span> <span class="op">!!</span>color)</span>
-<span id="cb42-14"><a href="structure.html#cb42-14"></a>    )  <span class="op">+</span></span>
-<span id="cb42-15"><a href="structure.html#cb42-15"></a><span class="st">      </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></span>
-<span id="cb42-16"><a href="structure.html#cb42-16"></a><span class="st">      </span><span class="kw">scale_color_manual</span>(</span>
-<span id="cb42-17"><a href="structure.html#cb42-17"></a>        <span class="dt">values =</span> <span class="kw">color_values</span>(</span>
-<span id="cb42-18"><a href="structure.html#cb42-18"></a>          <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(<span class="kw">unique</span>(<span class="kw">pull</span>(big_epa_cars, <span class="op">!!</span>color))), </span>
-<span id="cb42-19"><a href="structure.html#cb42-19"></a>          <span class="dt">palette =</span> input<span class="op">$</span>palette</span>
-<span id="cb42-20"><a href="structure.html#cb42-20"></a>        )</span>
-<span id="cb42-21"><a href="structure.html#cb42-21"></a>      )</span>
-<span id="cb42-22"><a href="structure.html#cb42-22"></a>  } </span>
-<span id="cb42-23"><a href="structure.html#cb42-23"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="structure.html#cb46-1"></a>mod_dataviz_server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb46-2"><a href="structure.html#cb46-2"></a>  input, </span>
+<span id="cb46-3"><a href="structure.html#cb46-3"></a>  output, </span>
+<span id="cb46-4"><a href="structure.html#cb46-4"></a>  session, </span>
+<span id="cb46-5"><a href="structure.html#cb46-5"></a>  type</span>
+<span id="cb46-6"><a href="structure.html#cb46-6"></a>) {</span>
+<span id="cb46-7"><a href="structure.html#cb46-7"></a>  <span class="cf">if</span> (type <span class="op">==</span><span class="st"> &quot;point&quot;</span>) {</span>
+<span id="cb46-8"><a href="structure.html#cb46-8"></a>    x &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">sym</span>(input<span class="op">$</span>x)</span>
+<span id="cb46-9"><a href="structure.html#cb46-9"></a>    y &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">sym</span>(input<span class="op">$</span>y)</span>
+<span id="cb46-10"><a href="structure.html#cb46-10"></a>    color &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">sym</span>(input<span class="op">$</span>color)</span>
+<span id="cb46-11"><a href="structure.html#cb46-11"></a>    r<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">ggplot</span>(</span>
+<span id="cb46-12"><a href="structure.html#cb46-12"></a>      big_epa_cars, </span>
+<span id="cb46-13"><a href="structure.html#cb46-13"></a>      <span class="kw">aes</span>(<span class="op">!!</span>x, <span class="op">!!</span>y, <span class="dt">color =</span> <span class="op">!!</span>color)</span>
+<span id="cb46-14"><a href="structure.html#cb46-14"></a>    )  <span class="op">+</span></span>
+<span id="cb46-15"><a href="structure.html#cb46-15"></a><span class="st">      </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb46-16"><a href="structure.html#cb46-16"></a><span class="st">      </span><span class="kw">scale_color_manual</span>(</span>
+<span id="cb46-17"><a href="structure.html#cb46-17"></a>        <span class="dt">values =</span> <span class="kw">color_values</span>(</span>
+<span id="cb46-18"><a href="structure.html#cb46-18"></a>          <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(<span class="kw">unique</span>(<span class="kw">pull</span>(big_epa_cars, <span class="op">!!</span>color))), </span>
+<span id="cb46-19"><a href="structure.html#cb46-19"></a>          <span class="dt">palette =</span> input<span class="op">$</span>palette</span>
+<span id="cb46-20"><a href="structure.html#cb46-20"></a>        )</span>
+<span id="cb46-21"><a href="structure.html#cb46-21"></a>      )</span>
+<span id="cb46-22"><a href="structure.html#cb46-22"></a>  } </span>
+<span id="cb46-23"><a href="structure.html#cb46-23"></a>}</span></code></pre></div>
 <p>Then, the UI of the entire application is:</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="structure.html#cb43-1"></a>app_ui &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
-<span id="cb43-2"><a href="structure.html#cb43-2"></a>  <span class="co"># [...]</span></span>
-<span id="cb43-3"><a href="structure.html#cb43-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb43-4"><a href="structure.html#cb43-4"></a>    <span class="kw">fluidRow</span>(</span>
-<span id="cb43-5"><a href="structure.html#cb43-5"></a>      <span class="dt">id =</span> <span class="st">&quot;geom_point&quot;</span>, <span class="kw">mod_dataviz_ui</span>(<span class="st">&quot;dataviz_ui_1&quot;</span>, <span class="st">&quot;point&quot;</span>)</span>
-<span id="cb43-6"><a href="structure.html#cb43-6"></a>    ), </span>
-<span id="cb43-7"><a href="structure.html#cb43-7"></a>    <span class="kw">fluidRow</span>(</span>
-<span id="cb43-8"><a href="structure.html#cb43-8"></a>      <span class="dt">id =</span> <span class="st">&quot;geom_hist&quot;</span>, <span class="kw">mod_dataviz_ui</span>(<span class="st">&quot;dataviz_ui_2&quot;</span>, <span class="st">&quot;hist&quot;</span>)</span>
-<span id="cb43-9"><a href="structure.html#cb43-9"></a>    )</span>
-<span id="cb43-10"><a href="structure.html#cb43-10"></a>  )</span>
-<span id="cb43-11"><a href="structure.html#cb43-11"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="structure.html#cb47-1"></a>app_ui &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
+<span id="cb47-2"><a href="structure.html#cb47-2"></a>  <span class="co"># [...]</span></span>
+<span id="cb47-3"><a href="structure.html#cb47-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb47-4"><a href="structure.html#cb47-4"></a>    <span class="kw">fluidRow</span>(</span>
+<span id="cb47-5"><a href="structure.html#cb47-5"></a>      <span class="dt">id =</span> <span class="st">&quot;geom_point&quot;</span>, <span class="kw">mod_dataviz_ui</span>(<span class="st">&quot;dataviz_ui_1&quot;</span>, <span class="st">&quot;point&quot;</span>)</span>
+<span id="cb47-6"><a href="structure.html#cb47-6"></a>    ), </span>
+<span id="cb47-7"><a href="structure.html#cb47-7"></a>    <span class="kw">fluidRow</span>(</span>
+<span id="cb47-8"><a href="structure.html#cb47-8"></a>      <span class="dt">id =</span> <span class="st">&quot;geom_hist&quot;</span>, <span class="kw">mod_dataviz_ui</span>(<span class="st">&quot;dataviz_ui_2&quot;</span>, <span class="st">&quot;hist&quot;</span>)</span>
+<span id="cb47-9"><a href="structure.html#cb47-9"></a>    )</span>
+<span id="cb47-10"><a href="structure.html#cb47-10"></a>  )</span>
+<span id="cb47-11"><a href="structure.html#cb47-11"></a>}</span></code></pre></div>
 <p>And the <code>app_server()</code> of the application:</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="structure.html#cb44-1"></a>app_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb44-2"><a href="structure.html#cb44-2"></a>  <span class="co">#callModule(mod_raw_server, &quot;raw_ui_1&quot;)</span></span>
-<span id="cb44-3"><a href="structure.html#cb44-3"></a>  <span class="kw">callModule</span>(mod_dataviz_server, <span class="st">&quot;dataviz_ui_1&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;point&quot;</span>)</span>
-<span id="cb44-4"><a href="structure.html#cb44-4"></a>  <span class="kw">callModule</span>(mod_dataviz_server, <span class="st">&quot;dataviz_ui_2&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;hist&quot;</span>)</span>
-<span id="cb44-5"><a href="structure.html#cb44-5"></a>  <span class="kw">callModule</span>(mod_dataviz_server, <span class="st">&quot;dataviz_ui_3&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;boxplot&quot;</span>)</span>
-<span id="cb44-6"><a href="structure.html#cb44-6"></a>  <span class="kw">callModule</span>(mod_dataviz_server, <span class="st">&quot;dataviz_ui_4&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;bar&quot;</span>)</span>
-<span id="cb44-7"><a href="structure.html#cb44-7"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="structure.html#cb48-1"></a>app_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb48-2"><a href="structure.html#cb48-2"></a>  <span class="co">#callModule(mod_raw_server, &quot;raw_ui_1&quot;)</span></span>
+<span id="cb48-3"><a href="structure.html#cb48-3"></a>  <span class="kw">callModule</span>(mod_dataviz_server, <span class="st">&quot;dataviz_ui_1&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;point&quot;</span>)</span>
+<span id="cb48-4"><a href="structure.html#cb48-4"></a>  <span class="kw">callModule</span>(mod_dataviz_server, <span class="st">&quot;dataviz_ui_2&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;hist&quot;</span>)</span>
+<span id="cb48-5"><a href="structure.html#cb48-5"></a>  <span class="kw">callModule</span>(mod_dataviz_server, <span class="st">&quot;dataviz_ui_3&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;boxplot&quot;</span>)</span>
+<span id="cb48-6"><a href="structure.html#cb48-6"></a>  <span class="kw">callModule</span>(mod_dataviz_server, <span class="st">&quot;dataviz_ui_4&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;bar&quot;</span>)</span>
+<span id="cb48-7"><a href="structure.html#cb48-7"></a>}</span></code></pre></div>
 </div>
 </div>
 <div id="communication-between-modules" class="section level3">
@@ -884,51 +884,51 @@ There are at least three approaches:</p>
 <h4><span class="header-section-number">3.2.4.1</span> Returning values from the module</h4>
 <p>One common approach is to return a <code>reactive</code> function from one module, and pass it to another in the general <code>app_server()</code> function.</p>
 <p>Here is an example that illustrate this pattern.</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="structure.html#cb45-1"></a><span class="co"># Module 1</span></span>
-<span id="cb45-2"><a href="structure.html#cb45-2"></a>mod_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
-<span id="cb45-3"><a href="structure.html#cb45-3"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
-<span id="cb45-4"><a href="structure.html#cb45-4"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb45-5"><a href="structure.html#cb45-5"></a>    <span class="kw">sliderInput</span>(<span class="kw">ns</span>(<span class="st">&quot;choice&quot;</span>), <span class="st">&quot;Choice&quot;</span>, <span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">5</span>)</span>
-<span id="cb45-6"><a href="structure.html#cb45-6"></a>  )</span>
-<span id="cb45-7"><a href="structure.html#cb45-7"></a>}</span>
-<span id="cb45-8"><a href="structure.html#cb45-8"></a></span>
-<span id="cb45-9"><a href="structure.html#cb45-9"></a>mod_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb45-10"><a href="structure.html#cb45-10"></a>  <span class="kw">return</span>(</span>
-<span id="cb45-11"><a href="structure.html#cb45-11"></a>    <span class="kw">reactive</span>({</span>
-<span id="cb45-12"><a href="structure.html#cb45-12"></a>      input<span class="op">$</span>choice</span>
-<span id="cb45-13"><a href="structure.html#cb45-13"></a>    })</span>
-<span id="cb45-14"><a href="structure.html#cb45-14"></a>  )</span>
-<span id="cb45-15"><a href="structure.html#cb45-15"></a>}</span>
-<span id="cb45-16"><a href="structure.html#cb45-16"></a></span>
-<span id="cb45-17"><a href="structure.html#cb45-17"></a><span class="co"># Module 2</span></span>
-<span id="cb45-18"><a href="structure.html#cb45-18"></a>mod_b_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
-<span id="cb45-19"><a href="structure.html#cb45-19"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
-<span id="cb45-20"><a href="structure.html#cb45-20"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb45-21"><a href="structure.html#cb45-21"></a>    <span class="kw">actionButton</span>(<span class="kw">ns</span>(<span class="st">&quot;validate&quot;</span>), <span class="st">&quot;Print&quot;</span>)</span>
-<span id="cb45-22"><a href="structure.html#cb45-22"></a>  )</span>
-<span id="cb45-23"><a href="structure.html#cb45-23"></a>}</span>
-<span id="cb45-24"><a href="structure.html#cb45-24"></a></span>
-<span id="cb45-25"><a href="structure.html#cb45-25"></a>mod_b_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, react) {</span>
-<span id="cb45-26"><a href="structure.html#cb45-26"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>validate , {</span>
-<span id="cb45-27"><a href="structure.html#cb45-27"></a>    <span class="kw">print</span>(<span class="kw">react</span>())</span>
-<span id="cb45-28"><a href="structure.html#cb45-28"></a>  })</span>
-<span id="cb45-29"><a href="structure.html#cb45-29"></a>}</span>
-<span id="cb45-30"><a href="structure.html#cb45-30"></a></span>
-<span id="cb45-31"><a href="structure.html#cb45-31"></a><span class="co"># Application</span></span>
-<span id="cb45-32"><a href="structure.html#cb45-32"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb45-33"><a href="structure.html#cb45-33"></a>app_ui &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
-<span id="cb45-34"><a href="structure.html#cb45-34"></a>  <span class="kw">fluidPage</span>(</span>
-<span id="cb45-35"><a href="structure.html#cb45-35"></a>    <span class="kw">mod_ui</span>(<span class="st">&quot;mod_ui_1&quot;</span>),</span>
-<span id="cb45-36"><a href="structure.html#cb45-36"></a>    <span class="kw">mod_b_ui</span>(<span class="st">&quot;mod_ui_2&quot;</span>)</span>
-<span id="cb45-37"><a href="structure.html#cb45-37"></a>  )</span>
-<span id="cb45-38"><a href="structure.html#cb45-38"></a>}</span>
-<span id="cb45-39"><a href="structure.html#cb45-39"></a></span>
-<span id="cb45-40"><a href="structure.html#cb45-40"></a>app_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb45-41"><a href="structure.html#cb45-41"></a>  res &lt;-<span class="st"> </span><span class="kw">callModule</span>(mod_server, <span class="st">&quot;mod_ui_1&quot;</span>)</span>
-<span id="cb45-42"><a href="structure.html#cb45-42"></a>  <span class="kw">callModule</span>(mod_b_server, <span class="st">&quot;mod_ui_2&quot;</span>, <span class="dt">react =</span> res)</span>
-<span id="cb45-43"><a href="structure.html#cb45-43"></a>}</span>
-<span id="cb45-44"><a href="structure.html#cb45-44"></a></span>
-<span id="cb45-45"><a href="structure.html#cb45-45"></a><span class="kw">shinyApp</span>(app_ui, app_server)</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="structure.html#cb49-1"></a><span class="co"># Module 1</span></span>
+<span id="cb49-2"><a href="structure.html#cb49-2"></a>mod_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
+<span id="cb49-3"><a href="structure.html#cb49-3"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
+<span id="cb49-4"><a href="structure.html#cb49-4"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb49-5"><a href="structure.html#cb49-5"></a>    <span class="kw">sliderInput</span>(<span class="kw">ns</span>(<span class="st">&quot;choice&quot;</span>), <span class="st">&quot;Choice&quot;</span>, <span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">5</span>)</span>
+<span id="cb49-6"><a href="structure.html#cb49-6"></a>  )</span>
+<span id="cb49-7"><a href="structure.html#cb49-7"></a>}</span>
+<span id="cb49-8"><a href="structure.html#cb49-8"></a></span>
+<span id="cb49-9"><a href="structure.html#cb49-9"></a>mod_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb49-10"><a href="structure.html#cb49-10"></a>  <span class="kw">return</span>(</span>
+<span id="cb49-11"><a href="structure.html#cb49-11"></a>    <span class="kw">reactive</span>({</span>
+<span id="cb49-12"><a href="structure.html#cb49-12"></a>      input<span class="op">$</span>choice</span>
+<span id="cb49-13"><a href="structure.html#cb49-13"></a>    })</span>
+<span id="cb49-14"><a href="structure.html#cb49-14"></a>  )</span>
+<span id="cb49-15"><a href="structure.html#cb49-15"></a>}</span>
+<span id="cb49-16"><a href="structure.html#cb49-16"></a></span>
+<span id="cb49-17"><a href="structure.html#cb49-17"></a><span class="co"># Module 2</span></span>
+<span id="cb49-18"><a href="structure.html#cb49-18"></a>mod_b_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
+<span id="cb49-19"><a href="structure.html#cb49-19"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
+<span id="cb49-20"><a href="structure.html#cb49-20"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb49-21"><a href="structure.html#cb49-21"></a>    <span class="kw">actionButton</span>(<span class="kw">ns</span>(<span class="st">&quot;validate&quot;</span>), <span class="st">&quot;Print&quot;</span>)</span>
+<span id="cb49-22"><a href="structure.html#cb49-22"></a>  )</span>
+<span id="cb49-23"><a href="structure.html#cb49-23"></a>}</span>
+<span id="cb49-24"><a href="structure.html#cb49-24"></a></span>
+<span id="cb49-25"><a href="structure.html#cb49-25"></a>mod_b_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, react) {</span>
+<span id="cb49-26"><a href="structure.html#cb49-26"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>validate , {</span>
+<span id="cb49-27"><a href="structure.html#cb49-27"></a>    <span class="kw">print</span>(<span class="kw">react</span>())</span>
+<span id="cb49-28"><a href="structure.html#cb49-28"></a>  })</span>
+<span id="cb49-29"><a href="structure.html#cb49-29"></a>}</span>
+<span id="cb49-30"><a href="structure.html#cb49-30"></a></span>
+<span id="cb49-31"><a href="structure.html#cb49-31"></a><span class="co"># Application</span></span>
+<span id="cb49-32"><a href="structure.html#cb49-32"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb49-33"><a href="structure.html#cb49-33"></a>app_ui &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
+<span id="cb49-34"><a href="structure.html#cb49-34"></a>  <span class="kw">fluidPage</span>(</span>
+<span id="cb49-35"><a href="structure.html#cb49-35"></a>    <span class="kw">mod_ui</span>(<span class="st">&quot;mod_ui_1&quot;</span>),</span>
+<span id="cb49-36"><a href="structure.html#cb49-36"></a>    <span class="kw">mod_b_ui</span>(<span class="st">&quot;mod_ui_2&quot;</span>)</span>
+<span id="cb49-37"><a href="structure.html#cb49-37"></a>  )</span>
+<span id="cb49-38"><a href="structure.html#cb49-38"></a>}</span>
+<span id="cb49-39"><a href="structure.html#cb49-39"></a></span>
+<span id="cb49-40"><a href="structure.html#cb49-40"></a>app_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb49-41"><a href="structure.html#cb49-41"></a>  res &lt;-<span class="st"> </span><span class="kw">callModule</span>(mod_server, <span class="st">&quot;mod_ui_1&quot;</span>)</span>
+<span id="cb49-42"><a href="structure.html#cb49-42"></a>  <span class="kw">callModule</span>(mod_b_server, <span class="st">&quot;mod_ui_2&quot;</span>, <span class="dt">react =</span> res)</span>
+<span id="cb49-43"><a href="structure.html#cb49-43"></a>}</span>
+<span id="cb49-44"><a href="structure.html#cb49-44"></a></span>
+<span id="cb49-45"><a href="structure.html#cb49-45"></a><span class="kw">shinyApp</span>(app_ui, app_server)</span></code></pre></div>
 <p>This strategy works well, but for large Shiny Apps it might be hard to handle large lists of reactive outputs / inputs and to keep track of how things are organized.
 It might also create some reactivity issues, as a lot of <code>reactive</code> function calls is harder to control, or lead to too much computation from the server.</p>
 </div>
@@ -939,53 +939,53 @@ The idea is that it allows to be less preoccupied about what your module takes a
 You can think of this approach as creating a small, internal database that is passed along all the modules of your application.</p>
 <p>Below, we create a “global” (in the sense that it is initiated at the top of the module hierarchy) <code>reactiveValues()</code> object in the <code>app_server()</code> function.
 It will then go through all modules, passed as a function argument.</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="structure.html#cb46-1"></a><span class="co"># Module 1</span></span>
-<span id="cb46-2"><a href="structure.html#cb46-2"></a>mod_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
-<span id="cb46-3"><a href="structure.html#cb46-3"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
-<span id="cb46-4"><a href="structure.html#cb46-4"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb46-5"><a href="structure.html#cb46-5"></a>    <span class="kw">sliderInput</span>(<span class="kw">ns</span>(<span class="st">&quot;choice&quot;</span>), <span class="st">&quot;Choice&quot;</span>, <span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">5</span>)</span>
-<span id="cb46-6"><a href="structure.html#cb46-6"></a>  )</span>
-<span id="cb46-7"><a href="structure.html#cb46-7"></a>}</span>
-<span id="cb46-8"><a href="structure.html#cb46-8"></a></span>
-<span id="cb46-9"><a href="structure.html#cb46-9"></a>mod_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, r) {</span>
-<span id="cb46-10"><a href="structure.html#cb46-10"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>choice , {</span>
-<span id="cb46-11"><a href="structure.html#cb46-11"></a>    r<span class="op">$</span>choice &lt;-<span class="st"> </span>input<span class="op">$</span>choice</span>
-<span id="cb46-12"><a href="structure.html#cb46-12"></a>  })</span>
-<span id="cb46-13"><a href="structure.html#cb46-13"></a>  </span>
-<span id="cb46-14"><a href="structure.html#cb46-14"></a>}</span>
-<span id="cb46-15"><a href="structure.html#cb46-15"></a></span>
-<span id="cb46-16"><a href="structure.html#cb46-16"></a><span class="co"># Module 2</span></span>
-<span id="cb46-17"><a href="structure.html#cb46-17"></a>mod_b_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
-<span id="cb46-18"><a href="structure.html#cb46-18"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
-<span id="cb46-19"><a href="structure.html#cb46-19"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb46-20"><a href="structure.html#cb46-20"></a>    <span class="kw">actionButton</span>(<span class="kw">ns</span>(<span class="st">&quot;validate&quot;</span>), <span class="st">&quot;Print&quot;</span>)</span>
-<span id="cb46-21"><a href="structure.html#cb46-21"></a>  )</span>
-<span id="cb46-22"><a href="structure.html#cb46-22"></a>}</span>
-<span id="cb46-23"><a href="structure.html#cb46-23"></a></span>
-<span id="cb46-24"><a href="structure.html#cb46-24"></a>mod_b_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, r) {</span>
-<span id="cb46-25"><a href="structure.html#cb46-25"></a>  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</span>
-<span id="cb46-26"><a href="structure.html#cb46-26"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>validate , {</span>
-<span id="cb46-27"><a href="structure.html#cb46-27"></a>    <span class="kw">print</span>(r<span class="op">$</span>choice)</span>
-<span id="cb46-28"><a href="structure.html#cb46-28"></a>  })</span>
-<span id="cb46-29"><a href="structure.html#cb46-29"></a>  </span>
-<span id="cb46-30"><a href="structure.html#cb46-30"></a>}</span>
-<span id="cb46-31"><a href="structure.html#cb46-31"></a></span>
-<span id="cb46-32"><a href="structure.html#cb46-32"></a><span class="co"># Application</span></span>
-<span id="cb46-33"><a href="structure.html#cb46-33"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb46-34"><a href="structure.html#cb46-34"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
-<span id="cb46-35"><a href="structure.html#cb46-35"></a>  <span class="kw">fluidPage</span>(</span>
-<span id="cb46-36"><a href="structure.html#cb46-36"></a>    <span class="kw">mod_ui</span>(<span class="st">&quot;mod_ui_1&quot;</span>),</span>
-<span id="cb46-37"><a href="structure.html#cb46-37"></a>    <span class="kw">mod_b_ui</span>(<span class="st">&quot;mod_ui_2&quot;</span>)</span>
-<span id="cb46-38"><a href="structure.html#cb46-38"></a>  )</span>
-<span id="cb46-39"><a href="structure.html#cb46-39"></a>}</span>
-<span id="cb46-40"><a href="structure.html#cb46-40"></a></span>
-<span id="cb46-41"><a href="structure.html#cb46-41"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb46-42"><a href="structure.html#cb46-42"></a>  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>()</span>
-<span id="cb46-43"><a href="structure.html#cb46-43"></a>  <span class="kw">callModule</span>(mod_server, <span class="st">&quot;mod_ui_1&quot;</span>, r)</span>
-<span id="cb46-44"><a href="structure.html#cb46-44"></a>  <span class="kw">callModule</span>(mod_b_server, <span class="st">&quot;mod_ui_2&quot;</span>, r)</span>
-<span id="cb46-45"><a href="structure.html#cb46-45"></a>}</span>
-<span id="cb46-46"><a href="structure.html#cb46-46"></a></span>
-<span id="cb46-47"><a href="structure.html#cb46-47"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="structure.html#cb50-1"></a><span class="co"># Module 1</span></span>
+<span id="cb50-2"><a href="structure.html#cb50-2"></a>mod_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
+<span id="cb50-3"><a href="structure.html#cb50-3"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
+<span id="cb50-4"><a href="structure.html#cb50-4"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb50-5"><a href="structure.html#cb50-5"></a>    <span class="kw">sliderInput</span>(<span class="kw">ns</span>(<span class="st">&quot;choice&quot;</span>), <span class="st">&quot;Choice&quot;</span>, <span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">5</span>)</span>
+<span id="cb50-6"><a href="structure.html#cb50-6"></a>  )</span>
+<span id="cb50-7"><a href="structure.html#cb50-7"></a>}</span>
+<span id="cb50-8"><a href="structure.html#cb50-8"></a></span>
+<span id="cb50-9"><a href="structure.html#cb50-9"></a>mod_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, r) {</span>
+<span id="cb50-10"><a href="structure.html#cb50-10"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>choice , {</span>
+<span id="cb50-11"><a href="structure.html#cb50-11"></a>    r<span class="op">$</span>choice &lt;-<span class="st"> </span>input<span class="op">$</span>choice</span>
+<span id="cb50-12"><a href="structure.html#cb50-12"></a>  })</span>
+<span id="cb50-13"><a href="structure.html#cb50-13"></a>  </span>
+<span id="cb50-14"><a href="structure.html#cb50-14"></a>}</span>
+<span id="cb50-15"><a href="structure.html#cb50-15"></a></span>
+<span id="cb50-16"><a href="structure.html#cb50-16"></a><span class="co"># Module 2</span></span>
+<span id="cb50-17"><a href="structure.html#cb50-17"></a>mod_b_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id) {</span>
+<span id="cb50-18"><a href="structure.html#cb50-18"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
+<span id="cb50-19"><a href="structure.html#cb50-19"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb50-20"><a href="structure.html#cb50-20"></a>    <span class="kw">actionButton</span>(<span class="kw">ns</span>(<span class="st">&quot;validate&quot;</span>), <span class="st">&quot;Print&quot;</span>)</span>
+<span id="cb50-21"><a href="structure.html#cb50-21"></a>  )</span>
+<span id="cb50-22"><a href="structure.html#cb50-22"></a>}</span>
+<span id="cb50-23"><a href="structure.html#cb50-23"></a></span>
+<span id="cb50-24"><a href="structure.html#cb50-24"></a>mod_b_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, r) {</span>
+<span id="cb50-25"><a href="structure.html#cb50-25"></a>  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</span>
+<span id="cb50-26"><a href="structure.html#cb50-26"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>validate , {</span>
+<span id="cb50-27"><a href="structure.html#cb50-27"></a>    <span class="kw">print</span>(r<span class="op">$</span>choice)</span>
+<span id="cb50-28"><a href="structure.html#cb50-28"></a>  })</span>
+<span id="cb50-29"><a href="structure.html#cb50-29"></a>  </span>
+<span id="cb50-30"><a href="structure.html#cb50-30"></a>}</span>
+<span id="cb50-31"><a href="structure.html#cb50-31"></a></span>
+<span id="cb50-32"><a href="structure.html#cb50-32"></a><span class="co"># Application</span></span>
+<span id="cb50-33"><a href="structure.html#cb50-33"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb50-34"><a href="structure.html#cb50-34"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
+<span id="cb50-35"><a href="structure.html#cb50-35"></a>  <span class="kw">fluidPage</span>(</span>
+<span id="cb50-36"><a href="structure.html#cb50-36"></a>    <span class="kw">mod_ui</span>(<span class="st">&quot;mod_ui_1&quot;</span>),</span>
+<span id="cb50-37"><a href="structure.html#cb50-37"></a>    <span class="kw">mod_b_ui</span>(<span class="st">&quot;mod_ui_2&quot;</span>)</span>
+<span id="cb50-38"><a href="structure.html#cb50-38"></a>  )</span>
+<span id="cb50-39"><a href="structure.html#cb50-39"></a>}</span>
+<span id="cb50-40"><a href="structure.html#cb50-40"></a></span>
+<span id="cb50-41"><a href="structure.html#cb50-41"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb50-42"><a href="structure.html#cb50-42"></a>  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>()</span>
+<span id="cb50-43"><a href="structure.html#cb50-43"></a>  <span class="kw">callModule</span>(mod_server, <span class="st">&quot;mod_ui_1&quot;</span>, r)</span>
+<span id="cb50-44"><a href="structure.html#cb50-44"></a>  <span class="kw">callModule</span>(mod_b_server, <span class="st">&quot;mod_ui_2&quot;</span>, r)</span>
+<span id="cb50-45"><a href="structure.html#cb50-45"></a>}</span>
+<span id="cb50-46"><a href="structure.html#cb50-46"></a></span>
+<span id="cb50-47"><a href="structure.html#cb50-47"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>The good thing about this method is that whenever you add something in one module, it is immediately available in all other modules where <code>r</code> is present.
 The downside is that it can make it harder to reason about the app, as the input/content of the <code>r</code> is not specified anywhere unless you explicitly document it: the parameter to your server function being “r” only, you need to be a little bit more zealous when it comes to documenting it.</p>
 <p>Note that if you want to share your module, for example in a package, you should document the structure of the <code>r</code>.
@@ -1023,56 +1023,56 @@ If you keep all together in the same file, you will end up having to rerun the a
 Extract the business function from the reactive functions.
 Literally.
 Compare this pattern:</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="structure.html#cb48-1"></a><span class="co"># Application</span></span>
-<span id="cb48-2"><a href="structure.html#cb48-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb48-3"><a href="structure.html#cb48-3"></a><span class="kw">library</span>(dplyr)</span>
-<span id="cb48-4"><a href="structure.html#cb48-4"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
-<span id="cb48-5"><a href="structure.html#cb48-5"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb48-6"><a href="structure.html#cb48-6"></a>    <span class="kw">tableOutput</span>(<span class="st">&quot;tbl&quot;</span>)</span>
-<span id="cb48-7"><a href="structure.html#cb48-7"></a>  )</span>
-<span id="cb48-8"><a href="structure.html#cb48-8"></a>}</span>
-<span id="cb48-9"><a href="structure.html#cb48-9"></a></span>
-<span id="cb48-10"><a href="structure.html#cb48-10"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb48-11"><a href="structure.html#cb48-11"></a>  output<span class="op">$</span>tbl &lt;-<span class="st"> </span><span class="kw">renderTable</span>({</span>
-<span id="cb48-12"><a href="structure.html#cb48-12"></a>    mtcars <span class="op">%&gt;%</span></span>
-<span id="cb48-13"><a href="structure.html#cb48-13"></a><span class="st">      </span><span class="co"># [...] %&gt;% </span></span>
-<span id="cb48-14"><a href="structure.html#cb48-14"></a><span class="st">      </span><span class="co"># [...] %&gt;% </span></span>
-<span id="cb48-15"><a href="structure.html#cb48-15"></a><span class="st">      </span><span class="co"># [...] %&gt;% </span></span>
-<span id="cb48-16"><a href="structure.html#cb48-16"></a><span class="st">      </span><span class="co"># [...] %&gt;% </span></span>
-<span id="cb48-17"><a href="structure.html#cb48-17"></a><span class="st">      </span><span class="co"># [...] %&gt;% </span></span>
-<span id="cb48-18"><a href="structure.html#cb48-18"></a><span class="st">      </span><span class="kw">top_n</span>(<span class="dv">10</span>)</span>
-<span id="cb48-19"><a href="structure.html#cb48-19"></a>  })</span>
-<span id="cb48-20"><a href="structure.html#cb48-20"></a>}</span>
-<span id="cb48-21"><a href="structure.html#cb48-21"></a></span>
-<span id="cb48-22"><a href="structure.html#cb48-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="structure.html#cb52-1"></a><span class="co"># Application</span></span>
+<span id="cb52-2"><a href="structure.html#cb52-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb52-3"><a href="structure.html#cb52-3"></a><span class="kw">library</span>(dplyr)</span>
+<span id="cb52-4"><a href="structure.html#cb52-4"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
+<span id="cb52-5"><a href="structure.html#cb52-5"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb52-6"><a href="structure.html#cb52-6"></a>    <span class="kw">tableOutput</span>(<span class="st">&quot;tbl&quot;</span>)</span>
+<span id="cb52-7"><a href="structure.html#cb52-7"></a>  )</span>
+<span id="cb52-8"><a href="structure.html#cb52-8"></a>}</span>
+<span id="cb52-9"><a href="structure.html#cb52-9"></a></span>
+<span id="cb52-10"><a href="structure.html#cb52-10"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb52-11"><a href="structure.html#cb52-11"></a>  output<span class="op">$</span>tbl &lt;-<span class="st"> </span><span class="kw">renderTable</span>({</span>
+<span id="cb52-12"><a href="structure.html#cb52-12"></a>    mtcars <span class="op">%&gt;%</span></span>
+<span id="cb52-13"><a href="structure.html#cb52-13"></a><span class="st">      </span><span class="co"># [...] %&gt;% </span></span>
+<span id="cb52-14"><a href="structure.html#cb52-14"></a><span class="st">      </span><span class="co"># [...] %&gt;% </span></span>
+<span id="cb52-15"><a href="structure.html#cb52-15"></a><span class="st">      </span><span class="co"># [...] %&gt;% </span></span>
+<span id="cb52-16"><a href="structure.html#cb52-16"></a><span class="st">      </span><span class="co"># [...] %&gt;% </span></span>
+<span id="cb52-17"><a href="structure.html#cb52-17"></a><span class="st">      </span><span class="co"># [...] %&gt;% </span></span>
+<span id="cb52-18"><a href="structure.html#cb52-18"></a><span class="st">      </span><span class="kw">top_n</span>(<span class="dv">10</span>)</span>
+<span id="cb52-19"><a href="structure.html#cb52-19"></a>  })</span>
+<span id="cb52-20"><a href="structure.html#cb52-20"></a>}</span>
+<span id="cb52-21"><a href="structure.html#cb52-21"></a></span>
+<span id="cb52-22"><a href="structure.html#cb52-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>To this one:</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="structure.html#cb49-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb49-2"><a href="structure.html#cb49-2"></a><span class="kw">library</span>(dplyr)</span>
-<span id="cb49-3"><a href="structure.html#cb49-3"></a></span>
-<span id="cb49-4"><a href="structure.html#cb49-4"></a><span class="co"># Business logic</span></span>
-<span id="cb49-5"><a href="structure.html#cb49-5"></a>top_this &lt;-<span class="st"> </span><span class="cf">function</span>(tbl) {</span>
-<span id="cb49-6"><a href="structure.html#cb49-6"></a>  tbl <span class="op">%&gt;%</span></span>
-<span id="cb49-7"><a href="structure.html#cb49-7"></a><span class="st">    </span><span class="co"># [...] %&gt;% </span></span>
-<span id="cb49-8"><a href="structure.html#cb49-8"></a><span class="st">    </span><span class="co"># [...] %&gt;% </span></span>
-<span id="cb49-9"><a href="structure.html#cb49-9"></a><span class="st">    </span><span class="co"># [...] %&gt;% </span></span>
-<span id="cb49-10"><a href="structure.html#cb49-10"></a><span class="st">    </span><span class="co"># [...] %&gt;% </span></span>
-<span id="cb49-11"><a href="structure.html#cb49-11"></a><span class="st">    </span><span class="kw">top_n</span>(<span class="dv">10</span>)</span>
-<span id="cb49-12"><a href="structure.html#cb49-12"></a>}</span>
-<span id="cb49-13"><a href="structure.html#cb49-13"></a></span>
-<span id="cb49-14"><a href="structure.html#cb49-14"></a><span class="co"># Application</span></span>
-<span id="cb49-15"><a href="structure.html#cb49-15"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
-<span id="cb49-16"><a href="structure.html#cb49-16"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb49-17"><a href="structure.html#cb49-17"></a>    <span class="kw">tableOutput</span>(<span class="st">&quot;tbl&quot;</span>)</span>
-<span id="cb49-18"><a href="structure.html#cb49-18"></a>  )</span>
-<span id="cb49-19"><a href="structure.html#cb49-19"></a>}</span>
-<span id="cb49-20"><a href="structure.html#cb49-20"></a></span>
-<span id="cb49-21"><a href="structure.html#cb49-21"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb49-22"><a href="structure.html#cb49-22"></a>  output<span class="op">$</span>tbl &lt;-<span class="st"> </span><span class="kw">renderTable</span>({</span>
-<span id="cb49-23"><a href="structure.html#cb49-23"></a>    <span class="kw">top_this</span>(mtcars)</span>
-<span id="cb49-24"><a href="structure.html#cb49-24"></a>  })</span>
-<span id="cb49-25"><a href="structure.html#cb49-25"></a>}</span>
-<span id="cb49-26"><a href="structure.html#cb49-26"></a></span>
-<span id="cb49-27"><a href="structure.html#cb49-27"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="structure.html#cb53-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb53-2"><a href="structure.html#cb53-2"></a><span class="kw">library</span>(dplyr)</span>
+<span id="cb53-3"><a href="structure.html#cb53-3"></a></span>
+<span id="cb53-4"><a href="structure.html#cb53-4"></a><span class="co"># Business logic</span></span>
+<span id="cb53-5"><a href="structure.html#cb53-5"></a>top_this &lt;-<span class="st"> </span><span class="cf">function</span>(tbl) {</span>
+<span id="cb53-6"><a href="structure.html#cb53-6"></a>  tbl <span class="op">%&gt;%</span></span>
+<span id="cb53-7"><a href="structure.html#cb53-7"></a><span class="st">    </span><span class="co"># [...] %&gt;% </span></span>
+<span id="cb53-8"><a href="structure.html#cb53-8"></a><span class="st">    </span><span class="co"># [...] %&gt;% </span></span>
+<span id="cb53-9"><a href="structure.html#cb53-9"></a><span class="st">    </span><span class="co"># [...] %&gt;% </span></span>
+<span id="cb53-10"><a href="structure.html#cb53-10"></a><span class="st">    </span><span class="co"># [...] %&gt;% </span></span>
+<span id="cb53-11"><a href="structure.html#cb53-11"></a><span class="st">    </span><span class="kw">top_n</span>(<span class="dv">10</span>)</span>
+<span id="cb53-12"><a href="structure.html#cb53-12"></a>}</span>
+<span id="cb53-13"><a href="structure.html#cb53-13"></a></span>
+<span id="cb53-14"><a href="structure.html#cb53-14"></a><span class="co"># Application</span></span>
+<span id="cb53-15"><a href="structure.html#cb53-15"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>() {</span>
+<span id="cb53-16"><a href="structure.html#cb53-16"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb53-17"><a href="structure.html#cb53-17"></a>    <span class="kw">tableOutput</span>(<span class="st">&quot;tbl&quot;</span>)</span>
+<span id="cb53-18"><a href="structure.html#cb53-18"></a>  )</span>
+<span id="cb53-19"><a href="structure.html#cb53-19"></a>}</span>
+<span id="cb53-20"><a href="structure.html#cb53-20"></a></span>
+<span id="cb53-21"><a href="structure.html#cb53-21"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb53-22"><a href="structure.html#cb53-22"></a>  output<span class="op">$</span>tbl &lt;-<span class="st"> </span><span class="kw">renderTable</span>({</span>
+<span id="cb53-23"><a href="structure.html#cb53-23"></a>    <span class="kw">top_this</span>(mtcars)</span>
+<span id="cb53-24"><a href="structure.html#cb53-24"></a>  })</span>
+<span id="cb53-25"><a href="structure.html#cb53-25"></a>}</span>
+<span id="cb53-26"><a href="structure.html#cb53-26"></a></span>
+<span id="cb53-27"><a href="structure.html#cb53-27"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>Both scripts do the exact same thing.
 The difference is that the second code can be easily explored without having to relaunch the app.
 You will be able to build a reproducible example to explore, illustrate and improve <code>top_this()</code>.

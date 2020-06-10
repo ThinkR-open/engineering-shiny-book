@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 4 Introduction to {golem} | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 4 Introduction to {golem} | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-05-12" />
+<meta name="date" content="2020-06-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -461,26 +461,26 @@ Note that the version used at the time of writing this book is 0.2.1.9010.</p>
 <h2><span class="header-section-number">4.1</span> What is <code>{golem}</code>?</h2>
 <p><code>{golem}</code> is a toolkit for simplifying the creation, development and deployment of a Shiny application.
 It’s focused on building applications that will be sent to production, but of course starting with <code>{golem}</code> from the very beginning is also possible, even recommended: it is easier to start with <code>{golem}</code> than to refactor your codebase to fit into the framework.</p>
-<p>The stable release can be found on CRAN and is installed with:</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="golem.html#cb50-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;golem&quot;</span>)</span></code></pre></div>
-<p><code>{golem}</code> development version can be found on GitHub and is installed with:</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="golem.html#cb51-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;Thinkr-open/golem&quot;</span>)</span></code></pre></div>
+<p>The stable release can be found on CRAN and installed with:</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="golem.html#cb54-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;golem&quot;</span>)</span></code></pre></div>
+<p><code>{golem}</code> development version can be found on GitHub and installed with:</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="golem.html#cb55-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;Thinkr-open/golem&quot;</span>)</span></code></pre></div>
 <p>The version of the package on CRAN at the time of writing this book is:</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="golem.html#cb52-1"></a><span class="kw">library</span>(dplyr, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb52-2"><a href="golem.html#cb52-2"></a>tools<span class="op">::</span><span class="kw">CRAN_package_db</span>() <span class="op">%&gt;%</span></span>
-<span id="cb52-3"><a href="golem.html#cb52-3"></a><span class="st">  </span><span class="kw">filter</span>(Package <span class="op">==</span><span class="st"> &quot;golem&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb52-4"><a href="golem.html#cb52-4"></a><span class="st">  </span><span class="kw">select</span>(Version)</span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="golem.html#cb56-1"></a><span class="kw">library</span>(dplyr, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb56-2"><a href="golem.html#cb56-2"></a>tools<span class="op">::</span><span class="kw">CRAN_package_db</span>() <span class="op">%&gt;%</span></span>
+<span id="cb56-3"><a href="golem.html#cb56-3"></a><span class="st">  </span><span class="kw">filter</span>(Package <span class="op">==</span><span class="st"> &quot;golem&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb56-4"><a href="golem.html#cb56-4"></a><span class="st">  </span><span class="kw">select</span>(Version)</span></code></pre></div>
 <pre><code>  Version
 1   0.2.1</code></pre>
 <p>While the current development version is:</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="golem.html#cb54-1"></a>x &lt;-<span class="st"> </span><span class="kw">tempfile</span>()</span>
-<span id="cb54-2"><a href="golem.html#cb54-2"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb54-3"><a href="golem.html#cb54-3"></a>  <span class="st">&quot;https://raw.githubusercontent.com/&quot;</span>, </span>
-<span id="cb54-4"><a href="golem.html#cb54-4"></a>  <span class="st">&quot;ThinkR-open/golem/dev/DESCRIPTION&quot;</span></span>
-<span id="cb54-5"><a href="golem.html#cb54-5"></a>)</span>
-<span id="cb54-6"><a href="golem.html#cb54-6"></a><span class="kw">download.file</span>(url, x)</span>
-<span id="cb54-7"><a href="golem.html#cb54-7"></a>desc<span class="op">::</span><span class="kw">desc_get_version</span>(x)</span></code></pre></div>
-<pre><code>[1] &#39;0.2.1.9020&#39;</code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="golem.html#cb58-1"></a>x &lt;-<span class="st"> </span><span class="kw">tempfile</span>()</span>
+<span id="cb58-2"><a href="golem.html#cb58-2"></a>url &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
+<span id="cb58-3"><a href="golem.html#cb58-3"></a>  <span class="st">&quot;https://raw.githubusercontent.com/&quot;</span>, </span>
+<span id="cb58-4"><a href="golem.html#cb58-4"></a>  <span class="st">&quot;ThinkR-open/golem/dev/DESCRIPTION&quot;</span></span>
+<span id="cb58-5"><a href="golem.html#cb58-5"></a>)</span>
+<span id="cb58-6"><a href="golem.html#cb58-6"></a><span class="kw">download.file</span>(url, x)</span>
+<span id="cb58-7"><a href="golem.html#cb58-7"></a>desc<span class="op">::</span><span class="kw">desc_get_version</span>(x)</span></code></pre></div>
+<pre><code>[1] &#39;0.2.1.9021&#39;</code></pre>
 <p>The motivation behind <code>{golem}</code> is that building a Proof of Concept application is easy, but things change when the application becomes larger and more complex, and especially when you need to send that app to production.
 Until recently there has not been any real framework for building and deploying production-grade Shiny Apps.
 This is where <code>{golem}</code> comes into play: offering Shiny developers a toolkit for making a stable, easy-to-maintain, and robust production web application with R.
@@ -500,9 +500,9 @@ Knowing how modules work is also recommended but not necessary.</p></li>
 <p>A <code>{golem}</code> application is an R package. Having an R package architecture is perfectly suited for production-ready programs, as we developed in the previous chapter.</p>
 <p>Let’s focus on the architecture of the default <code>{golem}</code> app, and present what part each file plays and how you can use (or not use) each of them.</p>
 <p>You can create a <code>{golem}</code> project, here called <code>golex</code>, with RStudio “New project” creation or with command line:</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="golem.html#cb56-1"></a>golem<span class="op">::</span><span class="kw">create_golem</span>(<span class="st">&quot;golex&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="golem.html#cb60-1"></a>golem<span class="op">::</span><span class="kw">create_golem</span>(<span class="st">&quot;golex&quot;</span>)</span></code></pre></div>
 <p>The project will start with this specific architecture:</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="golem.html#cb57-1"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;golex&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="golem.html#cb61-1"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;golex&quot;</span>)</span></code></pre></div>
 <pre><code>golex
 ├── DESCRIPTION
 ├── NAMESPACE
@@ -528,7 +528,7 @@ Knowing how modules work is also recommended but not necessary.</p></li>
 └── man
     └── run_app.Rd</code></pre>
 <p>If you are familiar with building R packages, this structure will look familiar to you.
-And for a good read on: a <code>{golem}</code> app IS a package.</p>
+And for a good reason: a <code>{golem}</code> app IS a package.</p>
 <div id="description-namespace" class="section level3">
 <h3><span class="header-section-number">4.2.1</span> <code>DESCRIPTION</code> &amp; <code>NAMESPACE</code></h3>
 <p>The <code>DESCRIPTION</code> and <code>NAMESPACE</code> are standard package files (<em>i.e.</em> they are not <code>{golem}</code>-specific).
@@ -562,7 +562,7 @@ The <code>dev/</code> folder also contains <code>.R</code> scripts, and they are
 If you want to add a standard file (that is to say out of <code>{golem}</code> nomenclature), you can also call <code>usethis::use_r("name")</code>, which will create a <code>R/name.R</code> file.</p>
 <p>If you have built a “classic” Shiny App, <em>i.e</em> before <code>{golem}</code> was available, or if you started with the standard RStudio template, you might have a series of <code>source()</code> and <code>library()</code> calls all over the place.
 This is not to be done with a <code>{golem}</code>-based application: you are leveraging the package infrastructure so that everything inside the <code>R/</code> folder is made available internally, without having to <code>source()</code> scripts.</p>
-<p>Note also that this folder can not contain sub-folders.</p>
+<p>Note also that this folder must not contain any sub-folders.</p>
 <div id="app_server.r" class="section level4">
 <h4><span class="header-section-number">4.2.2.1</span> app_server.R</h4>
 <pre><code>#&#39; The application server-side
@@ -668,7 +668,7 @@ run_app &lt;- function(
 }</code></pre>
 <p>The <code>run_app()</code> function is the one that you will use to launch the app<a href="#fn18" class="footnote-ref" id="fnref18"><sup>18</sup></a>
 .</p>
-<p>The body of this function is wrapped inside <code>with_golem_options()</code>, which allows you to pass arguments to the <code>run_app()</code> function, which will later be callable with <code>golem::get_golem_options()</code>.
+<p>The body of this function is wrapped inside <code>with_golem_options()</code>, which allows you to pass arguments to the <code>run_app()</code> function, which can be called later on with <code>golem::get_golem_options()</code>.
 Some examples of passing arguments include <code>run_app(prod = FALSE)</code> to run a verbose development version or <code>run_app(user = "admin)</code> to bypass authentication during development tests.</p>
 </div>
 </div>
@@ -735,42 +735,42 @@ For example, in the default example:</p>
 Use the <code>app_sys()</code> function if you want to rely on the package path once the app is deployed.</li>
 </ul>
 <p>These options are globally set with:</p>
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="golem.html#cb65-1"></a><span class="kw">set_golem_options</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="golem.html#cb69-1"></a><span class="kw">set_golem_options</span>()</span></code></pre></div>
 <p>The functions reading the options in this config file are:</p>
-<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="golem.html#cb66-1"></a><span class="kw">get_golem_name</span>()</span>
-<span id="cb66-2"><a href="golem.html#cb66-2"></a><span class="kw">get_golem_wd</span>()</span>
-<span id="cb66-3"><a href="golem.html#cb66-3"></a><span class="kw">get_golem_version</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="golem.html#cb70-1"></a><span class="kw">get_golem_name</span>()</span>
+<span id="cb70-2"><a href="golem.html#cb70-2"></a><span class="kw">get_golem_wd</span>()</span>
+<span id="cb70-3"><a href="golem.html#cb70-3"></a><span class="kw">get_golem_version</span>()</span></code></pre></div>
 <p>You can set these with:</p>
-<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="golem.html#cb67-1"></a><span class="kw">set_golem_name</span>(<span class="st">&quot;this&quot;</span>)</span>
-<span id="cb67-2"><a href="golem.html#cb67-2"></a><span class="kw">set_golem_wd</span>(<span class="st">&quot;.&quot;</span>)</span>
-<span id="cb67-3"><a href="golem.html#cb67-3"></a><span class="kw">set_golem_version</span>(<span class="st">&quot;0.0.1&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="golem.html#cb71-1"></a><span class="kw">set_golem_name</span>(<span class="st">&quot;this&quot;</span>)</span>
+<span id="cb71-2"><a href="golem.html#cb71-2"></a><span class="kw">set_golem_wd</span>(<span class="st">&quot;.&quot;</span>)</span>
+<span id="cb71-3"><a href="golem.html#cb71-3"></a><span class="kw">set_golem_version</span>(<span class="st">&quot;0.0.1&quot;</span>)</span></code></pre></div>
 <p>If you are already familiar with the <code>{config}</code> package, you can use this file just as any config file.</p>
 <p><code>{golem}</code> comes with an <code>amend_golem_config()</code> function to add elements to it.</p>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="golem.html#cb68-1"></a><span class="kw">amend_golem_config</span>(</span>
-<span id="cb68-2"><a href="golem.html#cb68-2"></a>  <span class="dt">key =</span> <span class="st">&quot;where&quot;</span>, </span>
-<span id="cb68-3"><a href="golem.html#cb68-3"></a>  <span class="dt">value =</span> <span class="st">&quot;indev&quot;</span></span>
-<span id="cb68-4"><a href="golem.html#cb68-4"></a>)</span>
-<span id="cb68-5"><a href="golem.html#cb68-5"></a><span class="kw">amend_golem_config</span>(</span>
-<span id="cb68-6"><a href="golem.html#cb68-6"></a>  <span class="dt">key =</span> <span class="st">&quot;where&quot;</span>, </span>
-<span id="cb68-7"><a href="golem.html#cb68-7"></a>  <span class="dt">value =</span> <span class="st">&quot;inprod&quot;</span>, </span>
-<span id="cb68-8"><a href="golem.html#cb68-8"></a>  <span class="dt">config =</span> <span class="st">&quot;production&quot;</span></span>
-<span id="cb68-9"><a href="golem.html#cb68-9"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="golem.html#cb72-1"></a><span class="kw">amend_golem_config</span>(</span>
+<span id="cb72-2"><a href="golem.html#cb72-2"></a>  <span class="dt">key =</span> <span class="st">&quot;where&quot;</span>, </span>
+<span id="cb72-3"><a href="golem.html#cb72-3"></a>  <span class="dt">value =</span> <span class="st">&quot;indev&quot;</span></span>
+<span id="cb72-4"><a href="golem.html#cb72-4"></a>)</span>
+<span id="cb72-5"><a href="golem.html#cb72-5"></a><span class="kw">amend_golem_config</span>(</span>
+<span id="cb72-6"><a href="golem.html#cb72-6"></a>  <span class="dt">key =</span> <span class="st">&quot;where&quot;</span>, </span>
+<span id="cb72-7"><a href="golem.html#cb72-7"></a>  <span class="dt">value =</span> <span class="st">&quot;inprod&quot;</span>, </span>
+<span id="cb72-8"><a href="golem.html#cb72-8"></a>  <span class="dt">config =</span> <span class="st">&quot;production&quot;</span></span>
+<span id="cb72-9"><a href="golem.html#cb72-9"></a>)</span></code></pre></div>
 <p>In <code>R/app_config.R</code>, you will find a <code>get_golem_config()</code> function that allows you to retrieve config from this config file:</p>
-<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="golem.html#cb69-1"></a><span class="kw">get_golem_config</span>(</span>
-<span id="cb69-2"><a href="golem.html#cb69-2"></a>  <span class="st">&quot;where&quot;</span></span>
-<span id="cb69-3"><a href="golem.html#cb69-3"></a>)</span>
-<span id="cb69-4"><a href="golem.html#cb69-4"></a><span class="kw">get_golem_config</span>(</span>
-<span id="cb69-5"><a href="golem.html#cb69-5"></a>  <span class="st">&quot;where&quot;</span>, </span>
-<span id="cb69-6"><a href="golem.html#cb69-6"></a>  <span class="dt">config =</span> <span class="st">&quot;production&quot;</span></span>
-<span id="cb69-7"><a href="golem.html#cb69-7"></a>)</span></code></pre></div>
-<p>You can also use en environment variable (default <code>{config}</code> behavior):</p>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="golem.html#cb70-1"></a><span class="kw">Sys.setenv</span>(<span class="st">&quot;R_CONFIG_ACTIVE&quot;</span> =<span class="st"> &quot;production&quot;</span>)</span>
-<span id="cb70-2"><a href="golem.html#cb70-2"></a><span class="kw">get_golem_config</span>(<span class="st">&quot;where&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="golem.html#cb73-1"></a><span class="kw">get_golem_config</span>(</span>
+<span id="cb73-2"><a href="golem.html#cb73-2"></a>  <span class="st">&quot;where&quot;</span></span>
+<span id="cb73-3"><a href="golem.html#cb73-3"></a>)</span>
+<span id="cb73-4"><a href="golem.html#cb73-4"></a><span class="kw">get_golem_config</span>(</span>
+<span id="cb73-5"><a href="golem.html#cb73-5"></a>  <span class="st">&quot;where&quot;</span>, </span>
+<span id="cb73-6"><a href="golem.html#cb73-6"></a>  <span class="dt">config =</span> <span class="st">&quot;production&quot;</span></span>
+<span id="cb73-7"><a href="golem.html#cb73-7"></a>)</span></code></pre></div>
+<p>You can also use an environment variable (default <code>{config}</code> behavior):</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="golem.html#cb74-1"></a><span class="kw">Sys.setenv</span>(<span class="st">&quot;R_CONFIG_ACTIVE&quot;</span> =<span class="st"> &quot;production&quot;</span>)</span>
+<span id="cb74-2"><a href="golem.html#cb74-2"></a><span class="kw">get_golem_config</span>(<span class="st">&quot;where&quot;</span>)</span></code></pre></div>
 <p>The good news is that if you don’t want/need to use <code>{config}</code>, you can safely ignore this file, just leave it where it is: it is used internally by the <code>{golem}</code> functions.</p>
 </div>
 <div id="golem_config-vs-golem_options" class="section level4">
 <h4><span class="header-section-number">4.2.3.3</span> <code>golem_config</code> vs <code>golem_options</code></h4>
-<p>There is two ways to configure golem apps:</p>
+<p>There are two ways to configure golem apps:</p>
 <ul>
 <li>The <code>golem_opts</code> in the <code>run_app()</code> function</li>
 <li>The <code>golem-config.yml</code> file</li>
@@ -785,10 +785,10 @@ Use the <code>app_sys()</code> function if you want to rely on the package path 
 <p>The <code>inst/app/www/</code> folder contains all files that are made available <strong>at application run time</strong>.
 Any web application has external files that allow it to run<a href="#fn19" class="footnote-ref" id="fnref19"><sup>19</sup></a>
 .
-For example, <code>{shiny}</code> and its <code>fluidPage()</code> function bundles a series of CSS and JavaScript files, notably the <code>Boostrap</code> library, or <code>jQuery</code>.
+For example, <code>{shiny}</code> and its <code>fluidPage()</code> function bundles a series of CSS and JavaScript files, notably the <code>Bootstrap</code> library, or <code>jQuery</code>.
 These external files enhance your app: CSS for the design part and JavaScript for the interactive part (more or less).
 On top of that, you can add your own files: your own design with CSS or your own JavaScript content (as we will see in the last chapters of this book).
-In order to work, you have to include, somewhere in the UI, a link to these files.
+In order to work, you have to include a link to these files somewhere in the UI.
 This is what <code>golem_add_external_resources()</code> is made for: linking the external resources that you will build with the following functions.</p>
 <ul>
 <li><code>golem::add_css_file()</code></li>

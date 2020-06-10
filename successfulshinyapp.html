@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 1 About Successful Shiny Apps | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 1 About Successful Shiny Apps | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-05-12" />
+<meta name="date" content="2020-06-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -462,7 +462,7 @@ And that is probably one of the main reason why this package has become so succe
 <p>The first version of <code>{shiny}</code> was published in 2012.
 Since then, it has been one of the top project of the RStudio team.
 At the time of writing these lines (April 2020), there are more than 4700 commits in the master branch of the GitHub repository, made by 46 contributors.
-It is now downloaded around 400K times a month, according to <a href="https://cranlogs.r-pkg.org/badges/shiny">cranlogs</a>, and has 741 reverse dependencies (i.e packages that depend on it), according to <code>revdep("shiny")</code> from <code>{devtools}</code> <span class="citation">(Wickham, Hester, and Chang <a href="#ref-R-devtools" role="doc-biblioref">2020</a>)</span>.</p>
+It is now downloaded around 400K times a month, according to <a href="https://cranlogs.r-pkg.org/badges/shiny">cranlogs</a>, and has 755 reverse dependencies (i.e packages that depend on it), according to <code>revdep("shiny")</code> from <code>{devtools}</code> <span class="citation">(Wickham, Hester, and Chang <a href="#ref-R-devtools" role="doc-biblioref">2020</a>)</span>.</p>
 <p>If you are very new to Shiny, this book might feel a little bit overwhelming: we will be discussing some advanced <code>{shiny}</code> and software engineering methods, best practices and structural idea for sending Shiny applications to production.
 This books relies on the assumption that you already know how to build basic Shiny applications, and that you want to push your Shiny skills to the next level: in other words, you are ready to move from the Proof of Concept to the production-grade application.
 If you are very new to Shiny, we suggest you start with the <a href="https://mastering-shiny.org/">Mastering Shiny book</a> before reading the present book.</p>
@@ -501,7 +501,7 @@ Indeed, the user will have to invest more time learning how the app works, and w
 <p>Let’s dive a little bit more in these two type of complexity.</p>
 <div id="developers-complexity" class="section level4">
 <h4><span class="header-section-number">1.2.1.1</span> Developers complexity</h4>
-<p>An app is to be considered complex when it is so large in terms of size and functionality that it makes it impossible to reason about it at once, and developer must rely on tools and methods to understand and handle this complexity: for example, when it comes to <code>{shiny}</code>, you will rely on tools like the <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> framework, introduced all along this book, to handle some implementation, development and deployment complexity.
+<p>An app is to be considered complex when it is so large in terms of size and functionality that it makes it impossible to reason about it at once, and developers must rely on tools and methods to understand and handle this complexity: for example, when it comes to <code>{shiny}</code>, you will rely on tools like the <code>{golem}</code> <span class="citation">(Guyader et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> framework, introduced all along this book, to handle some implementation, development and deployment complexity.
 This book will introduce a clear methodology that comes with a series of conventions, which are crucial when it comes to building and maintaining complex systems: by imposing a formalized structure for a software, it enhances its readability, lower the learning curve for new-comers, and reduces the risk of errors inherent to repetitive tasks.</p>
 <p>This type of complexity is called <em>implementation complexity</em>.
 One of the goal of this book is to present you a methodology and toolkit that will help you reduce this form of complexity.</p>
@@ -561,14 +561,16 @@ Both have a different number of lines, and a different level of reading complexi
 <span id="cb5-3"><a href="successfulshinyapp.html#cb5-3"></a>iris <span class="op">%&gt;%</span></span>
 <span id="cb5-4"><a href="successfulshinyapp.html#cb5-4"></a><span class="st">  </span><span class="kw">group_by</span>(Species) <span class="op">%&gt;%</span></span>
 <span id="cb5-5"><a href="successfulshinyapp.html#cb5-5"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">m_sp =</span> <span class="kw">mean</span>(Sepal.Length))</span></code></pre></div>
+<pre><code>`summarise()` ungrouping output (override with `.groups` argument)</code></pre>
 <pre><code># A tibble: 3 x 2
   Species     m_sp
   &lt;fct&gt;      &lt;dbl&gt;
 1 setosa      5.01
 2 versicolor  5.94
 3 virginica   6.59</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="successfulshinyapp.html#cb7-1"></a><span class="co"># Without</span></span>
-<span id="cb7-2"><a href="successfulshinyapp.html#cb7-2"></a><span class="kw">summarize</span>(<span class="kw">group_by</span>(iris, Species), <span class="dt">m_sp =</span> <span class="kw">mean</span>(Sepal.Length))</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="successfulshinyapp.html#cb8-1"></a><span class="co"># Without</span></span>
+<span id="cb8-2"><a href="successfulshinyapp.html#cb8-2"></a><span class="kw">summarize</span>(<span class="kw">group_by</span>(iris, Species), <span class="dt">m_sp =</span> <span class="kw">mean</span>(Sepal.Length))</span></code></pre></div>
+<pre><code>`summarise()` ungrouping output (override with `.groups` argument)</code></pre>
 <pre><code># A tibble: 3 x 2
   Species     m_sp
   &lt;fct&gt;      &lt;dbl&gt;
@@ -576,16 +578,16 @@ Both have a different number of lines, and a different level of reading complexi
 2 versicolor  5.94
 3 virginica   6.59</code></pre>
 <p>Also, there is also no limit in the way you can indent your code.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="successfulshinyapp.html#cb9-1"></a>iris[</span>
-<span id="cb9-2"><a href="successfulshinyapp.html#cb9-2"></a>  <span class="dv">1</span></span>
-<span id="cb9-3"><a href="successfulshinyapp.html#cb9-3"></a>  <span class="op">:</span></span>
-<span id="cb9-4"><a href="successfulshinyapp.html#cb9-4"></a><span class="st">    </span><span class="dv">5</span>, </span>
-<span id="cb9-5"><a href="successfulshinyapp.html#cb9-5"></a>  <span class="st">&quot;Species&quot;</span></span>
-<span id="cb9-6"><a href="successfulshinyapp.html#cb9-6"></a>]</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="successfulshinyapp.html#cb11-1"></a>iris[</span>
+<span id="cb11-2"><a href="successfulshinyapp.html#cb11-2"></a>  <span class="dv">1</span></span>
+<span id="cb11-3"><a href="successfulshinyapp.html#cb11-3"></a>  <span class="op">:</span></span>
+<span id="cb11-4"><a href="successfulshinyapp.html#cb11-4"></a><span class="st">    </span><span class="dv">5</span>, </span>
+<span id="cb11-5"><a href="successfulshinyapp.html#cb11-5"></a>  <span class="st">&quot;Species&quot;</span></span>
+<span id="cb11-6"><a href="successfulshinyapp.html#cb11-6"></a>]</span></code></pre></div>
 <pre><code>[1] setosa setosa setosa setosa setosa
 Levels: setosa versicolor virginica</code></pre>
 <p>Six lines of code for something that could also be written in one line.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="successfulshinyapp.html#cb11-1"></a>iris[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="st">&quot;Species&quot;</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="successfulshinyapp.html#cb13-1"></a>iris[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="st">&quot;Species&quot;</span>]</span></code></pre></div>
 <pre><code>[1] setosa setosa setosa setosa setosa
 Levels: setosa versicolor virginica</code></pre>
 <p>In other words, using this kind of writing style can make the code base larger in term of lines, without really adding complexity to the general program.</p>
@@ -597,42 +599,44 @@ It is rather unlikely that you will find this “extreme” coding style we show
 And numerous files can also be a sign of maintenance complexity, as it may be harder to reason about an app logic split into several files than about something that fits into one linear code inside one file.<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>
 On the other hand, one big 10,000-lines file which is standing alone in the project is not a good sign either.</p>
 <p>If you want to use the number of lines metric, you can do it from R with the <code>{cloc}</code> <span class="citation">(Rudis and Danial <a href="#ref-R-cloc" role="doc-biblioref">2020</a>)</span> package, available at <a href="https://github.com/hrbrmstr/cloc" class="uri">https://github.com/hrbrmstr/cloc</a>.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="successfulshinyapp.html#cb13-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;hrbrmstr/cloc&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="successfulshinyapp.html#cb15-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;hrbrmstr/cloc&quot;</span>)</span></code></pre></div>
 <p>For example, let’s compare a rather big package (<code>{shiny}</code>) with a small one (<code>{attempt}</code> <span class="citation">(Fay <a href="#ref-R-attempt" role="doc-biblioref">2020</a><a href="#ref-R-attempt" role="doc-biblioref">a</a>)</span>):</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="successfulshinyapp.html#cb14-1"></a><span class="kw">library</span>(cloc)</span>
-<span id="cb14-2"><a href="successfulshinyapp.html#cb14-2"></a><span class="kw">library</span>(dplyr)</span>
-<span id="cb14-3"><a href="successfulshinyapp.html#cb14-3"></a>shiny_cloc &lt;-<span class="st"> </span><span class="kw">cloc_cran</span>(</span>
-<span id="cb14-4"><a href="successfulshinyapp.html#cb14-4"></a>  <span class="st">&quot;shiny&quot;</span>, </span>
-<span id="cb14-5"><a href="successfulshinyapp.html#cb14-5"></a>  <span class="dt">.progress =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb14-6"><a href="successfulshinyapp.html#cb14-6"></a>  <span class="dt">repos =</span> <span class="st">&quot;http://cran.irsn.fr/&quot;</span></span>
-<span id="cb14-7"><a href="successfulshinyapp.html#cb14-7"></a>)</span>
-<span id="cb14-8"><a href="successfulshinyapp.html#cb14-8"></a>attempt_cloc &lt;-<span class="st"> </span><span class="kw">cloc_cran</span>(</span>
-<span id="cb14-9"><a href="successfulshinyapp.html#cb14-9"></a>  <span class="st">&quot;attempt&quot;</span>, </span>
-<span id="cb14-10"><a href="successfulshinyapp.html#cb14-10"></a>  <span class="dt">.progress =</span> <span class="ot">FALSE</span>, </span>
-<span id="cb14-11"><a href="successfulshinyapp.html#cb14-11"></a>  <span class="dt">repos =</span> <span class="st">&quot;http://cran.irsn.fr/&quot;</span> </span>
-<span id="cb14-12"><a href="successfulshinyapp.html#cb14-12"></a>)</span>
-<span id="cb14-13"><a href="successfulshinyapp.html#cb14-13"></a>clocs &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(</span>
-<span id="cb14-14"><a href="successfulshinyapp.html#cb14-14"></a>  shiny_cloc, </span>
-<span id="cb14-15"><a href="successfulshinyapp.html#cb14-15"></a>  attempt_cloc</span>
-<span id="cb14-16"><a href="successfulshinyapp.html#cb14-16"></a>)</span>
-<span id="cb14-17"><a href="successfulshinyapp.html#cb14-17"></a></span>
-<span id="cb14-18"><a href="successfulshinyapp.html#cb14-18"></a><span class="co"># Counting lines of code</span></span>
-<span id="cb14-19"><a href="successfulshinyapp.html#cb14-19"></a>clocs <span class="op">%&gt;%</span></span>
-<span id="cb14-20"><a href="successfulshinyapp.html#cb14-20"></a><span class="st">  </span><span class="kw">group_by</span>(pkg) <span class="op">%&gt;%</span></span>
-<span id="cb14-21"><a href="successfulshinyapp.html#cb14-21"></a><span class="st">  </span><span class="kw">summarise</span>(</span>
-<span id="cb14-22"><a href="successfulshinyapp.html#cb14-22"></a>    <span class="dt">loc =</span> <span class="kw">sum</span>(loc)</span>
-<span id="cb14-23"><a href="successfulshinyapp.html#cb14-23"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="successfulshinyapp.html#cb16-1"></a><span class="kw">library</span>(cloc)</span>
+<span id="cb16-2"><a href="successfulshinyapp.html#cb16-2"></a><span class="kw">library</span>(dplyr)</span>
+<span id="cb16-3"><a href="successfulshinyapp.html#cb16-3"></a>shiny_cloc &lt;-<span class="st"> </span><span class="kw">cloc_cran</span>(</span>
+<span id="cb16-4"><a href="successfulshinyapp.html#cb16-4"></a>  <span class="st">&quot;shiny&quot;</span>, </span>
+<span id="cb16-5"><a href="successfulshinyapp.html#cb16-5"></a>  <span class="dt">.progress =</span> <span class="ot">FALSE</span>, </span>
+<span id="cb16-6"><a href="successfulshinyapp.html#cb16-6"></a>  <span class="dt">repos =</span> <span class="st">&quot;http://cran.irsn.fr/&quot;</span></span>
+<span id="cb16-7"><a href="successfulshinyapp.html#cb16-7"></a>)</span>
+<span id="cb16-8"><a href="successfulshinyapp.html#cb16-8"></a>attempt_cloc &lt;-<span class="st"> </span><span class="kw">cloc_cran</span>(</span>
+<span id="cb16-9"><a href="successfulshinyapp.html#cb16-9"></a>  <span class="st">&quot;attempt&quot;</span>, </span>
+<span id="cb16-10"><a href="successfulshinyapp.html#cb16-10"></a>  <span class="dt">.progress =</span> <span class="ot">FALSE</span>, </span>
+<span id="cb16-11"><a href="successfulshinyapp.html#cb16-11"></a>  <span class="dt">repos =</span> <span class="st">&quot;http://cran.irsn.fr/&quot;</span> </span>
+<span id="cb16-12"><a href="successfulshinyapp.html#cb16-12"></a>)</span>
+<span id="cb16-13"><a href="successfulshinyapp.html#cb16-13"></a>clocs &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(</span>
+<span id="cb16-14"><a href="successfulshinyapp.html#cb16-14"></a>  shiny_cloc, </span>
+<span id="cb16-15"><a href="successfulshinyapp.html#cb16-15"></a>  attempt_cloc</span>
+<span id="cb16-16"><a href="successfulshinyapp.html#cb16-16"></a>)</span>
+<span id="cb16-17"><a href="successfulshinyapp.html#cb16-17"></a></span>
+<span id="cb16-18"><a href="successfulshinyapp.html#cb16-18"></a><span class="co"># Counting lines of code</span></span>
+<span id="cb16-19"><a href="successfulshinyapp.html#cb16-19"></a>clocs <span class="op">%&gt;%</span></span>
+<span id="cb16-20"><a href="successfulshinyapp.html#cb16-20"></a><span class="st">  </span><span class="kw">group_by</span>(pkg) <span class="op">%&gt;%</span></span>
+<span id="cb16-21"><a href="successfulshinyapp.html#cb16-21"></a><span class="st">  </span><span class="kw">summarise</span>(</span>
+<span id="cb16-22"><a href="successfulshinyapp.html#cb16-22"></a>    <span class="dt">loc =</span> <span class="kw">sum</span>(loc)</span>
+<span id="cb16-23"><a href="successfulshinyapp.html#cb16-23"></a>  )</span></code></pre></div>
+<pre><code>`summarise()` ungrouping output (override with `.groups` argument)</code></pre>
 <pre><code># A tibble: 2 x 2
   pkg       loc
   &lt;chr&gt;   &lt;int&gt;
 1 attempt  3243
 2 shiny   71493</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="successfulshinyapp.html#cb16-1"></a><span class="co"># Counting files</span></span>
-<span id="cb16-2"><a href="successfulshinyapp.html#cb16-2"></a>clocs <span class="op">%&gt;%</span></span>
-<span id="cb16-3"><a href="successfulshinyapp.html#cb16-3"></a><span class="st">  </span><span class="kw">group_by</span>(pkg) <span class="op">%&gt;%</span></span>
-<span id="cb16-4"><a href="successfulshinyapp.html#cb16-4"></a><span class="st">  </span><span class="kw">summarise</span>(</span>
-<span id="cb16-5"><a href="successfulshinyapp.html#cb16-5"></a>    <span class="dt">files =</span> <span class="kw">sum</span>(file_count)</span>
-<span id="cb16-6"><a href="successfulshinyapp.html#cb16-6"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="successfulshinyapp.html#cb19-1"></a><span class="co"># Counting files</span></span>
+<span id="cb19-2"><a href="successfulshinyapp.html#cb19-2"></a>clocs <span class="op">%&gt;%</span></span>
+<span id="cb19-3"><a href="successfulshinyapp.html#cb19-3"></a><span class="st">  </span><span class="kw">group_by</span>(pkg) <span class="op">%&gt;%</span></span>
+<span id="cb19-4"><a href="successfulshinyapp.html#cb19-4"></a><span class="st">  </span><span class="kw">summarise</span>(</span>
+<span id="cb19-5"><a href="successfulshinyapp.html#cb19-5"></a>    <span class="dt">files =</span> <span class="kw">sum</span>(file_count)</span>
+<span id="cb19-6"><a href="successfulshinyapp.html#cb19-6"></a>  )</span></code></pre></div>
+<pre><code>`summarise()` ungrouping output (override with `.groups` argument)</code></pre>
 <pre><code># A tibble: 2 x 2
   pkg     files
   &lt;chr&gt;   &lt;int&gt;
@@ -661,19 +665,19 @@ We will not go deep into this topic, as there are a lot things going on in this 
 Please refer to the bibliography for further readings about the theory behind this measurement.</p>
 <p>In R, the cyclomatic complexity can be computed using the <code>{cyclocomp}</code> <span class="citation">(Csardi <a href="#ref-R-cyclocomp" role="doc-biblioref">2016</a>)</span> package.
 You can get it from <code>CRAN</code> with:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="successfulshinyapp.html#cb18-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;cyclocomp&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="successfulshinyapp.html#cb22-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;cyclocomp&quot;</span>)</span></code></pre></div>
 <p>The <code>{cyclocomp}</code> package comes with three main functions: <code>cyclocomp()</code>, <code>cyclocomp_package()</code>, and <code>cyclocomp_package_dir()</code>.
 While developing your application, the one you will be interested in is <code>cyclocomp_package_dir()</code>: building successful shiny apps with the <code>{golem}</code> framework means you will be building your app as a package (we will get back on that later).</p>
 <p>Here is for example the cyclomatic complexity of the default golem template (assuming it is located in a <code>golex/</code> subdirectory):</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="successfulshinyapp.html#cb19-1"></a><span class="kw">library</span>(cyclocomp)</span>
-<span id="cb19-2"><a href="successfulshinyapp.html#cb19-2"></a><span class="kw">cyclocomp_package_dir</span>(<span class="st">&quot;golex&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="successfulshinyapp.html#cb23-1"></a><span class="kw">library</span>(cyclocomp)</span>
+<span id="cb23-2"><a href="successfulshinyapp.html#cb23-2"></a><span class="kw">cyclocomp_package_dir</span>(<span class="st">&quot;golex&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</span></code></pre></div>
 <pre><code>                          name cyclocomp
 1                   app_server         1
 2                       app_ui         1
 3 golem_add_external_resources         1
 4                      run_app         1</code></pre>
 <p>And the one from another small application:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="successfulshinyapp.html#cb21-1"></a><span class="kw">cyclocomp_package</span>(<span class="st">&quot;tidytuesday201942&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="successfulshinyapp.html#cb25-1"></a><span class="kw">cyclocomp_package</span>(<span class="st">&quot;tidytuesday201942&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</span></code></pre></div>
 <pre><code>                  name cyclocomp
 24      mod_dataviz_ui         8
 23  mod_dataviz_server         7
@@ -682,7 +686,7 @@ While developing your application, the one you will be interested in is <code>cy
 39           undisplay         4
 37 tagRemoveAttributes         3</code></pre>
 <p>And, finally, the one for <code>{shiny}</code>:</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="successfulshinyapp.html#cb23-1"></a><span class="kw">cyclocomp_package</span>(<span class="st">&quot;shiny&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="successfulshinyapp.html#cb27-1"></a><span class="kw">cyclocomp_package</span>(<span class="st">&quot;shiny&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</span></code></pre></div>
 <pre><code>                       name cyclocomp
 494                  untar2        75
 115            diagnoseCode        54
@@ -701,17 +705,17 @@ In the end of the day splitting into smaller functions is not a magic solution b
 <h4><span class="header-section-number">1.2.3.3</span> Other measures for code complexity</h4>
 <p>Complexity can come from other sources: insufficient code coverage, dependencies that breaks the implementation, relying on old packages, or a lot of other things.</p>
 <p>We can use the <code>{packageMetrics2}</code> <span class="citation">(Csardi <a href="#ref-R-packageMetrics2" role="doc-biblioref">2020</a>)</span> package to get some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc., … and the number of lines of code and the cyclomatic complexity.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="successfulshinyapp.html#cb25-1"></a><span class="kw">library</span>(packageMetrics2)</span>
-<span id="cb25-2"><a href="successfulshinyapp.html#cb25-2"></a>frame_metric &lt;-<span class="st"> </span><span class="cf">function</span>(pkg){</span>
-<span id="cb25-3"><a href="successfulshinyapp.html#cb25-3"></a>  metrics &lt;-<span class="st"> </span><span class="kw">package_metrics</span>(pkg)</span>
-<span id="cb25-4"><a href="successfulshinyapp.html#cb25-4"></a>  tibble<span class="op">::</span><span class="kw">tibble</span>(</span>
-<span id="cb25-5"><a href="successfulshinyapp.html#cb25-5"></a>    <span class="dt">n =</span> <span class="kw">names</span>(metrics), </span>
-<span id="cb25-6"><a href="successfulshinyapp.html#cb25-6"></a>    <span class="dt">val =</span> metrics, </span>
-<span id="cb25-7"><a href="successfulshinyapp.html#cb25-7"></a>    <span class="dt">expl =</span> <span class="kw">list_package_metrics</span>()[<span class="kw">names</span>(metrics)]</span>
-<span id="cb25-8"><a href="successfulshinyapp.html#cb25-8"></a>  )</span>
-<span id="cb25-9"><a href="successfulshinyapp.html#cb25-9"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="successfulshinyapp.html#cb29-1"></a><span class="kw">library</span>(packageMetrics2)</span>
+<span id="cb29-2"><a href="successfulshinyapp.html#cb29-2"></a>frame_metric &lt;-<span class="st"> </span><span class="cf">function</span>(pkg){</span>
+<span id="cb29-3"><a href="successfulshinyapp.html#cb29-3"></a>  metrics &lt;-<span class="st"> </span><span class="kw">package_metrics</span>(pkg)</span>
+<span id="cb29-4"><a href="successfulshinyapp.html#cb29-4"></a>  tibble<span class="op">::</span><span class="kw">tibble</span>(</span>
+<span id="cb29-5"><a href="successfulshinyapp.html#cb29-5"></a>    <span class="dt">n =</span> <span class="kw">names</span>(metrics), </span>
+<span id="cb29-6"><a href="successfulshinyapp.html#cb29-6"></a>    <span class="dt">val =</span> metrics, </span>
+<span id="cb29-7"><a href="successfulshinyapp.html#cb29-7"></a>    <span class="dt">expl =</span> <span class="kw">list_package_metrics</span>()[<span class="kw">names</span>(metrics)]</span>
+<span id="cb29-8"><a href="successfulshinyapp.html#cb29-8"></a>  )</span>
+<span id="cb29-9"><a href="successfulshinyapp.html#cb29-9"></a>}</span></code></pre></div>
 <p><em>{golem}</em></p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="successfulshinyapp.html#cb26-1"></a><span class="kw">frame_metric</span>(<span class="st">&quot;golem&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>knitr<span class="op">::</span><span class="kw">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="successfulshinyapp.html#cb30-1"></a><span class="kw">frame_metric</span>(<span class="st">&quot;golem&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>knitr<span class="op">::</span><span class="kw">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -834,7 +838,7 @@ In the end of the day splitting into smaller functions is not a magic solution b
 </tbody>
 </table>
 <p><em>{shiny}</em></p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="successfulshinyapp.html#cb27-1"></a><span class="kw">frame_metric</span>(<span class="st">&quot;shiny&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>knitr<span class="op">::</span><span class="kw">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="successfulshinyapp.html#cb31-1"></a><span class="kw">frame_metric</span>(<span class="st">&quot;shiny&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>knitr<span class="op">::</span><span class="kw">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -957,13 +961,13 @@ In the end of the day splitting into smaller functions is not a magic solution b
 </tbody>
 </table>
 <p>If you are building your Shiny application with <code>{golem}</code>, you can use the <code>DESCRIPTION</code> file, which contains the list of dependencies, as a starting point to explore these metrics for your dependencies, for example using <code>{desc}</code> <span class="citation">(Csárdi, Müller, and Hester <a href="#ref-R-desc" role="doc-biblioref">2018</a>)</span> or <code>{attachment}</code> <span class="citation">(Guyader and Rochette <a href="#ref-R-attachment" role="doc-biblioref">2020</a>)</span>:</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="successfulshinyapp.html#cb28-1"></a>desc<span class="op">::</span><span class="kw">desc_get_deps</span>(<span class="st">&quot;golex/DESCRIPTION&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="successfulshinyapp.html#cb32-1"></a>desc<span class="op">::</span><span class="kw">desc_get_deps</span>(<span class="st">&quot;golex/DESCRIPTION&quot;</span>)</span></code></pre></div>
 <pre><code>     type package version
 1 Imports  config       *
 2 Imports   golem       *
 3 Imports   shiny       *</code></pre>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="successfulshinyapp.html#cb30-1"></a><span class="co"># See also </span></span>
-<span id="cb30-2"><a href="successfulshinyapp.html#cb30-2"></a>attachment<span class="op">::</span><span class="kw">att_from_description</span>(<span class="st">&quot;golex/DESCRIPTION&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="successfulshinyapp.html#cb34-1"></a><span class="co"># See also </span></span>
+<span id="cb34-2"><a href="successfulshinyapp.html#cb34-2"></a>attachment<span class="op">::</span><span class="kw">att_from_description</span>(<span class="st">&quot;golex/DESCRIPTION&quot;</span>)</span></code></pre></div>
 <pre><code>[1] &quot;config&quot; &quot;golem&quot;  &quot;shiny&quot; </code></pre>
 </div>
 </div>
@@ -1078,6 +1082,8 @@ And this, again, is hard to do without effective planning and efficient engineer
 <li id="fn5"><p>See <a href="https://github.com/rstudio/shiny/issues/2043#issuecomment-525640738" target="_blank">shiny/issues/2043#issuecomment-525640738</a> for an example<a href="successfulshinyapp.html#fnref5" class="footnote-back">↩︎</a></p></li>
 <li id="fn6"><p>The minification process is the process of removing all blank characters and put everything on one line so that the file in the output is much smaller.<a href="successfulshinyapp.html#fnref6" class="footnote-back">↩︎</a></p></li>
 <li id="fn7"><p>Note though that some users find using the pipe more complex than not.<a href="successfulshinyapp.html#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p>
+To handle the complexity of splitting into files, you can set filenames to follow the structure of the project. This pattern is developed in another part of this book, where we explicit the conventions used in <code>{golem}</code>.<a href="successfulshinyapp.html#fnref8" class="footnote-back">↩︎</a></p></li>
 <li id="fn9"><p>A control flow graph is a graph representing all the possible paths a piece of code can take while it is executed.<a href="successfulshinyapp.html#fnref9" class="footnote-back">↩︎</a></p></li>
 <li id="fn10"><p>By production-grade, we mean a software that can be used in a context where people use it for doing their job, and where failures or bugs have real-life consequences.<a href="successfulshinyapp.html#fnref10" class="footnote-back">↩︎</a></p></li>
 <li id="fn11"><p>In fact, this new person might simply be you, a month from now. And <em>"You’ll be there in the future too, maintaining code you may have half forgotten under the press of more recent projects. When you design for the future, the sanity you save may be your own.</em> <span class="citation">(Raymond <a href="#ref-ericraymond2003" role="doc-biblioref">2003</a>)</span>.<a href="successfulshinyapp.html#fnref11" class="footnote-back">↩︎</a></p></li>
