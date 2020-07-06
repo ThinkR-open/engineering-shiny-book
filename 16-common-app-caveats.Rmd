@@ -217,7 +217,7 @@ We generally want our observer to update its content under a small, controlled n
 And, what we often forget is that users do not type/select correctly on the first try. 
 No, they usually try and miss, restart, change things, amplifying the reactivity "over-happening". 
 
-Moreover, long `observe()` statements are hard to debug, and they make collaboration harder when the trigger to the observe logic can potentially lives anywhere between line one and line 257 of your `observe()`. That's why (well, in 99% of cases), it is safer to go with `observeEvent`, as it allows to see at a glance what are the condition under which the content is invalidated and re-evaluated. 
+Moreover, long `observe()` statements are hard to debug, and they make collaboration harder when the trigger to the observe logic can potentially live anywhere between line one and line 257 of your `observe()`. That's why (well, in 99% of cases), it is safer to go with `observeEvent`, as it allows to see at a glance what are the condition under which the content is invalidated and re-evaluated. 
 Then, if a reactive context is invalidated, __you know why__.
 For example, here is where the reactive invalidation can happen (lines with a `*`):
 
@@ -262,7 +262,7 @@ observeEvent( c(
 
 ### Building triggers and watchers
 
-To prevent this, one way to go is to create "flags" objects, which can be thought of as internal buttons to control what you want to invalidate: you create the button, set some places where you want these buttons to invalidate the context, and finally press these 
+To prevent this, one way to go is to create "flags" objects, which can be thought of as internal buttons to control what you want to invalidate: you create the button, set some places where you want these buttons to invalidate the context, and finally press these buttons.
 
 These objects are launched with an `init` function, then these flags are triggered with `trigger()`, and wherever we want these flags to invalidate a reactive context, we `watch()` these flags. 
 
@@ -597,12 +597,12 @@ We will introduce these selectors in the last chapter of this book.
 
 If you are building a Shiny application, there is a great chance you are building it to analyze data. 
 If you are dealing with large datasets, you should consider deporting the data handling and computation to an external database system: for example to an SQL database. 
-Why? Because these system has been created to handle and manipulate data on disk: in other words it will allow you to perform operation on your data without having to clutter R memory with large dataset. 
+Why? Because these system has been created to handle and manipulate data on disk: in other words it will allow you to perform operations on your data without having to clutter R memory with a large dataset. 
 
 For example, if you have a `selectInput()` that is used to perform a filter on a dataset, you can do that filter straight inside SQL, instead of bringing all the data to R and then do the filter.
-That is even more necessary if you are building the app for a large number of users: for example if one Shiny session takes up to 300MB, multiply that by the number of users that will need one session, and you will have a rough estimate of how many RAM you will need.
+That is even more necessary if you are building the app for a large number of users: for example if one Shiny session takes up to 300MB, multiply that by the number of users that will need one session, and you will have a rough estimate of how much RAM you will need.
 On the contrary, if you lighten the data manipulation so that it is done by the back-end, you will have, let's say, one database with 300 mo of data, then the database size will remain (more or less constant), and the only RAM used by Shiny will be the data manipulation, not the data storage. 
-That's even more true now that almost any operation you can do today in `{dplyr}` [@R-dplyr]  would be doable with an SQL backend, and that is the purpose of the `{dbplyr}` [@R-dbplyr] package: translate `{dplyr}` code into SQL.
+That's even more true now that almost any operation you can do today in `{dplyr}` [@R-dplyr]  would be doable with an SQL backend, and that is the purpose of the `{dbplyr}` [@R-dbplyr] package: translates `{dplyr}` code into SQL.
 
 If using a database as a back-end seems a little bit far-fetched right now, that is how it is done in most programming languages: if you are building a web app with NodeJS or Python for example, and need to interact with data, nothing will be stored in RAM: you will be relying on an external database to store your data. 
 Then your application will be used to make queries to this database backend.
@@ -612,7 +612,7 @@ Then your application will be used to make queries to this database backend.
 Shiny applications are a tool of choice when it comes to analyzing data. 
 But that also means that these data have to be imported/read at some point in time, and reading data can be time consuming. 
 How can we optimize that? 
-In this section, we will have a look at three strategies: including datasets inside your application, using R packages for fast data reading, and when and why you should move to an external database system. 
+In this section, we will take a look at three strategies: including datasets inside your application, using R packages for fast data reading, and when and why you should move to an external database system. 
 
 ### Including Data in your Application
 
@@ -661,7 +661,7 @@ Another type of data analyzed in a shiny application is one contained inside an 
 Database are wildly used in the data science world, and in the software engineering as a whole. 
 Being a widely used source of data, databases come with API and drivers that help retrieving and transferring data: be it SQL, NoSQL, or even graph.
 
-Using a database is one of the solution for making your app lighter, and more efficient in the long run, notably if you need to scale your app to thousands of visitors. 
+Using a database is one of the solutions for making your app lighter, and more efficient in the long run, notably if you need to scale your app to thousands of visitors. 
 Indeed, if you plan on having your app scale to numerous people, that will mean that a lot of R processes will be triggered. 
 And if your data is contained in your app, this will mean that each R process will take a significant amount of RAM if the dataset is large. 
 For example, if your dataset alone takes ~300 mb of RAM, that means that if you want to launch the app 10 times, you will need ~3gb of RAM.
