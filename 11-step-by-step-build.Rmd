@@ -19,7 +19,7 @@ Note that some concepts introduced here will be more extensively explored in the
 
 When you are building a `{shiny}` [@R-shiny] application, you will have to deal with dependencies. 
 Well, at least with one dependency, `{shiny}`. 
-But chances are that you will not only be using `{shiny}` inside your application: you will probably call functions from other packages, for example from `{ggplot2}` [@R-ggplot2] for plotting, `{DT}` [@R-DT] for interactive tables, or any other packages  that will be necessary to your application working. 
+But chances are that you will not only be using `{shiny}` inside your application: you will probably call functions from other packages, for example from `{ggplot2}` [@R-ggplot2] for plotting, `{DT}` [@R-DT] for interactive tables, or any other package that is necessary for your application to work. 
 
 ```{r 11-step-by-step-build-1, echo = FALSE}
 paks <-  eval(formals(golem::use_recommended_deps)$recommended)
@@ -57,7 +57,7 @@ What this `NAMESPACE` file allows to do is to specify only a subset of functions
 The idea with selective import is to avoid namespace conflicts: if you remember correctly, we described a few chapters ago a namespace conflict occurring between `jsonlite::flatten()` and `purrr::flatten()`
 ^[which can be pretty common as `{jsonlite}` might import `JSON` files as list, and `{purrr}` has pretty powerful tools for manipulating lists]
 : using a selective importation, _i.e_ only importing the function we need from `{purrr}`, will prevent our code from failing because it is looking for the wrong function. 
-To do so, we will need to go to every script that defines one or several function(s), and add a `{roxygen2}` [@R-roxygen2] tag, in the following form : `#' @importFrom purrr map map_df partial`.
+To do so, we will need to go to every script that defines one or several function/s, and add a `{roxygen2}` [@R-roxygen2] tag, in the following form : `#' @importFrom purrr map map_df partial`.
 Note that you can also use explicit namespacing, _i.e_ the `pkg::function()` notation inside your code. 
 
 Also, if you need a little help to identify dependencies, all the explicitly namespaced calls (`pkg::function()`) can be scraped using the `{attachment}` [@R-attachment] package:
@@ -78,7 +78,7 @@ _R Packages_, [@rpkg]
 To learn more about the details of dependencies, `DESCRIPTION` and `NAMESPACE`, here are some resources: 
 
 + [Writing R Extensions](https://cran.r-project.org/manuals.html), the official manual from the R-Core team
-+ [R Packages](https://r-pkgs.org/), especially the _Package metadata_ and _Namespace_ 
++ [R Packages](https://r-pkgs.org/), especially the _Package metadata_ and _Namespace_ chapters
 
 ## Submodules and utility functions
 
@@ -226,7 +226,7 @@ Note also that if you want to add the code coverage of your application inside a
 
 #### Continuous Integration
 
-Continuous Integration, on the other hand, is ensuring the software is still working whenever a change is made by one of the developer. 
+Continuous Integration, on the other hand, is ensuring the software is still working whenever a change is made by one of the developers. 
 The idea is to add to the centralized version control system (for example Git)
 ^[We will get back to Version Control in the _Version Control_ chapter]
 a service like Travis CI, GitHub Action (if you are on GitHub) or GitLab CI (for GitLab) that runs a series of commands whenever something is integrated to the repository, _i.e_ every time a change to the codebase is made. 
@@ -250,12 +250,12 @@ The possibilities are almost limitless!
 
 ## Using `{golem}` dev functions
 
-When building an application, you will want it to behave differently depending on where it is run, and notably if it is run in development of in production. 
+When building an application, you will want it to behave differently depending on where it is run, and notably, if it is run in development or in production. 
 We have seen that to do that, you can use the `golem-config.yml` file, or by passing arguments to `run_app()`.
 A third option is to use the `dev` functions from `{golem}`.
 
 There is a series of tools to make your app behave differently whether it is in "dev" or "prod" mode. 
-Notably, the `app_prod()` and `app_dev()` function look for the value of `options( "golem.app.prod" )`, or return TRUE if this option does not exist.
+Notably, the `app_prod()` and `app_dev()` function look for the value of `options( "golem.app.prod" )`, or return `TRUE` if this option does not exist.
 In other words, by setting `options( "golem.app.prod" )` to `TRUE`, you will make the functions that depend on this option behave in a specific way.
 
 Some functions pre-exist in `{golem}`, for example if you need to print a message to the console only during dev, you can do it with `cat_dev()`.
