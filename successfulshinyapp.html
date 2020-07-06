@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 1 About Successful Shiny Apps | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 1 About Successful Shiny Apps | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-06-10" />
+<meta name="date" content="2020-07-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -50,6 +50,7 @@
 
 
 
+<script src="libs/accessible-code-block/empty-anchor.js"></script>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149994171-1"></script>
 <script>
@@ -350,7 +351,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="14.3" data-path="deploy-golem.html"><a href="deploy-golem.html#deploying-apps-with-golem"><i class="fa fa-check"></i><b>14.3</b> Deploying Apps with <code>{golem}</code></a><ul>
 <li class="chapter" data-level="14.3.1" data-path="deploy-golem.html"><a href="deploy-golem.html#rstudio-environments"><i class="fa fa-check"></i><b>14.3.1</b> RStudio Environments</a></li>
-<li class="chapter" data-level="14.3.2" data-path="deploy-golem.html"><a href="deploy-golem.html#docker-1"><i class="fa fa-check"></i><b>14.3.2</b> Docker</a></li>
+<li class="chapter" data-level="14.3.2" data-path="step-secure.html"><a href="step-secure.html#docker"><i class="fa fa-check"></i><b>14.3.2</b> Docker</a></li>
 </ul></li>
 </ul></li>
 <li class="part"><span><b>VII Optimizing</b></span></li>
@@ -462,8 +463,8 @@ And that is probably one of the main reason why this package has become so succe
 <p>The first version of <code>{shiny}</code> was published in 2012.
 Since then, it has been one of the top project of the RStudio team.
 At the time of writing these lines (April 2020), there are more than 4700 commits in the master branch of the GitHub repository, made by 46 contributors.
-It is now downloaded around 400K times a month, according to <a href="https://cranlogs.r-pkg.org/badges/shiny">cranlogs</a>, and has 755 reverse dependencies (i.e packages that depend on it), according to <code>revdep("shiny")</code> from <code>{devtools}</code> <span class="citation">(Wickham, Hester, and Chang <a href="#ref-R-devtools" role="doc-biblioref">2020</a>)</span>.</p>
-<p>If you are very new to Shiny, this book might feel a little bit overwhelming: we will be discussing some advanced <code>{shiny}</code> and software engineering methods, best practices and structural idea for sending Shiny applications to production.
+It is now downloaded around 400K times a month, according to <a href="https://cranlogs.r-pkg.org/badges/shiny">cranlogs</a>, and has 772 reverse dependencies (i.e packages that depend on it), according to <code>revdep("shiny")</code> from <code>{devtools}</code> <span class="citation">(Wickham, Hester, and Chang <a href="#ref-R-devtools" role="doc-biblioref">2020</a>)</span>.</p>
+<p>If you are very new to Shiny, this book might feel a little bit overwhelming: we will be discussing some advanced <code>{shiny}</code> and software engineering methods, best practices and structural ideas for sending Shiny applications to production.
 This books relies on the assumption that you already know how to build basic Shiny applications, and that you want to push your Shiny skills to the next level: in other words, you are ready to move from the Proof of Concept to the production-grade application.
 If you are very new to Shiny, we suggest you start with the <a href="https://mastering-shiny.org/">Mastering Shiny book</a> before reading the present book.</p>
 <p>Ready to start engineering production-grade Shiny Apps?</p>
@@ -483,11 +484,11 @@ If you are very new to Shiny, we suggest you start with the <a href="https://mas
 <h3><span class="header-section-number">1.2.1</span> Reaching the cliff of complexity</h3>
 <p>Building a Shiny application seems quite straightforward when it comes to small prototypes or proof of concepts: after a few hours of practice and documentation reading, most R developers can have a small working application.<br />
 But things change when your application reaches “the cliff of complexity”<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>
-, <em>i.e</em> that moment when the application reaches a states when it can be qualified as “complex”.</p>
+, <em>i.e</em> that moment when the application reaches a state when it can be qualified as “complex”.</p>
 <p>But what do we mean by complexity?
 Getting a clear definition is not an easy task<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>
 as it very much depends on who is concerned and who you are talking to.
-But a good definition can be found in <em>The DevOps Handbook</em> <span class="citation">(Kim <a href="#ref-genekim2016" role="doc-biblioref">2016</a>)</span>: <em>“One of the defining characteristics of a complex system is that it <strong>defies any single person’s ability to see the system as a whole and understand how all the pieces fit together</strong>. Complex system typically have a high degree of interconnectedness of tightly coupled components, and system-level behavior cannot be explained merely in terms of the behavior of the system components.”</em> (we underlined).</p>
+But a good definition can be found in <em>The DevOps Handbook</em> <span class="citation">(Kim <a href="#ref-genekim2016" role="doc-biblioref">2016</a>)</span>: <em>“One of the defining characteristics of a complex system is that it <strong>defies any single person’s ability to see the system as a whole and understand how all the pieces fit together</strong>. Complex systems typically have a high degree of interconnectedness of tightly coupled components, and system-level behavior cannot be explained merely in terms of the behavior of the system components.”</em> (we underlined).</p>
 <p>Or as noted in “Refactoring at Scale” <span class="citation">(Lemaire <a href="#ref-lemaire2020" role="doc-biblioref">2020</a>)</span>, “<em>It becomes nearly impossible to reason about the effect a change might have when applied uniformly across a sprawling, complex system. Many tools exist to identify code smells or automatically detect improvements within subsections of code, but we are largely unable to automate human reasoning about how to restructure large applications,in codebases that are growing at an increasingly rapid pace.</em>”</p>
 <p>Building on top of these quotes, let’s try to come up with a definition that will serve us in the context of engineering Shiny applications.</p>
 <p>When building software, we can think of complexity from two points of view: the complexity as it is seen by the developer, and the complexity as it is seen by the customer/end-user<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>
@@ -518,7 +519,7 @@ This book will also bring you strategy to help you cope with the need for simpli
 <p>There is an inherent tension between these two sources of complexity, as designing an app means finding a good balance between implementation and interface complexity.
 Lowering one source of complexity usually means increasing the other, and managing an application project means knowing where to draw the line.
 This usually requires restraining yourself from implementing too much features, and still create an application that is easy to use, and that fits the requirements you have received.</p>
-<p>For example, there is something common in Shiny application: what we can call the “too much reactivity pattern”.
+<p>For example, there is something common in Shiny applications: what we can call the “too much reactivity pattern”.
 In some cases, developers try to make everything reactive: <em>e.g.</em>, three sliders and a dropdown input, all updating a single plot.
 This behavior lowers the interface complexity: users do not have to really think about what they are doing, they move sliders, change the inputs, and boom! the plot updates.
 But this kind of pattern can make the application perform too much computation, for example because users rarely go to the value they need on their first try: they usually miss what value they actually want to select.</p>
@@ -540,7 +541,7 @@ It’s up to you: deciding where to draw the line between interface &amp; implem
 </div>
 <div id="assessing-code-complexity" class="section level3">
 <h3><span class="header-section-number">1.2.3</span> Assessing Code Complexity</h3>
-<p>On the developer side, you will want to reduce code complexity so that everybody involved in the coding process is able to create a mental model of how the application work.
+<p>On the developer side, you will want to reduce code complexity so that everybody involved in the coding process is able to create a mental model of how the application works.
 On the user side, you will want to reduce interface complexity so that everybody comes out of using your application with a good user-experience.</p>
 <p>Reducing complexity first comes with being able to identify its potential sources, be it in your application code base or in the specifications describing how the application should work.
 Finding these sources of complexity is not an easy task, as it requires some programming knowledge to identify bottlenecks, basic UX (User Experience) skills to implement a good interface, and of course a project management methodology to structure the whole life of your application.</p>
@@ -548,7 +549,7 @@ Finding these sources of complexity is not an easy task, as it requires some pro
 But before that, let’s dive into code complexity.</p>
 <div id="codebase-size" class="section level4">
 <h4><span class="header-section-number">1.2.3.1</span> Codebase size</h4>
-<p>The total number of lines of code, or the number of files, can be good clue of potential complexity, but only if used as order of magnitude (for example a 10,000-line codebase is potentially more complex than a 100-line codebase), but should not be relied on if used strictly, even more if you try to reduce this number of line by sacrificing code readability.</p>
+<p>The total number of lines of code, or the number of files, can be good clue of potential complexity, but only if used as order of magnitude (for example a 10,000-line codebase is potentially more complex than a 100-line codebase), but should not be relied on if used strictly, even more if you try to reduce this number of lines by sacrificing code readability.</p>
 <p>R is very permissive when it comes to indentation and line breaks, and, unlike JavaScript or CSS, it is generally not minified<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>
 .<br />
 In R, the number of lines of code depends on your coding style and the packages you are using.
@@ -577,7 +578,7 @@ Both have a different number of lines, and a different level of reading complexi
 1 setosa      5.01
 2 versicolor  5.94
 3 virginica   6.59</code></pre>
-<p>Also, there is also no limit in the way you can indent your code.</p>
+<p>Also, there is no limit in the way you can indent your code.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="successfulshinyapp.html#cb11-1"></a>iris[</span>
 <span id="cb11-2"><a href="successfulshinyapp.html#cb11-2"></a>  <span class="dv">1</span></span>
 <span id="cb11-3"><a href="successfulshinyapp.html#cb11-3"></a>  <span class="op">:</span></span>
@@ -629,7 +630,7 @@ On the other hand, one big 10,000-lines file which is standing alone in the proj
   pkg       loc
   &lt;chr&gt;   &lt;int&gt;
 1 attempt  3243
-2 shiny   71493</code></pre>
+2 shiny   75550</code></pre>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="successfulshinyapp.html#cb19-1"></a><span class="co"># Counting files</span></span>
 <span id="cb19-2"><a href="successfulshinyapp.html#cb19-2"></a>clocs <span class="op">%&gt;%</span></span>
 <span id="cb19-3"><a href="successfulshinyapp.html#cb19-3"></a><span class="st">  </span><span class="kw">group_by</span>(pkg) <span class="op">%&gt;%</span></span>
@@ -641,7 +642,7 @@ On the other hand, one big 10,000-lines file which is standing alone in the proj
   pkg     files
   &lt;chr&gt;   &lt;int&gt;
 1 attempt    32
-2 shiny     269</code></pre>
+2 shiny     315</code></pre>
 <p>Here, with these two metrics, we can safely assume that <code>{shiny}</code> is a more complex package than <code>{attempt}</code>.</p>
 </div>
 <div id="cyclomatic-complexity" class="section level4">
@@ -661,7 +662,7 @@ FIGURE 1.1: Control-flow graph representation of an algorithm.
 <p><em>(The following paragraph details the algorithm implementation, feel free to skip it if you are not interested in the implementation details)</em><br />
 The complexity number is then computed by taking the number of nodes, subtracting the number of edges, and adding twice the number of connected components of this graph.
 The algorithm is then <span class="math inline">\(M = E − N + 2P\)</span>, where <span class="math inline">\(M\)</span> is the measure, <span class="math inline">\(E\)</span> the number of edges, <span class="math inline">\(N\)</span> the number of nodes and <span class="math inline">\(2P\)</span> is twice the number of connected components.
-We will not go deep into this topic, as there are a lot things going on in this computation and you can find many documentation about this online.
+We will not go deep into this topic, as there are a lot things going on in this computation and you can find much documentation about this online.
 Please refer to the bibliography for further readings about the theory behind this measurement.</p>
 <p>In R, the cyclomatic complexity can be computed using the <code>{cyclocomp}</code> <span class="citation">(Csardi <a href="#ref-R-cyclocomp" role="doc-biblioref">2016</a>)</span> package.
 You can get it from <code>CRAN</code> with:</p>
@@ -703,7 +704,7 @@ In the end of the day splitting into smaller functions is not a magic solution b
 </div>
 <div id="other-measures-for-code-complexity" class="section level4">
 <h4><span class="header-section-number">1.2.3.3</span> Other measures for code complexity</h4>
-<p>Complexity can come from other sources: insufficient code coverage, dependencies that breaks the implementation, relying on old packages, or a lot of other things.</p>
+<p>Complexity can come from other sources: insufficient code coverage, dependencies that break the implementation, relying on old packages, or a lot of other things.</p>
 <p>We can use the <code>{packageMetrics2}</code> <span class="citation">(Csardi <a href="#ref-R-packageMetrics2" role="doc-biblioref">2020</a>)</span> package to get some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc., … and the number of lines of code and the cyclomatic complexity.</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="successfulshinyapp.html#cb29-1"></a><span class="kw">library</span>(packageMetrics2)</span>
 <span id="cb29-2"><a href="successfulshinyapp.html#cb29-2"></a>frame_metric &lt;-<span class="st"> </span><span class="cf">function</span>(pkg){</span>
@@ -981,10 +982,10 @@ And this is not necessarily a bad thing!
 Shiny apps can definitely be used to implement production-grade<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>
 software, but production-grade software implies production-grade software engineering.
 To make your project a success, you need to use tools that reduce the complexity of your app and ensure that your app is resilient to aging.</p>
-<p>In other words, production-grade Shiny apps requires working with a software engineering mindset, which is not always an easy task in the R world: many R developers have learned this language as a tool for doing data analysis, building model, making statistics, not really as a tool for building software.</p>
+<p>In other words, production-grade Shiny apps require working with a software engineering mindset, which is not always an easy task in the R world: many R developers have learned this language as a tool for doing data analysis, building model, making statistics, not really as a tool for building software.</p>
 <p>The use of R has evolved since its initial version released in 1995, and using this programming language as a tool to build software for production is still a challenge, even 25 years after its first release.
 And still today, for a lot of R users, the software is still used as an “experimentation tool”, where production quality is one of the least concerns.
-But the rise of <code>{shiny}</code> (among other packages) has drastically changed the potential of R as a language for production software engineering: its ease of use is also one of the reason why the language is now used outside academia, in more “traditional” software engineering teams.</p>
+But the rise of <code>{shiny}</code> (among other packages) has drastically changed the potential of R as a language for production software engineering: its ease of use is also one of the reasons why the language is now used outside academia, in more “traditional” software engineering teams.</p>
 <p>This changing context requires different mindsets, skills, and tools.</p>
 <p>With <code>{shiny}</code>, as we said before, it is quite easy to prototype a simple app, without any “hardcore” software engineering skills.
 And when we are happy with our little proof of concept, we are tempted to add something new.

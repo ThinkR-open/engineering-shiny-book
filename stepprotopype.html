@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 10 Building an “ipsum-app” | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 10 Building an “ipsum-app” | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-06-10" />
+<meta name="date" content="2020-07-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -50,6 +50,7 @@
 
 
 
+<script src="libs/accessible-code-block/empty-anchor.js"></script>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149994171-1"></script>
 <script>
@@ -350,7 +351,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="14.3" data-path="deploy-golem.html"><a href="deploy-golem.html#deploying-apps-with-golem"><i class="fa fa-check"></i><b>14.3</b> Deploying Apps with <code>{golem}</code></a><ul>
 <li class="chapter" data-level="14.3.1" data-path="deploy-golem.html"><a href="deploy-golem.html#rstudio-environments"><i class="fa fa-check"></i><b>14.3.1</b> RStudio Environments</a></li>
-<li class="chapter" data-level="14.3.2" data-path="deploy-golem.html"><a href="deploy-golem.html#docker-1"><i class="fa fa-check"></i><b>14.3.2</b> Docker</a></li>
+<li class="chapter" data-level="14.3.2" data-path="step-secure.html"><a href="step-secure.html#docker"><i class="fa fa-check"></i><b>14.3.2</b> Docker</a></li>
 </ul></li>
 </ul></li>
 <li class="part"><span><b>VII Optimizing</b></span></li>
@@ -549,6 +550,8 @@ If we run this code two times, we should get different results<a href="#fn32" cl
 
 <div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="stepprotopype.html#cb117-1"></a><span class="kw">random_ggplot</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb117-2"><a href="stepprotopype.html#cb117-2"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Random plot&quot;</span>) </span></code></pre></div>
+<pre><code>Warning: Removed 478 rows containing non-finite values
+(stat_bin2d).</code></pre>
 <div class="figure" style="text-align: center"><span id="fig:10-prototyping-5"></span>
 <img src="engineering-production-grade-shiny-apps_files/figure-html/10-prototyping-5-1.png" alt="A random plot" width="100%" />
 <p class="caption">
@@ -556,8 +559,8 @@ FIGURE 10.2: A random plot
 </p>
 </div>
 
-<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="stepprotopype.html#cb118-1"></a><span class="kw">random_ggplot</span>() <span class="op">+</span><span class="st"> </span></span>
-<span id="cb118-2"><a href="stepprotopype.html#cb118-2"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Random plot&quot;</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="stepprotopype.html#cb119-1"></a><span class="kw">random_ggplot</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb119-2"><a href="stepprotopype.html#cb119-2"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Random plot&quot;</span>) </span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:10-prototyping-6"></span>
 <img src="engineering-production-grade-shiny-apps_files/figure-html/10-prototyping-6-1.png" alt="A random plot" width="100%" />
 <p class="caption">
@@ -566,30 +569,30 @@ FIGURE 10.3: A random plot
 </div>
 <p>Of course, the idea is to combine this with a Shiny interface, for example <code>random_ggplot()</code> will be used with a <code>renderPlot()</code> and <code>plotOutput()</code>.
 And as we want to prototype but still be close to what the app might look like, these functions take arguments that can shape the output: for example, <code>random_ggplot()</code> has a <code>type</code> parameter that can help you select a specific geom.</p>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="stepprotopype.html#cb119-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb119-2"><a href="stepprotopype.html#cb119-2"></a><span class="kw">library</span>(shinipsum)</span>
-<span id="cb119-3"><a href="stepprotopype.html#cb119-3"></a><span class="kw">library</span>(DT)</span>
-<span id="cb119-4"><a href="stepprotopype.html#cb119-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb119-5"><a href="stepprotopype.html#cb119-5"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random DT&quot;</span>),</span>
-<span id="cb119-6"><a href="stepprotopype.html#cb119-6"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;data_table&quot;</span>),</span>
-<span id="cb119-7"><a href="stepprotopype.html#cb119-7"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random Plot&quot;</span>),</span>
-<span id="cb119-8"><a href="stepprotopype.html#cb119-8"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>),</span>
-<span id="cb119-9"><a href="stepprotopype.html#cb119-9"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random Text&quot;</span>),</span>
-<span id="cb119-10"><a href="stepprotopype.html#cb119-10"></a>  <span class="kw">tableOutput</span>(<span class="st">&quot;text&quot;</span>)</span>
-<span id="cb119-11"><a href="stepprotopype.html#cb119-11"></a>)</span>
-<span id="cb119-12"><a href="stepprotopype.html#cb119-12"></a></span>
-<span id="cb119-13"><a href="stepprotopype.html#cb119-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb119-14"><a href="stepprotopype.html#cb119-14"></a>  output<span class="op">$</span>data_table &lt;-<span class="st"> </span>DT<span class="op">::</span><span class="kw">renderDT</span>({</span>
-<span id="cb119-15"><a href="stepprotopype.html#cb119-15"></a>    <span class="kw">random_DT</span>(<span class="dv">5</span>, <span class="dv">5</span>)</span>
-<span id="cb119-16"><a href="stepprotopype.html#cb119-16"></a>  })</span>
-<span id="cb119-17"><a href="stepprotopype.html#cb119-17"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb119-18"><a href="stepprotopype.html#cb119-18"></a>    <span class="kw">random_ggplot</span>()</span>
-<span id="cb119-19"><a href="stepprotopype.html#cb119-19"></a>  })</span>
-<span id="cb119-20"><a href="stepprotopype.html#cb119-20"></a>  output<span class="op">$</span>text &lt;-<span class="st"> </span><span class="kw">renderText</span>({</span>
-<span id="cb119-21"><a href="stepprotopype.html#cb119-21"></a>    <span class="kw">random_text</span>(<span class="dt">nwords =</span> <span class="dv">50</span>)</span>
-<span id="cb119-22"><a href="stepprotopype.html#cb119-22"></a>  })</span>
-<span id="cb119-23"><a href="stepprotopype.html#cb119-23"></a>}</span>
-<span id="cb119-24"><a href="stepprotopype.html#cb119-24"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="stepprotopype.html#cb120-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb120-2"><a href="stepprotopype.html#cb120-2"></a><span class="kw">library</span>(shinipsum)</span>
+<span id="cb120-3"><a href="stepprotopype.html#cb120-3"></a><span class="kw">library</span>(DT)</span>
+<span id="cb120-4"><a href="stepprotopype.html#cb120-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb120-5"><a href="stepprotopype.html#cb120-5"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random DT&quot;</span>),</span>
+<span id="cb120-6"><a href="stepprotopype.html#cb120-6"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;data_table&quot;</span>),</span>
+<span id="cb120-7"><a href="stepprotopype.html#cb120-7"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random Plot&quot;</span>),</span>
+<span id="cb120-8"><a href="stepprotopype.html#cb120-8"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>),</span>
+<span id="cb120-9"><a href="stepprotopype.html#cb120-9"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random Text&quot;</span>),</span>
+<span id="cb120-10"><a href="stepprotopype.html#cb120-10"></a>  <span class="kw">tableOutput</span>(<span class="st">&quot;text&quot;</span>)</span>
+<span id="cb120-11"><a href="stepprotopype.html#cb120-11"></a>)</span>
+<span id="cb120-12"><a href="stepprotopype.html#cb120-12"></a></span>
+<span id="cb120-13"><a href="stepprotopype.html#cb120-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb120-14"><a href="stepprotopype.html#cb120-14"></a>  output<span class="op">$</span>data_table &lt;-<span class="st"> </span>DT<span class="op">::</span><span class="kw">renderDT</span>({</span>
+<span id="cb120-15"><a href="stepprotopype.html#cb120-15"></a>    <span class="kw">random_DT</span>(<span class="dv">5</span>, <span class="dv">5</span>)</span>
+<span id="cb120-16"><a href="stepprotopype.html#cb120-16"></a>  })</span>
+<span id="cb120-17"><a href="stepprotopype.html#cb120-17"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb120-18"><a href="stepprotopype.html#cb120-18"></a>    <span class="kw">random_ggplot</span>()</span>
+<span id="cb120-19"><a href="stepprotopype.html#cb120-19"></a>  })</span>
+<span id="cb120-20"><a href="stepprotopype.html#cb120-20"></a>  output<span class="op">$</span>text &lt;-<span class="st"> </span><span class="kw">renderText</span>({</span>
+<span id="cb120-21"><a href="stepprotopype.html#cb120-21"></a>    <span class="kw">random_text</span>(<span class="dt">nwords =</span> <span class="dv">50</span>)</span>
+<span id="cb120-22"><a href="stepprotopype.html#cb120-22"></a>  })</span>
+<span id="cb120-23"><a href="stepprotopype.html#cb120-23"></a>}</span>
+<span id="cb120-24"><a href="stepprotopype.html#cb120-24"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 
 <div class="figure" style="text-align: center"><span id="fig:10-prototyping-8"></span>
 <img src="img/shinipsumapp.png" alt="An app built with {shinipsum}" width="100%" />
@@ -601,28 +604,30 @@ FIGURE 10.4: An app built with <code>{shinipsum}</code>
 <ul>
 <li>tables:</li>
 </ul>
-<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="stepprotopype.html#cb120-1"></a><span class="kw">random_table</span>(<span class="dt">nrow =</span> <span class="dv">3</span>, <span class="dt">ncol =</span> <span class="dv">10</span>)</span></code></pre></div>
-<pre><code>     GNP.deflator   GNP Unemployed Armed.Forces
-1947         83.0 234.3      235.6        159.0
-1948         88.5 259.4      232.5        145.6
-1949         88.2 258.1      368.2        161.6
-     Population Year Employed GNP.deflator.1 GNP.1
-1947      107.6 1947    60.32           83.0 234.3
-1948      108.6 1948    61.12           88.5 259.4
-1949      109.8 1949    60.17           88.2 258.1
-     Unemployed.1
-1947        235.6
-1948        232.5
-1949        368.2</code></pre>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="stepprotopype.html#cb121-1"></a><span class="kw">random_table</span>(<span class="dt">nrow =</span> <span class="dv">3</span>, <span class="dt">ncol =</span> <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>  day time  temp activ day.1 time.1 temp.1 activ.1
+1 346  840 36.33     0   346    840  36.33       0
+2 346  850 36.34     0   346    850  36.34       0
+3 346  900 36.35     0   346    900  36.35       0
+  day.2 time.2
+1   346    840
+2   346    850
+3   346    900</code></pre>
 <ul>
 <li>print outputs:</li>
 </ul>
-<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="stepprotopype.html#cb122-1"></a><span class="kw">random_print</span>(<span class="dt">type =</span> <span class="st">&quot;model&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="stepprotopype.html#cb123-1"></a><span class="kw">random_print</span>(<span class="dt">type =</span> <span class="st">&quot;model&quot;</span>)</span></code></pre></div>
 <pre><code>
-    Shapiro-Wilk normality test
+	Pearson&#39;s product-moment correlation
 
-data:  datasets::airquality$Ozone
-W = 0.88, p-value = 3e-08</code></pre>
+data:  datasets::mtcars$mpg and datasets::mtcars$cyl
+t = -8.9, df = 30, p-value = 6e-10
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ -0.9258 -0.7163
+sample estimates:
+    cor 
+-0.8522 </code></pre>
 <p>… and text, image, ggplotly, dygraph, and DT.</p>
 </div>
 <div id="using-fakir-for-fake-data-generation" class="section level3">
@@ -630,15 +635,15 @@ W = 0.88, p-value = 3e-08</code></pre>
 <p>Generating random placeholders for Shiny might not be enough: maybe you also need example datasets.</p>
 <p>This can be accomplished using the <code>{fakir}</code> package, which was primarily created to provide fake datasets for R tutorials and exercises, but that can easily be used inside a Shiny application.</p>
 <p>At the time of writing these lines, the package is only available on GitHub, and can be installed with:</p>
-<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="stepprotopype.html#cb124-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;Thinkr-open/fakir&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="stepprotopype.html#cb125-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;Thinkr-open/fakir&quot;</span>)</span></code></pre></div>
 <p>This package contains three datasets that are randomly generated when you call the corresponding functions:</p>
 <ul>
 <li><p><code>fake_base_clients()</code> generates a fake dataset for a ticketing service</p></li>
 <li><p><code>fake_sondage_answers()</code> is a fake survey about transportation</p></li>
 <li><p><code>fake_visits()</code> is a fake dataset for the visits on a website</p></li>
 </ul>
-<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="stepprotopype.html#cb125-1"></a><span class="kw">library</span>(fakir)</span>
-<span id="cb125-2"><a href="stepprotopype.html#cb125-2"></a><span class="kw">fake_visits</span>(<span class="dt">from =</span> <span class="st">&quot;2017-01-01&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;2017-01-31&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="stepprotopype.html#cb126-1"></a><span class="kw">library</span>(fakir)</span>
+<span id="cb126-2"><a href="stepprotopype.html#cb126-2"></a><span class="kw">fake_visits</span>(<span class="dt">from =</span> <span class="st">&quot;2017-01-01&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;2017-01-31&quot;</span>)</span></code></pre></div>
 <pre><code># A tibble: 31 x 8
    timestamp   year month   day  home about  blog
  * &lt;date&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;

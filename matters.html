@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 6 UX Matters | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 6 UX Matters | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-06-10" />
+<meta name="date" content="2020-07-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -50,6 +50,7 @@
 
 
 
+<script src="libs/accessible-code-block/empty-anchor.js"></script>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149994171-1"></script>
 <script>
@@ -350,7 +351,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="14.3" data-path="deploy-golem.html"><a href="deploy-golem.html#deploying-apps-with-golem"><i class="fa fa-check"></i><b>14.3</b> Deploying Apps with <code>{golem}</code></a><ul>
 <li class="chapter" data-level="14.3.1" data-path="deploy-golem.html"><a href="deploy-golem.html#rstudio-environments"><i class="fa fa-check"></i><b>14.3.1</b> RStudio Environments</a></li>
-<li class="chapter" data-level="14.3.2" data-path="deploy-golem.html"><a href="deploy-golem.html#docker-1"><i class="fa fa-check"></i><b>14.3.2</b> Docker</a></li>
+<li class="chapter" data-level="14.3.2" data-path="step-secure.html"><a href="step-secure.html#docker"><i class="fa fa-check"></i><b>14.3.2</b> Docker</a></li>
 </ul></li>
 </ul></li>
 <li class="part"><span><b>VII Optimizing</b></span></li>
@@ -447,14 +448,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Let’s state the truth: no matter how complex and innovative your back-end is, your application is bad if your User Experience (UX) is bad.
 That’s the hard truth.</p>
 <p>We have a natural tendency, as R-coders, to be focused on the back-end, i.e the server part of the application<a href="#fn21" class="footnote-ref" id="fnref21"><sup>21</sup></a>
-.
-Which is perfectly normal—chances are you did not come to R to design front-ends.<a href="#fn22" class="footnote-ref" id="fnref22"><sup>22</sup></a></p>
-<p>However, if people can not understand how to use your application, or if your application front-end does not work at all, your application is not successful, no matter how innovative and incredible the computation algorithms in the back-end are.</p>
-<p>As you are building a complex, production-grade Shiny application, do not under-estimate the necessity for a successful front-end: it is after all the first thing (and probably the only thing) that the end-users of your web application will see, and our natural taste, as R developers, for back-end/server logic can play against us in the long run: by neglecting the UI and the UX, you will make your application less likely to be adopted among your users; which is a good way to fail your application project.</p>
+,
+which is perfectly normal—chances are you did not come to R to design front-ends.<a href="#fn22" class="footnote-ref" id="fnref22"><sup>22</sup></a></p>
+<p>However, if people can not understand how to use your application, or if your application front-end does not work at all, your application is not successful no matter how innovative and incredible the computation algorithms in the back-end are.</p>
+<p>As you are building a complex, production-grade Shiny application, do not under-estimate the necessity for a successful front-end - it is, after all, the first thing (and probably the only thing) that the end-users of your web application will see. However, our natural back-end/server logic as R developers can play against us in the long run - by neglecting the UI and the UX, you will make your application less likely to be adopted among your users, which is a good way to fail your application project.</p>
 <div id="simplicity-is-gold" class="section level2">
 <h2><span class="header-section-number">6.1</span> Simplicity is Gold</h2>
 <blockquote>
-<p>“Simplify, then add lightness”</p>
+<p>“Simplify, then add lightness.”</p>
 </blockquote>
 <!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
 <style>.right{ text-align: right;}</style>
@@ -463,25 +464,25 @@ Which is perfectly normal—chances are you did not come to R to design front-en
 <a href="https://www.lotuscars.com/lotus-philosophy/">Colin Chapman CBE, Founder of Lotus Cars</a>
 </div>
 <p>Aiming for simplicity is a hard thing, but some rules will help you build a better UX, paving the way for a successful application.</p>
-<p>There are mainly two contexts where you will be building a web app with R: for professional use (<em>i.e</em> people will rely on this app to do their job), or for fun (<em>i.e</em> people will just use the app as a distraction)</p>
-<p>But both cases have something in common: people will want the app to be usable, and <strong>easily</strong> usable.</p>
+<p>There are mainly two contexts where you will be building a web app with R: for professional use (<em>i.e.,</em> people will rely on the app to do their job), or for fun (<em>i.e.,</em> people will just use the app as a distraction)</p>
+<p>But both cases have something in common: people will want the app to be usable, <strong>easily</strong> usable.</p>
 <p>If people use your app in a professional context, they do not want to fight with your interface, read complex manuals, or lose time understanding what they are supposed to do and how they are supposed to use your application.
-In other words, they want an efficient tool: something that, beyond being accurate, is easy to grasp.
-In a professional context, when it comes to “Business applications”, remember that quicker you understand the interface, the better the user experience.
-Think about all the professional applications and software that you have been ranting about during your professional life, all these cranky user interfaces you have not understand and/or you need to relearn every time you use them.
+In other words, they want an efficient tool, something that - beyond being accurate - is easy to grasp.
+In a professional context, when it comes to “business applications”, remember that the quicker you understand the interface, the better the user experience.
+Think about all the professional applications and software that you have been ranting about during your professional life, all these cranky user interfaces you did not understand and/or need to relearn every time you use them.
 You do not want your app to be one of these applications.</p>
-<p>And on the other hand, if users open your app for fun, they are not going to fight against your application: they are just going to give up if the app is too complex to be used.
+<p>On the other hand, if users open your app for fun, they are not going to fight against your application; they are just going to give up if the app is too complex to use.
 Even a game has to appear easy to use when the users open it.</p>
-<p>In this section, we will review two general principles: the “do not make me think” principle, which states that interfaces should be as self-explanatory as possible, and the “Rule of least surprise”, stating that elements should behave the way they are commonly expected to behave.
+<p>In this section, we will review two general principles: the “do not make me think” principle, which states that interfaces should be as self-explanatory as possible, and the “rule of least surprise”, stating that elements should behave the way they are commonly expected to behave.
 These two rules aim at solving one issue: the bigger the cognitive load of your app, the harder it will be for the end-user to use it on a daily basis.</p>
 <div id="how-we-read-the-web-scanning-content" class="section level3">
 <h3><span class="header-section-number">6.1.1</span> How we read the web: scanning content</h3>
-<p>One big lie we tell ourselves as developers is that the end-user will use the app the way we designed it to be used (and to be honest, this is not true for any software).
-We love to think that when faced to our app, the users will carefully read the instructions, make a rational decision based on careful examination of the inputs, before doing what we expect them to do.
-But the harsh truth is that it is not how what happens.</p>
-<p>First of all, user rarely read carefully all the instructions: they <strong>scan</strong>, and perform the first action that more or less match what they need to do, i.e they <strong>satisfice</strong> (a portmanteau of satisfy and suffice).
-Navigating the web, users try to optimize their decision but not by making the decision that would be “optimal”, but by doing the first that will satisfy a sufficient amount of relevance.
-They are behaving like that for a lot of reasons, but notably because they want to be as quick as possible on the web, and because the cost of being wrong is most of the time very low: even if you make the wrong decision on a website, chances are that you are just a “return” or “cancel” button away from canceling your last action.</p>
+<p>One big lie we tell ourselves as developers is that the end-user will use the app the way we designed it to be used (though to be honest, this is not true for any software).
+We love to think that when faced with our app, the users will carefully read the instructions and make a rational decision based on careful examination of the inputs before doing what we expect them to do.
+But the harsh truth is that it is not what happens.</p>
+<p>First of all, users rarely carefully read all the instructions: they <strong>scan</strong> and perform the first action that more or less matches what they need to do, i.e., they <strong>satisfice</strong> (a portmanteau of satisfy and suffice).
+Navigating the web, users try to optimize their decision not by making the decision that would be “optimal”, but by doing the first action that is sufficiently satisfactory in relevance.
+They are behaving like that for a lot of reasons, but notably because they want to be as quick as possible on the web, and because the cost of being wrong is very low most of the time - even if you make the wrong decision on a website, chances are that you are just a “return” or “cancel” button away from canceling your last action.</p>
 
 <div class="figure" style="text-align: center"><span id="fig:06-ux-matters-1-bis"></span>
 <img src="img/scanning.png" alt="How we design a webpage versus how a user will really scan it. From (Krug 2014)." width="100%" />
@@ -500,21 +501,20 @@ FIGURE 6.2: Snapshot of the <code>{hexmake}</code> Shiny application on <a href=
 <p>What will be your reading pattern for this application?
 What is the first thing you will do when using this app?</p>
 <p>There is an inherent logic in the application: each sub-menu is designed to handle one specific part of your sticker.
-The last-but-two menu is the one used to download the sticker, and the last one the menu to open the “how to” of the app.
-When opening this app, will your fist move be to open the “How to”?
-Will you open all the sub-menu and select the most “logical” one to start with?
-Chances are that reading this line, you think you will do that.
-But in reality, we behave less rationally that we’d like to think.
-What we most of the time do is click on the first thing that matches what we are here to do.
-For example, most of the time we will first change the package name, or upload an image, before even opening the about section of this app.</p>
-<p>Once user have scanned the page, they perform the first action that seems reasonable.
-Or as coined in “Rational Choice and the Structure of the Environment” by Herbert A. Simon, “<strong>organisms adapt well enough to “satisfice”; they do not, in general, “optimize.”</strong>”.<br />
-In other words, <strong>“As soon as we find a link that seems like it might lead to what we’re looking for, there’s a very good chance that we’ll click it”</strong> (‘Don’t make me think’, Steve Krug <span class="citation">(Krug <a href="#ref-stevekrug2014" role="doc-biblioref">2014</a>)</span>).</p>
+The second menu is the one used to download the sticker, and the last menu is the one used to open the “how to” of the app.
+When opening this app, will your first move be to open the “How to”?
+Will you open all the sub-menus and select the most “logical” one to start with?
+Chances are that by reading this line, you think you will do that.
+But in reality, we behave less rationally than we’d like to think.
+What we do most of the time is click on the first thing that matches what we are here to do.
+For example, most of the time we will first change the package name or upload an image before even opening the “about” section of this app.</p>
+<p>Once users have scanned the page, they perform the first action that seems reasonable…or as coined in “Rational Choice and the Structure of the Environment” by Herbert A. Simon, “<strong>organisms adapt well enough to “satisfice”; they do not, in general, “optimize.”</strong>”.<br />
+In other words, <strong>“As soon as we find a link that seems like it might lead to what we’re looking for, there’s a very good chance that we’ll click it”</strong> (“Don’t Make Me Think”, Steve Krug <span class="citation">(Krug <a href="#ref-stevekrug2014" role="doc-biblioref">2014</a>)</span>).</p>
 <p>What that also means is that user might perform what you’d expect to be “irrational” choices.
 As they are scanning your application, they might do something unexpected, or use a part of your app in a way that you would not expect it to be used.
-For example, if you are creating an app that is designed to take as input data that has to be filled following a specific form, you <strong>need</strong> to check that this requirement is fulfill, or you will end up debugging errors on uncommon entries.</p>
-<p>This is a pretty common thing about apps and about software in general: you have to expect users to use your product in ways you would not have expect, in way that might seem absurd to you.
-This is what is called “defensive programming”: you prevent the application to be used in an unexpected way, and instead of relying on the end user being rational with their choice, we “defend” our function from unexpected inputs.</p>
+For example, if you are creating an app that is designed to take input data that has to be filled following a specific form, you <strong>need</strong> to check that this requirement is fulfilled, or you will end up debugging errors on uncommon entries.</p>
+<p>This is a pretty common thing about apps and about software in general: you have to expect users to use your product in ways you would not have expected, in ways that might seem absurd to you.
+This is what is called “defensive programming” - you prevent the application from being used in an unexpected way, and instead of relying on the end user to be rational with their choice, we “defend” our function from unexpected inputs.</p>
 <p>For example, consider this small app:</p>
 <div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="matters.html#cb75-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb75-2"><a href="matters.html#cb75-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
@@ -544,26 +544,26 @@ This is what is called “defensive programming”: you prevent the application 
 <span id="cb75-26"><a href="matters.html#cb75-26"></a></span>
 <span id="cb75-27"><a href="matters.html#cb75-27"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>What is wrong with this app?
-Probably nothing from a developer point of view: there is a label telling that one should select one or more element from the dropdown, and then something is plotted below.
+Probably nothing from a developer point of view - there is a label stating that one should select one or more elements from the dropdown, and then something is plotted below.
 Pretty standard.
-But what happen if the dropdown is empty?
-Our first conception would be that this would never happen, as it is explicitly specified that there should be one or more elements selected.
+But what happens if the dropdown is empty?
+Our first thought would be that this would never happen, as it is explicitly specified that there should be one or more elements selected.
 In fact, chances are that even with this label, users will eventually end up with an empty <code>selectInput()</code>, leading to the printing of a red error where the plot should be.
-And here, we are lucky, the error only prevents the plot from being displayed: other errors would make the application crash.</p>
+We are lucky here, as the error only prevents the plot from being displayed; other errors could make the application crash.</p>
 <p>What should we do?
 Adopt a defensive programming mindset.
-Every time you create interactive elements, inputs and outputs, or things the user might interact with, ask yourself: “what if [that crazy thing] happens? How do I handle the case where the minimal viable requirements for my app are not met?”.
-And in fact, you should not be focusing on that only for the user side: the back-end should also be examined for potential unexpected behaviors.
-For example, if your Shiny app relies on a database connection, you should check gracefully that the connection is possible, and if it is not, send a message to your user that the database is not reachable, and that they should either restart the app or come back in a few minutes.</p>
+Every time you create interactive elements, inputs and outputs, or things the user might interact with, ask yourself: “What if that [crazy thing] happens? How do I handle the case where the minimal viable requirements for my app are not met?”.
+And in fact, you should not be focusing on that only for the user side - the back-end should also be examined for potential unexpected behaviors.
+For example, if your Shiny app relies on a database connection, you should gracefully check that the connection is possible, and if it is not, send a message to your user that the database is not reachable, and that they should either restart the app or come back in a few minutes.</p>
 <p>In fact, this is a crucial thing when it comes to making your app successful: <strong>you should always fail gracefully and informatively</strong>.
-That means that when your R code fails, the whole app should not fail.
+That means that even when your R code fails, the whole app should not fail.
 If the R code fails for some reason, the user should either get nothing back or an informative bug message, not be faced with a grayish version of the application.</p>
 <p>Because of the way Shiny is designed, a lot of R errors will make the Shiny app fail completely.
-If you have not thought about this upfront, that means that a user might use the app for say 10 minutes, do a series of specifications, enter parameters and data, and at some point the app completely crashes.
-Then the user has to restart from scratch, because there is no native way, from there, to restart from where the app has crashed.
-This is a very important thing to keep in mind when building Shiny app: <strong>once the app has failed, there is no easy way to natively get it back to the moment just before it crashed</strong>, meaning that your users might lose a significant amount of time they have spent configuring the app.</p>
-<p>So, one good practice: try, as much as possible, to <strong>wrap all server calls in some form of try-catch</strong> pattern.
-That way, you can for example send a notification to the user if the process fails, either using <code>{shiny}</code> <span class="citation">(Chang et al. <a href="#ref-R-shiny" role="doc-biblioref">2020</a>)</span> notification function, an external package like <code>{shinyalert}</code> <span class="citation">(Attali and Edwards <a href="#ref-R-shinyalert" role="doc-biblioref">2020</a>)</span>, or a custom JavaScript alert like <a href="https://github.com/ColinFay/notifyjsexample">notify.js</a>.
+If you have not thought about this upfront, that means that a user might use the app for 10 minutes, do a series of specifications, enter parameters and data, only for the app to complete crash at some point.
+The user has to then restart from scratch, because there is no native way - from there - to restart from where the app has crashed.
+This is a very important thing to keep in mind when building Shiny apps: <strong>once the app has failed, there is no easy way to natively get it back to the moment just before it crashed</strong>, meaning that your users might lose a significant amount of the time they have spent configuring the app.</p>
+<p>One good practice is to try, as much as possible, to <strong>wrap all server calls in some form of try-catch</strong> pattern.
+That way, you can, for example, send a notification to the user if the process fails, either using a <code>{shiny}</code> <span class="citation">(Chang et al. <a href="#ref-R-shiny" role="doc-biblioref">2020</a>)</span> notification function, an external package like <code>{shinyalert}</code> <span class="citation">(Attali and Edwards <a href="#ref-R-shinyalert" role="doc-biblioref">2020</a>)</span>, or a custom JavaScript alert like <a href="https://github.com/ColinFay/notifyjsexample">notify.js</a>.
 Here is a pseudo-code pattern for this using the <code>{attempt}</code> <span class="citation">(Fay <a href="#ref-R-attempt" role="doc-biblioref">2020</a><a href="#ref-R-attempt" role="doc-biblioref">a</a>)</span> package:</p>
 <div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="matters.html#cb76-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb76-2"><a href="matters.html#cb76-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(request){</span>
@@ -918,7 +918,7 @@ Hence the importance of structuring the page: these technologies need the app to
 <p>Your app user might also have mobility impairment.
 For example, some with Parkinson might be using your app, or someone with a handicap making it harder for them to move their hand and click.
 For these users, moving an arm to grab the mouse might be challenging, and they might be navigating the web using their keyboard only.</p>
-<p>When building your app, thinking about how these users will be able to use it is crucial: maybe there are so may button they need to <strong>move their mouse to and click</strong> that they will not be able to use it.
+<p>When building your app, thinking about how these users will be able to use it is crucial: maybe there are so many button they need to <strong>move their mouse to and click</strong> that they will not be able to use it.
 So, as much as possible, make everything doable with a keyboard: for example, if you have a <code>textInput()</code> with a validation button below, allow the user to validate by pressing the ENTER on their keyboard.
 Here is a small example of how to implement that:</p>
 <div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="matters.html#cb81-1"></a><span class="kw">library</span>(shiny)</span>
@@ -1151,8 +1151,8 @@ It also comes with tools for Java and JavaScript, and notably with a NodeJS modu
 <div class="footnotes">
 <hr />
 <ol start="21">
-<li id="fn21"><p>aka what happens in the server side of a Shiny App<a href="matters.html#fnref21" class="footnote-back">↩︎</a></p></li>
-<li id="fn22"><p>Front-end are the visual parts of your application, the one your user interacts with, as opposed to the back-end, which is what is installed on the server, the part the end user does not see. In Shiny, front-end is what correspond to the UI, back-end to the server.<a href="matters.html#fnref22" class="footnote-back">↩︎</a></p></li>
+<li id="fn21"><p>e.g., what happens on the server side of a Shiny App<a href="matters.html#fnref21" class="footnote-back">↩︎</a></p></li>
+<li id="fn22"><p>The front-end eis the visual part of your application - the one your user interacts with - as opposed to the back-end, which is what is installed on the server, the part the end user does not see. In Shiny, front-end corresponds to the UI, while back-end, to the server.<a href="matters.html#fnref22" class="footnote-back">↩︎</a></p></li>
 <li id="fn23"><p>For a good summary of these, see <a href="https://www.ibm.com/developerworks/web/library/us-cranky10/us-cranky10-pdf.pdf">The cranky user: The Principle of Least Astonishment</a><a href="matters.html#fnref23" class="footnote-back">↩︎</a></p></li>
 <li id="fn24"><p><code>{shiny}</code> is built on top of Bootstrap 3, and the action buttons are of class <code>btn-default</code>, which was removed in Bootstrap 4.<a href="matters.html#fnref24" class="footnote-back">↩︎</a></p></li>
 <li id="fn25"><p>Well, maybe the native <code>{plotly}</code> <span class="citation">(<span class="citeproc-not-found" data-reference-id="plotly2018"><strong>???</strong></span>)</span> implementation is faster, but you get the spirit.<a href="matters.html#fnref25" class="footnote-back">↩︎</a></p></li>
