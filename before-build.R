@@ -1,6 +1,6 @@
 install.packages(c("attachment", "remotes", "usethis", "namer", "desc", "spelling"))
 remotes::install_github("lbartnik/subprocess")
-remotes::install_github("rstudio/websocket", "rc-v1.2.0")
+remotes::install_github("rstudio/websocket")
 paks <- c(
   "cloc", "dplyr", "cyclocomp", "tidytuesday201942", "shiny", "packageMetrics2", 
   "remotes", "readr", "here", "tibble", "knitr", "desc", "attachment", "magrittr", 
