@@ -1,0 +1,780 @@
+# Using JavaScript {#optimjs}
+
+```{r 18-javascript-1, include = FALSE}
+knitr::opts_chunk$set( comment = "", eval = FALSE)
+```
+
+#### Prelude {-}
+
+Note that you can build successful, production-grade `{shiny}`[@R-shiny] application without ever writing a single line of JavaScript code. 
+Even more when you can use a lot of tools that already bundle JavaScript functionalities: a great example of that being `{shinyjs}`[@R-shinyjs], which allows to interact with your application using JavaScript, without writing a single line of JavaScript. 
+
+We chose to include this chapter in this book as it will help you get a better understanding on how `{shiny}` works at its core, and that getting at ease with JavaScript can help you get better at building web applications using R on the long run.
+It can also help extending `{shiny}` with other JavaScript libraries, for example using `{htmlwidgets}`[@R-htmlwidgets], when you get better at writing JavaScript.
+
+That being said, note also that every inclusion of external JavaScript code or library can present a security risk for your application, so don't include code you don't know/understand in your application unless you are sure of what you are doing.
+As a rule of thumb, always go for an existing and tested solution when need JavaScript widgets/functionalities, instead of trying to implement them yourself.
+
+## Introduction
+
+At its core, __building a `{shiny}` app is building a JavaScript application__ that can talk with an R session. 
+This process is invisible to most `{shiny}` developers, who usually do everything in R. In fact, most of the `{shiny}` apps out there are 100% written with R. 
+
+In fact, when you are writing UI elements in `{shiny}`, __what you are actually doing is building a series of HTML tags__. 
+
+For example, this simple `{shiny}` [@R-shiny] code returns a series of HTML tags: 
+
+``` r
+fluidPage(
+  h2("hey"), 
+  textInput("act", "Ipt")
+)
+```
+``` html
+<div class="container-fluid">
+  <h2>hey</h2>
+  <div class="form-group shiny-input-container">
+    <label class="control-label" for="act">Ipt</label>
+    <input id="act" type="text" class="form-control" value=""/>
+  </div>
+</div>
+```
+
+Later on, when the app is launched, `{shiny}` binds events to UI elements, and these JavaScript events will communicate with R, in the sense that they will send data to R, and receive data from R. 
+What happens under the hood is a little bit complex and out of scope for this book, but the general idea is: R talks to your browser through a web socket (that you can imagine as a small "phone line" with both software listening at each end, both being able to send messages to each other
+^[See this post on dev.to <https://dev.to/buzzingbuzzer/comment/g0g> for a quick introduction to the general concept of web sockets]
+), and this browser talks to R through the same web socket.
+
+Most of the time, when the JavaScript side of the websocket receives one of these events, the page the user sees is modified (for example, a plot is drawn).
+On the R end of the websocket, _i.e_ when R receives data from the web page, a value is fetched, and something is computed. 
+
+It's important to note here that the __communication happens in both ways__: from R to JavaScript, and from JavaScript to R. 
+In fact, when we write a piece of code like `sliderInput("first_input", "Select a number", 1, 10, 5)`, what we are doing is creating a binding between JavaScript and R, where the JavaScript runtime (in the browser) listens to any event happening on the slider with the id `"plop"`, and whenever it detects that something happens to this element, something (most of the time its value) is sent back to R, and R does computation based on that value.
+With `output$bla <- renderPlot({})`, what we are doing is making the two communicate the other way around: we are telling JavaScript to listen to any incoming data from R for the `id` `"bla"`, and whenever JavaScript sees incoming data from R, it puts it into the proper HTML tag (here, JavaScript inserts the image received from R in the `<img>` tags with the id `bla`). 
+
+Even if everything is written in R, we __are__ writing a web application, _i.e_. HTML, CSS and JavaScript elements. 
+Once you have realized that, the possibilities are endless: in fact almost anything doable in a "classic" web app can be done in `{shiny}` with a little bit of tweaking. 
+What this also implies is that getting (even a little bit) better at writing HTML, CSS, and especially JavaScript will make your app better, lighter, and more user-friendly, as JavaScript is a language that has been designed to interact with a web page: change element appearances, hide and show things, click somewhere, show alerts and prompts, etc.
+__Knowing just enough JavaScript can improve the quality of your app__: especially when you have been using R to render some complex UIs: think conditional panels, simulating a button click from the server, hide and show elements, etc.
+All these things are good examples of where you should be using JavaScript instead of building more or less complex `renderUI` or `insertUI` patterns in your server.
+
+Moreover, the number of JavaScript libraries available on the web is tremendous; and the good news is that `{shiny}` has everything it needs to bundle external JavaScript libraries inside your application
+^[This can also be done by wrapping a JS libraries inside a package, which will later be used inside an application. See for example `{glouton}` [@R-glouton], which is a wrapper around the [`js-cookie`](https://github.com/js-cookie/js-cookie) JavaScript library.]
+.
+
+This is what this section of the book aims at: giving you just enough JavaScript knowledge to lighten your `{shiny}` App, in order to improve the global user and developer experience.
+In this chapter, we will first review some JavaScript basics which can be used "client-side" only, i.e. only in your browser.
+Then, we will talk about making R & JS communicate with each other, and explore some common patterns for JavaScript in `{shiny}`. 
+Finally, we will quickly present some of the functions available in `{golem}` [@R-golem] that can be used to launch JavaScript.
+
+> Note that this chapter does not try to be a comprehensive JavaScript course. 
+External resources are linked all throughout this chapter and at the end if you want to dive deeper into JavaScript.
+
+## A quick introduction to JavaScript
+
+### About JavaScript
+
+JavaScript is a programming language which has been designed to work in the browser
+^[You can now work with JavaScript in a server with Node.JS, but this is out of scope of this book. See linked resources to learn more.]
+.
+To play with a JavaScript console, the fastest way is to open your favorite web browser, and to open the developer tools. 
+In Google Chrome, it's available under View > Developer > Developer Tools. 
+This will open a new interface where you can have access to a JavaScript console under the Console tab. 
+Here, you can try your first JavaScript code!
+For example, you can try running `var message = "Hello world"; alert(message);`.
+
+As you might have guessed, we will not be focusing on playing with JavaScript in your browser console: what we want to know is how to insert JavaScript code inside a `{shiny}` application. 
+
+### Including JavaScript code in your app
+
+There are three ways to include the JavaScript code inside your web app: 
+
++ As an external file, which is served to the browser alongside your main application page
++ Inside a `<script>` HTML tag inside your page
++ Inline, on a specific tag, for example by adding an `onclick` event straight on a tag
+
+> Note that the good practice when it comes to include JavaScript is to add the code inside an external file.
+
+If you are working with `{golem}`, including a JavaScript file is achieved via two functions: 
+
++ `golem::add_js_file("name")`, which adds a standard JavaScript file, i.e. one which is not meant to be used to communicate with R.
+We'll see in the first part of this chapter how to add JavaScript code there.
++ `golem::add_js_handler("name")`, which creates a file with a skeleton for `{shiny}` handlers. 
+We'll see this second type of elements in the `JavaScript <-> R communication` part.
++ `golem::add_js_binding("name")`, for more advanced use cases, when you want to build your own custom inputs, _i.e_ when you want to create a custom html element that can be used to interact with `{shiny}`. 
+See [shiny.rstudio.com/articles/js-custom-input.html](https://shiny.rstudio.com/articles/js-custom-input.html) for more information about how to complete this skeleton.
+
+OK, good, but what do we do now?
+Note that in this chapter, we will not be covering basic JavaScript object and manipulation. 
+Feel free to refer to the first chapter of [JavaScript 4 `{shiny}` - Field Notes](http://connect.thinkr.fr/js4shinyfieldnotes/intro.html) for a detailed introduction to objects and object manipulation, or following one of the resources linked at the end of this chapter.
+
+### Understanding html, class, and id
+
+You have to think of a web page as a tree, where the top of the webpage is the root node, and every element in the page is a node in this tree (this tree is called a DOM, for Document Object Model). 
+__You can work on any of these HTML nodes with JavaScript__: modify it, bind events to it and/or listen to events, hide and show, etc.
+But first, __you have to find a way to identify these elements__: either as a group of elements or as a unique element inside the whole tree. 
+That is what HTML semantic elements, classes, and ids are made for.
+Consider this piece of code:
+
+```{r 18-javascript-2, echo = TRUE, eval = FALSE}
+library(shiny)
+fluidPage(
+  titlePanel("Hello Shiny"), 
+   textInput("act", "Ipt")
+)
+```
+
+``` html
+<div class="container-fluid">
+  <h2>Hello Shiny</h2>
+  <div class="form-group shiny-input-container">
+    <label class="control-label" for="act">Ipt</label>
+    <input id="act" type="text" class="form-control" value=""/>
+  </div>
+</div>
+```
+
+This `{shiny}` code creates a piece of HTML code containing three nodes: a `div` with a specific class (a Bootstrap container), an `h2`, which is a level-two header, and a button which has an id and a class.
+Both are included in the `div`. 
+Let's detail what we have got here:
+
++ HTML tags, which are the building blocks of the "tree": here `div`, `h2` and `button` are HTML tags.
++ The button has an `id`, which is short for "identifier". 
+Note that this id has to be unique: the id of an element allows to refer to this exact element. 
+In the context of `{shiny}`, it allows JavaScript and R to talk to each other. 
+For example, if you are rendering a plot, you have to be sure it is rendered at the correct spot in the UI, hence the need for a unique id in `renderPlot()`.
+Same goes for your inputs: if you are computing a value based on an input value, you have to be sure that this value is the correct one.
++ Elements can have a class which can apply to multiple elements. 
+This can be used in JavaScript, but it is also very useful for styling elements in CSS. 
+
+### Querying in Vanilla JavaScript
+
+In "Vanilla" JavaScript (i.e without any external plugins installed), you can query these elements using methods from the `document` object. 
+For example: 
+
+``` javascript
+// Given
+<div id = "first_input" name="number" class = "widediv">Wesh</div>
+
+// Query with the ID
+document.querySelector("#first_input")
+document.getElementById("first_input")
+
+// With the class
+document.querySelectorAll(".widediv")
+document.getElementsByClassName("widediv") 
+
+// With the name attribute
+document.getElementsByName("number") 
+
+// Using the tag name
+document.getElementsByTagName("div")
+```
+
+Note that some of these methods have been introduced with ES6, which is a version of JavaScript that came out in 2015. 
+This version of JavaScript is supported by most browsers since mid-2016 (and June 2017 for Firefox) (see [JavaScript Versions](https://www.w3schools.com/js/js_versions.asp) from W3Schools).
+Most of your users should now be using a browser version that is compatible with ES6, but that is something that you might want to keep in mind: browser version matters when it comes to using JavaScript.
+Indeed, some companies (for internal reason) are still using old versions of Internet Explorer: a constraint you want to be aware of before starting building the app, hence a question that you want to ask during the Design step. 
+
+### About DOM events 
+
+When users navigate to a webpage, they will generate events on the page: clicking, hovering elements, pressing keys, etc. All these events are listened to by the JavaScript runtime, plus some events that are not generated by the users: for example, there is a "ready" event generated when the webpage has finished loading. 
+Most of these events are linked to a specific node in the tree: for example, if you click on something, you are clicking on a node in the DOM. 
+That is where JavaScript events come into play: when an event is triggered in JavaScript, you can link to it a "reaction", in other words a piece of JavaScript code that is executed when this event occurs. 
+
+Here are some examples of events: 
+
++ `click` / `dblclick`
+
++ `focus`
+
++ `keypress`, `keydown`, `keyup`
+
++ `mousedown`, `mouseenter`, `mouseleave`, `mousemove`, `mouseout`, `mouseover`, `mouseup`
+
++ `scroll`
+
+For a full list, please refer to <https://developer.mozilla.org/fr/docs/Web/Events>.
+
+Once you have this list in mind, you can select elements in the DOM, add an `addEventListener` to them, and define a callback function (which is executed when the event is triggered). 
+For example, the code below adds an event to the `input` when a key is pressed, showing a native `alert()` to the user.
+
+``` html
+<input type="text" id = "firstinput">
+<script> 
+  document.getElementById("firstinput").addEventListener(
+    "keypress", 
+    function(){
+      alert("Pressed!")
+    }
+  )
+</script>
+```
+
+Note that `{shiny}` also generates events, meaning that you can customize the behavior of your application based on these events. 
+Here is a code that launches an alert when `{shiny}` is connected:
+
+``` javascript
+$(document).on('shiny:connected', function(event) {
+  alert('Connected to the server'); 
+}); 
+```
+
+But wait, what is this weird `$()`?
+That's `jQuery`, and we will discover it in the very next section!
+
+### About `jQuery` & `jQuery` selectors
+
+The `jQuery` framework is natively included in `{shiny}`.
+
+> jQuery is a fast, small, and feature-rich JavaScript library. It makes things like HTML document traversal and manipulation, event handling, animation, and Ajax much simpler with an easy-to-use API that works across a multitude of browsers. `r right_link("jQuery home page", "https://jquery.com/")`
+
+`jQuery` is a very popular JavaScript library which is designed to manipulate the DOM, its events, and its elements. 
+It can be used to do a lot of things, like hide and show objects, change object classes, click somewhere, etc.
+And to be able to do that, it comes with the notion of selectors, which will be put between `$()`.
+You can use, for example:
+
++ `$("#firstinput")` to refer to the element with the id `firstinput` 
+
++ `$(".widediv")` to refer to element(s) of class `widediv`
+
++ `$("button:contains('this')")` to refer to the buttons with a text containing `'this'`
+
+You can also use special HTML attributes, which are specific to a tag.
+For example, the following HTML code:
+
+``` html
+<a href = "https://thinkr.fr" data-value = "panel2">ThinkR</a>
+```
+
+contains the `href` & `data-value` attributes.
+You can refer to these with `[]` after the tag name.
+
++ `$("a[href = 'https://thinkr.fr']")` refers to link(s) with `href` being `https://thinkr.fr`
+
++ `$('a[data-value="panel2"]')` refers to link(s) with  `data-value` being `"panel2"`
+
+These and other selectors are __used to identify one or more node(s) in the big tree which is a web page__. 
+Once we have identified these elements, we can either extract or change data contained in these nodes, or invoke methods contained within these nodes.
+Indeed JavaScript, like R, can be used as a functional language, but most of what we do is done in an object-oriented way. 
+In other words, you will interact with objects from the web page, and these objects will contain data and methods. 
+
+Note that this is not specific to `jQuery`: elements can also be selected with standard JavaScript. 
+`jQuery` has the advantage of simplifying selections and actions and to be cross-platform, making it easier to ship applications that can work on all major browsers. 
+And it comes with `{shiny}` for free!
+
+Choosing `jQuery` or vanilla JavaScript is up to you: and in the rest of this chapter we will try to mix both syntax, and put both when possible, so that you can choose the one you are the most comfortable with.
+
+## Client-side JavaScript
+
+It is hard to give an exhaustive list of what you can do with JavaScript inside `{shiny}`. 
+As a `{shiny}` app is part JavaScript, part R, once you have a good grasp of JavaScript you can quickly enhance any of your applications.
+That being said, a few common things can be done that would allow you to immediately optimize your application: i.e. small JavaScript functions that will prevent you from writing complex algorithmic logic in your application server. 
+
+### Common patterns
+
++ `alert("message")` uses the built-in alert-box mechanism from the user's browser (i.e., the `alert()` function is not part of `jQuery` but it is built inside the user's browser).
+It works well as it relies on the browser instead of relying on R or on a specific JavaScript library. 
+You can use this functionality to replace a call to `{shinyalert}` [@R-shinyalert]: the result is a little less aesthetically pleasing, but is easier to implement and maintain.
+
++ `var x = prompt("this", "that");` this function opens the built-in prompt, which is a text area where the user can input text. 
+With this code, when the user clicks "OK", the text is stored in the `x` variable, which you can then send back to R (see further part down this chapter for more info on how to do that). 
+This can replace something like the following: 
+
+```{r 18-javascript-4 }
+# Initiating a modalDialog that will ask the user to enter
+# some information
+mod <- function() {
+  # The modal box definition
+  modalDialog(
+    # Simple body with a textInput
+    tagList(
+      textInput("info", "Your info here")
+    ),
+    footer = tagList(
+      modalButton("Cancel"),
+      actionButton("ok", "OK")
+    )
+  )
+}
+
+# When the user clicks on the "show" button in the UI, 
+# the modalDialog() is displayed
+observeEvent(input$show, {
+  showModal(mod())
+})
+
+# Whenever the "ok" button is clicked, the modal is removed
+observeEvent(input$ok, {
+  print(input$info)
+  removeModal()
+})
+```
+
++ `$('#id').css('color', 'green');`, or in vanilla JavaScript `document.getElementById("demo").style.color = "green";` changes the CSS attributes of the selected element(s). 
+Here, we are switching to green on the `#id` element.
+
++ `$("#id").text("this")`, or in vanilla JavaScript `document.getElementById("id").innerText = "this";` changes the text content to "this". 
+This can be used to replace 
+
+```{r 18-javascript-5, eval = FALSE}
+output$ui <- renderUI({
+  # Conditionnal rendering of the UI
+  if (this){
+    tags$p("First")
+  } else {
+    tags$p("Second")
+  }
+})
+```
+
++ `$("#id").remove();`, or in vanilla JavaScript `var elem = document.querySelector('#some-element'); elem.parentNode.removeChild(elem);` completely removes the element from the DOM. 
+It can be used as a replacement for `shiny::removeUI()`, or as a conditional UI. 
+Note that this code doesn't remove the input values on the server-side: the elements only disappear from the UI, but nothing is sent to the server-side. 
+For a safe implementation, see `{shinyjs}`.
+
+### Where to put them - Back to JavaScript Events
+
+OK, now that we have got some ideas about JS code that can be used in `{shiny}`, where do we put it? 
+HTML and JS have a concept called `events`, which are... well, events that happen when the user manipulates the webpage: when the user clicks, hovers (the mouse goes over an element), presses the keyboard, etc.
+All these events can be used to trigger a JavaScript function. 
+
+Here are some examples of adding JavaScript functions to DOM events:
+
++`onclick`
+
+The `onclick` attribute can be added straight inside the HTML tag when possible:
+
+```{r 18-javascript-6, eval = FALSE}
+# Building a button using the native HTML tag 
+# (i.e. not using the actionButton() function)
+# This button only goal is to launch this JS code
+# when it is clicked 
+tags$button(
+  "Show",
+  onclick = "$('#plot').show()"
+)
+```
+
+Or with `shiny::tagAppendAttributes`:
+
+```{r 18-javascript-7, eval = FALSE}
+# Using tagAppendAttributes() allows to add attributes to the 
+# outputed UI element
+plotOutput(
+  "plot"
+) %>% tagAppendAttributes(
+  onclick = "alert('hello world')"
+)
+```
+
+Here is for example a small `{shiny}` app that implements this behavior:
+
+```{r 18-javascript-8, eval = FALSE}
+library(shiny)
+library(magrittr)
+ui <- function(){
+  fluidPage(
+    # We create a plotOutput, which will show an alert when 
+    # it is clicked
+    plotOutput(
+      "plot"
+    ) %>% tagAppendAttributes(
+      onclick = "alert('iris plot!')"
+    )
+  )
+}
+
+server <- function(input, output, session){
+  output$plot <- renderPlot({
+    plot(iris)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+You can find a real Life example of this `tagAppendAttributes` in the `{tidytuesday201942}` [@R-tidytuesday201942] app: 
+
++ [R/mod_dataviz.R#L109](https://github.com/ColinFay/tidytuesday201942/blob/master/R/mod_dataviz.R#L109), where the click on the plot generates the creation of a `{shiny}` input (we will see this below)
+
+That, of course, works well with very small JavaScript code. 
+For longer JavaScript code, you can write a function inside and external file, and add it to your app. 
+In `{golem}`, this works by launching the `add_js_file("name")`, which will create a `.js` file. 
+The JavaScript file is then automatically linked in your application.
+
+This, for example, could be: 
+
++ In `inst/app/www/script.js `
+
+```{js 18-javascript-9, eval = FALSE, echo = TRUE}
+function alertme(id){
+  // Asking information
+  var name = prompt("Who are you?");
+  // Showing an alert
+  alert("Hello " + name + "! You're seeing " + id);
+}
+```
+
++ Then in R
+
+```{r 18-javascript-10, eval = FALSE}
+plotOutput(
+  "plot"
+) %>% tagAppendAttributes(
+  # Calling the function which has been defined in the 
+  # external script
+  onclick = "alertme('plot')"
+)
+```
+
+Inside this `inst/app/www/script.js`, you can also attach a new behavior with `jQuery` to one or several elements. 
+For example, you can add this `alertme` / `onclick` behavior to all plots of the app:
+
+```{js 18-javascript-11, eval = FALSE, echo = TRUE}
+function alertme(id){
+  var name = prompt("Who are you?");
+  alert("Hello " + name + "! You're seeing " + id);
+}
+
+/* We're adding this so that the function is launched only
+when the document is ready */
+$(function(){ 
+  // Selecting all `{shiny}` plots
+  $(".shiny-plot-output").on("click", function(){
+    /* Calling the alertme function with the id 
+    of the clicked plot */
+    alertme(this.id);
+  });
+});
+```
+
+Then, all the plots from your app will receive this on-click event
+^[This `click` behavior can also be done through `$(".shiny-plot-output").click(...)`. We chose to display the `on("click")` pattern as it can be generalized to all DOM events.]
+.
+
+Note that there is a series of events which are specific to `{shiny}` but that can be used just like the one we have just seen: 
+
+```{js 18-javascript-12, eval = FALSE, echo = TRUE}
+// We define a function that will ask for the visitor name, and 
+// then show an alert to welcome the visitor
+function alertme(){
+  var name = prompt("Who are you?");
+  alert("Hello " + name + "! Welcome to my app");
+}
+
+$(function(){ 
+  // Waiting for `{shiny}` to be connected
+  $(document).on('shiny:connected', function(event) {
+    alertme();
+  });
+});
+```
+
+See [JavaScript Events in `{shiny}`](https://shiny.rstudio.com/articles/js-events.html) for the full list of JavaScript events available in `{shiny}`.
+
+## JavaScript <-> `{shiny}` communication 
+
+Now that we have seen some client-side optimization, i.e. R does not do anything with these events when they happen (in fact R is not even aware they happened), let's now see how we can make these two communicate with each other. 
+
+### From R to JavaScript 
+
+Calling JS from the server side (i.e from R) is done by defining a series of `CustomMessageHandler`: these are functions with one argument that can then be called using the `session$sendCustomMessage()` method from the server side. 
+Or if you are using `{golem}`, using the `invoke_js()` function. 
+
+You can define them using this skeleton:
+
+```{r 18-javascript-13, echo = FALSE, eval = TRUE}
+readLines("golex/inst/app/www/first_handler.js") %>%
+  glue::as_glue()
+```
+
+This skeleton is the one generated by `golem::add_js_handler("first_handler")`.
+
+Then, it can be called from server-side with:
+
+```{r 18-javascript-14, eval = FALSE}
+session$sendCustomMessage("fun", list())
+# OR
+golem::invoke_js("fun", ...)
+```
+
+Note that the `list()` argument from your function will be converted to JSON, and read as such from JavaScript. 
+In other words, if you have an argument called `x`, and you call the function with `list(a = 1, b = 12)`, then in JavaScript you will be able to use `x.a` and `x.b`.
+
+For example:
+
++ In `inst/app/www/script.js`:
+
+```{js 18-javascript-15, eval = FALSE, echo = TRUE}
+// We define an handler called "computed", that can be called 
+// from the server side of the {shiny} application
+Shiny.addCustomMessageHandler('computed', function(mess) {
+  // The received value (in mess) is serialized in JSON, so we can 
+  // access the list element with object.name
+  alert("Computed " + mess.what + " in " + mess.sec + " secs");
+})
+```
+
++ Then in R: 
+
+```{r 18-javascript-16, eval = FALSE}
+observe({
+  # Register the starting time
+  deb <- Sys.time()
+  # Mimic a long computation
+  Sys.sleep(
+    sample(1:5, 1)
+  )
+  # Calling the computed handler
+  golem::invoke_js(
+    "computed", 
+    # We send a list, that will be turned into JSON
+    list(
+      what = "time", 
+      sec = round(Sys.time() - deb)
+    )
+  )
+})
+```
+
+### From JavaScript to R
+
+How to do the other way around (from JavaScript to R)?
+`{shiny}` apps, in the browser, contain an object called `Shiny`, which may be used to send values to R by creating an `InputValue`. 
+For example, with: 
+
+```{js 18-javascript-17, eval = FALSE, echo = TRUE}
+// This function from the Shiny JavaScript object
+// Allows to register an input name, and a value
+Shiny.setInputValue("rand", Math.random())
+```
+
+you will bind an input that can be caught from the server side with:
+
+```{r 18-javascript-18, eval = FALSE}
+# Once the input is set, it can be caught with R using:
+observeEvent( input$rand , {
+  print( input$rand )
+})
+```
+
+`Shiny.setInputValue`^[Note that the old name of this function is `Shiny.onInputChange`.] can of course be used inside any JavaScript function. 
+Here is a small example wrapping some of the things we have seen previously:
+
++ In `inst/app/www/script.js`
+
+```{js 18-javascript-19, eval = FALSE, echo = TRUE}
+function alertme(){
+  var name = prompt("Who are you?");
+  alert("Hello " + name + "! Welcome to my app");
+  Shiny.setInputValue("username", name)
+}
+
+$(function(){ 
+  // Waiting for `{shiny}` to be connected
+  $(document).on('shiny:connected', function(event) {
+    alertme();
+  });
+  
+  $(".shiny-plot-output").on("click", function(){
+    /* Calling the alertme function with the id 
+    of the clicked plot. 
+    The `this` object here refers to the clicked element*/
+    Shiny.setInputValue("last_plot_clicked", this.id);
+  });
+});
+```
+
+These events (getting the user name and the last plot clicked), can then be caught from the server side with:
+
+```{r 18-javascript-20, eval = FALSE}
+# We wait for the output of alertme(), which will set the
+# "username" input value
+observeEvent( input$username , {
+  cli::cat_rule("User name:")
+  print(input$username)
+})
+
+# This will print the id of the last clicked plot
+observeEvent( input$last_plot_clicked , {
+  cli::cat_rule("Last plot clicked:")
+  print(input$last_plot_clicked)
+})
+```
+
+Which will give:
+
+``` 
+> golex::run_app()
+Loading required package: shiny
+
+Listening on http://127.0.0.1:5495
+── User name: ─────────────────────────────────────────────────────
+[1] "Colin"
+── Last plot clicked: ─────────────────────────────────────────────
+[1] "plota"
+── Last plot clicked: ─────────────────────────────────────────────
+[1] "plotb"
+```
+
+__Important note__: if you are using modules, you will need to pass the namespacing of the `id` to be able to get it back from the server. 
+This can be done using the `session$ns` function, which comes by default in any golem-generated module. 
+In other words, you will need to write something like:
+
+```{js 18-javascript-21, eval = FALSE, echo = TRUE}
+$( document ).ready(function() {
+  // Setting a custom handler that will ask the users their name
+  // then set the returned value to a Shiny input
+  Shiny.addCustomMessageHandler('whoareyou', function(arg) {
+    var name = prompt("Who are you?")
+    Shiny.setInputValue(arg.id, name);
+  })
+});
+```
+
+```{r 18-javascript-22 }
+mod_my_first_module_ui <- function(id){
+  ns <- NS(id)
+  tagList(
+    actionButton(
+      ns("showname"), "Enter your name"
+    )
+  )
+}
+
+mod_my_first_module_server <- function(input, output, session){
+  ns <- session$ns
+  # Whenever the button is clicked, we call the CustomMessageHandler
+  observeEvent( input$showname , {
+    # Calling the "whoareyou" handler
+    golem::invoke_js(
+      "whoareyou", 
+      # The id is namespaced, so that we get it back on the server-side
+      list(
+        id = ns("name")
+      )
+    )
+  })
+  
+  # Waiting for input$name to  be set with JavaScript
+  observeEvent( input$name , {
+    cli::cat_rule("Username is:")
+    print(input$name)
+  })
+}
+```
+
+## About `{shinyjs}` js functions
+
+As said in the introduction to this chapter, running JavaScript code that you don't fully control/understand can be tricky and might open doors for external attacks. 
+In many cases, for the most common JavaScript manipulations, it's safer to go for a package that has already been proved efficient: `{shinyjs}`. 
+
+This package, licensed in MIT since version 2.0.0, can be used to perform common JavaScript tasks: show, hide, alert, click... 
+
+See [deanattali.com/shinyjs/](https://deanattali.com/shinyjs/) for more information about how to use this package.
+
+## One Last Thing: API calls
+
+If your application uses API calls, chances are that right now you have being doing them straight from R. 
+But there are downsides to that approach. 
+Notably, if the API limits requests based on an IP and your application gets a lot of traffic, your users will end up being unable to use the app because of this restriction. 
+
+So, why not switch to writing these API calls in JavaScript? 
+As JavaScript is run inside the users' browser, the limitation will apply to the users' IPs, not the one where the application is deployed, allowing you to more easily scale your application. 
+
+You can write this API call using the `fetch()` JavaScript function. 
+It can then be used inside a `{shiny}` JavaScript handler, or as a response to a DOM event (for example, with `tags$button("Get Me One!", onclick = "get_rand_beer()")`, as we will see below). 
+
+Here is the general skeleton that would work when the API does not need authentication and returns JSON. 
+
++ Inside JavaScript (here, we create a function  that will be available on an `onclick` event)
+
+``` javascript
+// FUNCTION definition
+const get_rand_beer = () => {
+    // FETCHING THE API DATA
+    fetch("https://api.punkapi.com/v2/beers/random")
+      // DEFINE WHAT HAPPENS WHEN JAVASCRIPT RECEIVES THE DATA
+      .then((data) =>{
+        // TURN THE DATA TO JSON
+        data.json().then((res) => {
+          // SEND THE JSON TO R
+          Shiny.setInputValue("beer", res, {priority: 'event'})
+        })
+      })
+      // DEFINE WHAT HAPPENS WHEN THERE IS AN ERROR FETCHING THE API
+      .catch((error) => {
+        alert("Error catching result from API")
+      })
+  };
+```
+
++ Observe the event in your server:
+
+```{r 18-javascript-1-bis, eval = FALSE}
+observeEvent( input$beer , {
+  # Do things with beer
+})
+
+```
+
+Note that the data shared between R and JavaScript is serialized to JSON, so you will have to manipulate that format once you receive it in R. 
+
+Learn more about `fetch()` at [Using Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch).
+
+## Learn more about JavaScript
+
+If you want to interact straight from R with NodeJS (JavaScript in the terminal), you can try the `{bubble}` [@R-bubble] package. 
+Be aware that you will need to have a working NodeJS installation on your machine. 
+
+It can be installed from GitHub
+
+```{r 18-javascript-26, eval = FALSE}
+remotes::install_github("ColinFay/bubble")
+```
+
+You can use it in RMarkdown chunks by setting the `{knitr}` engine:
+
+```{r 18-javascript-27, eval = FALSE}
+bubble::set_node_engine()
+```
+
+Or straight in the command line with:
+
+```{r 18-javascript-28, eval = FALSE}
+node_repl()
+```
+
+Want to learn more?
+Here is a list of external resources to learn more about JavaScript: 
+
+### `{shiny}` & JavaScript
+
++ We have written an online, freely available book about `{shiny}` & JavaScript: [JavaScript 4 `{shiny}` - Field Notes](http://connect.thinkr.fr/js4shinyfieldnotes/)
+
++ [JavaScript for `{shiny}` Users](https://js4shiny.com/), companion website to the rstudio::conf(2020) workshop.
+
++ [Build custom input objects](https://shiny.rstudio.com/articles/building-inputs.html)
+
++ [Packaging JavaScript code for `{shiny}`](https://shiny.rstudio.com/articles/packaging-javascript.html)
+
++ [Communicating with `{shiny}` via JavaScript](https://shiny.rstudio.com/articles/communicating-with-js.html)
+
+### JavaScript basics 
+
++ [Mozilla JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
++ [w3schools JavaScript](https://www.w3schools.com/js/default.asp)
++ [Free Code Camp](https://www.freecodecamp.org/)
++ [JavaScript For Cats](http://jsforcats.com/)
++ [Learn JS](https://www.learn-js.org/)
+
+### jQuery
+
++ [jQuery Learning Center](https://learn.jquery.com/)
++ [w3schools jQuery](https://www.w3schools.com/jquery/default.asp)
+
+### Intermediate / advanced JavaScript
+
++ [Eloquent JavaScript](https://eloquentjavascript.net/)
++ [You Don't Know JS Yet](https://github.com/getify/You-Dont-Know-JS)

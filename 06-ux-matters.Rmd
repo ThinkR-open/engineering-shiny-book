@@ -6,21 +6,19 @@ Let's state the truth: no matter how complex and innovative your back-end is, yo
 That's the hard truth. 
 
 We have a natural tendency, as R-coders, to be focused on the back-end, i.e the server part of the application
-^[e.g., what happens on the server side of a Shiny App]
+^[e.g., what happens on the server side of a `{shiny}` App]
 ,
 which is perfectly normal—chances are you did not come to R to design front-ends
-^[The front-end eis the visual part of your application - the one your user interacts with - as opposed to the back-end, which is what is installed on the server, the part the end user does not see. In Shiny, front-end corresponds to the UI, while back-end, to the server.
+^[The front-end eis the visual part of your application - the one your user interacts with - as opposed to the back-end, which is what is installed on the server, the part the end user does not see. In `{shiny}`, front-end corresponds to the UI, while back-end, to the server.
 ]. 
 
 However, if people can not understand how to use your application, or if your application front-end does not work at all, your application is not successful no matter how innovative and incredible the computation algorithms in the back-end are.
 
-As you are building a complex, production-grade Shiny application, do not under-estimate the necessity for a successful front-end - it is, after all, the first thing (and probably the only thing) that the end-users of your web application will see. However, our natural back-end/server logic as R developers can play against us in the long run - by neglecting the UI and the UX, you will make your application less likely to be adopted among your users, which is a good way to fail your application project.
+As you are building a complex, production-grade `{shiny}` application, do not under-estimate the necessity for a successful front-end - it is, after all, the first thing (and probably the only thing) that the end-users of your web application will see. However, our natural back-end/server logic as R developers can play against us in the long run - by neglecting the UI and the UX, you will make your application less likely to be adopted among your users, which is a good way to fail your application project.
 
 ## Simplicity is Gold
 
-> "Simplify, then add lightness."
-
-`r right_link('Colin Chapman CBE, Founder of Lotus Cars', 'https://www.lotuscars.com/lotus-philosophy/')`
+> "Simplify, then add lightness." `r right_link('Colin Chapman CBE, Founder of Lotus Cars', 'https://www.lotuscars.com/lotus-philosophy/')`
 
 Aiming for simplicity is a hard thing, but some rules will help you build a better UX, paving the way for a successful application.
 
@@ -28,7 +26,10 @@ There are mainly two contexts where you will be building a web app with R: for p
 
 But both cases have something in common: people will want the app to be usable, __easily__ usable. 
 
-If people use your app in a professional context, they do not want to fight with your interface, read complex manuals, or lose time understanding what they are supposed to do and how they are supposed to use your application. 
+If people use your app in a professional context, they do not want to fight with your interface, read complex manuals, or lose time understanding what they are supposed to do and how they are supposed to use your application, at least when it comes to the core usage of the application. 
+This core usage needs to be "self-explanatory", in the sense that, if possible, the main usage of the application does not require reading the manual; 
+On the other hand, more advanced/rarely used features will need a more detailed documentation.
+
 In other words, they want an efficient tool, something that - beyond being accurate - is easy to grasp.
 In a professional context, when it comes to "business applications", remember that the quicker you understand the interface, the better the user experience.
 Think about all the professional applications and software that you have been ranting about during your professional life, all these cranky user interfaces you did not understand and/or need to relearn every time you use them. 
@@ -37,7 +38,7 @@ You do not want your app to be one of these applications.
 On the other hand, if users open your app for fun, they are not going to fight against your application; they are just going to give up if the app is too complex to use.
 Even a game has to appear easy to use when the users open it.
 
-In this section, we will review two general principles: the "do not make me think" principle, which states that interfaces should be as self-explanatory as possible, and the "rule of least surprise", stating that elements should behave the way they are commonly expected to behave.
+In this section, we will review two general principles: the "don't make me think" principle, which states that interfaces should be as self-explanatory as possible, and the "rule of least surprise", stating that elements should behave the way they are commonly expected to behave.
 These two rules aim at solving one issue: the bigger the cognitive load of your app, the harder it will be for the end-user to use it on a daily basis.
 
 ### How we read the web: scanning content 
@@ -56,9 +57,9 @@ They are behaving like that for a lot of reasons, but notably because they want 
 knitr::include_graphics("img/scanning.png")
 ```
 
-For example, let's have a look at the user interface of `{hexmake}` [@R-hexmake], a Shiny app for building hex stickers, available at https://connect.thinkr.fr/hexmake/
+For example, let's have a look at the user interface of `{hexmake}` [@R-hexmake], a `{shiny}` app for building hex stickers, available at https://connect.thinkr.fr/hexmake/
 
-(ref:hexmakecap) Snapshot of the `{hexmake}` Shiny application on <https://connect.thinkr.fr/hexmake/>.
+(ref:hexmakecap) Snapshot of the `{hexmake}` `{shiny}` application on <https://connect.thinkr.fr/hexmake/>.
 
 ```{r 06-ux-matters-2-bis, echo=FALSE, fig.cap="(ref:hexmakecap)", out.width="100%"}
 knitr::include_graphics("img/hexmake.png")
@@ -90,8 +91,10 @@ For example, consider this small app:
 
 ```{r 06-ux-matters-1, eval = FALSE}
 library(shiny)
-ui <- function(request){
+ui <- function(){
   tagList(
+    # Designing an interface that lets the user select a species from iris, 
+    # then display a plot() of this dataset
     selectInput(
       "species", 
       "Choose one or more species",
@@ -99,7 +102,7 @@ ui <- function(request){
       multiple = TRUE, 
       selected = unique(iris$Species)[1]
     ), 
-    plotOutput("plt")
+    plotOutput("plot")
   )
 }
 
@@ -108,7 +111,9 @@ server <- function(
   output, 
   session
 ){
-  output$plt <- renderPlot({
+  # Taking the species as input, and returning the plot 
+  # of the filtered dataset
+  output$plot <- renderPlot({
     plot(
       iris[ iris$Species %in% input$species, ]
     )
@@ -130,16 +135,20 @@ What should we do?
 Adopt a defensive programming mindset. 
 Every time you create interactive elements, inputs and outputs, or things the user might interact with, ask yourself: "What if that [crazy thing] happens? How do I handle the case where the minimal viable requirements for my app are not met?".
 And in fact, you should not be focusing on that only for the user side - the back-end should also be examined for potential unexpected behaviors. 
-For example, if your Shiny app relies on a database connection, you should gracefully check that the connection is possible, and if it is not, send a message to your user that the database is not reachable, and that they should either restart the app or come back in a few minutes. 
+For example, if your `{shiny}` app relies on a database connection, you should gracefully check that the connection is possible, and if it is not, send a message to your user that the database is not reachable, and that they should either restart the app or come back in a few minutes. 
 
 In fact, this is a crucial thing when it comes to making your app successful: __you should always fail gracefully and informatively__. 
 That means that even when your R code fails, the whole app should not fail.
-If the R code fails for some reason, the user should either get nothing back or an informative bug message, not be faced with a grayish version of the application.
+If the R code fails for some reason, the user should either get nothing back or an informative bug message, not be faced with a grayish version of the application^[If you want something different from this grayish screen when `{shiny}` fails, you can have a look at the `{sever}` package [@R-sever], which allows to implement custom disconnected screen and error messages.].
+Note that using external widgets, like the one from the `{DT}` package (or any other that binds to an external JavaScript library), can make this principle harder to apply: as you have less control over what is happening when using this widget, gracefully handling errors can be tricky. 
+Indeed, `{DT}` sometime returns errors that originates from the user's browser, so that has nothing to do with R. 
+In that case, it might be hard to catch this error and gracefully manage it. 
+The only upside of this error is that it does not crash the whole application.
 
-Because of the way Shiny is designed, a lot of R errors will make the Shiny app fail completely. 
+Because of the way `{shiny}` is designed, a lot of R errors will make the `{shiny}` app fail completely. 
 If you have not thought about this upfront, that means that a user might use the app for 10 minutes, do a series of specifications, enter parameters and data, only for the app to complete crash at some point. 
 The user has to then restart from scratch, because there is no native way - from there - to restart from where the app has crashed.
-This is a very important thing to keep in mind when building Shiny apps: __once the app has failed, there is no easy way to natively get it back to the moment just before it crashed__, meaning that your users might lose a significant amount of the time they have spent configuring the app.
+This is a very important thing to keep in mind when building `{shiny}` apps: __once the app has failed, there is no easy way to natively get it back to the moment just before it crashed__, meaning that your users might lose a significant amount of the time they have spent configuring the app.
 
 One good practice is to try, as much as possible, to __wrap all server calls in some form of try-catch__ pattern. 
 That way, you can, for example, send a notification to the user if the process fails, either using a `{shiny}` [@R-shiny] notification function, an external package like `{shinyalert}` [@R-shinyalert], or a custom JavaScript alert like [notify.js](https://github.com/ColinFay/notifyjsexample).
@@ -147,7 +156,8 @@ Here is a pseudo-code pattern for this using the `{attempt}` [@R-attempt] packag
 
 ```{r 06-ux-matters-2, eval = FALSE}
 library(shiny)
-ui <- function(request){
+ui <- function(){
+  # Here, we would define the interface
   tagList(
     # [...]
   )
@@ -158,12 +168,19 @@ server <- function(
   output, 
   session
 ){
+  # We are attempting to connect to the database, 
+  # using a `connect_db()` connection
   conn <- attempt::attempt({
     connect_db()
   })
+  # if ever this connection failed, we notify the user 
+  # about this failed connection, so that they can know
+  # what has gone wrong
   if (attempt::is_try_error(conn)){
+    # Notify the user
     send_notification("Could not connect")
   } else {
+    # Continue computing if the connection was successful
     continue_computing()
   }
 }
@@ -171,7 +188,7 @@ server <- function(
 shinyApp(ui, server)
 ```
 
-### A self-evident app (or at least self-explanatory)
+### Building a self-evident app (or at least self-explanatory)
 
 One of the goals of a usable app is to make it self-evident, and fall back to a self explanatory app if the first option is too complex a goal. 
 What is the difference between the two? 
@@ -180,7 +197,7 @@ What is the difference between the two?
 
 + self-explanatory : "Easily understood; not needing explanation." [https://www.lexico.com/en/definition/self_explanatory](https://www.lexico.com/en/definition/self_explanatory)
 
-So the first is that the app is designed in such a way that there is no learning curve to using it.
+The first is that the app is designed in such a way that there is no learning curve to using it.
 A self-explanatory app has a small learning curve, but it is designed in a way that will make the user understand it in a matter of seconds. 
 
 Let's for example get back to our `{tidytuesday201942}` [@R-tidytuesday201942] application available at [connect.thinkr.fr/tidytuesday201942](https://connect.thinkr.fr/tidytuesday201942/).
@@ -192,9 +209,9 @@ Then, if we have a look at the menu elements, we see that these are a series of 
 Yet, if you want to understand what this app is designed for, you will find enough information either on the home page or in the About section, with external links if needed. 
 And of course, when building apps, context matters. 
 The `{tidytuesday201942}` app is one that has been developed in the context of `tidytuesday`, an online weekly event for learning data analysis, mainly through the use of `{tidyverse}` packages. 
-So there is a good chance visitors of the app will already know what is `{ggplot2}` when visiting the app. 
+There is a good chance visitors of the app will already know what is `{ggplot2}` when visiting the app. 
 
-#### The "Rule of Least Surprise"
+#### A. About the "Rule of Least Surprise" {-}
 
 Also know as "Principle of Least Astonishment."
 
@@ -218,6 +235,7 @@ Links should appear clickable.
 Bigger texts are headers, the bigger the more important. 
 Elements "visually nested" are related. 
 Etc. 
+Of course, this is not an absolute rule, and there is always room for creativity when it comes to design, but you should keep in mind that too much surprise can lead to users being lost when it comes to understanding how to use the application. 
 
 Weirdly enough, that is an easy thing to spot when we arrive on a webpage/an app: it can either feel "natural", or you can immediately see that something is off. 
 The hard thing is that it is something you spot when you are a new-comer: developing the app makes us so familiar with the app that we might miss when something is not used the way it is conventionally used
@@ -250,12 +268,10 @@ Yes, it is subtle, yet the second version of the button is clearer to understand
 Least surprise is crucial to make the user experience a good one: users rarely think that if something is behaving unexpectedly on an app, it is because of the app: they will usually think it is their fault.
 Same goes for the application failing or behaving in an unexpected way: most users think they are "doing it wrong", instead of blaming the designer of the software.
 
-> When users are astonished they usually assume that they have made a mistake; they are unlikely to realize that the page has astonished them. They are more likely to feel that they are at fault for not anticipating the page. Don't take advantage of this; making users feel stupid is not endearing.
-
-`r right_link("The cranky user: The Principle of Least Astonishment", "https://www.ibm.com/developerworks/web/library/us-cranky10/us-cranky10-pdf.pdf")`
+> When users are astonished they usually assume that they have made a mistake; they are unlikely to realize that the page has astonished them. They are more likely to feel that they are at fault for not anticipating the page. Don't take advantage of this; making users feel stupid is not endearing. `r right_link("The cranky user: The Principle of Least Astonishment", "https://www.ibm.com/developerworks/web/library/us-cranky10/us-cranky10-pdf.pdf")`
 
 
-#### Think about the progression
+#### B. Thinking about progression {-}
 
 If there is a progression in your app, you should have designed a clear pattern of moving forward. 
 If you need to bring your user from step 1 to step 7, you need to guide them through the whole process, and it can be as simple as putting "Next" buttons on the bottom of each page.  
@@ -268,11 +284,11 @@ Another way to help this readability is to ensure some kind of linear logic thro
 And organized your application around this logic, from left to right / right to left, or from top to bottom. 
 
 Let's compare `{tidytuesday201942}` to `{hexmake}` — one has a clear progression, `{hexmake}`, and has been designed as such: the upper menus design the stickers, and then once they are filled you can download them. 
-So there is a progression here, from top to bottom. 
+There is a progression here, from top to bottom. 
 On the other hand, the `{tidytuesday201942}` does not have a real progression inside it: you can navigate from one tab to the other indifferently. 
 Hence there is no visual clues of progression on that app.
 
-#### Inputs and errors
+#### C. Inputs and errors {-}
 
 You're the one developing the app, so of course you are conscious of all the inputs that are needed to complete a specific task. 
 But your users might be new to the app, distracted while reading, they might not clearly understand what they are doing, maybe they do not really want to use your app but are forced to by their boss...
@@ -312,15 +328,20 @@ with_red_star("Enter your name here")
 ```
 
 Also, be generous when it comes to errors: it is rather frustrating for a user to see an app crash without any explanation about what went wrong.
-So, if something fails or behaves unexpectedly, error messages are a key feature to help your user get on the right track. 
+If something fails or behaves unexpectedly, error messages are a key feature to help your user get on the right track. 
 And, at the same time, helping them correct themselves after an error is the best way to save you time answering angry emails!
 
-Let's refactor our app from before:
+Let's refactor our app from before, using the `{shinyFeedback}` [@R-shinyFeedback] package.
 
 ```{r 06-ux-matters-5, eval = FALSE}
 library(shiny)
-ui <- function(request){
+library(shinyFeedback)
+
+ui <- function(){
   tagList(
+    # Attaching the {shinyFeedback} dependencies
+    useShinyFeedback(),
+    # Recreating our selectInput + plot from before
     selectInput(
       "species", 
       "Choose one or more species",
@@ -338,12 +359,20 @@ server <- function(
   session
 ){
   output$plt <- renderPlot({
+    # If the length of the input is 0 (i.e nothing is selected),
+    # we show a feedback to the user in the form of a text
+    # If the length > 0, we remove the feedback
     if (length(input$species) == 0){
-      shiny::showNotification(
-        type = "error", 
-        "Species can not be empty"
-      )
+      showFeedbackWarning(
+        inputId = "species",
+        text = "Select at least one Species"
+      )  
+    } else {
+      hideFeedback("species")
     }
+    # req() allows to stop further code execution if the condition is 
+    # not a truthy. Hence if input$species is NULL, the computation 
+    # will be stopped here
     req(input$species)
     plot(
       iris[ iris$Species %in% input$species, ]
@@ -357,16 +386,14 @@ shinyApp(ui, server)
 Here, as a user, it is way easier to understand what went wrong: we have moved from a red error `Error: need finite 'xlim' values` to a pop-up explaining what went wrong in the way the user configured the app. 
 Perfect way to reduce your bug tracker incoming tickets!
 
-This is a way to do it natively in Shiny, but note that you can also use the  `{shinyAlert}` package to implement alerts. 
+This is a way to do it natively in `{shiny}`, but note that you can also use the  `{shinyAlert}` package to implement alerts. 
 It is also possible to build your own with a little bit of HTML, CSS and JavaScript, as shown on [the notifyjsexample repo](https://github.com/ColinFay/notifyjsexample).
 
 ## The danger of feature-creep
 
 ### What is feature-creep?
 
-> Even more often (at least in the commercial software world) excessive complexity comes from project requirements that are based on the marketing fad of the month rather than the reality of what customers want or software can actually deliver. Many a good design has been smothered under marketing's pile of “checklist features” — features that, often, no customer will ever use. And a vicious circle operates; the competition thinks it has to compete with chrome by adding more chrome. Pretty soon, massive bloat is the industry standard and everyone is using huge, buggy programs not even their developers can love.
-
-`r right_link('The Art of Unix Programming', 'http://www.catb.org/~esr/writings/taoup/html/ch01s06.html')`
+> Even more often (at least in the commercial software world) excessive complexity comes from project requirements that are based on the marketing fad of the month rather than the reality of what customers want or software can actually deliver. Many a good design has been smothered under marketing's pile of “checklist features” — features that, often, no customer will ever use. And a vicious circle operates; the competition thinks it has to compete with chrome by adding more chrome. Pretty soon, massive bloat is the industry standard and everyone is using huge, buggy programs not even their developers can love. `r right_link('The Art of Unix Programming', 'http://www.catb.org/~esr/writings/taoup/html/ch01s06.html')`
 
 
 Feature-creep is the process of adding features to the app that complexify the usage and the maintenance of the product, to the point that extreme feature-creep can lead to the product being entirely unusable and completely impossible to maintain. 
@@ -387,28 +414,28 @@ Or, as simply put in _The Art of Unix Programming_:
 
 > Rule of Parsimony: Write a big program only when it is clear by demonstration that nothing else will do.
 
-But let's focus on a smaller scope, and think about some things that can be thought of as feature-creeping your Shiny app.
+But let's focus on a smaller scope, and think about some things that can be thought of as feature-creeping your `{shiny}` app.
 
 ### Too much reactivity 
 
 When designing an app, you will be designing the way users will navigate through the app. 
 And most of the time, we design with the idea that the users will perform a "correct selection" pattern. 
-Something like: "__The user will select 40 on the `sliderInput()` and the plot will update automatically. 
-Then the user will select the element they need in the `selectInput()` and the plot will update automatically__". 
-When in reality what will happen is: "__The user will click on the slider, aim at 40 but will reach 45, then 37, then 42, before having the right amount of 40. 
-Then they will select something in the `selectInput()`, but chances are not the correct one from the first time.__"
+Something like: "_The user will select 40 on the `sliderInput()` and the plot will update automatically. 
+Then the user will select the element they need in the `selectInput()` and the plot will update automatically_". 
+When in reality what will happen is: "_The user will click on the slider, aim at 40 but will reach 45, then 37, then 42, before having the right amount of 40. 
+Then they will select something in the `selectInput()`, but chances are not the correct one from the first time._"
 
-In real life usage, people make mistakes using the app, they do not move the sliders to the right place, so if the application reacts to all of the moves, the experience using the app can be bad: in the example above, full reactivity means that you will get 4 "wrong" computations of the plot before getting it right. 
+In real life usage, people make mistakes using the app (and even more when discovering the application): they do not move the sliders to the right place, so if the application reacts to all of the moves, the experience using the app can be bad: in the example above, full reactivity means that you will get 4 "wrong" computations of the plot before getting it right. 
 
 In the `{tidytuesday201942}` application example, let's imagine all the elements on the left automatically update the plot: especially in a context of a learning tool, reacting to any configuration change will launch a lot of useless computation, slowing the app in the long run, and making the user experience poorer. 
 
-(ref:uxtidytuesdayappcap) Snapshot of the `{tidytuesday201942}` Shiny application.
+(ref:uxtidytuesdayappcap) Snapshot of the `{tidytuesday201942}` `{shiny}` application.
 
 ```{r 06-ux-matters-5-bis, echo=FALSE, fig.cap="(ref:uxtidytuesdayappcap)", out.width="100%"}
 knitr::include_graphics("img/tidytuesdayapp.png")
 ```
 
-So what should we do? 
+What should we do? 
 Prevent ourselves from implementing "full reactivity": instead, we will add a user input that will launch the computation. 
 The simplest solution being a button so that the user signals to the application than now they are ready for the application to compute what they have parametrized.
 
@@ -419,17 +446,19 @@ Maybe too much.
 If you present a user with a choice between a simple graph and a dynamic one, chances are that they will spontaneously go for the dynamic graph. 
 Yet, dynamic is not always the solution, and for several reasons. 
 
-#### Speed
+#### A. Speed {-}
 
 Dynamic elements are slower to render than fixed one. 
 Most of the time (if not always), rendering dynamic elements means that you will bind some external libraries, and maybe you will have to make R convert data from one format to another.
 For example, rendering a `{ggplot2}` plot will be faster than rendering a `ggplotly()` plot, which has to convert from one format to another
-^[Well, maybe the native `{plotly}` [@plotly2018] implementation is faster, but you get the spirit.]
+^[Well, maybe the native `{plotly}` [@plotly2020] implementation is faster, but you get the spirit.]
 .
 
 That being said, not all visualization libraries are created equal, and choosing interactive visualization will not automatically lead to poorer performance: just keep in mind that this can happen.
 
-#### Visual noise
+Finally, if you do choose to use an interactive library for your application, try to, if possible, stick with one: it's easier for you as a developer as it will lower the potential conflicts between libraries, and for the user, who will have to "learn" only one interactive mechanism. 
+
+####  B. Visual noise {-}
 
 More interactivity can lead to an element being less straightforward to understand.
 Think for a minute about the `{plotly}` outputs. 
@@ -451,23 +480,19 @@ Adding interactivity widgets (in most cases) means adding visual elements to you
 
 To sum up, a good rule to live by is that you should not add a feature for the sake of adding a feature. 
 
-> Less is more.
-
-`r right_link("Ludwig Mies van der Rohe", "http://www.masterofdetails.fr/mies-van-der-rohe-less-is-more/")`
+> Less is more. `r right_link("Ludwig Mies van der Rohe", "http://www.masterofdetails.fr/mies-van-der-rohe-less-is-more/")`
 
 ## Web Accessibility 
 
 ### About Accessibility
 
-When building professional Shiny applications, you have to keep in mind that, potentially, this app will be consumed by a large audience. 
+When building professional `{shiny}` applications, you have to keep in mind that, potentially, this app will be consumed by a large audience. 
 A large audience means that there is a chance that your app will be used by people with visual, mobility, or maybe cognitive disabilities
 ^[And of course, other type of disabilities.]
 . 
 Web Accessibility deals with the process of making the web available to people with disabilities.
 
-> The Web is fundamentally designed to work for all people, whatever their hardware, software, language, location, or ability. When the Web meets this goal, it is accessible to people with a diverse range of hearing, movement, sight, and cognitive ability.
-
-`r right_link("Accessibility in Context - The Web Accessibility Initiative", "https://www.w3.org/WAI/fundamentals/accessibility-intro/")`
+> The Web is fundamentally designed to work for all people, whatever their hardware, software, language, location, or ability. When the Web meets this goal, it is accessible to people with a diverse range of hearing, movement, sight, and cognitive ability. `r right_link("Accessibility in Context - The Web Accessibility Initiative", "https://www.w3.org/WAI/fundamentals/accessibility-intro/")`
 
 When learning to code a web app through "canonical" courses, you will be introduced to web Accessibility very early.
 For example, you can learn about this straight from the first chapter of [learn.freecodecamp.org](https://learn.freecodecamp.org/). 
@@ -475,7 +500,7 @@ The first course, "Responsive Web Design Certification", has a chapter on web ac
 
 ### Making your App Accessible
 
-#### Hierarchy
+#### A. Hierarchy {-}
 
 Headers are not just there to make your application more stylish. 
 `<h1>` to `<h6>` are there so they can create a hierarchy inside your webpage: `<h1>` being more important (hierarchically speaking) than `<h2>`.
@@ -485,7 +510,7 @@ These elements are used by screen readers (devices used by blind people) to unde
 Hence, you should not rely on the header level for styling: do not use an `<h1>` because you need a larger title somewhere in your app. 
 If you want to increase the size of an header, use CSS, which we will see in an upcoming chapter.
 
-#### HTML element: Semantic tags, and tags metadata
+#### B. HTML element: Semantic tags, and tags metadata {-}
 
 In HTML, there are two kind of elements: the one without "meanings" like `<div>` or `<span>`, and the one which are considered meaningful, like `<title>` or `<article>`. 
 The second ones are called "semantic tags", as they have a specific meaning in the sense that they define what they contain. 
@@ -493,6 +518,7 @@ Same thing as with headers, these elements are crucial for the screen readers to
 
 ```{r 06-ux-matters-6, eval = FALSE}
 library(htmltools)
+# Using the `article` tag for a better semantic
 tags$article(
   tags$h2("Title"),
   tags$div("Content")
@@ -504,12 +530,15 @@ Tags attributes are complementary elements you can add to a tag to add informati
 ^[See the JavaScript chapter.]
 .
 But these can also be used to add, for example, an alternate text to an image: this `alt` being the one which is read when the image is not available, either because the page could not reach the resource, or because the person navigating the app is using a screen to speech technology. 
+To do this, we can use the `tagAppendAttributes()` function from `{shiny}`, which allows to add attributes to an HTML element. 
 
 ```{r 06-ux-matters-7, eval = FALSE}
 library(shiny)
-ui <- function(request){
+ui <- function(){
+  # Generating a UI with one plot
   tagList(
     plotOutput("plot") %>% 
+      # Adding the `alt` attribute to our plot
       tagAppendAttributes(alt = "Plot of iris")
   )
 }
@@ -519,6 +548,7 @@ server <- function(
   output, 
   session
 ){
+  # Generating the plot from the server side, no modification here 
   output$plot <- renderPlot({
     plot(iris)
   })
@@ -535,94 +565,71 @@ Hence the importance of structuring the page: these technologies need the app to
 
 Some other tags exists and can be used for semantic purpose: for example `<address>`, `<video>`, or `<label>`.
 
-#### Navigation 
+#### C. Navigation  {-}
 
 Your app user might also have mobility impairment. 
 For example, some with Parkinson might be using your app, or someone with a handicap making it harder for them to move their hand and click. 
 For these users, moving an arm to grab the mouse might be challenging, and they might be navigating the web using their keyboard only. 
 
 When building your app, thinking about how these users will be able to use it is crucial: maybe there are so many button they need to  __move their mouse to and click__ that they will not be able to use it. 
-So, as much as possible, make everything doable with a keyboard: for example, if you have a `textInput()` with a validation button below, allow the user to validate by pressing the ENTER on their keyboard.
-Here is a small example of how to implement that:
-
-```{r 06-ux-matters-8, eval = FALSE}
-library(shiny)
-ui <- function(request){
-  tagList(
-    textInput("text", "title") %>% 
-      tagAppendAttributes(
-        onKeyPress = "Shiny.setInputValue(
-        'keypress', 
-        {value : event.key}, 
-        {priority: 'event'}
-        )"
-      ), 
-    actionButton("go", "Go")
-  )
-}
-
-server <- function(
-  input, 
-  output, 
-  session
-){
-  observeEvent( input$keypress , {
-    
-    if (input$keypress$value == "Enter"){
-      # ...
-    }
-    
-  })
-  
-}
-
-shinyApp(ui, server)
-```
-
-Note that if you need a more systemic way to do this, you can do it with the `{nter}` package, which is available only on GitHub at the time of writing these lines:
+As much as possible, make everything doable with a keyboard: for example, if you have a `textInput()` with a validation button below, allow the user to validate by pressing the ENTER on their keyboard.
+This can for example be done with the `{nter}` package, which is available only on GitHub^[https://github.com/JohnCoene/nter] at the time of writing these lines.
 
 ```{r 06-ux-matters-9, eval=FALSE}
-# Taken from https://github.com/JohnCoene/nter
+# Adapted from https://github.com/JohnCoene/nter
 library(nter)
 library(shiny)
 
 ui <- fluidPage(
-  textInput("txt", ""),
+  # Setting a text input and a button
+  textInput("text", ""),
+  # This button will be clicked when 'Enter' is pressed in 
+  # the textInput text
   actionButton("send", "Do not click hit enter"),
   verbatimTextOutput("typed"),
-  nter("send", "txt") # trigger 'send' when 'text' is active
+  # define the rule
+  nter("send", "text") 
 )
 
 server <- function(input, output) {
   
-  txt <- eventReactive(input$send, {
-    input$text
+  r <- reactiveValues()
+  
+  # Define the behavior on click
+  observeEvent( input$send , {
+    r$printed <- input$text
   })
-
-  output$typed <- renderPrint(txt())
+  
+  # Render the text
+  output$typed <- renderPrint({
+    r$printed
+  })
 }
 
 shinyApp(ui, server)
 ```
 
-#### Color choices
+#### D. Color choices {-}
 
 Color blindness is also a common impairment when it comes to web accessibility.
 And it is a rather common deficiency: according to [colourblindawareness.org](http://www.colourblindawareness.org/), _"color (color) blindness (color vision deficiency, or CVD) affects approximately 1 in 12 men (8%) and 1 in 200 women in the world"_.
 
-Keeping in mind this prevalence of color blindness is even more important in the context of Shiny, where we are developing data science products, which most of the time include data visualization. 
+Keeping in mind this prevalence of color blindness is even more important in the context of `{shiny}`, where we are developing data science products, which most of the time include data visualization. 
 If designed wrong, dataviz can be unreadable for some specific type of color blindness. 
 That is why we recommend using the `viridis` [@R-viridis] palette, which has been created to be readable by the most common types of color blindness. 
 
 Here are for example a visualization through the lens of various type of color blindness: 
 
 ```{r 06-ux-matters-10 }
-# Function to generate the graph
+# This function generates a plot for an internal matrix, and takes a palette as
+# parameter so that we can display the plot using various palettes, as (the
+# palette should be a function)
 with_palette <- function(palette) {
   x <- y <- seq(-8 * pi, 8 * pi, len = 40)
   r <- sqrt(outer(x^2, y^2, "+"))
   z <- cos(r^2) * exp(-r / (2 * pi))
-  filled.contour(z,
+  filled.contour(
+    z,
     axes = FALSE,
     color.palette = palette,
     asp = 1
@@ -658,18 +665,21 @@ library(purrr, warn.conflicts = FALSE)
 (ref:jetcolorsdeutan) View of `jet.colors` palette for a Deuteranopian.
 
 ```{r 06-ux-matters-14, fig.cap="(ref:jetcolorsdeutan)"}
-graph <- partial(dichromat, type = "deutan")
-with_palette(
-  compose( graph, matlab::jet.colors )
-)
+deutan_jet_color <- function(n){
+  cols <- matlab::jet.colors(n)
+  dichromat(cols, type = "deutan")
+}
+with_palette( deutan_jet_color )
 ```
 
 (ref:viridisdeutan) View of `viridis` palette for a Deuteranopian.
 
 ```{r 06-ux-matters-7-bis, fig.cap="(ref:viridisdeutan)"}
-with_palette(
-  compose( graph, viridis::viridis )
-)
+deutan_viridis <- function(n){
+  cols <- viridis::viridis(n)
+  dichromat(cols, type = "deutan")
+}
+with_palette( deutan_viridis )
 ```
 
 + Simulation of Protanopia with `jet.colors` and `viridis`
@@ -678,18 +688,21 @@ with_palette(
 
 
 ```{r 06-ux-matters-15, fig.cap="(ref:jetcolorsprotan)"}
-graph <- partial(dichromat, type = "protan")
-with_palette(
-  compose( graph, matlab::jet.colors )
-)
+protan_jet_color <- function(n){
+  cols <- matlab::jet.colors(n)
+  dichromat(cols, type = "protan")
+}
+with_palette( protan_jet_color )
 ```
 
 (ref:viridisprotan) View of `viridis` palette for a Protanopian.
 
 ```{r 06-ux-matters-8-bis, fig.cap="(ref:viridisprotan)"}
-with_palette(
-  compose( graph, viridis::viridis )
-)
+protan_viridis <- function(n){
+  cols <- viridis::viridis(n)
+  dichromat(cols, type = "protan")
+}
+with_palette( protan_viridis )
 ```
 
 + Simulation of Tritanopia with `jet.colors` and `viridis`
@@ -697,27 +710,54 @@ with_palette(
 (ref:jetcolorstritan) View of `jet.colors` palette for a Tritanopian.
 
 ```{r 06-ux-matters-16, fig.cap="(ref:jetcolorstritan)", out.width="100%"}
-graph <- partial(dichromat, type = "tritan")
-with_palette(
-  compose( graph, matlab::jet.colors )
-)
+tritan_jet_color <- function(n){
+  cols <- matlab::jet.colors(n)
+  dichromat(cols, type = "tritan")
+}
+with_palette( tritan_jet_color )
 ```
 
 (ref:viridistritan) View of `viridis` palette for a Tritanopian.
 
 ```{r 06-ux-matters-9-bis, fig.cap="(ref:viridistritan)", out.width="100%"}
-with_palette(
-  compose( graph, viridis::viridis )
-)
+tritan_viridis <- function(n){
+  cols <- viridis::viridis(n)
+  dichromat(cols, type = "tritan")
+}
+with_palette( tritan_viridis )
 ```
 
 As you can see, the `viridis` palette always gives a more readable graph than the `jet.colors` one. 
 And, the plus side, it looks fantastic. 
-So do not hesitate to try and use it!
+Do not hesitate to try and use it!
 
 ### Evaluating your App Accessibility & Further reading 
 
+#### A. Emulate Vision Deficiency Using Google Chrome {-}
+
+Google Chrome has a built-in feature that allows to simulate some vision deficiency.
+To access this feature, open your developer console, then open the "More Tools" > "Rendering" menu. 
+There, you will find at the very bottom an input called "Emulate vision deficiencies", which will allow to simulate Blurred vision, and four types of color blindness. 
+
+For example,  
+
+(ref:blurredvision) Emulating blurred vision with Google Chrome.
+
+```{r echo=FALSE, fig.cap="(ref:blurredvision)", out.width="100%"}
+knitr::include_graphics("img/blurred-vision.png")
+```
+
+(ref:deuto) Emulating deutoranopia with Google Chrome.
+
+```{r echo=FALSE, fig.cap="(ref:deuto)", out.width="100%"}
+knitr::include_graphics("img/deuto.png")
+```
+
+#### B. External tools {-}
+
 There are several tools on the web that can evaluate the accessibility of your webpage. You can also use a Google Chrome built-in tool called `LightHouse` (we will come back to it in the Testing chapter).
+
++ [IBM Equal Access Toolkit](https://github.com/IBMa/equal-access), an open source tool to monitor the accessibility of a web application, and which comes with Google Chrome and Firefox Extensions
 
 + [Evaluating Web Accessibility](https://www.w3.org/WAI/test-evaluate/), with lengthy reports and advice about checking the accessibility of your website
 
