@@ -53,7 +53,7 @@ For example, if computing your data once takes 5 seconds with the parameter `n =
 
 Here is a simple example with `{memoise}`:
 
-```{r 17-optimizing-shiny-code-1 }
+```{r 16-optimizing-shiny-code-1 }
 library(memoise)
 library(tictoc)
 # We define a function that sleeps for a given number of seconds, 
@@ -79,7 +79,7 @@ toc()
 
 Let's try with another example that might look more like what we can find in a `{shiny}` App: connecting to a database, using the `{DBI}` [@R-DBI] and `{RSQLite}` [@R-RSQLite] packages
 
-```{r 17-optimizing-shiny-code-2 }
+```{r 16-optimizing-shiny-code-2 }
 # We create an in-memory database using SQLite
 con <- DBI::dbConnect(
   RSQLite::SQLite(), 
@@ -121,15 +121,15 @@ setequal(res_a, res_c)
 Note that you can change where the cache is stored by `{memoise}`. 
 Here, we will save it in a random directory (do not do this in production).
 
-```{r 17-optimizing-shiny-code-3, error = TRUE}
+```{r 16-optimizing-shiny-code-3, error = TRUE}
 (random_dir <- fs::path(paste(sample(letters, 10), collapse = "")))
 ```
 
-```{r 17-optimizing-shiny-code-4, include = FALSE, error = TRUE}
+```{r 16-optimizing-shiny-code-4, include = FALSE, error = TRUE}
 try(fs::dir_delete(random_dir))
 ```
 
-```{r 17-optimizing-shiny-code-5, error = TRUE}
+```{r 16-optimizing-shiny-code-5, error = TRUE}
 # We create a directory in the current working directory
 fs::dir_create(random_dir)
 # We use this directory as the cache_filesystem for {memoise}
@@ -147,7 +147,7 @@ fs::dir_tree(tpd)
 
 As you can see, we now have two cache objects inside the directory we have specified as a `cache_filesystem`.
 
-```{r include = FALSE, error = TRUE}
+```{r 16-optimizing-shiny-code-6, include = FALSE, error = TRUE}
 try(fs::dir_delete(random_dir))
 #try(fs::dir_delete("cache"))
 ```
@@ -165,7 +165,7 @@ The good news is that converting existing `renderPlot()` functions to `renderCac
 
 Here is an example: 
 
-```{r 17-optimizing-shiny-code-6, eval=FALSE}
+```{r 16-optimizing-shiny-code-7, eval=FALSE}
 library(shiny)
 ui <- function(){
   tagList(
@@ -203,7 +203,7 @@ If you try this app, the first rendering of the three plots will take a little b
 
 At the time of writing only one function is available, but we can apply what we have just seen with `{memoise}`, for example to render a table:
 
-```{r 17-optimizing-shiny-code-7, eval=FALSE}
+```{r 16-optimizing-shiny-code-8, eval=FALSE}
 # We create an in-memory database using SQLite
 con <- DBI::dbConnect(
   RSQLite::SQLite(), 
@@ -281,7 +281,7 @@ One other thing to remember is that, just like our computer screen from our phon
 
 For example, from our stored cache from before:
 
-```{r 17-optimizing-shiny-code-8 }
+```{r 16-optimizing-shiny-code-9 }
 fs::dir_info("cache")[, "size", drop  = FALSE]
 ```
 
@@ -290,7 +290,7 @@ The underlying principle of this approach is that users tend to need what they h
 And this can be retrieved with:
 
 
-```{r 17-optimizing-shiny-code-10 }
+```{r 16-optimizing-shiny-code-10 }
 fs::dir_info("cache")[, "access_time", drop  = FALSE]
 ```
 
@@ -324,7 +324,7 @@ How does it work
 
 Here is an example of using this skeleton: 
 
-```{r 17-optimizing-shiny-code-11, eval = FALSE}
+```{r 16-optimizing-shiny-code-11, eval = FALSE}
 library(future)
 library(promises)
 # We're opening several R session (future specific)
@@ -352,7 +352,7 @@ And a couple of seconds later (a little bit more than 3), the result of the `rno
 
 Note that you can also write one-line function with `.` as a parameter, instead of building the full anonymous function (we will use this notation in the rest of the chapter): 
 
-```{r 17-optimizing-shiny-code-12, eval=FALSE}
+```{r 16-optimizing-shiny-code-12, eval=FALSE}
 library(future)
 library(promises)
 plan(multisession)
@@ -367,7 +367,7 @@ future({
 
 Let's port this to `{shiny}`:
 
-```{r 17-optimizing-shiny-code-13, eval = FALSE}
+```{r 16-optimizing-shiny-code-13, eval = FALSE}
 library(shiny)
 library(future)
 library(promises)
@@ -407,7 +407,7 @@ In other words, the code in the `renderPrint()` will still block the rest of the
 
 Let's have a look at this code:
 
-```{r 17-optimizing-shiny-code-14, eval = FALSE}
+```{r 16-optimizing-shiny-code-14, eval = FALSE}
 library(shiny)
 ui <- function(){
   tagList(
@@ -448,7 +448,7 @@ shinyApp(ui, server)
 Here, you would expect the plot to be available before the `rnorm()`, but it is not: `{promises}` is still blocking at an inner-session level, so elements are still rendered sequentially. 
 To bypass that, we will need to use a `reactiveValue()` structure. 
 
-```{r 17-optimizing-shiny-code-15, eval = FALSE}
+```{r 16-optimizing-shiny-code-15, eval = FALSE}
 library(shiny)
 library(promises)
 library(future)
@@ -528,7 +528,7 @@ To handle that, the best way is to have an id that is also sent to the future, a
 If it is, we update the `reactiveValues()`. 
 If it is not, we ignore it. 
 
-```{r 17-optimizing-shiny-code-16, eval = FALSE}
+```{r 16-optimizing-shiny-code-16, eval = FALSE}
 library(shiny)
 library(promises)
 library(future)
@@ -621,7 +621,7 @@ shinyApp(ui, server)
 In that case, instead of waiting for the very last input, you will need to build a structure that will receive the output, check if this output is the "next in line", store it if it is not, or return it if it is and see if there is another output in the queue. 
 This type of implementation is a little bit more complex so we will not detail a full implementation inside this chapter, but here is a small example of  using `{liteq}` [@R-liteq]. 
 
-```{r 17-optimizing-shiny-code-17 }
+```{r 16-optimizing-shiny-code-17 }
 library(promises)
 library(future)
 plan(multisession)
@@ -654,6 +654,6 @@ for (i in 1:5){
 ```
 
 
-```{r 17-optimizing-shiny-code-18, include = FALSE, error = TRUE}
+```{r 16-optimizing-shiny-code-18, include = FALSE, error = TRUE}
 try(fs::dir_delete(tpd))
 ```

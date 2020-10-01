@@ -182,7 +182,7 @@ But if you think about it, you are mimicking a namespacing process: a `validate`
 
 Consider the following `{shiny}` application:
 
-```{r 03-structure-5, eval=FALSE}
+```{r 03-structure-2, eval=FALSE}
 library(shiny)
 ui <- function() {
   fluidPage(
@@ -280,7 +280,7 @@ An example is worth a thousand words, so let's explore the code of a very small 
 Let's try to transform the above example (the one with two sliders and two action buttons) into an application with a module.
 Note that the following code will work only for `{shiny}`, version 1.5.0 and after.
 
-```{r 03-structure-6, eval = FALSE}
+```{r 03-structure-3, eval = FALSE}
 # Re-usable module
 choice_ui <- function(id) {
   # This ns <- NS structure creates a "namespacing" function, that will 
@@ -354,7 +354,7 @@ This line, `ns <- NS(id)`, is added on top of all module ui functions and will a
 
 To understand what it does, let us try and run it outside `{shiny}`: 
 
-```{r 03-structure-7 }
+```{r 03-structure-4 }
 # Defining the id
 id <- "mod_ui_1"
 # Creating the internal "namespacing" function
@@ -385,7 +385,7 @@ As UI and server are functions, you can set parameters that will be used to conf
 
 As you can see, the __app_ui__ contains a series of call to `mod_ui(unique_id, ...)` function, allowing additional arguments like any other function: 
 
-```{r 03-structure-8, eval=FALSE}
+```{r 03-structure-5, eval=FALSE}
 mod_ui <- function(id, button_label) {
   ns <- NS(id)
   tagList(
@@ -419,13 +419,13 @@ This is a typical case where you should reuse modules: if several parts are rela
 
 (ref:tidytuesdayappcap) Snapshot of the `{tidytuesday201942}` `{shiny}` application.
 
-```{r 03-structure-1-ter, echo=FALSE, fig.cap="(ref:tidytuesdayappcap)", out.width="100%"}
+```{r 03-structure-6, echo=FALSE, fig.cap="(ref:tidytuesdayappcap)", out.width="100%"}
 knitr::include_graphics("img/tidytuesdayapp.png")
 ```
 
 Let's extract some pieces of this application to show how (and why) you would parametrize your module.
 
-```{r 03-structure-9, eval = FALSE}
+```{r 03-structure-7, eval = FALSE}
 mod_dataviz_ui <- function(
   id, 
   type = c("point", "hist", "boxplot", "bar")
@@ -466,7 +466,7 @@ mod_dataviz_ui <- function(
 
 And in the module server:
 
-```{r 03-structure-10, eval = FALSE}
+```{r 03-structure-8, eval = FALSE}
 mod_dataviz_server <- function(
   input, 
   output, 
@@ -506,7 +506,7 @@ mod_dataviz_server <- function(
 
 Then, the UI of the entire application is:
 
-```{r 03-structure-11 }
+```{r 03-structure-9 }
 app_ui <- function() {
   # [...]
   tagList(
@@ -524,7 +524,7 @@ app_ui <- function() {
 
 And the `app_server()` of the application:
 
-```{r 03-structure-12 }
+```{r 03-structure-10 }
 app_server <- function(input, output, session) {
   # This app has been built before shiny 1.5.0, so we use the 
   # callModule structure
@@ -552,7 +552,7 @@ One common approach is to return a `reactive` function from one module, and pass
 
 Here is an example that illustrate this pattern.
 
-```{r 03-structure-13, eval = FALSE}
+```{r 03-structure-11, eval = FALSE}
 # Module 1, which will allow to select a number
 choice_ui <- function(id) {
   ns <- NS(id)
@@ -626,7 +626,7 @@ You can think of this approach as creating a small, internal database that is pa
 Below, we create a "global" (in the sense that it is initiated at the top of the module hierarchy) `reactiveValues()` object in the `app_server()` function.
 It will then go through all modules, passed as a function argument. 
 
-```{r 03-structure-14, eval = FALSE}
+```{r 03-structure-12, eval = FALSE}
 # Module 1, which will allow to select a number
 choice_ui <- function(id) {
   ns <- NS(id)
@@ -743,7 +743,7 @@ Extract the business function from the reactive functions.
 Literally.
 Compare this pattern:
 
-```{r 03-structure-15, eval=FALSE}
+```{r 03-structure-13, eval=FALSE}
 library(shiny)
 library(dplyr)
 # A simple app that returns a table
@@ -773,7 +773,7 @@ shinyApp(ui, server)
 
 To this one:
 
-```{r 03-structure-16, eval = FALSE}
+```{r 03-structure-14, eval = FALSE}
 library(shiny)
 library(dplyr)
 
