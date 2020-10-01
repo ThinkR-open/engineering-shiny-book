@@ -232,7 +232,7 @@ Here, with these two metrics, we can safely assume that `{shiny}` is a more comp
 If you want to compute the same prefix for a local package/repository, the `cloc_pkg()` function can be used. 
 For example, here is how to compute the cloc metric from a "blank" `{golem}` project:
 
-```{r}
+```{r 01-big-shiny-7}
 # Creating a golem in the temporary directory
 new_golem <- tempdir()
 golem::create_golem(
@@ -253,7 +253,7 @@ cloc::cloc_pkg(
 
 Now compare to the same metric for the `{hexmake}` application: 
 
-```{r echo = FALSE}
+```{r 01-big-shiny-8, echo = FALSE}
 if (
   dir.exists(
     file.path(
@@ -274,7 +274,7 @@ if (
 ```
 
 
-```{r}
+```{r 01-big-shiny-9}
 # Calling the function on the {hexmake} application git repository
 hexmake_cloc <- cloc_git(
   "https://github.com/ColinFay/hexmake"
@@ -297,7 +297,7 @@ For example, here is a simple control flow for an `ifelse` statement:
 
 (ref:controlflowcap) Control-flow graph representation of an algorithm.
 
-```{r 01-big-shiny-1-bis, echo=FALSE, fig.cap="(ref:controlflowcap)", out.width='100%'}
+```{r 01-big-shiny-10, echo=FALSE, fig.cap="(ref:controlflowcap)", out.width='100%'}
 knitr::include_graphics("img/controlflow.png")
 ```
 
@@ -310,12 +310,12 @@ Please refer to the bibliography for further readings about the theory behind th
 In R, the cyclomatic complexity can be computed using the `{cyclocomp}` [@R-cyclocomp] package.
 You can get it from `CRAN` with:
 
-```{r 01-big-shiny-7, include=FALSE}
+```{r 01-big-shiny-11, include=FALSE}
 # for writers
 if (!requireNamespace("cyclocomp")) {install.packages("cyclocomp")}
 ```
 
-```{r 01-big-shiny-8, eval = FALSE}
+```{r 01-big-shiny-12, eval = FALSE}
 # Install the {cyclocomp} package
 install.packages("cyclocomp")
 ```
@@ -325,11 +325,11 @@ While developing your application, the one you will be interested in is `cycloco
 
 Here is for example the cyclomatic complexity of the default golem template (assuming it is located in a `golex/` subdirectory):
 
-```{r 01-big-shiny-9, include = FALSE}
+```{r 01-big-shiny-13, include = FALSE}
 #remotes::install_local("golex", upgrade = "never")
 ```
 
-```{r 01-big-shiny-11, eval=FALSE}
+```{r 01-big-shiny-14, eval=FALSE}
 # Launch the {cyclocomp} package, and compute the cyclomatic complexity of "golex",
 # A blank {golem} project with one module skeleton
 library(cyclocomp)
@@ -337,51 +337,51 @@ cyclocomp_package_dir("golex") %>%
   head()
 ```
 
-```{r 01-big-shiny-12, echo=FALSE}
+```{r 01-big-shiny-15, echo=FALSE}
 cyclo_golex <- readr::read_rds(here::here("dataset", "cyclo_golex.rds"))
 head(cyclo_golex)
 ```
 
-```{r 01-big-shiny-13, include = FALSE}
+```{r 01-big-shiny-16, include = FALSE}
 #remove.packages("golex")
 ```
 
 And the one from another small application:
 
-```{r 01-big-shiny-14, include = FALSE}
+```{r 01-big-shiny-17, include = FALSE}
 if (!requireNamespace("tidytuesday201942")) {
   remotes::install_github("ColinFay/tidytuesday201942")
 }
 ```
 
 
-```{r 01-big-shiny-15, eval=FALSE}
+```{r 01-big-shiny-18, eval=FALSE}
 # Same metric, but for the application {tidytuesday201942}, 
 # available at https://engineering-shiny.org/tidytuesday201942.html
 cyclocomp_package("tidytuesday201942") %>% 
   head()
 ```
 
-```{r 01-big-shiny-16, echo=FALSE}
+```{r 01-big-shiny-19, echo=FALSE}
 cyclo_tidytuesday <- readr::read_rds(here::here("dataset", "cyclo_tidytuesday.rds"))
 head(cyclo_tidytuesday)
 ```
 
 And, finally, the same metric for `{shiny}`:
 
-```{r 01-big-shiny-17, include = FALSE}
+```{r 01-big-shiny-20, include = FALSE}
 if (!requireNamespace("shiny")) {
   remotes::install_cran("shiny")
 }
 ```
 
-```{r 01-big-shiny-18, eval=FALSE}
+```{r 01-big-shiny-21, eval=FALSE}
 # Computing this metric for the {shiny} package
 cyclocomp_package("shiny") %>% 
   head()
 ```
 
-```{r 01-big-shiny-19, echo=FALSE}
+```{r 01-big-shiny-22, echo=FALSE}
 cyclo_shiny <- readr::read_rds(here::here("dataset", "cyclo_shiny.rds"))
 head(cyclo_shiny)
 ```
@@ -404,7 +404,7 @@ Complexity can come from other sources: insufficient code coverage, dependencies
 
 We can use the `{packageMetrics2}` [@R-packageMetrics2] package to get some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc., ... and the number of lines of code and the cyclomatic complexity.
 
-```{r 01-big-shiny-20, include = FALSE}
+```{r 01-big-shiny-23, include = FALSE}
 if (!requireNamespace("packageMetrics2")) {
   remotes::install_github("MangoTheCat/packageMetrics2")
 }
@@ -412,7 +412,7 @@ if (!requireNamespace("packageMetrics2")) {
 
 At the time of writing these lines, the package is not on CRAN and can be installed using the following line of code:
 
-```{r echo = FALSE}
+```{r 01-big-shiny-24, echo = FALSE}
 # Installing {packageMetrics2} from GitHub
 remotes::install_github("MangoTheCat/packageMetrics2")
 ```
@@ -420,7 +420,7 @@ remotes::install_github("MangoTheCat/packageMetrics2")
 This package can now be used to assess the dependencies we use in our application.
 To do that, let's create a small function that computes this metric and return a tibble:
 
-```{r 01-big-shiny-21 }
+```{r 01-big-shiny-25 }
 library(packageMetrics2)
 # We are building a function to turn the output of the metrics 
 # into a data.frame
@@ -436,40 +436,40 @@ frame_metric <- function(pkg){
 }
 ```
 
-```{r 01-big-shiny-22, echo=FALSE, eval=FALSE}
+```{r 01-big-shiny-26, echo=FALSE, eval=FALSE}
 db <- memoise::cache_filesystem(here::here("fcache/"))
 frame_metric <- memoise::memoise(frame_metric, cache = db)
 ```
 
 And run the metric for `{golem}`,
 
-```{r 01-big-shiny-23, cache=TRUE, warning=FALSE, eval=FALSE}
+```{r 01-big-shiny-27, cache=TRUE, warning=FALSE, eval=FALSE}
 # Using this function for computing the cyclomatic complexity of {golem}
 frame_metric("golem") %>% 
   knitr::kable()
 ```
 
-```{r 01-big-shiny-24, echo=FALSE}
+```{r 01-big-shiny-28, echo=FALSE}
 frame_golem <- readr::read_rds(here::here("dataset", "frame_golem.rds"))
 knitr::kable(frame_golem)
 ```
 
 And `{shiny}`
 
-```{r 01-big-shiny-25, cache=TRUE, warning=FALSE, eval=FALSE}
+```{r 01-big-shiny-29, cache=TRUE, warning=FALSE, eval=FALSE}
 # Using this function for computing the cyclomatic complexity of {shiny}
 frame_metric("shiny") %>% 
   knitr::kable()
 ```
 
-```{r 01-big-shiny-26, echo=FALSE}
+```{r 01-big-shiny-30, echo=FALSE}
 frame_shiny <- readr::read_rds(here::here("dataset", "frame_shiny.rds"))
 knitr::kable(frame_shiny)
 ```
 
 If you are building your `{shiny}` application with `{golem}`, you can use the `DESCRIPTION` file, which contains the list of dependencies, as a starting point to explore these metrics for your dependencies, for example using `{desc}` [@R-desc] or `{attachment}` [@R-attachment]:
 
-```{r 01-big-shiny-27 }
+```{r 01-big-shiny-31 }
 # Get the dependencies from the DESCRIPTION file.
 # You can use one of these two functions to list the dependencies of your package, 
 # and compute the metric for each dep
