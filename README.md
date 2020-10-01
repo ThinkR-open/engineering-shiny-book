@@ -1,6 +1,4 @@
-__WORK IN PROGRESS__ 
-
-  <!-- badges: start -->
+<!-- badges: start -->
   [![R build status](https://github.com/ThinkR-open/building-shiny-apps-workflow/workflows/R-CMD-check/badge.svg)](https://github.com/ThinkR-open/building-shiny-apps-workflow/actions)
   <!-- badges: end -->
 

@@ -20,7 +20,9 @@ paks <- c(
   'data.table', 'jsonlite', 'readxl', 
   'R.cache', 'glouton', 'bubble', 'roxygen2', 
   'covr', 'rcmdcheck', 'covrpage', 
-  'dccvalidator', 'minifyr'
+  'dccvalidator', 'minifyr', 'sever', 'shinyFeedback', 
+  "whereami", "RcppSimdJson", "foreign", "haven", 
+  "tidymodules", "shinyjs", "htmlwidgets"
 )
 
 cran_paks <- tools::CRAN_package_db()
@@ -30,7 +32,7 @@ for (pak in paks){
   if ( !(pak %in% desc_pak)){
     try({
       if (pak %in% cran_paks$Package){
-        usethis::use_package()
+        usethis::use_package(pak)
       } else {
         usethis::use_dev_package(pak)
       } 
@@ -43,7 +45,7 @@ usethis::use_tidy_description()
 remotes::install_local(Ncpus = 4, upgrade = "never", force = TRUE)
 
 knitr::write_bib(c(
-  paks
+  unique(paks)
 ), 'packages.bib')
 
 purrr::walk(
