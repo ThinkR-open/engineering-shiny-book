@@ -1,3 +1,5 @@
+options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/latest"))
+
 install.packages(c("attachment", "remotes", "usethis", "namer", "desc", "spelling"))
 remotes::install_github("lbartnik/subprocess")
 remotes::install_github("rstudio/websocket")
