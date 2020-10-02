@@ -203,7 +203,7 @@ If you try this app, the first rendering of the three plots will take a little b
 
 At the time of writing only one function is available, but we can apply what we have just seen with `{memoise}`, for example to render a table:
 
-```{r 16-optimizing-shiny-code-8, eval=FALSE}
+```{r 16-optimizing-shiny-code-8, eval=TRUE}
 # We create an in-memory database using SQLite
 con <- DBI::dbConnect(
   RSQLite::SQLite(), 
@@ -238,7 +238,11 @@ fct_sql <- function(cut, con){
 # Using a local cache
 cache_dir <- cache_filesystem("cache")
 memoised_fct_sql <- memoise(fct_sql, cache = cache_dir)
+```
 
+Then, it can be used in an app:
+
+```{r 16-optimizing-shiny-code-8-bis, eval=FALSE}
 ui <- function(){
   tagList(
     # The user can select one of the cut from ggplot2::diamonds,  
@@ -268,6 +272,7 @@ server <- function(
 shinyApp(ui, server)
 ```
 
+
 You will see that the first time you run this piece of code, it will take a couple of seconds to render the table for a new `input$cut` value.
 But if you re-select this input a second time, the output will show instantaneously.
 
@@ -285,7 +290,7 @@ For example, from our stored cache from before:
 fs::dir_info("cache")[, "size", drop  = FALSE]
 ```
 
-Managing cache at a system level is out of scope for this book, but note that the most commonly accepted rule for deleting cache is called __LRU__, for __Least Recently Used__. 
+Managing cache at a system level is a very vast, fascinating topic that we can not cover here, but note that the most commonly accepted rule for deleting cache is called __LRU__, for __Least Recently Used__. 
 The underlying principle of this approach is that users tend to need what they have needed recently: hence the more a piece of data has been used recently, the more likely it is that it will be needed soon. 
 And this can be retrieved with:
 
@@ -653,6 +658,8 @@ for (i in 1:5){
 }
 ```
 
+For an example of an application built using `{promise}` and `{future}`, feel free to browse
+[engineering-shiny.org/shinyfuture/](https://engineering-shiny.org/shinyfuture/): you'll find here an example of blocking and non-blocking processes.
 
 ```{r 16-optimizing-shiny-code-18, include = FALSE, error = TRUE}
 try(fs::dir_delete(tpd))
