@@ -30,7 +30,8 @@ options(
   formatR.indent = 2, 
   width = 55, 
   digits = 4, 
-  conflicts.policy = FALSE
+  conflicts.policy = FALSE,
+  dplyr.summarise.inform = FALSE
 )
 ```
 
@@ -236,20 +237,24 @@ Thanks to them for their help on the book!
 ```{r index-4, include = FALSE}
 # Some internal funs
 right_link <- function(text, link){
-  htmltools::tagList(
-    htmltools::singleton(
-      htmltools::tags$style(
-        ".right{ text-align: right;}"
+  if (knitr::is_latex_output()){
+    tufte::quote_footer(text)
+  } else {
+    htmltools::tagList(
+      htmltools::singleton(
+        htmltools::tags$style(
+          ".right{ text-align: right;}"
+        )
+      ), 
+      htmltools::tags$div(
+        class = "right",
+        htmltools::tags$a(
+          href = link, 
+          text
+        )
       )
-    ), 
-    htmltools::tags$div(
-      class = "right",
-      htmltools::tags$a(
-        href = link, 
-        text
-      )
-    )
-  )
+    ) 
+  }
 }
 right_align<- function(text, link){
   htmltools::tagList(
@@ -325,8 +330,8 @@ make_redirect("bs4dashdemo", "https://connect.thinkr.fr/bs4dashdemo/")
 make_redirect("shinyfuture", "https://connect.thinkr.fr/shinyfuture/")
 try({
   dirs <- list.dirs(
-      "redirects"
-    )
+    "redirects"
+  )
   dirs <- dirs[!dirs == "redirects"]
   for (i in c(
     dirs
