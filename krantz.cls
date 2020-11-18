@@ -161,13 +161,13 @@
 \newcommand\TitlePageTitleFont{\fontsize{24}{28}\slshape\bfseries\selectfont}
 \newcommand\PageNumFont{\reset@font\fontsize{10}{12}\selectfont}
 \newcommand\ChapNumFont{\reset@font\fontsize{24}{24}\bfseries\selectfont}
-\newcommand\ChapTitleFont{\reset@font\fontsize{18}{20}\slshape\selectfont}
-\newcommand\SectionHeadFont{\fontsize{12}{14}\bfseries\selectfont}
+\newcommand\ChapTitleFont{\reset@font\color{orangethinkr}\fontsize{18}{20}\slshape\selectfont}
+\newcommand\SectionHeadFont{\color{bluethinkr}\fontsize{12}{14}\bfseries\selectfont}
 \newcommand\SubsectionHeadFont{\fontsize{11}{13}\bfseries\selectfont}
 \newcommand\SubsubsectionHeadFont{\fontsize{10}{12}\bfseries\selectfont}
 \newcommand\ParagraphHeadFont{\fontsize{10}{12}\itshape\selectfont}
 \newcommand\SubParagraphHeadFont{\fontsize{10}{12}\itshape\selectfont}
-\newcommand\FMHeadFont{\reset@font\fontsize{18}{20}\slshape\bfseries\selectfont}
+\newcommand\FMHeadFont{\reset@font\fontsize{18}{20}\color{orangethinkr}\slshape\bfseries\selectfont}
 \newcommand\RunningHeadFont{\fontsize{10}{12}\itshape\selectfont}
 \newcommand\NameFont{\fontsize{10}{12}\itshape\selectfont}
 \newcommand\AffiliationFont{\fontsize{8}{10}\selectfont}
