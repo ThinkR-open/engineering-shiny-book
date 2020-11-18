@@ -6,7 +6,7 @@
 
 Let's face it, reactivity is awesome... until it is not. 
 Reactivity is a common source of confusion for beginners, and a common source of bugs and bottlenecks, even for seasoned `{shiny}` developers. 
-Most of the time, issues come from the fact that __there is too much reactivity__, _i.e._ we build apps where too much things happen, and some things are updated way more often than they should, and computations are performed when they should not, and in the end we have a hard time understanding what is really happening inside our application. 
+Most of the time, issues come from the fact that __there is too much reactivity__, _i.e._ we build apps where too many things happen, and some things are updated way more often than they should, and computations are performed when they should not, and in the end we have a hard time understanding what is really happening inside our application. 
 
 Of course, it is a nice feature to make everything react instantly to changes, but when building larger apps it is easy to create monsters, i.e complicated, messy reactive graphs where everything is updated too much and too often. 
 Or worse, we generate endless reactive loops, aka "the reactive inferno" where A invalidates B which invalidates C which invalidates A which invalidates B which invalidates C... 
@@ -647,7 +647,7 @@ There are many reasons we would want to change things on the UI based on what ha
 Chances are that to do that, you have been using the `uiOutput()` & `renderUI()` functions from `{shiny}` [@R-shiny].
 Even if convenient, and the functions of choice in some specific context, this couple makes R do a little bit too much: you are making R regenerate the whole UI component instead of changing only what you need., which can be a suboptimal, be it from the user point of view, or from a developer perspective.
 
-One of the reason why this pattern might not be optimal is in the case where your visitors do not have an high speed internet, or when visiting using a smartphone, contexts where every byte count. 
+One of the reason why this pattern might not be optimal is in the case where your visitors do not have an high speed internet, or when visiting using a smartphone, contexts where every byte counts. 
 Rendering large elements from the server side in your `{shiny}` app means that these elements will have to transit through the socket, _i.e_ they need to be sent by the server, and downloaded by the browser. 
 In this case, the smaller the message size the better! 
 
@@ -893,7 +893,7 @@ Why? Because these system has been created to handle and manipulate data on disk
 
 For example, if you have a `selectInput()` that is used to perform a filter on a dataset, you can do that filter straight inside SQL, instead of bringing all the data to R and then do the filter.
 That is even more necessary if you are building the app for a large number of users: for example if one `{shiny}` session takes up to 300MB, multiply that by the number of users that will need one session, and you will have a rough estimate of how much RAM you will need.
-On the contrary, if you lighten the data manipulation so that it is done by the back-end, you will have, let's say, one database with 300 mo of data, then the database size will remain (more or less constant), and the only RAM used by `{shiny}` will be the data manipulation, not the data storage. 
+On the contrary, if you lighten the data manipulation so that it is done by the back-end, you will have, let's say, one database with 300MB of data, then the database size will remain (more or less constant), and the only RAM used by `{shiny}` will be the data manipulation, not the data storage. 
 That's even more true now that almost any operation you can do today in `{dplyr}` [@R-dplyr]  would be doable with an SQL backend, and that is the purpose of the `{dbplyr}` [@R-dbplyr] package: translates `{dplyr}` code into SQL.
 
 If using a database as a back-end seems a little bit far-fetched right now, that is how it is done in most programming languages: if you are building a web app with NodeJS or Python for example, and need to interact with data, nothing will be stored in RAM: you will be relying on an external database to store your data. 
@@ -947,10 +947,10 @@ Here are some packages that can make the file reading faster:
 - If you need to read Excel files inside your app, `{readxl}` [@R-readxl] offers a binding to the [`RapidXML`](http://rapidxml.sourceforge.net/) C++ library, reading Excel files fast. 
 - Most files exported from statistical software (SAS, SPSS...) can be read using either the `{foreign}` [@R-foreign] or `{haven}` [@R-haven] packages.
 
-### Using External DataBases
+### Using External Databases
 
 Another type of data analyzed in a shiny application is one contained inside an external database.
-Database are heavily used in the data science world, and in the software engineering as a whole. 
+Databases are heavily used in the data science world, and in the software engineering as a whole. 
 Databases come with API and drivers that help retrieving and transferring data: be it SQL, NoSQL, or even graph.
 
 Using a database is one of the solutions for making your app lighter, and more efficient in the long run, notably if you need to scale your app to thousands of visitors. 
@@ -958,7 +958,7 @@ Indeed, if you plan on having your app scale to numerous people, that will mean 
 And if your data is contained in your app, this will mean that each R process will take a significant amount of RAM if the dataset is large. 
 For example, if your dataset alone takes ~300 mb of RAM, that means that if you want to launch the app 10 times, you will need ~3gb of RAM.
 On the other hand, if you decide to switch these data to an external database, it will lower the global RAM need: the DB will takes these 300mb of data, and each shiny application will make request to the database. 
-For instance, if the database needs 300mb, and one shiny app 50mb, then 10 app will be 300mb + 50 * 1b mo. 
+For instance, if the database needs 300mb, and one shiny app 50mb, then 10 apps will be 300mb + 50 * 1b mo. 
 In practice, other things are to be considered: making database requests can be computationally expensive, and might need some network adjustments, but you get the idea. 
 
 How do one chose between database backend? 
