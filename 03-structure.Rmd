@@ -186,27 +186,31 @@ Consider the following `{shiny}` application:
 library(shiny)
 ui <- function() {
   fluidPage(
-    # Define a first sliderInput(), with an id that we will postfix with `1`
+    # Define a first sliderInput(), 
+    # with an id that we will postfix with `1`
     # in order to make it unique
     sliderInput(
       inputId = "choice1", 
       label = "choice 1", 
       min = 1, max = 10, value = 5
     ),
-    # Define a first actionButton(), with an id that we will postfix with `1`
+    # Define a first actionButton(), 
+    # with an id that we will postfix with `1`
     # in order to make it unique
     actionButton(
       inputId = "validate1",
       label = "Validate choice 1"
     ),
-    # We define here a second sliderInput, and need its id to be unique, so we 
+    # We define here a second sliderInput, 
+    # and need its id to be unique, so we 
     # postfix it with 2
     sliderInput(
       inputId = "choice2",
       label = "choice 2", 
       min = 1, max = 10, value = 5
     ),
-    # We define here a second actionButton, and need its id to be unique, so we 
+    # We define here a second actionButton, 
+    # and need its id to be unique, so we 
     # postfix it with 2
     actionButton(
       inputId = "validate2", 
@@ -283,13 +287,15 @@ Note that the following code will work only for `{shiny}`, version 1.5.0 and aft
 ```{r 03-structure-3, eval = FALSE}
 # Re-usable module
 choice_ui <- function(id) {
-  # This ns <- NS structure creates a "namespacing" function, that will 
+  # This ns <- NS structure creates a 
+  # "namespacing" function, that will 
   # prefix all ids with a string
   ns <- NS(id)
   tagList(
     sliderInput(
-      # This looks the same as your usual piece of code, except that the id 
-      # is wrapped into the ns() function we defined before
+      # This looks the same as your usual piece of code, 
+      # except that the id is wrapped into 
+      # the ns() function we defined before
       inputId = ns("choice"), 
       label = "Choice",
       min = 1, max = 10, value = 5
@@ -309,8 +315,8 @@ choice_server <- function(id) {
     id,
     # Defining the module core mechanism
     function(input, output, session) {
-      # This part is the same as the code you would put inside a 
-      # standard server
+      # This part is the same as the code you would put 
+      # inside a standard server
       observeEvent( input$validate , {
         print(input$choice)
       })
@@ -323,16 +329,16 @@ choice_server <- function(id) {
 library(shiny)
 app_ui <- function() {
   fluidPage(
-    # Call the UI  function, this is the only place your ids will 
-    # need to be unique
+    # Call the UI  function, this is the only place 
+    # your ids will need to be unique
     choice_ui(id = "choice_ui1"),
     choice_ui(id = "choice_ui2")
   )
 }
 
 app_server <- function(input, output, session) {
-  # We are now calling the module server functions on a given id that matches
-  # the one from the UI
+  # We are now calling the module server functions 
+  # on a given id that matches the one from the UI
   choice_server(id = "choice_ui1")
   choice_server(id = "choice_ui2")
 }
@@ -394,18 +400,18 @@ mod_ui <- function(id, button_label) {
 }
 
 # Printing the html for this piece of UI
-mod_ui("mod_ui_1", button_label = "Validate Choice")
-mod_ui("mod_ui_2", button_label = "Validate Choice, again")
+mod_ui("mod_ui_1", button_label = "Validate ")
+mod_ui("mod_ui_2", button_label = "Validate, again")
 ```
 
 ```
 <!-- The ids are "namespaced" with mod_ui_*-->
 <button id="mod_ui_1-validate" type="button" 
-class="btn btn-default action-button">Validate Choice</button>
+class="btn btn-default action-button">Validate</button>
 
 <!-- The ids are "namespaced" with mod_ui_*-->
 <button id="mod_ui_2-validate" type="button" 
-class="btn btn-default action-button">Validate Choice, again</button>
+class="btn btn-default action-button">Validate, again</button>
 ```
 
 The __app_server__ side contains a series of `mod_server(unique_id, ...)`, also allowing additional parameters, just like any other function. 
@@ -443,7 +449,8 @@ mod_dataviz_ui <- function(
     )
   }, 
   # [ ... ]
-  # We want to display the bins input only when the type is histogram
+  # We want to display the bins input only 
+  # when the type is histogram
   if (type == "hist") {
     numericInput(
       ns("bins"), 
@@ -455,7 +462,8 @@ mod_dataviz_ui <- function(
     )
   },
   # [ ... ]
-  # The title input will be added to the graph for every type of graph
+  # The title input will be added to the graph 
+  # for every type of graph
   textInput(
     ns("title"),
     "Title",
@@ -476,13 +484,26 @@ mod_dataviz_server <- function(
   # [ ... ]
   if (type == "point") {
     # Defining the server logic when the type is point
-    # When the type is point, we have access to input$x, input$y, input$color, and input$palette, 
+    # When the type is point, we have access to input$x, 
+    # input$y, input$color, and input$palette, 
     # so we reuse them here
-    ggplot(big_epa_cars, aes(.data[[input$x]], .data[[input$y]], color = .data[[input$color]]))  +
+    ggplot(
+      big_epa_cars, 
+      aes(
+        .data[[input$x]], 
+        .data[[input$y]], 
+        color = .data[[input$color]])
+    )  +
       geom_point()+ 
       scale_color_manual(
         values = color_values(
-          1:length(unique(pull(big_epa_cars, .data[[input$color]]))), 
+          1:length(
+            unique(
+              pull(
+                big_epa_cars, 
+                .data[[input$color]])
+            )
+          ), 
           palette = input$palette
         )
       )
@@ -490,13 +511,27 @@ mod_dataviz_server <- function(
   # [ ... ]
   if (type == "hist") {
     # Defining the server logic when the type is hist
-    # When the type is point, we have access to input$x, input$color, input$bins, and input$palette
+    # When the type is point, we have access to input$x, 
+    # input$color, input$bins, and input$palette
     # so we reuse them here
-    ggplot(big_epa_cars, aes(.data[[input$x]], fill = .data[[input$color]])) +
+    ggplot(
+      big_epa_cars, 
+      aes(
+        .data[[input$x]], 
+        fill = .data[[input$color]]
+      )
+    ) +
       geom_histogram(bins = input$bins)+ 
       scale_fill_manual(
         values = color_values(
-          1:length(unique(dplyr::pull(big_epa_cars, .data[[input$color]]))), 
+          1:length(
+            unique(
+              pull(
+                big_epa_cars, 
+                .data[[input$color]]
+              )
+            )
+          ), 
           palette = input$palette
         )
       )
@@ -512,11 +547,19 @@ app_ui <- function() {
   tagList(
     fluidRow(
       # Setting the first tab to be of type point
-      id = "geom_point", mod_dataviz_ui("dataviz_ui_1", type = "point")
+      id = "geom_point", 
+      mod_dataviz_ui(
+        "dataviz_ui_1", 
+        type = "point"
+      )
     ), 
     fluidRow(
       # Setting the second tab to be of type point
-      id = "geom_hist", mod_dataviz_ui("dataviz_ui_2", type = "hist")
+      id = "geom_hist", 
+      mod_dataviz_ui(
+        "dataviz_ui_2", 
+        type = "hist"
+      )
     )
   )
 }
@@ -526,12 +569,13 @@ And the `app_server()` of the application:
 
 ```{r 03-structure-10 }
 app_server <- function(input, output, session) {
-  # This app has been built before shiny 1.5.0, so we use the 
-  # callModule structure
+  # This app has been built before shiny 1.5.0, 
+  # so we use the callModule structure
   # 
-  # We here call the server module on their corresponding id in the UI, 
-  # and set the parameter of the server function to match the correct 
-  # type of input
+  # We here call the server module on their 
+  # corresponding id in the UI, and set the 
+  # parameter of the server function to 
+  # match the correct type of input
   callModule(mod_dataviz_server, "dataviz_ui_1", type = "point")
   callModule(mod_dataviz_server, "dataviz_ui_2", type = "hist")
 }
@@ -565,8 +609,8 @@ choice_ui <- function(id) {
 
 choice_server <- function(id) {
   moduleServer( id, function(input, output, session) {
-    # We return a reactive function from this server, that can be passed along
-    # to other modules
+    # We return a reactive function from this server, 
+    # that can be passed along to other modules
     return(
       reactive({
         input$choice
@@ -587,7 +631,8 @@ printing_ui <- function(id) {
 
 printing_server <- function(id, number) {
   moduleServer(id, function(input, output, session) {
-    # We evaluate the reactive function returned from the other module
+    # We evaluate the reactive function 
+    # returned from the other module
     output$print <- renderPrint({
       number()
     })
@@ -608,7 +653,10 @@ app_server <- function(input, output, session) {
   # choice_server() returns a value that is then passed to 
   # printing_server()
   number_from_first_mod <- choice_server("choice_ui_1")
-  printing_server("printing_ui_2", number = number_from_first_mod)
+  printing_server(
+    "printing_ui_2", 
+    number = number_from_first_mod
+  )
 }
 
 shinyApp(app_ui, app_server)
@@ -681,7 +729,8 @@ app_ui <- function() {
 }
 
 app_server <- function(input, output, session) {
-  # both servers take a reactiveValue, which is set in the first module
+  # both servers take a reactiveValue,
+  #  which is set in the first module
   # and printed in the second one.
   # The server functions don't return any value per se
   r <- reactiveValues()
@@ -699,8 +748,10 @@ Note that if you want to share your module, for example in a package, you should
 For example: 
 
 ```
-#' @param r a `reactiveValues()` list with a `number_from_first_mod` element in it. 
-#' This `r$number_from_first_mod` will be printed to the `print` output.
+#' @param r a `reactiveValues()` list with a 
+    `number_from_first_mod` element in it. 
+#' This `r$number_from_first_mod` will be 
+    printed to the `print` output.
 ```
 
 #### C. The "stratégie du grand R6" {-}

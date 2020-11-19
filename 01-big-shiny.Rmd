@@ -23,7 +23,7 @@ If you are very new to `{shiny}`, this book might feel a little bit overwhelming
 This books relies on the assumption that you already know how to build basic `{shiny}` applications, and that you want to push your `{shiny}` skills to the next level: in other words, you are ready to move from the Proof of Concept to the production-grade application.
 If you are very new to `{shiny}`, we suggest you start with the [Mastering Shiny book](https://mastering-shiny.org/) before reading the present book.
 
-Ready to start engineering production-grade `{shiny}` Apps?
+Ready to start engineering production-grade `{shiny}` apps?
 
 ## What is a Complex `{shiny}` Application? {#complex-shiny}
 
@@ -129,19 +129,19 @@ So you can expect a "tidyverse-centric" package to contain more lines of code, y
 For example, the two following pieces of code do the same thing. 
 Both have a different number of lines, and a different level of reading complexity.
 
-```{r 01-big-shiny-1 }
+```{r 01-big-shiny-1, eval = FALSE}
 library(dplyr, warn.conflicts = FALSE)
 # With pipe
 iris %>%
   group_by(Species) %>%
-  summarize(mean_sepal_length = mean(Sepal.Length))
+  summarize(mean_sl = mean(Sepal.Length))
 # Without the pipe
-summarize(group_by(iris, Species), mean_sepal_length = mean(Sepal.Length))
+summarize(group_by(iris, Species), mean_sl = mean(Sepal.Length))
 ```
 
 Also, there is no limit in the way you can indent your code. 
 
-```{r 01-big-shiny-2 }
+```{r 01-big-shiny-2, eval = FALSE}
 # Putting one symbol by line 
 iris[
   1
@@ -153,7 +153,7 @@ iris[
 
 Six lines of code for something that could also be written in one line.  
 
-```{r 01-big-shiny-3 }
+```{r 01-big-shiny-3, eval = FALSE}
 # Same code but everything is on the same line
 iris[1:5, "Species"]
 ```
@@ -193,7 +193,8 @@ library(cloc)
 # Using dplyr to manipulate the results
 library(dplyr)
 
-# Computing the number of lines of code for various CRAN packages
+# Computing the number of lines of code 
+# for various CRAN packages
 shiny_cloc <- cloc_cran(
   "shiny", 
   .progress = FALSE, 
@@ -230,9 +231,13 @@ Here, with these two metrics, we can safely assume that `{shiny}` is a more comp
 If you want to compute the same prefix for a local package/repository, the `cloc_pkg()` function can be used. 
 For example, here is how to compute the cloc metric from a "blank" `{golem}` project:
 
-```{r 01-big-shiny-7}
+```{r 01-big-shiny-7-eval-but-hidden, include = FALSE}
 # Creating a golem in the temporary directory
 new_golem <- tempdir()
+unlink(file.path(
+    new_golem, 
+    "blankgolem"
+), 1, 1)
 golem::create_golem(
   file.path(
     new_golem, 
@@ -248,6 +253,48 @@ cloc::cloc_pkg(
   )
 )
 ```
+
+
+
+```{r 01-big-shiny-7-non-eval-but-shown, eval = FALSE}
+# Creating a golem in the temporary directory
+new_golem <- "~"
+golem::create_golem(
+  file.path(
+    new_golem, 
+    "blankgolem"
+  ), 
+  open = FALSE
+)
+# Counting metrics for this blank project:
+```
+
+```
+-- Checking package name -------------------------
+✓ Valid package name
+-- Creating dir ----------------------------------
+✓ Created package directory
+-- Copying package skeleton ----------------------
+✓ Copied app skeleton
+-- Setting the default config --------------------
+✓ Configured app
+-- Running project hook function -----------------
+✓ Setting active project to '~/blankgolem'
+-- Done ----------------- -----------------------
+A new golem named blankgolem was created at ~/blankgolem .
+To continue working on your app, start editing the 
+01_start.R file.
+```
+
+```{r 01-big-shiny-1-bis}
+cloc::cloc_pkg(
+  file.path(
+    new_golem, 
+    "blankgolem"
+  )
+) %>% glimpse()
+```
+
 
 Now compare to the same metric for the `{hexmake}` application: 
 
@@ -273,11 +320,12 @@ if (
 
 
 ```{r 01-big-shiny-9}
-# Calling the function on the {hexmake} application git repository
+# Calling the function on the {hexmake} 
+# application git repository
 hexmake_cloc <- cloc_git(
   "https://github.com/ColinFay/hexmake"
 )
-hexmake_cloc
+hexmake_cloc %>% glimpse()
 ```
 
 One thing that this package also allows is counting the number of lines of commented code: it's usually a good sign to see that a package has comments in its code-base, as it will allow to work more safely in the future, provided that this metric doesn't reveal that large portions of the application are "commented code" (as opposed to "code comments"). 
@@ -328,7 +376,8 @@ Here is for example the cyclomatic complexity of the default golem template (ass
 ```
 
 ```{r 01-big-shiny-14, eval=FALSE}
-# Launch the {cyclocomp} package, and compute the cyclomatic complexity of "golex",
+# Launch the {cyclocomp} package, and compute the 
+# cyclomatic complexity of "golex",
 # A blank {golem} project with one module skeleton
 library(cyclocomp)
 cyclocomp_package_dir("golex") %>% 
@@ -354,8 +403,9 @@ if (!requireNamespace("tidytuesday201942")) {
 
 
 ```{r 01-big-shiny-18, eval=FALSE}
-# Same metric, but for the application {tidytuesday201942}, 
-# available at https://engineering-shiny.org/tidytuesday201942.html
+# Same metric, but for the application 
+# {tidytuesday201942}, available at
+# https://engineering-shiny.org/tidytuesday201942.html
 cyclocomp_package("tidytuesday201942") %>% 
   head()
 ```
@@ -410,7 +460,7 @@ if (!requireNamespace("packageMetrics2")) {
 
 At the time of writing these lines, the package is not on CRAN and can be installed using the following line of code:
 
-```{r 01-big-shiny-24, echo = FALSE}
+```{r 01-big-shiny-24, echo = FALSE, include = FALSE}
 # Installing {packageMetrics2} from GitHub
 remotes::install_github("MangoTheCat/packageMetrics2")
 ```
@@ -426,14 +476,10 @@ frame_metric <- function(pkg){
   # Get the metrics
   metrics <- package_metrics(pkg)
   # Create the table
-  cat(
-    names(metrics), 
-    ":", 
-    metrics, 
-    "(", 
-    list_package_metrics()[names(metrics)], 
-    ")", 
-    "\n"
+  tibble::tibble(
+    n = names(metrics), 
+    val = metrics, 
+    expl = list_package_metrics()[names(metrics)]
   )
 }
 ```
@@ -445,35 +491,44 @@ frame_metric <- memoise::memoise(frame_metric, cache = db)
 
 And run the metric for `{golem}`,
 
-```{r 01-big-shiny-27, cache=TRUE, warning=FALSE, eval=FALSE}
-# Using this function for computing the cyclomatic complexity of {golem}
-frame_metric("golem") %>% 
-  knitr::kable()
+
+```{r 01-big-shiny-2-bis, include = FALSE, cache=TRUE}
+#f_golem <- frame_metric("golem") 
+# saveRDS(f_golem, "data-raw/f_golem.RDS")
 ```
 
-```{r 01-big-shiny-28, echo=FALSE}
-frame_golem <- readr::read_rds(here::here("dataset", "frame_golem.rds"))
-knitr::kable(frame_golem)
+```{r 01-big-shiny-27, cache=TRUE, warning=FALSE}
+# Using this function with{golem}
+frame_metric("golem") 
+```
+
+```{r 01-big-shiny-3-bis, echo = FALSE}
+readRDS("data-raw/f_golem.RDS")
 ```
 
 And `{shiny}`
 
-```{r 01-big-shiny-29, cache=TRUE, warning=FALSE, eval=FALSE}
-# Using this function for computing the cyclomatic complexity of {shiny}
-frame_metric("shiny") %>% 
-  knitr::kable()
+```{r 01-big-shiny-4-bis, include = FALSE}
+# f_shiny <- frame_metric("shiny") 
+# saveRDS(f_shiny, "data-raw/f_shiny.RDS")
 ```
 
-```{r 01-big-shiny-30, echo=FALSE}
-frame_shiny <- readr::read_rds(here::here("dataset", "frame_shiny.rds"))
-knitr::kable(frame_shiny)
+```{r 01-big-shiny-29, cache=TRUE, warning=FALSE, eval = FALSE}
+# Using this function with {shiny}
+frame_metric("shiny") 
 ```
+
+```{r 01-big-shiny-5-bis, include = FALSE}
+readRDS("data-raw/f_shiny.RDS")
+```
+
 
 If you are building your `{shiny}` application with `{golem}`, you can use the `DESCRIPTION` file, which contains the list of dependencies, as a starting point to explore these metrics for your dependencies, for example using `{desc}` [@R-desc] or `{attachment}` [@R-attachment]:
 
 ```{r 01-big-shiny-31 }
 # Get the dependencies from the DESCRIPTION file.
-# You can use one of these two functions to list the dependencies of your package, 
+# You can use one of these two functions to list 
+# the dependencies of your package, 
 # and compute the metric for each dep
 desc::desc_get_deps("golex/DESCRIPTION")
 # See also 

@@ -1,6 +1,6 @@
+# To do locally on Colin's computer, thanks
 options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/latest"))
 
-install.packages(c("attachment", "remotes", "usethis", "namer", "desc", "spelling", "tufte"))
 remotes::install_github("lbartnik/subprocess")
 remotes::install_github("rstudio/websocket")
 paks <- c(
@@ -24,8 +24,11 @@ paks <- c(
   'covr', 'rcmdcheck', 'covrpage', 
   'dccvalidator', 'minifyr', 'sever', 'shinyFeedback', 
   "whereami", "RcppSimdJson", "foreign", "haven", 
-  "tidymodules", "shinyjs", "htmlwidgets"
-)
+  "tidymodules", "shinyjs", "htmlwidgets", 
+  "hunspell", "rhub", "spelling", "tufte", "uuid", 
+  "attachment", "remotes", "usethis", "namer", "desc", "spelling", "tufte"
+) 
+paks <- unique(paks)
 
 cran_paks <- tools::CRAN_package_db()
 desc_pak <- desc::desc_get_deps()$package
@@ -43,7 +46,7 @@ for (pak in paks){
 }
 
 usethis::use_tidy_description()
-
+renv::restore()
 remotes::install_local(Ncpus = 4, upgrade = "never", force = TRUE)
 
 knitr::write_bib(c(
