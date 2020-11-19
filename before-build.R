@@ -26,10 +26,16 @@ paks <- c(
   "whereami", "RcppSimdJson", "foreign", "haven", 
   "tidymodules", "shinyjs", "htmlwidgets", 
   "hunspell", "rhub", "spelling", "tufte", "uuid", 
-  "attachment", "remotes", "usethis", "namer", "desc", "spelling", "tufte"
+  "attachment", "remotes", "usethis", "namer", "desc", "spelling", "tufte", 
+  "dockerstats", "spelling"
 ) 
-paks <- unique(paks)
 
+paks <- unique(paks)
+# for (i in paks){
+#   if (!requireNamespace(i)){
+#     install.packages(i)
+#   }
+# }
 cran_paks <- tools::CRAN_package_db()
 desc_pak <- desc::desc_get_deps()$package
 
@@ -46,7 +52,7 @@ for (pak in paks){
 }
 
 usethis::use_tidy_description()
-renv::restore()
+
 remotes::install_local(Ncpus = 4, upgrade = "never", force = TRUE)
 
 knitr::write_bib(c(
