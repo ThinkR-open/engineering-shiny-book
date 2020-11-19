@@ -73,7 +73,8 @@ msleep_and_return_time(2)
 toc()
 # We launch a new recording
 tic()
-# This memoised function will return immediately, without sleeping
+# This memoised function will return immediately, 
+# without sleeping
 msleep_and_return_time(2)
 toc()
 ```
@@ -97,23 +98,39 @@ DBI::dbWriteTable(
   )
 )
 
-# We memoise the dbGetQuery, so that every time this function is called with
-# the same parameters, the SQL query is not actually run, but the results are 
-# fetched from the cache 
+# We memoise the dbGetQuery,
+#  so that every time this function is called with
+# the same parameters, 
+# the SQL query is not actually run,
+#  but the results are fetched from the cache 
 m_get_query <- memoise(DBI::dbGetQuery)
-# We call a function the first time, with the connection object and an SQL query
+# We call a function the first time, 
+# with the connection object and an SQL query
 tic()
-res_a <- m_get_query(con, "SELECT * FROM diams WHERE cut = 'Ideal'")
+res_a <- m_get_query(
+  con, 
+  "SELECT * FROM diams WHERE cut = 'Ideal'"
+)
 toc()
-# We call this function a second time, with the same parameters
+# We call this function a second time, 
+# with the same parameters
 tic()
-res_b <- m_get_query(con, "SELECT * FROM diams WHERE cut = 'Ideal'")
+res_b <- m_get_query(
+  con, 
+  "SELECT * FROM diams WHERE cut = 'Ideal'"
+)
 toc()
 # Let's check that the two are equal
-all.equal(res_a, res_b)
+all.equal(
+  res_a, 
+  res_b
+)
 # We now try with a new SQL code (cut = 'Good')
 tic()
-res_c <- m_get_query(con, "SELECT * FROM diams WHERE cut = 'Good'")
+res_c <- m_get_query(
+  con, 
+  "SELECT * FROM diams WHERE cut = 'Good'"
+)
 toc()
 # The function has effectively returned a different result
 setequal(res_a, res_c)
@@ -123,7 +140,16 @@ Note that you can change where the cache is stored by `{memoise}`.
 Here, we will save it in a random directory (do not do this in production).
 
 ```{r 16-optimizing-shiny-code-3, error = TRUE}
-(random_dir <- fs::path(paste(sample(letters, 10), collapse = "")))
+random_dir <- fs::path(
+  paste(
+    sample(
+      letters, 
+      10
+    ), 
+    collapse = ""
+  )
+)
+random_dir
 ```
 
 ```{r 16-optimizing-shiny-code-4, include = FALSE, error = TRUE}
@@ -136,12 +162,25 @@ fs::dir_create(random_dir)
 # We use this directory as the cache_filesystem for {memoise}
 local_cache_folder <- cache_filesystem(random_dir)
 # The memoised function will use this directory for cache
-m_get_query <- memoise(DBI::dbGetQuery, cache = local_cache_folder)
+m_get_query <- memoise(
+  DBI::dbGetQuery, 
+  cache = local_cache_folder
+)
 # Run the function twice
-res_a <- m_get_query(con, "SELECT * FROM diams WHERE cut = 'Ideal'")
-res_b <- m_get_query(con, "SELECT * FROM diams WHERE cut = 'Good'")
-res_c <- m_get_query(con, "SELECT * FROM diams WHERE cut = 'Good'")
-# The random directory now contains two objects, one for each memoized call
+res_a <- m_get_query(
+  con,
+  "SELECT * FROM diams WHERE cut = 'Ideal'"
+)
+res_b <- m_get_query(
+  con,
+  "SELECT * FROM diams WHERE cut = 'Good'"
+)
+res_c <- m_get_query(
+  con, 
+  "SELECT * FROM diams WHERE cut = 'Good'"
+)
+# The random directory now contains two objects, 
+# one for each memoized call
 fs::dir_tree(tpd)
 ```
 
@@ -171,7 +210,11 @@ library(shiny)
 ui <- function(){
   tagList(
     # We select a data.frame to plot
-    selectInput("tbl", "Table", c("iris", "mtcars", "airquality")),
+    selectInput(
+      "tbl", 
+      "Table", 
+      c("iris", "mtcars", "airquality")
+    ),
     # This plotOutput will be cached
     plotOutput("plot")
   )
@@ -188,9 +231,11 @@ server <- function(
     # Plotting the selected data.frame
     plot( get(input$tbl) )
   }, cacheKeyExpr = {
-    # List here all the reactive expression that will be used as cache key
-    # When running the app, you will see that the first time you plot one 
-    # graph, it takes a couple of seconds, but the second time, it's almost 
+    # List here all the reactive expression that will 
+    # be used as cache key when running the app, 
+    # you will see that the first time you plot one 
+    # graph, it takes a couple of seconds, 
+    # but the second time, it's almost 
     # instantaneous
     input$tbl
   })
@@ -600,8 +645,9 @@ server <- function(
       (function(error){
         warning(e)
       })
-    # Note that every render() function should return something: here
-    # it will only work if the renderPrint() returns a value, even if 
+    # Note that every render() function should return
+    #  something: here it will only work if the 
+    #  renderPrint() returns a value, even if 
     # invisible. We use cat_rule to simulate that.
     cli::cat_rule(
       sprintf("%s sent", rv$last_id)
@@ -609,7 +655,8 @@ server <- function(
   })
   
   # output$rnorm will be printed whenever rv$output
-  # is available, i.e. returned from the future and the last one sent.
+  # is available, i.e. returned from the future
+  #  and the last one sent.
   output$rnorm <- renderPrint({
     req(rv$output)
   })

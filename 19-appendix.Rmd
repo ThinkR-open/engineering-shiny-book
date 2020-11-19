@@ -16,12 +16,16 @@ Here is for example what the specifications for this app could look like
 ``` txt
 Hello! 
 
-We want to build a small application that can minify CSS, JavaScript, HTML and JSON. 
+We want to build a small application that can 
+minify CSS, JavaScript, HTML and JSON. 
 
-In this app, user will be able either to paste the content or to upload a file. 
+In this app, user will be able either to paste 
+the content or to upload a file. 
 
-Once the content is pasted/upladed, they select the type, which is pre-selected based on the file extension. 
-Then they click on a button, and the content is minified. 
+Once the content is pasted/upladed, they select 
+the type, which is pre-selected based on the 
+file extension. Then they click on a button, 
+and the content is minified. 
 
 They can then copy the output, or download it as a file. 
 
@@ -159,15 +163,17 @@ guess_minifier <- function(file){
   # We'll start by getting the file extension
   ext <- tools::file_ext(file)
   # Check that the extension is correct, if not, return early
-  # It's important to do this kind of check also on the server side 
-  # As HTML manual tempering would allow to also send other type of files
+  # It's important to do this kind of check also 
+  # on the server side as HTML manual tempering 
+  # would allow to also send other type of files
   if (
     ! ext %in% c("js", "css", "html", "json")
   ){
     # Return early
     return(list())
   }
-  # We'll then retrieve the available pattern based on the extension
+  # We'll then retrieve the available 
+  # pattern based on the extension
   patt <- switch(
     ext, 
     js = "minifyr_js_.+",
@@ -179,24 +185,26 @@ guess_minifier <- function(file){
   list(
     file = file,
     ext = ext,
-    # We return this pattern so that it will be used to update the selectInput that 
+    # We return this pattern so that 
+    # it will be used to update the selectInput that 
     # is used to select an algo
     pattern = patt, 
     functions = grep(patt, names(loadNamespace("minifyr")), value = TRUE)
   )
   
 }
-options(width = 10)
-# minifyr comes with a series of examples, so we can use them as tests
+
+# minifyr comes with a series of examples, 
+# so we can use them as tests
 guess_minifier(
   minifyr_example("css")
-)
+)[2:4]
 guess_minifier(
   minifyr_example("js")
-)
+)[2:4]
 guess_minifier(
   minifyr_example("html")
-)
+)[2:4]
 guess_minifier(
   minifyr_example("json")
 )
@@ -210,7 +218,7 @@ guess_minifier(
 + A `compress()` function, which takes three parameters: the file as `input`, the `algo`, outputed from our last function, nd the selection, which is the one selected by the user. 
 The compressed file will be outputed to a tempfile.
 
-```{r 19-appendix-5}
+```{r 19-appendix-5, eval = FALSE}
 compress <- function(algo, selection){
   # Creating a tempfile using our algo object
   tps <- tempfile(fileext = sprintf(".%s", algo$ext))
@@ -231,8 +239,28 @@ algo <- guess_minifier(
 compress(
   algo = algo, 
   selection = "babel"
+) 
+```
+
+```{r echo = FALSE}
+compress <- function(algo, selection){
+  # Creating a tempfile using our algo object
+  tps <- tempfile(fileext = sprintf(".%s", algo$ext))
+  # Getting the function with the selection
+  converter <- get(
+    grep(selection, algo$functions, value = TRUE)
+  )
+  # Do the conversion
+  converter(algo$file, tps)
+  # Return the temp file
+  return(tps)
+}
+
+algo <- guess_minifier(
+  minifyr_example("js")
 )
 ```
+
 
 + Finally, a `compare()` function, that can compare the size of two files, so that we can measure the minification gain.
 This function will take two file paths. 
@@ -341,18 +369,20 @@ To prevent that, we will be caching the function that does the computation.
 This input will look like this on the server:
 
 ```{r 19-appendix-9}
-  observeEvent( input$testingtrigger , {
-    
-    if (golem::app_dev()){
-      file$original_file <- minifyr::minifyr_example(ext = input$testingtext)
-      file$guess_minifier()
-      file$type <- input$upload$type
-      file$minified_file <- NULL
-      file$original_name <- input$upload$name
-      gargoyle::trigger("uploaded")
-    }
+observeEvent( input$testingtrigger , {
   
-  })
+  if (golem::app_dev()){
+    file$original_file <- minifyr::minifyr_example(
+      ext = input$testingtext
+    )
+    file$guess_minifier()
+    file$type <- input$upload$type
+    file$minified_file <- NULL
+    file$original_name <- input$upload$name
+    gargoyle::trigger("uploaded")
+  }
+  
+})
 ```
 
 We use this pattern so that we can combine it with a testing suite with `{crrry}`, using the following pattern:
@@ -361,7 +391,7 @@ We use this pattern so that we can combine it with a testing suite with `{crrry}
 test <- crrry::CrrryProc$new(
   chrome_bin = pagedown::find_chrome(),
   # Process to launch locally
-  fun = "options(golem.app.prod = FALSE);golem::document_and_reload();run_app()",
+  fun = "golem::document_and_reload();run_app()",
   # Note that you will need httpuv >= 1.5.2 for randomPort
   chrome_port = httpuv::randomPort(), 
   headless = FALSE

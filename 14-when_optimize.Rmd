@@ -379,13 +379,16 @@ That being said, if you have a limited time to invest in optimizing the front-en
 And if you want to do if from R, the npm lighthouse module allows to output the audit in JSON, which can then be brought back to R!
 
 ```bash
-lighthouse --output json --output-path data-raw/output.json http://localhost:2811
+lighthouse --output json \
+  --output-path data-raw/output.json \
+  http://localhost:2811
 ```
 
 Then, being a JSON file, you can call if from R:
 
 ```{r 14-when-optimize-13 }
-# Reading the JSON output of your lighthouse audit, and displaying the Speed Index value
+# Reading the JSON output of your lighthouse audit, 
+# and displaying the Speed Index value
 lighthouse_report <- jsonlite::read_json("data-raw/output.json")
 lighthouse_report$audits$`speed-index`$displayValue
 ```
@@ -396,73 +399,97 @@ Here are for example some of the results, focused on performance, with there res
 
 ##### "First Meaningful Paint" {-}
 
-```{r 14-when-optimize-14 }
+```{r 14-when-optimize-14, eval = FALSE }
+# Each audit point contains a description, 
+# that explains what this value stands for
+lighthouse_report$audits$`first-meaningful-paint`$description
+```
+
+```{r echo = FALSE}
 # Each audit point contains a description, that explains what this 
 # value stands for
-lighthouse_report$audits$`first-meaningful-paint`$description
+lighthouse_report$audits$`first-meaningful-paint`$description %>%
+  strwrap(width = 55)
 ```
 
 ```{r 14-when-optimize-15 }
 # We can turn the results into a data frame
 lighthouse_report$audits$`first-meaningful-paint` %>%
-  as.data.frame() %>%
-  dplyr::select(title, score, displayValue) %>%
-  knitr::kable()
+  tibble::as_tibble()  %>%
+  dplyr::select(title, score, displayValue)
 ```
 
 ##### "Speed Index" {-}
 
-```{r 14-when-optimize-16 }
+```{r 14-when-optimize-16, eval = FALSE}
 lighthouse_report$audits$`speed-index`$description
+```
+
+```{r echo = FALSE}
+lighthouse_report$audits$`speed-index`$description %>%
+  strwrap(width = 55)
 ```
 
 
 ```{r 14-when-optimize-17 }
 lighthouse_report$audits$`speed-index` %>%
-  as.data.frame() %>%
-  dplyr::select(title, score, displayValue) %>%
-  knitr::kable()
+  tibble::as_tibble()  %>%
+  dplyr::select(title, score, displayValue) 
 ```
 
 ##### "Estimated Input Latency" {-}
 
-```{r 14-when-optimize-18 }
-lighthouse_report$audits$`estimated-input-latency`$description 
+```{r 14-when-optimize-18, eval = FALSE }
+lighthouse_report$audits$`estimated-input-latency`$description %>%
+  strwrap(width = 55)
+```
+
+```{r echo = FALSE}
+lighthouse_report$audits$`estimated-input-latency`$description %>%
+  strwrap(width = 55)
 ```
 
 
 ```{r 14-when-optimize-19 }
 lighthouse_report$audits$`estimated-input-latency` %>%
-  as.data.frame() %>%
-  dplyr::select(title, score, displayValue) %>%
-  knitr::kable()
+  tibble::as_tibble()  %>%
+  dplyr::select(title, score, displayValue) 
 ```
 
 ##### "Total Blocking Time" {-}
 
-```{r 14-when-optimize-20 }
+```{r 14-when-optimize-20, eval = FALSE}
 lighthouse_report$audits$`total-blocking-time`$description 
+```
+
+```{r  echo  = FALSE}
+lighthouse_report$audits$`total-blocking-time`$description %>%
+  strwrap(width = 55)
 ```
 
 
 ```{r 14-when-optimize-21 }
 lighthouse_report$audits$`total-blocking-time` %>%
-  as.data.frame() %>%
-  dplyr::select(title, score, displayValue) %>%
-  knitr::kable()
+  tibble::as_tibble()  %>%
+  dplyr::select(title, score, displayValue)
+  
 ```
 
 ##### "Time to first Byte" {-}
 
-```{r 14-when-optimize-22 }
+```{r 14-when-optimize-22, eval = FALSE}
 lighthouse_report$audits$`time-to-first-byte`$description 
+```
+
+```{r echo = FALSE}
+lighthouse_report$audits$`time-to-first-byte`$description %>%
+  strwrap(width = 55)
 ```
 
 ```{r 14-when-optimize-23 }
 lighthouse_report$audits$`time-to-first-byte` %>%
   .[c("title", "score", "displayValue")] %>%
-  as.data.frame() %>%
-  knitr::kable()
+  tibble::as_tibble() 
 ```
 
 Google Lighthouse also comes with a continuous integration tool, so that you can use it as a regression testing tool for your application. 
@@ -566,7 +593,9 @@ RUN apt-get install -y nodejs
 
 RUN Rscript -e 'remotes::install_github("colinfay/minifyr")'
 RUN Rscript -e 'remotes::install_cran("cicerone")'
-RUN Rscript -e 'library(minifyr);minifyr_npm_install(TRUE);minify_package_js("cicerone", minifyr_js_uglify)'
+RUN Rscript -e 'library(minifyr); \
+  minifyr_npm_install(TRUE); \
+  minify_package_js("cicerone", minifyr_js_uglify)'
 ```
 
 ### More resources about web page performance

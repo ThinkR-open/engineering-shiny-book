@@ -171,7 +171,7 @@ And to do the tests in a `puppeteer` spirit, you can refer to the `{crrry}` pack
 
 Here is an example:
 
-```{r 11-step-by-step-secure-3, eval = TRUE}
+```{r 11-step-by-step-secure-3, eval = FALSE}
 # Creating a new test instance
 test <- crrry::CrrryOnPage$new(
   # Using the `find_chrome()` function to guess where the 
@@ -189,6 +189,24 @@ test <- crrry::CrrryOnPage$new(
 # We'll wait for the application to be ready to accept inputs
 test$wait_for_shiny_ready()
 ```
+
+```{r include = FALSE}
+# Creating a new test instance
+test <- crrry::CrrryOnPage$new(
+  # Using the `find_chrome()` function to guess where the 
+  # Chrome bin is on our machine
+  chrome_bin = pagedown::find_chrome(),
+  # Launching Chrome on a random available port on our machine
+  # Note that you will need httpuv >= 1.5.2 if you want to use 
+  # this function
+  chrome_port = httpuv::randomPort(), 
+  # Specifying the page we want to connect to
+  url = "https://connect.thinkr.fr/hexmake/",
+  # Do everything on the terminal, with no window open
+  headless = TRUE
+)
+```
+
 
 ```
 Running \
@@ -220,19 +238,19 @@ for (i in letters[1:5]){
 ```
 
 ```
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value a --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package--
 Shiny is computing
 ✓ Shiny is still running
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value b --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value c --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value d --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value e --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
 ```
@@ -521,9 +539,11 @@ system(
 Let's say now we want the stats for the hexmake container:
 
 ```{r 11-step-by-step-secure-27, eval = TRUE, cache=TRUE}
+# Waiting for the container to be ready 
+Sys.sleep(30)
 # Showing the docker stats for hexmake
 dockerstats("hexmake") %>% 
-  glimpse()
+  tibble::as_tibble()
 ```
 
 Of course, right now nobody is using the app, so the usage can be pretty small. 
@@ -616,7 +636,26 @@ test$wait_for_shiny_ready()
 ```
 
 
-```{r 11-step-by-step-secure-35, eval = TRUE}
+```{r 11-step-by-step-secure-35, eval = TRUE, echo = FALSE}
+# See previous version of this code for a commented explanation 
+test <- crrry::CrrryOnPage$new(
+  chrome_bin = pagedown::find_chrome(),
+  chrome_port = httpuv::randomPort(),
+  url ="http://localhost:2708",
+  headless = TRUE
+)
+test$wait_for_shiny_ready()
+```
+
+```
+Running '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' 
+  --no-first-run --headless \
+  '--user-data-dir=/Users/colin/Library/Application     
+  Support/r-crrri/chrome-data-dir-thyhpptv' \
+  '--remote-debugging-port=48938'
+```
+
+```{r eval = FALSE, echo = TRUE}
 # See previous version of this code for a commented explanation 
 test <- crrry::CrrryOnPage$new(
   chrome_bin = pagedown::find_chrome(),
@@ -667,8 +706,9 @@ for (i in letters[1:10]){
     "main_ui_1-left_ui_1-pkg_name_ui_1-package", 
     i
   )
-  # Once the input is set, we call dockerstats() for this container
-  # and bind the results to the previously created data.frame
+  # Once the input is set, we call dockerstats() 
+  # for this container and bind the results to 
+  # the previously created data.frame
   results <- rbind(
     results, 
     dockerstats::dockerstats("xmk2", extra = i)
@@ -677,34 +717,34 @@ for (i in letters[1:10]){
 ```
 
 ```
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value a --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value b --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value c --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value d --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value e --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value f --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value g --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value h --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value i --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
--- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value j --
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
 ```
@@ -1003,14 +1043,18 @@ In the subsequent `RUN` calls, `{golem}` chooses to call `remotes::install_versi
 
 ```
 RUN Rscript -e \
-'remotes::install_version("config",upgrade="never", version = "0.3")'
+'remotes::install_version("xfun",upgrade="never",version="0.19")'
 
 ```
 
 As you can see, it matches the local version: 
 
-```{r 11-step-by-step-secure-49, comment=""}
-packageVersion("config")
+```{r 11-step-by-step-secure-49, comment="", eval = FALSE}
+packageVersion("xfun")
+```
+
+```
+[1] ‘0.19’
 ```
 
 3. `ADD`
@@ -1037,9 +1081,9 @@ readLines("data-raw/Dockerfile")[16] %>%
 This final command is the one that is launched when you run a container. 
 With a `{shiny}` app, this command is the one that launches the application.  
 
-```{r 11-step-by-step-secure-52, echo = FALSE, comment=""}
-readLines("data-raw/Dockerfile")[17] %>% 
-  glue::as_glue()
+```
+CMD R -e \
+ "options('shiny.port'=80,shiny.host='0.0.0.0');golex::run_app()"
 ```
 
 #### C. `{dockerfiler}` {-}

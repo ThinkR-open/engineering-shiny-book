@@ -154,11 +154,11 @@ For example:
 
 ``` javascript
 // Given
-<div id = "first_input" name="number" class = "widediv">Wesh</div>
+<div id = "first" name="number" class = "widediv">Hey</div>
 
 // Query with the ID
-document.querySelector("#first_input")
-document.getElementById("first_input")
+document.querySelector("#first")
+document.getElementById("first")
 
 // With the class
 document.querySelectorAll(".widediv")
@@ -341,7 +341,7 @@ All these events can be used to trigger a JavaScript function.
 
 Here are some examples of adding JavaScript functions to DOM events:
 
-+`onclick`
++ `onclick`
 
 The `onclick` attribute can be added straight inside the HTML tag when possible:
 
@@ -356,7 +356,7 @@ tags$button(
 )
 ```
 
-Or with `shiny::tagAppendAttributes`:
+Or with `shiny::tagAppendAttributes()`:
 
 ```{r 17-javascript-6, eval = FALSE}
 # Using tagAppendAttributes() allows to add attributes to the 
@@ -510,8 +510,8 @@ For example:
 // We define an handler called "computed", that can be called 
 // from the server side of the {shiny} application
 Shiny.addCustomMessageHandler('computed', function(mess) {
-  // The received value (in mess) is serialized in JSON, so we can 
-  // access the list element with object.name
+  // The received value (in mess) is serialized in JSON, 
+  // so we can  access the list element with object.name
   alert("Computed " + mess.what + " in " + mess.sec + " secs");
 })
 ```
@@ -624,7 +624,8 @@ In other words, you will need to write something like:
 
 ```{js 17-javascript-20, eval = FALSE, echo = TRUE}
 $( document ).ready(function() {
-  // Setting a custom handler that will ask the users their name
+  // Setting a custom handler that will
+  // ask the users their name
   // then set the returned value to a Shiny input
   Shiny.addCustomMessageHandler('whoareyou', function(arg) {
     var name = prompt("Who are you?")
@@ -645,12 +646,14 @@ mod_my_first_module_ui <- function(id){
 
 mod_my_first_module_server <- function(input, output, session){
   ns <- session$ns
-  # Whenever the button is clicked, we call the CustomMessageHandler
+  # Whenever the button is clicked, 
+  # we call the CustomMessageHandler
   observeEvent( input$showname , {
     # Calling the "whoareyou" handler
     golem::invoke_js(
       "whoareyou", 
-      # The id is namespaced, so that we get it back on the server-side
+      # The id is namespaced, 
+      # so that we get it back on the server-side
       list(
         id = ns("name")
       )
@@ -693,21 +696,21 @@ Here is the general skeleton that would work when the API does not need authenti
 ``` javascript
 // FUNCTION definition
 const get_rand_beer = () => {
-    // FETCHING THE API DATA
-    fetch("https://api.punkapi.com/v2/beers/random")
-      // DEFINE WHAT HAPPENS WHEN JAVASCRIPT RECEIVES THE DATA
-      .then((data) =>{
-        // TURN THE DATA TO JSON
-        data.json().then((res) => {
-          // SEND THE JSON TO R
-          Shiny.setInputValue("beer", res, {priority: 'event'})
-        })
-      })
-      // DEFINE WHAT HAPPENS WHEN THERE IS AN ERROR FETCHING THE API
-      .catch((error) => {
-        alert("Error catching result from API")
-      })
-  };
+  // Fetching the data
+  fetch("https://api.punkapi.com/v2/beers/random")
+  // What do we do when we receive the data
+  .then((data) =>{
+  // TTurn the data to JSON
+    data.json().then((res) => {
+    // Send the json to R
+      Shiny.setInputValue("beer", res, {priority: 'event'})
+    })
+  })
+  // Define what happens if we fail to fetch
+  .catch((error) => {
+      alert("Error catching result from API")
+  })
+};
 ```
 
 + Observe the event in your server:
