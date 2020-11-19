@@ -190,6 +190,15 @@ test <- crrry::CrrryOnPage$new(
 test$wait_for_shiny_ready()
 ```
 
+```
+Running \
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
+  --no-first-run --headless \
+  '--user-data-dir=/Users/colin/Library/Application Support/
+    r-crrri/chrome-data-dir-dhutmfux' \
+  '--remote-debugging-port=40698'
+```
+
 You can then call one of the `test` object methods: 
 
 + `call_js()`, that allows you to run JavaScript code
@@ -199,7 +208,7 @@ You can then call one of the `test` object methods:
 
 Of course, the interesting part is doing "bulk testing" of your application, for example by setting a series of values to an input:
 
-```{r 11-step-by-step-secure-4, eval = TRUE}
+```{r 11-step-by-step-secure-4, eval = FALSE}
 for (i in letters[1:5]){
   # We'll be setting a series of letters, one by one
   # for the package name input
@@ -208,6 +217,24 @@ for (i in letters[1:5]){
     i
   )
 }
+```
+
+```
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value a --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value b --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value c --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value d --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value e --
+Shiny is computing
+✓ Shiny is still running
 ```
 
 And once your test is done, do not forget to close the connection!
@@ -383,7 +410,7 @@ shinyload_runs <- load_runs(
 We now have a data.frame that looks like this:
 
 ```{r 11-step-by-step-secure-19 }
-dplyr::glimpse(shinyload_runs)
+dplyr::glimpse(head(shinyload_runs))
 ```
 
 Then, `{shinyloadtest}` comes with a series of plotting functions that can be used to analyze your recording. 
@@ -473,13 +500,17 @@ Sys.sleep(5)
 ```
 
 ```{r 11-step-by-step-secure-26, eval = FALSE}
-# We are launching the docker container using R system() command. 
-# Here, we are running the container image called colinfay/hexmake. 
-# We are naming the container hexmake using the --name flag, 
-# --rm means the container will be removed when stopped, and 
-# finally the -p flag defines how to bind the ports of the container
-# with the ports of the host (left is the host, right is the container): 
-# in other word, here, we bind port 80 of our container to the port 2811
+# We are launching the docker container 
+# using R system() command. Here, we are 
+# running the container image called 
+# colinfay/hexmake. We are naming the 
+# container hexmake using the --name flag, 
+# --rm means the container will be removed 
+# when stopped, and finally the -p flag defines 
+# how to bind the ports of the container
+# with the ports of the host (left is the host,
+#  right is the container): in other word, here, 
+#  we bind port 80 of our container to the port 2811
 # of our machine.
 system(
   "docker run --name hexmake --rm -p 2811:80 colinfay/hexmake", 
@@ -491,7 +522,8 @@ Let's say now we want the stats for the hexmake container:
 
 ```{r 11-step-by-step-secure-27, eval = TRUE, cache=TRUE}
 # Showing the docker stats for hexmake
-dockerstats("hexmake")
+dockerstats("hexmake") %>% 
+  glimpse()
 ```
 
 Of course, right now nobody is using the app, so the usage can be pretty small. 
@@ -547,7 +579,7 @@ docker_stats <- read_appended_csv(
 ```
 
 ```{r 11-step-by-step-secure-32 }
-dplyr::glimpse(docker_stats)
+dplyr::glimpse(head(docker_stats))
 ```
 
 ```{r 11-step-by-step-secure-33, include=FALSE, eval = TRUE, cache=TRUE}
@@ -561,7 +593,8 @@ Let's record the computation of the `hexmake` container containing the same app 
 First, launch the container:
 
 ```{r 11-step-by-step-secure-34 }
-# Launching the container a second time, but name it xmk2 and serve it on port 2708
+# Launching the container a second time, 
+# but name it xmk2 and serve it on port 2708
 system(
   "docker run -p 2708:80 --rm --name xmk2 -d colinfay/hexmake", 
   wait = FALSE
@@ -572,7 +605,18 @@ Sys.sleep(60) # Let the container launch
 
 Then, a `{crrry}` job:
 
-```{r 11-step-by-step-secure-35, eval = TRUE, cache=TRUE}
+```{r 11-step-by-step-secure-1-bis, include = FALSE}
+test <- crrry::CrrryOnPage$new(
+  chrome_bin = pagedown::find_chrome(),
+  chrome_port = httpuv::randomPort(),
+  url ="http://localhost:2708",
+  headless = TRUE
+)
+test$wait_for_shiny_ready()
+```
+
+
+```{r 11-step-by-step-secure-35, eval = TRUE}
 # See previous version of this code for a commented explanation 
 test <- crrry::CrrryOnPage$new(
   chrome_bin = pagedown::find_chrome(),
@@ -581,7 +625,12 @@ test <- crrry::CrrryOnPage$new(
   headless = TRUE
 )
 test$wait_for_shiny_ready()
+```
 
+
+
+
+```{r 11-step-by-step-secure-2-bis, eval = TRUE, include=FALSE}
 # We are creating a first data.frame that records the launch 
 # of the container.
 results <- dockerstats::dockerstats("xmk2", extra = "launch")
@@ -600,6 +649,67 @@ for (i in letters[1:10]){
   )
 }
 
+# Stopping the docker container
+system("docker kill xmk2")
+
+# Stopping the tests
+test$stop()
+```
+
+```{r 11-step-by-step-secure-3-bis, eval = FALSE}
+# We are creating a first data.frame that records the launch 
+# of the container.
+results <- dockerstats::dockerstats("xmk2", extra = "launch")
+
+for (i in letters[1:10]){
+  # We will be setting a letter for the package name input
+  test$shiny_set_input(
+    "main_ui_1-left_ui_1-pkg_name_ui_1-package", 
+    i
+  )
+  # Once the input is set, we call dockerstats() for this container
+  # and bind the results to the previously created data.frame
+  results <- rbind(
+    results, 
+    dockerstats::dockerstats("xmk2", extra = i)
+  )
+}
+```
+
+```
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value a --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value b --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value c --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value d --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value e --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value f --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value g --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value h --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value i --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package with value j --
+Shiny is computing
+✓ Shiny is still running
+```
+
+```{r 11-step-by-step-secure-4-bis, eval = TRUE, cache=TRUE}
 # Stopping the docker container
 system("docker kill xmk2")
 

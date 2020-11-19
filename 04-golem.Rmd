@@ -40,18 +40,7 @@ install.packages("golem")
 remotes::install_github("Thinkr-open/golem")
 ```
 
-The version of the package on CRAN at the time of writing this book is: 
-
-```{r 04-golem-4 }
-library(dplyr, warn.conflicts = FALSE)
-# Downloading the CRAN database
-tools::CRAN_package_db() %>%
-  # Getting golem and extracting the version number
-  filter(Package == "golem") %>% 
-  select(Version)
-```
-
-And the one we use for the book is:
+The version of the package used while writing this book is: 
 
 ```{r 04-golem-5}
 packageVersion("golem")
@@ -138,9 +127,41 @@ Note also that this folder must not contain any sub-folders.
 
 #### app_config.R {-}
 
-```{r 04-golem-9, echo = FALSE}
-readLines("golex/R/app_config.R") %>%
-  glue::as_glue()
+```r
+#' Access files in the current app
+#'
+#' @param ... Character vector specifying directory and or file 
+#'        to point to inside the current package.
+#'
+#' @noRd
+app_sys <- function(...) {
+  system.file(..., package = "golex")
+}
+
+
+#' Read App Config
+#'
+#' @param value Value to retrieve from the config file.
+#' @param config R_CONFIG_ACTIVE value.
+#' @param use_parent Logical, scan the parent directory 
+#'    for config file.
+#'
+#' @importFrom config get
+#'
+#' @noRd
+get_golem_config <- function(
+  value,
+  config = Sys.getenv("R_CONFIG_ACTIVE", "default"),
+  use_parent = TRUE
+) {
+  config::get(
+    value = value,
+    config = config,
+    # Modify this if your config file is somewhere else:
+    file = app_sys("golem-config.yml"),
+    use_parent = use_parent
+  )
+}
 ```
 
 The `app_config.R` file contains internal mechanic for golem, notably for referring to values in the `inst/` folder, and to get values from the config file in the `inst/` folder. 
@@ -149,9 +170,18 @@ To make this process easier, you can use the `golem::set_golem_name()`, that wil
 
 #### app_server.R {-}
 
-```{r 04-golem-10, echo = FALSE}
-readLines("golex/R/app_server.R") %>%
-  glue::as_glue()
+```r
+#' The application server-side
+#'
+#' @param input,output,session Internal parameters for
+#'  {shiny}.
+#' DO NOT REMOVE.
+#' @import shiny
+#' @noRd
+app_server <- function( input, output, session ) {
+  # List the first level callModules here
+
+}
 ```
 
 The `app_server.R` file contains the function for the server logic. 
@@ -164,9 +194,23 @@ You will also find global elements from your server-logic: top-level `reactiveVa
 
 #### app_ui.R {-}
 
-```{r 04-golem-11, echo = FALSE}
-readLines("golex/R/app_ui.R")[1:17] %>%
-  glue::as_glue()
+```r
+#' The application User-Interface
+#'
+#' @param request Internal parameter for `{shiny}`.
+#' DO NOT REMOVE.
+#' @import shiny
+#' @noRd
+app_ui <- function(request) {
+  tagList(
+    # Leave this function for adding external resources
+    golem_add_external_resources(),
+    # List the first level UI elements here
+    fluidPage(
+      h1("golex")
+    )
+  )
+}
 ```
 
 This piece of the `app_ui.R` is designed to receive the counterpart of what you put in your server.
@@ -180,9 +224,33 @@ For an example of an application built using an `htmlTemplate`, please visit [en
 
 If you're tempted to do that, be aware that `fluidPage()` come with a series of CSS/JS elements, and if you plan on not using a default `{shiny}` `*Page()` function, you will need to add your own CSS. 
 
-```{r 04-golem-12, echo = FALSE}
-readLines("golex/R/app_ui.R")[18:42] %>%
-  glue::as_glue()
+```r
+#' Add external Resources to the Application
+#'
+#' This function is internally used to add external
+#' resources inside the Shiny application.
+#'
+#' @import shiny
+#' @importFrom golem add_resource_path activate_js 
+#'    favicon bundle_resources
+#' @noRd
+golem_add_external_resources <- function() {
+  add_resource_path(
+    "www",
+    app_sys("app/www")
+  )
+
+  tags$head(
+    favicon(),
+    bundle_resources(
+      path = app_sys("app/www"),
+      app_title = "golex"
+    )
+    # Add here other external resources
+    # for example, you can add 
+    # shinyalert::useShinyalert()
+  )
+}
 ```
 
 The second part of this file contains the `golem_add_external_resources()` function, which is used to add, well, external resources. 
@@ -204,9 +272,25 @@ Note that as all these elements are inside a `tags$head()`, they are to be treat
 
 #### run_app.R {-}
 
-```{r 04-golem-13, echo = FALSE}
-readLines("golex/R/run_app.R") %>%
-  glue::as_glue()
+```r
+#' Run the Shiny Application
+#'
+#' @param ... A series of options to be used 
+#'    inside the app.
+#'
+#' @export
+#' @importFrom shiny shinyApp
+#' @importFrom golem with_golem_options
+run_app <- function(
+  ...) {
+  with_golem_options(
+    app = shinyApp(
+      ui = app_ui,
+      server = app_server
+    ),
+    golem_opts = list(...)
+  )
+}
 ```
 
 The `run_app()` function is the one that you will use to launch the app
@@ -232,9 +316,44 @@ Here are some examples of what you can pass to your shiny application using this
 
 Inside the `R/` folder is the `app_config.R` file.
 
-```{r 04-golem-14, echo = FALSE}
-readLines("golex/R/app_config.R") %>%
-  glue::as_glue()
+```r
+#' Access files in the current app
+#'
+#' @param ... Character vector specifying 
+#'        directory and or file to
+#'        point to inside the current package.
+#'
+#' @noRd
+app_sys <- function(...) {
+  system.file(..., package = "golex")
+}
+
+
+#' Read App Config
+#'
+#' @param value Value to retrieve from the 
+#'    config file.
+#' @param config R_CONFIG_ACTIVE value.
+#' @param use_parent Logical, scan the parent 
+#'    directory for config file.
+#'
+#' @importFrom config get
+#'
+#' @noRd
+get_golem_config <- function(
+  value,
+  config = Sys.getenv("R_CONFIG_ACTIVE", "default"),
+  use_parent = TRUE
+) {
+  config::get(
+    value = value,
+    config = config,
+    # Modify this if your config file is
+    # somewhere else:
+    file = app_sys("golem-config.yml"),
+    use_parent = use_parent
+  )
+}
 ```
 
 This file is designed to handle two things:
@@ -249,11 +368,12 @@ For example, `app_sys("x.txt")` points to `inst/x.txt` file inside your package.
 Here is what the default config file looks like:
 
 ```{r 04-golem-15, echo = FALSE, comment= ""}
-glue::as_glue(
-  readLines(
+readLines(
     "golex/inst/golem-config.yml"
-  )
-)
+  )  %>%
+  #strwrap(width = 55) %>%
+  #grkstyle::grk_style_text() %>%
+  glue::as_glue() 
 ```
 
 It is based on the `{config}` [@R-config] format, and allows you to define contexts, with values associated with these specific contexts. 
