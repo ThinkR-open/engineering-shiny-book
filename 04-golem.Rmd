@@ -1,32 +1,33 @@
 # Introduction to `{golem}` {#golem}
 
+```{=html}
 <style>
 img.left {
   float: left;
   margin-right: 1em;
 }
 </style>
-
-<img src="img/thinkr-hex-golem2.png" class = "left" width = "20%">
+```
+<img src="img/thinkr-hex-golem2.png" class="left" width="20%"/>
 
 ```{r 04-golem-1, include = FALSE}
 knitr::opts_chunk$set(comment = "")
 ```
 
-The `{golem}` [@R-golem] package is a framework for building production-grade `{shiny}` Application. 
+The `{golem}` [@R-golem] package is a framework for building production-grade `{shiny}` Application.
 Lot of the patterns and methodologies described in this book are linked to `{golem}` and packages from the [golemverse](http://golemverse.org/).
 Of course, all the advice developed in this book will still be valid even if you do not plan to use `{golem}`.
 
-We have quickly introduced `{golem}` in the last chapter, and we will come back to this package many times in the following chapters. 
-Let's start with an introduction to this package. 
+We have quickly introduced `{golem}` in the last chapter, and we will come back to this package many times in the following chapters.
+Let's start with an introduction to this package.
 Note that the version used at the time of writing this book is `r packageVersion("golem")`.
 
 ## What is `{golem}`?
 
-_Note: the current version of `{golem}` used when writing this book is `r packageVersion("golem")`, and some of the features presented in this book might not be available if you are using an older version, or be a little bit different if you have a newer version. Feel free to browse the package NEWS._ 
+*Note: the current version of `{golem}` used when writing this book is `r packageVersion("golem")`, and some of the features presented in this book might not be available if you are using an older version, or be a little bit different if you have a newer version. Feel free to browse the package NEWS.*
 
-`{golem}` is a toolkit for simplifying the creation, development and deployment of a `{shiny}` application. 
-It's focused on building applications that will be sent to production, but of course starting with `{golem}` from the very beginning is also possible, even recommended: it is easier to start with `{golem}` than to refactor your codebase to fit into the framework.
+`{golem}` is a **toolkit for simplifying the creation, development and deployment of a `{shiny}` application**.
+It focuses on building applications that will be sent to production, but of course starting with `{golem}` from the very beginning is also possible, even recommended: it is easier to start with `{golem}` than to refactor your codebase to fit into the framework.
 
 The stable release can be found on CRAN and installed with:
 
@@ -40,94 +41,94 @@ install.packages("golem")
 remotes::install_github("Thinkr-open/golem")
 ```
 
-The version of the package used while writing this book is: 
+The version of the package used while writing this book is:
 
 ```{r 04-golem-5}
 packageVersion("golem")
 ```
 
-
-The motivation behind `{golem}` is that building a Proof of Concept application is easy, but things change when the application becomes larger and more complex, and especially when you need to send that app to production. 
+The motivation behind `{golem}` is that building a Proof of Concept application is easy, but **things change when the application becomes larger and more complex, and especially when you need to send that app to production**.
 Until recently there has not been any real framework for building and deploying production-grade `{shiny}` Apps.
-This is where `{golem}` comes into play: offering `{shiny}` developers a toolkit for making a stable, easy-to-maintain, and robust production web application with R. 
-`{golem}` has been developed to abstract away the most common engineering tasks (for example, module creation, addition and linking of external CSS or JavaScript file, etc.), so you can focus on what matters: building the application. 
+This is where `{golem}` comes into play: **offering `{shiny}` developers a toolkit for making a stable, easy-to-maintain, and robust production web application with R**.
+`{golem}` has been developed to abstract away the most common engineering tasks (for example, module creation, addition and linking of external CSS or JavaScript file, etc.), so you can focus on what matters: building the application.
 Once your application is ready to be deployed, `{golem}` guides you through testing and brings tools for deploying to common platforms.
 
-Some things to keep in mind before using `{golem}`: 
+Some things to keep in mind before using `{golem}`:
 
-- A `{golem}` application is contained inside a package. 
-Knowing how to build a package is heavily recommended.
-The good news is also that everything you know about package development can be applied to `{golem}`.
+-   A `{golem}` application is contained inside a package.
+    Knowing how to build a package is heavily recommended.
+    The good news is also that everything you know about package development can be applied to `{golem}`.
 
-- A `{golem}` app works better if you are working with `shiny modules`. 
-Knowing how modules work is also recommended but not necessary. 
+-   A `{golem}` app works better if you are working with `shiny modules`.
+    Knowing how modules work is also recommended but not necessary.
 
 ## Understanding `{golem}` app structure
 
-A `{golem}` application is an R package. Having an R package architecture is perfectly suited for production-ready programs, as we developed in the previous chapter.
+**A `{golem}` application is an R package**.
+Having an R package architecture is perfectly suited for production-ready programs, as we developed in the previous chapter.
 
-Let's focus on the architecture of the default `{golem}` app, and present what part each file plays and how you can use (or not use) each of them. 
+Let's focus on the architecture of the default `{golem}` app, and present what part each file plays and how you can use (or not use) each of them.
 
 ```{r 04-golem-6, include=FALSE}
 library(magrittr)
 ```
 
-You can create a `{golem}` project, here called `golex`, with RStudio "New project" creation or with command line. 
+You can create a `{golem}` project, here called `golex`, with RStudio "New project" creation or with command line.
 
 ```{r 04-golem-7, eval=FALSE}
 golem::create_golem("golex")
 ```
 
-The project will start with this specific architecture: 
+The project will start with this specific architecture:
 
 ```{r 04-golem-8 }
 # Listing the files from the `golex` project using {fs}
 fs::dir_tree("golex")
 ```
 
-If you are familiar with building R packages, this structure will look familiar to you. 
+If you are familiar with building R packages, this structure will look familiar to you.
 And for a good reason: a `{golem}` app IS a package.
 
 ### `DESCRIPTION` & `NAMESPACE`
 
-The `DESCRIPTION` and `NAMESPACE` are standard package files (_i.e._ they are not `{golem}`-specific). 
+The `DESCRIPTION` and `NAMESPACE` are **standard package files** (*i.e.* they are not `{golem}`-specific).
 In `DESCRIPTION`, you will add a series of metadata about your package, for example who wrote the package, what is the package version, what is its goal, who to complain to if things go wrong, and also information about external dependencies, the license, the encoding and so forth.
 
-This `DESCRIPTION` file will be filled automatically by the first function you will run in `dev/01_start.R`, and by other functions from the `dev/` scripts. 
+This `DESCRIPTION` file will be filled automatically by the first function you will run in `dev/01_start.R`, and by other functions from the `dev/` scripts.
 In other words, most of the time you will not interact with it directly, but through wrappers from `{golem}` and `{usethis}` [@R-usethis] which are listed in the `dev` scripts.
 
 The `NAMESPACE` file is the file you will NEVER edit by hand!
-It defines how to interact with the rest of the package: what functions to import and from which package and what functions to export, _i.e._ what functions are available to the user when you do `library(golex)`. 
+**It defines how to interact with the rest of the package**: what functions to import and from which package and what functions to export, *i.e.* what functions are available to the user when you do `library(golex)`.
 This file will be built when running the documenting process in your R package, i.e when doing `devtools::document()`, or more specifically in our case `golem::document_and_reload()`.
-This process will build the `man/` files and fill the `NAMESPACE`, by scanning the `{roxygen}` tags in your `.R` files. 
+This process will build the `man/` files and fill the `NAMESPACE`, by scanning the `{roxygen}` tags in your `.R` files.
 
 If you want to learn more about these, here are some resources you can refer to:
 
-+ [Writing R Extensions - The DESCRIPTION file](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#The-DESCRIPTION-file)
-+ [Writing R Extensions - Package namespaces](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-namespaces)
-+ [R Packages - Package metadata](https://r-pkgs.org/description.html#)
-+ [R Packages - Namespace](https://r-pkgs.org/namespace.html)
-+ [Building a package that lasts — eRum 2018 workshop](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop)
+-   [Writing R Extensions - The DESCRIPTION file](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#The-DESCRIPTION-file)
+-   [Writing R Extensions - Package namespaces](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Package-namespaces)
+-   [R Packages - Package metadata](https://r-pkgs.org/description.html#)
+-   [R Packages - Namespace](https://r-pkgs.org/namespace.html)
+-   [Building a package that lasts --- eRum 2018 workshop](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop)
 
 ### R/
 
-The `R/` folder is the standard folder where you will store all your app functions. 
+The `R/` folder is **the standard folder where you will store all your app functions**.
 When you start your project with `{golem}`, this folder is pre-populated with three `.R` files: `app_config.R`, `app_server.R`, `app_ui.R` and `run_app.R`.
 
-During the process of building your application, all the core functionalities  of your app will be stored in this `R/` directory, which is the standard way to store functions when using the R package framework.
+During the process of building your application, all the core functionalities of your app will be stored in this `R/` directory, which is the standard way to store functions when using the R package framework.
 Note that these files are the "core" features of your application itself, and that other .R files also exists.
-For example, when you will need to deploy your application on RStudio platforms, `{golem}` will create an `app.R` at the root of your directory
-^[`{golem}` will automatically add this file to the `.Rbuildignore` file, _i.e_ make it be ignored by the package build process.]
-. 
+For example, when you will need to deploy your application on RStudio platforms, `{golem}` will create an `app.R` at the root of your directory [^golem-1] .
 The `dev/` folder also contains `.R` scripts, and they are inside this folder as they should not live inside the `R/` folder: they are utilitarian files used during development, not core functionalities of your application.
 
-Inside these `.R` files, contained inside the `R/` folder, you will find the content of your modules (the one added with `golem::add_modules()`) and the utilitarian / business logic functions, built with `golem::add_utils()` and `golem::add_fct()`. 
+[^golem-1]: `{golem}` will automatically add this file to the `.Rbuildignore` file, *i.e* make it be ignored by the package build process.
 
-Note also that this folder must not contain any sub-folders. 
+Inside these `.R` files, contained inside the `R/` folder, you will find the content of your modules (the one added with `golem::add_modules()`) and the utilitarian / business logic functions, built with `golem::add_utils()` and `golem::add_fct()`.
 
-#### app_config.R {-}
+Note also that this folder must not contain any sub-folders.
 
-```r
+#### app\_config.R {.unnumbered}
+
+``` {.r}
 #' Access files in the current app
 #'
 #' @param ... Character vector specifying directory and or file 
@@ -164,13 +165,13 @@ get_golem_config <- function(
 }
 ```
 
-The `app_config.R` file contains internal mechanic for golem, notably for referring to values in the `inst/` folder, and to get values from the config file in the `inst/` folder. 
-Keep in mind that if ever you need to change the name of your application, you will need to change it inside the `DESCRIPTION`, but also inside the `app_sys()` function. 
+The `app_config.R` file contains internal mechanic for `{golem}`, notably for referring to values in the `inst/` folder, and to get values from the config file in the `inst/` folder.
+Keep in mind that if ever you need to change the name of your application, you will need to change it inside the `DESCRIPTION`, but also inside the `app_sys()` function.
 To make this process easier, you can use the `golem::set_golem_name()`, that will perform both these actions, plus setting the name inside the config file.
 
-#### app_server.R {-}
+#### app\_server.R {.unnumbered}
 
-```r
+``` {.r}
 #' The application server-side
 #'
 #' @param input,output,session Internal parameters for
@@ -184,17 +185,17 @@ app_server <- function( input, output, session ) {
 }
 ```
 
-The `app_server.R` file contains the function for the server logic. 
-If you are familiar with the classic 'ui.R / server.R' approach, this function can be seen as a replacement for the content of the function you have in your `server.R`. 
+The `app_server.R` file **contains the function for the server logic**.
+If you are familiar with the classic 'ui.R / server.R' approach, this function can be seen as a replacement for the content of the function you have in your `server.R`.
 
-Building a complex `{shiny}` application commonly implies using `{shiny}` modules. 
+Building a complex `{shiny}` application commonly implies using `{shiny}` modules.
 If so, you will be adding there a series of `callModule()`, the ones you will get on the very bottom of the file created with `golem::add_module()`.
 
 You will also find global elements from your server-logic: top-level `reactiveValues()`, connections to databases, setting options and so forth.
 
-#### app_ui.R {-}
+#### app\_ui.R {.unnumbered}
 
-```r
+``` {.r}
 #' The application User-Interface
 #'
 #' @param request Internal parameter for `{shiny}`.
@@ -213,18 +214,18 @@ app_ui <- function(request) {
 }
 ```
 
-This piece of the `app_ui.R` is designed to receive the counterpart of what you put in your server.
-Everything here is to be put after the <code>`r readLines("golex/R/app_ui.R")[11]`</code> line. 
+This piece of the `app_ui.R` is designed to **receive the counterpart of what you put in your server**.
+Everything here is to be put after the `r readLines("golex/R/app_ui.R")[11]` line.
 Just as with their server counterparts, the UI side of these elements are the one from the bottom of the file you are creating with `golem::add_module()`.
 
-By default, `{golem}` uses a `fluidPage()`, which is `{shiny}` [@R-shiny] most commonly used template. 
-If ever you want to use `navBarPage()`, this is where you will define this: replace one with the other, and you will be good to go. 
-You can also define any other template page, for example with an `htmlTemplate()`. 
-For an example of an application built using an `htmlTemplate`, please visit [engineering-shiny.org/graysacle/](https://engineering-shiny.org/graysacle/), or [engineering-shiny.org/golemhtmltemplate/](https://engineering-shiny.org/golemhtmltemplate/): both these applications are built on top of an external html template. 
+By default, `{golem}` uses a `fluidPage()`, which is `{shiny}` [@R-shiny] most commonly used template.
+If ever you want to use `navBarPage()`, this is where you will define this: replace one with the other, and you will be good to go.
+You can also define any other template page, for example with an `htmlTemplate()`.
+For an example of an application built using an `htmlTemplate`, please visit [engineering-shiny.org/graysacle/](https://engineering-shiny.org/graysacle/), or [engineering-shiny.org/golemhtmltemplate/](https://engineering-shiny.org/golemhtmltemplate/): both these applications are built on top of an external html template.
 
-If you're tempted to do that, be aware that `fluidPage()` come with a series of CSS/JS elements, and if you plan on not using a default `{shiny}` `*Page()` function, you will need to add your own CSS. 
+If you're tempted to do that, be aware that `fluidPage()` come with a series of CSS/JS elements, and if you plan on not using a default `{shiny}` `*Page()` function, you will need to add your own CSS.
 
-```r
+``` {.r}
 #' Add external Resources to the Application
 #'
 #' This function is internally used to add external
@@ -253,70 +254,76 @@ golem_add_external_resources <- function() {
 }
 ```
 
-The second part of this file contains the `golem_add_external_resources()` function, which is used to add, well, external resources. 
+The second part of this file contains the `golem_add_external_resources()` function, which is used to add, well, external resources.
 You may have noticed that this function is to be found above in the file, in the `app_ui()` function.
-This function is used for linking to external files inside your applications: notably the files you will create with `golem::add_css_file()` and friends. 
+This function is used for **linking to external files inside your applications**: notably the files you will create with `golem::add_css_file()` and friends.
 
-In `golem_add_external_resources()`, you can also define a custom `resourcesPath`. 
-The first line (the one with `add_resource_path()`) is the one allowing the `inst/app/www` folder to be mounted and be available at `www` with your app when you launch it. 
+In `golem_add_external_resources()`, you can also define a custom `resourcesPath`.
+The first line (the one with `add_resource_path()`) is the one allowing the `inst/app/www` folder to be mounted and be available at `www` with your app when you launch it.
 That link makes it possible for `{golem}` to bundle the CSS and JavaScript files automatically.
 
-The other part of this function, starting with `tags$head`, creates a `<head>` tag for your application. 
-This `<head>` tag is a pretty standard tag, which is used in HTML to define a series of metadata about your app. 
-The last part of this function, the one with `bundle_resources()`, links all the CSS and JavaScript file contained in `inst/app/www` to your application, so you don't have to link them manually. 
+The other part of this function, starting with `tags$head`, creates a `<head>` tag for your application.
+This `<head>` tag is a pretty standard tag, which is used in HTML to define a series of metadata about your app.
+**The last part of this function, the one with `bundle_resources()`, links all the CSS and JavaScript file contained in `inst/app/www` to your application, so you don't have to link them manually**.
 
-And finally, if you want to add other elements to the `<head>` of your application (for example by calling `shinyalert::useShinyalert()` or `cicerone::use_cicerone()` as in `{hexmake}`
-^[See <https://github.com/ColinFay/hexmake/blob/master/R/app_ui.R#L35> ])
-, you can add these calls after the `bundle_resources()` function. 
-Note that as all these elements are inside a `tags$head()`, they are to be treated as a list, so separated by commas. 
+And finally, if you want to add other elements to the `<head>` of your application (for example by calling `shinyalert::useShinyalert()` or `cicerone::use_cicerone()` as in `{hexmake}` [^golem-2]) , you can add these calls after the `bundle_resources()` function.
+Note that as all these elements are inside a `tags$head()`, they are to be treated as a list, so separated by commas.
 
-#### run_app.R {-}
+[^golem-2]: See <https://github.com/ColinFay/hexmake/blob/master/R/app_ui.R#L35>
 
-```r
+#### run\_app.R {.unnumbered}
+
+``` {.r}
 #' Run the Shiny Application
 #'
-#' @param ... A series of options to be used 
-#'    inside the app.
+#' @param ... arguments to pass to golem_opts
+#' @inheritParams shiny::shinyApp
 #'
 #' @export
 #' @importFrom shiny shinyApp
 #' @importFrom golem with_golem_options
 run_app <- function(
-  ...) {
+  onStart = NULL,
+  options = list(), 
+  enableBookmarking = NULL,
+  ...
+) {
   with_golem_options(
     app = shinyApp(
       ui = app_ui,
-      server = app_server
-    ),
+      server = app_server,
+      onStart = onStart,
+      options = options, 
+      enableBookmarking = enableBookmarking
+    ), 
     golem_opts = list(...)
   )
 }
 ```
 
-The `run_app()` function is the one that you will use to launch the app
-^[Very technically speaking, it is the `print()` from the object outputed by `run_app()` that launches the app, but this is another story.]
-.
+The `run_app()` function is the one that you will use to launch the app [^golem-3] .
 
-The body of this function is wrapped inside `with_golem_options()`, which allows you to pass arguments to the `run_app()` function, which can be called later on with `golem::get_golem_options()`. 
-The idea here is that you can pass arguments to this functions, and that arguments will be later used inside your application to display a specific version of the application. 
-Using this `with_golem_options()` function simplifies the parameterization of `{shiny}` applications, be it during development, when deployed on a server, or when shared as a package. 
+[^golem-3]: Very technically speaking, it is the `print()` from the object outputed by `run_app()` that launches the app, but this is another story.
+
+The body of this function is wrapped inside `with_golem_options()`, which allows you to pass arguments to the `run_app()` function, which can be called later on with `golem::get_golem_options()`.
+**The idea here is that you can pass arguments to this functions, and that arguments will be later used inside your application to display a specific version of the application**.
+Using this `with_golem_options()` function simplifies the parameterization of `{shiny}` applications, be it during development, when deployed on a server, or when shared as a package.
 
 Here are some examples of what you can pass to your shiny application using this pattern:
 
-+ `run_app(user_country = "france")` & `run_app(user_country = "germany")`, to launch the application and show the data for a specific country
+-   `run_app(user_country = "france")` & `run_app(user_country = "germany")`, to launch the application and show the data for a specific country
 
-+ `run_app(with_mongo = TRUE)`, to launch the application with or without a MongoDB back-end (example taken from `{hexmake}`)
+-   `run_app(with_mongo = TRUE)`, to launch the application with or without a MongoDB back-end (example taken from `{hexmake}`)
 
-+ `run_app(dataset = iris)`, will make the dataset available with `golem::get_golem_options("dataset")`, so your user can launch the function from their package using a dataset they have created/loaded
-
+-   `run_app(dataset = iris)`, will make the dataset available with `golem::get_golem_options("dataset")`, so your user can launch the function from their package using a dataset they have created/loaded
 
 ### `golem-config`
 
-#### app_config.R {-}
+#### app\_config.R {.unnumbered}
 
 Inside the `R/` folder is the `app_config.R` file.
 
-```r
+``` {.r}
 #' Access files in the current app
 #'
 #' @param ... Character vector specifying 
@@ -358,12 +365,12 @@ get_golem_config <- function(
 
 This file is designed to handle two things:
 
-+ `app_sys()` is a wrapper around `system.file(package = "golex")`, and allows you to quickly reference to the files inside the `inst/` folder. 
-For example, `app_sys("x.txt")` points to `inst/x.txt` file inside your package. 
+-   `app_sys()` is a wrapper around `system.file(package = "golex")`, and allows you to quickly reference to the files inside the `inst/` folder.
+    For example, `app_sys("x.txt")` points to `inst/x.txt` file inside your package.
 
-+ `get_golem_config()` helps you manipulate the config file located at `inst/golem-config.yml`.
+-   `get_golem_config()` helps you manipulate the config file located at `inst/golem-config.yml`.
 
-#### Manipulating `golem-config.yml` {-}
+#### Manipulating `golem-config.yml` {.unnumbered}
 
 Here is what the default config file looks like:
 
@@ -376,22 +383,21 @@ readLines(
   glue::as_glue() 
 ```
 
-It is based on the `{config}` [@R-config] format, and allows you to define contexts, with values associated with these specific contexts. 
-For example, in the default example: 
+It is based on the `{config}` [@R-config] format, and allows you to define contexts, with values associated with these specific contexts.
+For example, in the default example:
 
-+ `default.golem_name`, `default.golem_version`, `default.app_prod` are usable across the whole life of your golem app: while developing, and also when in production. 
-+ `production.app_prod` might be used for adding elements that are to be used once the app is in production. 
-+ `dev.golem_wd` is in a `dev` config because __the only moment you might reliably use this config is while developing your app__. 
-Use the `app_sys()` function if you want to rely on the package path once the app is deployed.
+-   `default.golem_name`, `default.golem_version`, `default.app_prod` are usable across the whole life of your golem app: while developing, and also when in production.
+-   `production.app_prod` might be used for adding elements that are to be used once the app is in production.
+-   `dev.golem_wd` is in a `dev` config because **the only moment you might reliably use this config is while developing your app**. Use the `app_sys()` function if you want to rely on the package path once the app is deployed.
 
-These options are globally set with: 
+These options are globally set with:
 
 ```{r 04-golem-16, eval = FALSE}
 # This functions sets all the default options for your project
 set_golem_options()
 ```
 
-The functions reading the options in this config file are: 
+The functions reading the options in this config file are:
 
 ```{r 04-golem-17, eval = FALSE}
 # Get the values from the config file
@@ -400,7 +406,7 @@ get_golem_wd()
 get_golem_version()
 ```
 
-You can set these with: 
+You can set these with:
 
 ```{r 04-golem-18, eval = FALSE}
 # Get the values in the config file
@@ -409,7 +415,7 @@ set_golem_wd(".")
 set_golem_version("0.0.1")
 ```
 
-If you are already familiar with the `{config}` package, you can use this file just as any config file. 
+If you are already familiar with the `{config}` package, you can use this file just as any config file.
 
 `{golem}` comes with an `amend_golem_config()` function to add elements to it.
 
@@ -427,7 +433,7 @@ amend_golem_config(
 )
 ```
 
-In `R/app_config.R`, you will find a `get_golem_config()` function that allows you to retrieve config from this config file: 
+In `R/app_config.R`, you will find a `get_golem_config()` function that allows you to retrieve config from this config file:
 
 ```{r 04-golem-20, eval = FALSE}
 # Retrieve the value of `where`
@@ -440,41 +446,41 @@ get_golem_config(
 )
 ```
 
-You can also use an environment variable (default `{config}` behavior): 
+You can also use an environment variable (default `{config}` behavior):
 
 ```{r 04-golem-21, eval=FALSE}
 Sys.setenv("R_CONFIG_ACTIVE" = "production")
 get_golem_config("MONGODBURL")
 ```
 
-The good news is that if you don’t want/need to use `{config}`, you can safely ignore this file, just leave it where it is: it is used internally by the `{golem}` functions.
+The good news is that if you don't want/need to use `{config}`, you can safely ignore this file, just leave it where it is: it is used internally by the `{golem}` functions.
 
-#### `golem_config` vs `golem_options` {-}
+#### `golem_config` vs `golem_options` {.unnumbered}
 
-There are two ways to configure golem apps: 
+There are two ways to configure golem apps:
 
-+ The `golem_opts` in the `run_app()` function 
-+ The `golem-config.yml` file
- 
-The big difference between these two is that the golem options from `run_app()` are meant to be configured during runtime: you will be doing `run_app(val = "this")`, whereas the `golem-config` is meant to be used in the back-end, and will not be linked to the parameters passed to `run_app()` (even if this is technically possible, this is not the main objective). 
+-   The `golem_opts` in the `run_app()` function
+-   The `golem-config.yml` file
 
-It is also linked to the `R_CONFIG_ACTIVE` environment variable, just as any `{config}` file. 
+The big difference between these two is that the golem options from `run_app()` are meant to be configured during runtime: you will be doing `run_app(val = "this")`, whereas the `golem-config` is meant to be used in the back-end, and will not be linked to the parameters passed to `run_app()` (even if this is technically possible, this is not the main objective).
 
-The idea is also that the `golem-config.yml` file is shareable across `{golem}` projects (`golem_opts` are application specific), and will be tracked by version control systems. 
+It is also linked to the `R_CONFIG_ACTIVE` environment variable, just as any `{config}` file.
 
-For example, let's imagine we want to deploy the `{hexmake}` application on two RStudio Connect instances, but that both need a different MongoDB configuration when it comes to port, db and collection name. 
-To do that, you can take several approach: 
+The idea is also that the `golem-config.yml` file is shareable across `{golem}` projects (`golem_opts` are application specific), and will be tracked by version control systems.
 
-+ Set these values as `run_app()` parameters, but that means that you have to maintain one `app.R` by server you will be deploying to
-+ Set everything as environment variables, but that means that you have to do it for every server, and that there is no centralized way to keep track of these
-+ Set the values in `golem-config.yaml`, and then set a value for the `R_CONFIG_ACTIVE` environment variable in the environment the app is deployed
+For example, let's imagine we want to deploy the `{hexmake}` application on two RStudio Connect instances, but that both need a different MongoDB configuration when it comes to port, db and collection name.
+To do that, you can take several approach:
+
+-   Set these values as `run_app()` parameters, but that means that you have to maintain one `app.R` by server you will be deploying to
+-   Set everything as environment variables, but that means that you have to do it for every server, and that there is no centralized way to keep track of these
+-   Set the values in `golem-config.yaml`, and then set a value for the `R_CONFIG_ACTIVE` environment variable in the environment the app is deployed
 
 This last solution is a convenient one if you want to easily re-deploy your application on various server without having to (re)set the values for each environment.
-Note though that it shouldn't be used to store sensitive data (for example users and passwords). 
+Note though that it shouldn't be used to store sensitive data (for example users and passwords).
 
-Here is the config file that would illustrate what we just said (we have removed the other golem-related entries for the sake of clarity): 
+Here is the config file that would illustrate what we just said (we have removed the other golem-related entries for the sake of clarity):
 
-```yaml
+``` {.yaml}
 default: 
   url: mongo
   mongoport: 12345
@@ -497,7 +503,7 @@ server2:
   mongocollecton: app1
 ```
 
-Using this configuration file, you can then deploy the very same app on the two servers, and configure what is going to be read by the application by setting an environment variable inside the RStudio Connect interface. 
+Using this configuration file, you can then deploy the very same app on the two servers, and configure what is going to be read by the application by setting an environment variable inside the RStudio Connect interface.
 
 (ref:envvarconnect) Setting an Environment Variable in RStudio Connect
 
@@ -505,42 +511,40 @@ Using this configuration file, you can then deploy the very same app on the two 
 knitr::include_graphics("img/R_CONFIG_ACTIVE.png")
 ```
 
-
 ### `inst/app/www/`
 
-The `inst/app/www/` folder contains all files that are made available __at application run time__. 
-Any web application has external files that allow it to run
-^[Some webpages do not need any external sources, as they do not have any design and are plain HTML, but generally speaking we will not call this format a web application.]
-. 
-For example, `{shiny}` and its `fluidPage()` function bundles a series of CSS and JavaScript files, notably the `Bootstrap` library, or `jQuery`. 
-These external files enhance your app: CSS for the design part and JavaScript for the interactive part (more or less). 
-On top of that, you can add your own files: your own design with CSS or your own JavaScript content (as we will see in the last chapters of this book). 
-In order to work, you have to include a link to these files somewhere in the UI. 
+The `inst/app/www/` folder contains all files that are made available **at application run time**.
+Any web application has external files that allow it to run [^golem-4] .
+For example, `{shiny}` and its `fluidPage()` function bundles a series of CSS and JavaScript files, notably the `Bootstrap` library, or `jQuery`. These external files enhance your app: CSS for the design part and JavaScript for the interactive part (more or less).
+On top of that, you can add your own files: your own design with CSS or your own JavaScript content (as we will see in the last chapters of this book).
+In order to work, you have to include a link to these files somewhere in the UI.
 This is what `golem_add_external_resources()` is made for: linking the external resources that you will build with the following functions.
 
-+ `golem::add_css_file()`
-+ `golem::add_js_file()`
-+ `golem::add_js_handler()`
-+ `golem::use_external_css_file()`
-+ `golem::use_external_js_file()`
-+ `golem::use_favicon()`
+[^golem-4]: Some webpages do not need any external sources, as they do not have any design and are plain HTML, but generally speaking we will not call this format a web application.
 
-Be aware that these files are available under the `www/` at __application run time__, _i.e._ that the `www/` folder is available by your browser, not by R when it runs/generates your application. 
-In other words, you can use the `www` prefix in the HTML generated in your UI, which is read by your browser, not from the R/server side. 
-If you want to link to a file that is read during __application generation__, you will need to use the `app_sys()` function, with for example `includeMarkdown( app_sys("app/www/howto.md") )`. 
+-   `golem::add_css_file()`
+-   `golem::add_js_file()`
+-   `golem::add_js_handler()`
+-   `golem::use_external_css_file()`
+-   `golem::use_external_js_file()`
+-   `golem::use_favicon()`
 
-We encourage you to add any new external file (e.g pictures) in the `inst/app/www` folder, so that you can later use it in the UI with the common `www` prefix. 
-Another common pattern would be: 
+Be aware that these files are available under the `www/` at **application run time**, *i.e.* that the `www/` folder is available by your browser, not by R when it runs/generates your application.
+In other words, you can use the `www` prefix in the HTML generated in your UI, which is read by your browser, not from the R/server side.
+If you want to link to a file that is read during **application generation**, you will need to use the `app_sys()` function, with for example `includeMarkdown( app_sys("app/www/howto.md") )`.
 
-+ Adding images in `inst/app/img`
-+ Calling `addResourcePath( 'img', system.file('app/img', package = 'golex') )`
-+ Adding elements to your UI with `tags$img(src = "img/name.png")`.
+We encourage you to add any new external file (e.g pictures) in the `inst/app/www` folder, so that you can later use it in the UI with the common `www` prefix.
+Another common pattern would be:
+
+-   Adding images in `inst/app/img`
+-   Calling `addResourcePath( 'img', system.file('app/img', package = 'golex') )`
+-   Adding elements to your UI with `tags$img(src = "img/name.png")`.
 
 ### `dev/`
 
-The `dev/` folder is to be used as a notebook for your development process: you will find here a series of functions that can be used all along your project. 
+The `dev/` folder is to be used as a **notebook for your development process: you will find here a series of functions that can be used all along your project**.
 
-The content of these files are specific to `{golem}` here, but the concept of using a script to store all development steps is not restricted to a `{shiny}` application: it could easily be done for any package, and this is something we recommend to do. 
+The content of these files are specific to `{golem}` here, but the concept of using a script to store all development steps is not restricted to a `{shiny}` application: it could easily be done for any package, and this is something we recommend to do.
 The functions inside these files are the ones used to do some setup, like `usethis::use_mit_license()` or `usethis::use_vignette("my-analysis")`, add testing infrastructure like `usethis::use_test("my-function")` or `devtools::check()`.
 You will also find functions to populate the application like `golem::add_module("my-module")` or `golem::add_js_file("my-script")`.
 And finally, there are functions you will need once your application is ready: `pkgdown::build_site()`, `rhub::check_for_cran()` or `golem::add_dockerfile()`.
@@ -549,11 +553,11 @@ We will come back to these files later in this book when we describe in more dep
 
 ### `man/`
 
-The `man/` folder includes the package documentation. 
+The `man/` folder includes **the package documentation**.
 It is a common folder automatically filled when you document your app, notably when running the `dev/run_dev.R` script and the `document_and_reload()` function.
 
-Building documentation for a package is a widely documented subject, and if you want to know more about documentation and how to build it, here are some external links: 
+Building documentation for a package is a widely documented subject, and if you want to know more about documentation and how to build it, here are some external links:
 
-+ [R Packages - Object documentation](http://r-pkgs.had.co.nz/man.html)
-+ [Introduction to roxygen2](https://cran.r-project.org/web/packages/roxygen2/vignettes/roxygen2.html)
-+ [Building a package that lasts — eRum 2018 workshop](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop)
+-   [R Packages - Object documentation](http://r-pkgs.had.co.nz/man.html)
+-   [Introduction to roxygen2](https://cran.r-project.org/web/packages/roxygen2/vignettes/roxygen2.html)
+-   [Building a package that lasts --- eRum 2018 workshop](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop)

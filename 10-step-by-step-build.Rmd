@@ -1,25 +1,25 @@
-# (PART) Step 3: Build  {-}
+# (PART) Step 3: Build {.unnumbered}
 
 # Building the app with `{golem}` {#stepbuild}
 
-Now that the application is prototyped inside a `{golem}` [@R-golem] skeleton, you can work on its integration. 
-In this step of the workflow, you will be linking the back-end and front-end together, and working on the global engineering of the application, _i.e_:
+Now that the application is prototyped inside a `{golem}` [@R-golem] skeleton, you can work on its integration.
+In this step of the workflow, you will be linking the back-end and front-end together, and working on the global engineering of the application, *i.e*:
 
-+ add and organize dependencies
-+ creating and including sub-modules if necessary
-+ organize utility functions and link them to the module they are used in
-+ adding testing infrastructure 
-+ linking to CI / CD services
+-   add and organize dependencies
+-   creating and including sub-modules if necessary
+-   organize utility functions and link them to the module they are used in
+-   adding testing infrastructure
+-   linking to CI / CD services
 
-Note that some concepts introduced here will be more extensively explored in the following chapters: the present chapter is a walkthrough of what you will find inside the `02_dev` scripts. 
+Note that some concepts introduced here will be more extensively explored in the following chapters: the present chapter is a walkthrough of what you will find inside the `02_dev` scripts.
 
 ## Add dependencies
 
 ### Package dependencies
 
-When you are building a `{shiny}` [@R-shiny] application, you will have to deal with dependencies. 
-Well, at least with one dependency, `{shiny}`. 
-But chances are that you will not only be using `{shiny}` inside your application: you will probably call functions from other packages, for example from `{ggplot2}` [@R-ggplot2] for plotting, or any other package that is necessary for your application to work. 
+When you are building a `{shiny}` [@R-shiny] application, you will have to deal with dependencies.
+Well, at least with one dependency, `{shiny}`.
+But chances are that you will not only be using `{shiny}` inside your application: you will probably call functions from other packages, for example from `{ggplot2}` [@R-ggplot2] for plotting, or any other package that is necessary for your application to work.
 
 ```{r 10-step-by-step-build-1, echo = FALSE}
 paks <-  eval(formals(golem::use_recommended_deps)$recommended)
@@ -27,39 +27,39 @@ paks <- grep("shiny|golem", paks, invert = TRUE, value = TRUE)
 paks <- paste0("`{", eval(formals(golem::use_recommended_deps)$recommended), "}`")
 ```
 
+If you are building your application using `{golem}`, you will have 3 default dependencies: `{golem}` itself, `{shiny}`, and `{config}`.
+If you call `golem::use_recommended_deps()` in the first workflow script, you will also have `r knitr::combine_words(paks)` as dependencies to your package [^step-by-step-build-1] .
+But what about other dependencies like `{ggplot2}`? These ones need to be added by hand.
 
-If you are building your application using `{golem}`, you will have 3 default dependencies: `{golem}` itself, `{shiny}`, and `{config}`. 
-If you call `golem::use_recommended_deps()` in the first workflow script, you will also have `r knitr::combine_words(paks)` as dependencies to your package 
-^[The idea with this function is to provide a shortcut for adding commonly used dependencies, so that you don't have to do it by hand]
-.
-But what about other dependencies like `{ggplot2}`?
-These ones need to be added by hand. 
+[^step-by-step-build-1]: The idea with this function is to provide a shortcut for adding commonly used dependencies, so that you don't have to do it by hand
 
-Here is how to process for a new dependency: 
+Here is how to process for a new dependency:
 
-+ Open the `dev/02_dev.R` script, 
-+ Call the `use_package()` function from `{usethis}`: `usethis::use_package("pkg.you.waa git repository for the {hexmake} application
-nt.to.add")`
-+ Detail import mechanism in the related R files
+-   Open the `dev/02_dev.R` script,
+-   Call the `use_package()` function from `{usethis}`: `usethis::use_package("pkg.you.waa git repository for the {hexmake} application nt.to.add")`
+-   Detail import mechanism in the related R files
 
 ### Importing packages and functions
 
-There are two places where the dependencies of your application need to be managed
-^[This is not `{shiny}` nor `{golem}` specific, but a requirement for any package]
-: the `DESCRIPTION` file and the `NAMESPACE`
+There are two places where the dependencies of your application need to be managed [^step-by-step-build-2] : the `DESCRIPTION` file and the `NAMESPACE`
 
-+ The `DESCRIPTION` file dictates which packages have to be installed __when your application is installed__. 
-For example, when you install `{golem}` on your machine, you will also need other packages that are internally used by `{golem}`. 
-And your application will also have dependencies: at the very least `{shiny}`, `{golem}`, and `{config}`.
-When building your application, you have to list somewhere these requirements, and the standard way to do that is by using the `DESCRIPTION` file^[Note that most of the time, you will not be filling this by hand, but by using `usethis::use_package()`]. 
+[^step-by-step-build-2]: This is not `{shiny}` nor `{golem}` specific, but a requirement for any package
 
-+ The `NAMESPACE` file describes how your app interacts with the R session at run time, _i.e_ __when your application is launched__. 
-With this `NAMESPACE` file, you can specify only a subset of functions to import from other packages: for example you can choose to import only `renderDT()` and `DTOutput()` from `{DT}`, instead of importing all the functions. 
-This selective import mechanism allows to avoid namespace conflicts: for example between `jsonlite::flatten()` and `purrr::flatten()`
-^[which can be pretty common as `{jsonlite}` might import `JSON` files as list, and `{purrr}` has pretty powerful tools for manipulating lists]. 
-To do so, we will need to go to every script that defines one or several function/s, and add a `{roxygen2}` [@R-roxygen2] tag, in the following form : `#' @importFrom jsonlite fromJSON` and `#' @importFrom purrr flatten`: that way, you are only importing `fromJSON()` from `{jsonlite}`.
+-   The `DESCRIPTION` file dictates which packages have to be installed **when your application is installed**.
+    For example, when you install `{golem}` on your machine, you will also need other packages that are internally used by `{golem}`.
+    And your application will also have dependencies: at the very least `{shiny}`, `{golem}`, and `{config}`.
+    When building your application, you have to list somewhere these requirements, and the standard way to do that is by using the `DESCRIPTION` file[^step-by-step-build-3].
 
-Note that you can also use explicit namespacing, _i.e_ the `pkg::function()` notation inside your code. 
+-   The `NAMESPACE` file describes how your app interacts with the R session at run time, *i.e* **when your application is launched**.
+    With this `NAMESPACE` file, you can specify only a subset of functions to import from other packages: for example you can choose to import only `renderDT()` and `DTOutput()` from `{DT}`, instead of importing all the functions.
+    This selective import mechanism allows to avoid namespace conflicts: for example between `jsonlite::flatten()` and `purrr::flatten()` [^step-by-step-build-4].
+    To do so, we will need to go to every script that defines one or several function/s, and add a `{roxygen2}` [@R-roxygen2] tag, in the following form : `#' @importFrom jsonlite fromJSON` and `#' @importFrom purrr flatten`: that way, you are only importing `fromJSON()` from `{jsonlite}`.
+
+[^step-by-step-build-3]: Note that most of the time, you will not be filling this by hand, but by using `usethis::use_package()`
+
+[^step-by-step-build-4]: which can be pretty common as `{jsonlite}` might import `JSON` files as list, and `{purrr}` has pretty powerful tools for manipulating lists
+
+Note that you can also use explicit namespacing, *i.e* the `pkg::function()` notation inside your code.
 And that if you need a little help to identify dependencies, all the explicitly namespaced calls (`pkg::function()`) can be scraped using the `{attachment}` [@R-attachment] package:
 
 ```{r 10-step-by-step-build-2, eval = FALSE}
@@ -68,29 +68,30 @@ And that if you need a little help to identify dependencies, all the explicitly 
 attachment::att_from_rscripts()
 ```
 
-If you are using a development package (for example one installed from GitHub), you can add it to the `DESCRIPTION` using the `use_dev_package()` function from `{usethis}`. 
-This will add another field to the `DESCRIPTION` file, `Remotes`, with the location where the package is available. 
+If you are using a development package (for example one installed from GitHub), you can add it to the `DESCRIPTION` using the `use_dev_package()` function from `{usethis}`.
+This will add another field to the `DESCRIPTION` file, `Remotes`, with the location where the package is available.
 
-All of this can seem a little bit daunting at first, but that is for the best: 
+All of this can seem a little bit daunting at first, but that is for the best:
 
-> Having a high quality namespace helps encapsulate your package and makes it self-contained. This ensures that other packages won’t interfere with your code, that your code won’t interfere with other packages, and that your package works regardless of the environment in which it’s run.   
+> Having a high quality namespace helps encapsulate your package and makes it self-contained.
+> This ensures that other packages won't interfere with your code, that your code won't interfere with other packages, and that your package works regardless of the environment in which it's run.\
 > [@rpkg]
 
-To learn more about the details of dependencies, `DESCRIPTION` and `NAMESPACE`, here are some resources: 
+To learn more about the details of dependencies, `DESCRIPTION` and `NAMESPACE`, here are some resources:
 
-+ [Writing R Extensions](https://cran.r-project.org/manuals.html), the official manual from the R-Core team
-+ [R Packages](https://r-pkgs.org/), especially the _Package metadata_ and _Namespace_ chapters
+-   [Writing R Extensions](https://cran.r-project.org/manuals.html), the official manual from the R-Core team
+-   [R Packages](https://r-pkgs.org/), especially the *Package metadata* and *Namespace* chapters
 
 ## Submodules and utility functions
 
-When building a large application, you will be splitting your code base into smaller pieces. 
-We have developed in the _Structuring your Project_ chapter that these utilitarian functions should be defined in files that are prefixed with a specific term.
-In the `{golem}` world, these are `utils_*` and `fct_*` files: 
+When building a large application, you **will be splitting your code base into smaller pieces**.
+We have developed in the *Structuring your Project* chapter that these utilitarian functions should be defined in files that are prefixed with a specific term.
+In the `{golem}` world, these are `utils_*` and `fct_*` files:
 
-+ `utils_*` files contain small functions that might be used several times in the application 
-+ `fct_*` files contain larger functions that are more central to the application
+-   `utils_*` files contain small functions that might be used several times in the application
+-   `fct_*` files contain larger functions that are more central to the application
 
-Two functions can be called to create these files: 
+Two functions can be called to create these files:
 
 ```{r 10-step-by-step-build-3, eval = FALSE}
 # Adding fct_ and utils_ files to the project
@@ -98,34 +99,32 @@ golem::add_fct( "helpers" )
 golem::add_utils( "helpers" )
 ```
 
-+ The first will create a `R/fct_helpers.R` file
-+ The second will create a `R/utils_helpers.R` file
+-   The first will create a `R/fct_helpers.R` file
+-   The second will create a `R/utils_helpers.R` file
 
-The idea, as explained before, is that as soon as you open a `{golem}` based project, you are able to identify what the files contain, without having to open them
-^[
-The `utils_*` convention is a pretty common one: a lot of R packages contain a file call `utils.R` that bundles a series of small functions that are used throughout the package.
-]
-.
+The idea, as explained before, is that as soon as you open a `{golem}` based project, you are able to identify what the files contain, without having to open them [^step-by-step-build-5] .
 
-For example, the `{hexmake}` app has two of these files [`R/utils_ui.R`](https://github.com/ColinFay/hexmake/blob/master/R/utils_ui.R) and [`R/utils_server.R`](https://github.com/ColinFay/hexmake/blob/master/R/utils_server.R), in which you will find small functions that are reused throughout the app. 
+[^step-by-step-build-5]:  The `utils_*` convention is a pretty common one: a lot of R packages contain a file call `utils.R` that bundles a series of small functions that are used throughout the package.
 
-The `fct_*` files are to be used with larger functions, which are more central to the application, but that might not fit into a specific module. 
-For example, in `{hexmake}`, you will find [`R/fct_mongo.R`](https://github.com/ColinFay/hexmake/blob/master/R/fct_mongo.R), that is used to handle all the things related to connecting and interacting with the Mongodb database. 
+For example, the `{hexmake}` app has two of these files [`R/utils_ui.R`](https://github.com/ColinFay/hexmake/blob/master/R/utils_ui.R) and [`R/utils_server.R`](https://github.com/ColinFay/hexmake/blob/master/R/utils_server.R), in which you will find small functions that are reused throughout the app.
+
+The `fct_*` files are to be used with larger functions, which are more central to the application, but that might not fit into a specific module.
+For example, in `{hexmake}`, you will find [`R/fct_mongo.R`](https://github.com/ColinFay/hexmake/blob/master/R/fct_mongo.R), that is used to handle all the things related to connecting and interacting with the Mongodb database.
 
 As you can see, the difference is that `fct_*` file are more "topic centered", in the sense that they gather functions that relate to a specific feature of the application (here, the database), while `utils_*` files are more used as a place where to put miscellaneous functions.
 
-Note that when building a module with `golem::add_module()`, you can add a module specific `fct_*` or  `utils_*` file:
+Note that when building a module with `golem::add_module()`, you can add a module specific `fct_*` or `utils_*` file:
 
 ```{r 10-step-by-step-build-4, eval = FALSE}
 # Creating the fct_ and utils_ file along the module creation
 golem::add_module("rendering", fct = "connect", utils = "wrapper")
 ```
 
-Will create: 
+Will create:
 
-+ `R/mod_rendering.R`
-+ `R/mod_rendering_fct_connect.R`
-+ `R/mod_rendering_utils_wrapper.R`
+-   `R/mod_rendering.R`
+-   `R/mod_rendering_fct_connect.R`
+-   `R/mod_rendering_utils_wrapper.R`
 
 And this can also be done the other way around, by specifying the module you want to link your file to:
 
@@ -136,12 +135,12 @@ golem::add_utils("wrapper", module = "rendering")
 
 ## Add tests
 
-No piece of software should go into production if it has not been sufficiently tested. 
-In this part of the building process, you will be setting tests for the application you are building. 
-We will get back to the how, why and what of testing in an upcoming chapter, but as we are currently going through the `02_dev.R` script, we mention here the line that allows you to add a test skeleton to your app. 
+No piece of software should go into production if it has not been sufficiently tested.
+In this part of the building process, you will be setting tests for the application you are building.
+We will get back to the how, why and what of testing in an upcoming chapter, but as we are currently going through the `02_dev.R` script, we mention here the line that allows you to add a test skeleton to your app.
 
-If you have followed every steps from the `01_start.R` file, you already have a full testing infrastructure ready, with a set of recommended tests inserted by `{golem}`. 
-But as it is hard to find tests that are relevant to all applications (as every application is unique), you will have to add and fill manually the tests that will check your app. 
+If you have followed every steps from the `01_start.R` file, you already have a full testing infrastructure ready, with a set of recommended tests inserted by `{golem}`.
+But as it is hard to find tests that are relevant to all applications (as every application is unique), you will have to add and fill manually the tests that will check your app.
 And right now, to add a new testing file, you can call:
 
 ```{r 10-step-by-step-build-6, eval = FALSE}
@@ -155,8 +154,8 @@ More on testing in chapter \@ref(step-secure).
 
 ### Vignette
 
-Vignettes are long format documentation for your application, they are the one users see when they are running `browseVignettes()`, when they look at the documentation in the `Help` pane from RStudio, when they are browsing a webpage on CRAN, and it is also the files that are used when the `{pkgdown}` websites are built. 
-The good news is that if you have been using our "Rmd first" method, you already have most of the Vignettes built: they are the Markdown files describing how the back-end of your application works. 
+Vignettes are long format documentation for your application, they are the one users see when they are running `browseVignettes()`, when they look at the documentation in the `Help` pane from RStudio, when they are browsing a webpage on CRAN, and it is also the files that are used when the `{pkgdown}` websites are built.
+The good news is that if you have been using our "Rmd first" method, you already have most of the Vignettes built: they are the Markdown files describing how the back-end of your application works.
 Depending on how you applied this principle, these Rmd files might live inside the `inst/` folder, or already as package Vignettes.
 If you need to add a new Vignette, be it for adding an Rmd describing the back-end or a global documentation about the application, you can call the `use_vignette()` function from `{usethis}`.
 
@@ -174,12 +173,12 @@ devtools::build_vignettes()
 
 ### Code Coverage & Continuous Integration
 
-#### A. Code Coverage {-}
+#### A. Code Coverage {.unnumbered}
 
-Code coverage is a way to detect the volume of code that is covered by unit testing. 
-You can do this locally, or you can use online services like Appveyor, an online platform that computes and tracks the code coverage of your repository. 
+Code coverage is a way to detect the volume of code that is covered by unit testing.
+You can do this locally, or you can use online services like Appveyor, an online platform that computes and tracks the code coverage of your repository.
 
-To add it to your application, call the `use_coverage()` function from the `{usethis}` package: 
+To add it to your application, call the `use_coverage()` function from the `{usethis}` package:
 
 ```{r 10-step-by-step-build-9, eval = FALSE}
 # Adding the correct code coverage 
@@ -196,17 +195,17 @@ Note that you can also perform code coverage locally, using the `{covr}` [@R-cov
 code_coverage <- covr::package_coverage()
 ```
 
-For example, figure \@ref(fig:10-step-by-step-build-11) is the output of running the `package_coverage()` function on the `{golem}` package on the 2020-04-29 on the `dev` branch: 
+For example, figure \@ref(fig:10-step-by-step-build-11) is the output of running the `package_coverage()` function on the `{golem}` package on the 2020-04-29 on the `dev` branch:
 
 ```{r 10-step-by-step-build-11, echo=FALSE, fig.cap="{golem} code coverage results", out.width="100%"}
 knitr::include_graphics("img/golemcov.png")
 ```
 
-As you can see, we reach a code coverage of almost 70%. 
-Deciding what the perfect percentage of coverage should be is not an easy task, and setting for an arbitrary coverage is not a smart move either, as it very much depends on the type of project you are working on. 
-For example, in `{golem}`, the `addins.R` file is not tested (0% code coverage), and that is for a good reason: these addins are linked to RStudio and are not meant to be tested/used in a non-interactive environment, and (at least at the time of writing these lines) there are no automated way to test for RStudio addins. 
-Another thing to keep in mind while computing code coverage is that it counts the number of lines that are run when the tests are run, which means that if you write your whole function on one single line, you will have a 100% code coverage. 
-Another example is writing your `if/else` statement on one line `if (this) that else that`: your code coverage will count this line as covered, even if your test suite only runs the `if(this)` and not the `else` ; in other words, even if your code coverage is good here, you are still not testing this algorithm extensively. 
+As you can see, we reach a code coverage of almost 70%.
+**Deciding what the perfect percentage of coverage should be is not an easy task, and setting for an arbitrary coverage is not a smart move either, as it very much depends on the type of project you are working on**.
+For example, in `{golem}`, the `addins.R` file is not tested (0% code coverage), and that is for a good reason: these addins are linked to RStudio and are not meant to be tested/used in a non-interactive environment, and (at least at the time of writing these lines) there are no automated way to test for RStudio addins.
+Another thing to keep in mind while computing code coverage is that it counts the number of lines that are run when the tests are run, which means that if you write your whole function on one single line, you will have a 100% code coverage.
+Another example is writing your `if/else` statement on one line `if (this) that else that`: your code coverage will count this line as covered, even if your test suite only runs the `if(this)` and not the `else` ; in other words, even if your code coverage is good here, you are still not testing this algorithm extensively.
 
 Note that you can also identify files with zero code coverage using the `covr::zero_coverage(covr::package_coverage())` function, which, instead of printing back a metric of coverage for each file, will point to all the lines that are not covered by tests inside your package, as show in figure \@ref(fig:10-step-by-step-build-12):
 
@@ -214,9 +213,9 @@ Note that you can also identify files with zero code coverage using the `covr::z
 knitr::include_graphics("img/zerocov.png")
 ```
 
-To sum up: do not set an arbitrary code coverage percentage goal, but rather use it as a general metric all along your project. 
-With CodeCov, you can get a timeline of the evolution of code coverage: a good tool for judging when you need to write more tests. 
-For example, figure \@ref(fig:10-step-by-step-build-13) is the general tendency for the code coverage of the `{tibble}` package over the last 6 months (November 2019 - April 2020): 
+To sum up: do not set an arbitrary code coverage percentage goal, but rather use it as a general metric all along your project.
+With CodeCov, you can get a timeline of the evolution of code coverage: a good tool for judging when you need to write more tests.
+For example, figure \@ref(fig:10-step-by-step-build-13) is the general tendency for the code coverage of the `{tibble}` package over the last 6 months (November 2019 - April 2020):
 
 ```{r 10-step-by-step-build-13, echo=FALSE, fig.cap="CodeCov.io results for the {tibble} package", out.width="100%"}
 knitr::include_graphics("img/codecov-tibble.png")
@@ -227,37 +226,37 @@ Perfect for getting a general feeling about the code coverage during the life of
 Note also that if you want to add the code coverage of your application inside a Vignette, you can use the `{covrpage}` [@R-covrpage] package, that bundles the results of `{covr}` coverage report into an interactive, human readable Vignette, that you can later on use as package documentation, or as an article inside your package website.
 `{covrpage}` can be installed from GitHub with `remotes::install_github('metrumresearchgroup/covrpage')`.
 
-#### B. Continuous Integration {-}
+#### B. Continuous Integration {.unnumbered}
 
-Continuous Integration, on the other hand, is ensuring the software is still working whenever a change is made by one of the developers. 
-The idea is to add to the centralized version control system (for example Git)
-^[We will get back to Version Control in the _Version Control_ chapter]
-a service like Travis CI, GitHub Action (if you are on GitHub) or GitLab CI (for GitLab) that runs a series of commands whenever something is integrated to the repository, _i.e_ every time a change to the codebase is made. 
+Continuous Integration, on the other hand, is ensuring the software is still working whenever a change is made by one of the developers.
+The idea is to add to the centralized version control system (for example Git) [^step-by-step-build-6] a service like Travis CI, GitHub Action (if you are on GitHub) or GitLab CI (for GitLab) that runs a series of commands whenever something is integrated to the repository, *i.e* every time a change to the codebase is made.
 In other words, every time a new piece of code is sent to the central repository, a service runs regression tests that check that the software is still in a valid, working state.
+
+[^step-by-step-build-6]: We will get back to Version Control in the *Version Control* chapter
 
 You can set up various continuous integration services automatically by using functions from the `{usethis}` package:
 
-+ Travis CI is set up with `usethis::use_travis()`
-+ AppVeyor with `usethis::use_appveyor()`
-+ GitLab CI with `use_gitlab_ci()`
-+ Circle CI with `use_circleci()`
-+ GitHub Actions with `use_github_actions()`
-+ Jenkins with `use_jenkins()`
+-   Travis CI is set up with `usethis::use_travis()`
+-   AppVeyor with `usethis::use_appveyor()`
+-   GitLab CI with `use_gitlab_ci()`
+-   Circle CI with `use_circleci()`
+-   GitHub Actions with `use_github_actions()`
+-   Jenkins with `use_jenkins()`
 
 If ever you want to add badges to your `README` files for these services, `{usethis}` also comes with a series of functions to do just that: `use_travis_badge()`, `use_appveyor_badge()`, `use_circleci_badge()` and `use_github_actions_badge()`.
 
-CI services can do a lot more, like for example deploying the application, build a container and send it to a container registry, compile RMarkdown files
-^[For example, the online version of this book is compiled to HTML every time something is merged into the `master` branch on GitHub]
-, etc.
+CI services can do a lot more, like for example deploying the application, build a container and send it to a container registry, compile RMarkdown files [^step-by-step-build-7] , etc.
 The possibilities are almost limitless!
+
+[^step-by-step-build-7]: For example, the online version of this book is compiled to HTML every time something is merged into the `master` branch on GitHub
 
 ## Using `{golem}` dev functions
 
-When building an application, you will want it to behave differently depending on where it is run, and notably, if it is run in development or in production. 
+When building an application, you will want it to behave differently depending on where it is run, and notably, if it is run in development or in production.
 We have seen in previous chapters that you can use the `golem-config.yml` file, or pass arguments to `run_app()`.
 A third option is to use the `dev` functions from `{golem}`.
 
-There is a series of tools to make your app behave differently whether it is in "dev" or "prod" mode. 
+There is a series of tools to make your app behave differently whether it is in "dev" or "prod" mode.
 Notably, the `app_prod()` and `app_dev()` function look for the value of `options( "golem.app.prod" )`, or return `TRUE` if this option does not exist.
 In other words, by setting `options( "golem.app.prod" )` to `TRUE`, you will make the functions that depend on this option behave in a specific way.
 
@@ -277,9 +276,9 @@ options( "golem.app.prod" = TRUE)
 golem::cat_dev("In dev\n")
 ```
 
-Of course, chances are you do not only need to print things, you might want to use other functions. 
+Of course, chances are you do not only need to print things, you might want to use other functions.
 Good news!
-You can make any function being "dev-dependent" with the `make_dev()` function: 
+You can make any function being "dev-dependent" with the `make_dev()` function:
 
 ```{r 10-step-by-step-build-16, eval = TRUE}
 # Same mechanism as cat_dev, but with other functions 
