@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-11-23" />
+<meta name="date" content="2020-11-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -504,7 +504,7 @@ Or as Maude Lemaire writes in “Refactoring at Scale” <span class="citation">
 <p>But beware!
 As Donald Knuth puts it <em>“Premature optimization is the root of all evil”</em>.
 What does that means?
-That focusing on optimizing small portions of your app before making it work fully is the best way to lose time along the way, even more in the context of a production application, where there are deadlines and a limited amount of time to build the application.</p>
+That <strong>focusing on optimizing small portions of your app before making it work fully is the best way to lose time along the way, even more in the context of a production application, where there are deadlines and a limited amount of time to build the application</strong>.</p>
 <p>Why?
 Here is the general idea: let’s say the schema below represents your software, and its goals is to make things travel from <code>X1</code> to <code>X2</code>, but you have a bottleneck at <code>μ</code>.
 Thing is you are building elements pieces by pieces: first, the portion <code>X1.1</code> of the “road”, then <code>X1.2</code>, etc.
@@ -518,14 +518,15 @@ Once the application is ready: here in our example, we can only detect the bottl
 FIGURE 14.1: Road bottleneck, from WikiMedia <a href="https://commons.wikimedia.org/wiki/File:Roadway_section_with_bottleneck.png" class="uri">https://commons.wikimedia.org/wiki/File:Roadway_section_with_bottleneck.png</a>
 </p>
 </div>
-<p>This bottleneck is the very thing you should be optimizing: having faster code anywhere else except this bottleneck will not make your app faster: you will just make your app reach the bottleneck faster, but there will still be this part of your app that slows everything down.
+<p>This bottleneck is the very thing you should be optimizing: <strong>having faster code anywhere else except this bottleneck will not make your app faster</strong>: you will just make your app reach the bottleneck faster, but there will still be this part of your app that slows everything down.
 But this is something you might only realize when the app is fully built: pieces might be fast apart, but slow when put together.
 It is also possible that the test dataset you have been using from the start works just fine, but when you try your app with a bigger, more realistic dataset, the application is actually way slower than it should be.
 And, maybe you have been using an example dataset so that you do not have to query the database every time you implement a new feature, but actually the SQL query to the database is very slow.
 This is something you will discover only when the application is fully functional, not when building the parts: and realizing that when you only have 5% of the allocated time for this project left on your calendar is not a good surprise.</p>
 <p>Or to sum up:</p>
 <blockquote>
-<p>Get your design right with an un-optimized, slow, memory-intensive implementation before you try to tune. Then, tune systematically, looking for the places where you can buy big performance wins with the smallest possible increases in local complexity.<br />
+<p>Get your design right with an un-optimized, slow, memory-intensive implementation before you try to tune.
+Then, tune systematically, looking for the places where you can buy big performance wins with the smallest possible increases in local complexity.<br />
 <!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
 <style>.right{ text-align: right;}</style>
 <!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
@@ -540,7 +541,7 @@ This is something you will discover only when the application is fully functiona
 But in the real world, you have deadlines, limited times and resources, and we are all but humans.
 That means that at the end of the day, your app will not be completely perfect: a software can <strong>always</strong> be made better.
 No piece of code has ever reached complete perfection.</p>
-<p>Given that, do you want to spend 5 days out of the 30 you have planned optimizing a function so that it runs in a quarter of a second instead of half a second, then realize the critical bottleneck of your app is actually the SQL query and not the data manipulation?
+<p>Given that, <strong>do you want to spend 5 days out of the 30 you have planned optimizing a function so that it runs in a quarter of a second instead of half a second</strong>, then realize the critical bottleneck of your app is actually the SQL query and not the data manipulation?
 Of course a function running twice faster is a good thing, but think about it in context: for example, how many times is this function called ?
 We can safely bet that if your function is only called once, working on making it twice faster might not be the one function you would want to focus on (well, unless you have unlimited time to work on your project, and in that case lucky you, you can spend a massive amount of time building the perfect software).
 On the other hand, the function which is called thousands of time in your application might benefit from being optimized.</p>
@@ -561,42 +562,41 @@ Yet you will only realize that once the application is up and running!</p>
 <h3><span class="header-section-number">14.1.3</span> Don’t sacrifice readability</h3>
 <p>As said in the last section, every piece of code can be rewritten to be faster, either from R to R or using a lower level language: for example C or C++.
 You can also rebuild data manipulation code switching from a package to another, use complex data structures to optimizing memory usage, etc, etc.
-But that comes with a price: not keeping thing simple for the sake of local optimization makes maintenance harder, even more if you are using a lesser known language/package.
+But that comes with a price: <strong>not keeping thing simple for the sake of local optimization makes maintenance harder, even more if you are using a lesser known language/package</strong>.
 Refactoring a piece of code is better done when you keep in mind that “<em>the primary goal should be to produce human-friendly code, even at the cost of your original design. If the laser focus is on the solution rather than the process, there’s a greater chance your application will end up more more contrived and complicated than it was in the first place</em>” <span class="citation">(Lemaire <a href="#ref-lemaire2020" role="doc-biblioref">2020</a>)</span>.</p>
 <p>For example, switching some portions of your code to C++ implies that you might be the only person being able to maintain that specific portion of code, or that your colleague taking over the project will have to spend hours learning the tools you have been building, or the language you have chosen to write your functions with.</p>
-<p>Again, optimization is always a matter of trade-off: is the half-second local optimization worth the extra hours you will have to spend correcting bugs when the app will crash and when you will be the only one able to correct it?
+<p>Again, <strong>optimization is always a matter of trade-off</strong>: is the half-second local optimization worth the extra hours you will have to spend correcting bugs when the app will crash and when you will be the only one able to correct it?
 Also, are the extra hours/days spent rewriting a working code-base worth the speed gain of 0.5 seconds on one function?</p>
-<p>For example, let’s compare both these implementations of the same function, one in R, and one in C++ via <code>{Rcpp}</code> <span class="citation">(Eddelbuettel et al. <a href="#ref-R-Rcpp" role="doc-biblioref">2020</a>)</span>
-Of course, the C++ function is faster than the R one—this is the very reason of using C++ with R.</p>
-<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb204-1"><a href="when-optimize.html#cb204-1"></a><span class="kw">library</span>(<span class="st">&quot;Rcpp&quot;</span>)</span>
-<span id="cb204-2"><a href="when-optimize.html#cb204-2"></a><span class="co"># A C++ function to compute the mean</span></span>
-<span id="cb204-3"><a href="when-optimize.html#cb204-3"></a><span class="kw">cppFunction</span>(<span class="st">&quot;</span></span>
-<span id="cb204-4"><a href="when-optimize.html#cb204-4"></a><span class="st">double mean_cpp(NumericVector x) {</span></span>
-<span id="cb204-5"><a href="when-optimize.html#cb204-5"></a><span class="st">  int j;</span></span>
-<span id="cb204-6"><a href="when-optimize.html#cb204-6"></a><span class="st">  int size = x.size();</span></span>
-<span id="cb204-7"><a href="when-optimize.html#cb204-7"></a><span class="st">  double res = 0;</span></span>
-<span id="cb204-8"><a href="when-optimize.html#cb204-8"></a><span class="st">  for (j = 0; j &lt; size; j++){</span></span>
-<span id="cb204-9"><a href="when-optimize.html#cb204-9"></a><span class="st">    res = res + x[j];</span></span>
-<span id="cb204-10"><a href="when-optimize.html#cb204-10"></a><span class="st">  }</span></span>
-<span id="cb204-11"><a href="when-optimize.html#cb204-11"></a><span class="st">  return res / size;</span></span>
-<span id="cb204-12"><a href="when-optimize.html#cb204-12"></a><span class="st">}&quot;</span>)</span>
-<span id="cb204-13"><a href="when-optimize.html#cb204-13"></a></span>
-<span id="cb204-14"><a href="when-optimize.html#cb204-14"></a><span class="co"># Computing the mean using base R and C++, </span></span>
-<span id="cb204-15"><a href="when-optimize.html#cb204-15"></a><span class="co"># and comparing the time spent on each</span></span>
-<span id="cb204-16"><a href="when-optimize.html#cb204-16"></a>benched &lt;-<span class="st"> </span>bench<span class="op">::</span><span class="kw">mark</span>(</span>
-<span id="cb204-17"><a href="when-optimize.html#cb204-17"></a>  <span class="dt">cpp =</span> <span class="kw">mean_cpp</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100000</span>),</span>
-<span id="cb204-18"><a href="when-optimize.html#cb204-18"></a>  <span class="dt">native =</span> <span class="kw">mean</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100000</span>), </span>
-<span id="cb204-19"><a href="when-optimize.html#cb204-19"></a>  <span class="dt">iterations =</span> <span class="dv">1000</span></span>
-<span id="cb204-20"><a href="when-optimize.html#cb204-20"></a>)</span>
-<span id="cb204-21"><a href="when-optimize.html#cb204-21"></a>benched</span></code></pre></div>
+<p>For example, let’s compare both these implementations of the same function, one in R, and one in C++ via <code>{Rcpp}</code> <span class="citation">(Eddelbuettel et al. <a href="#ref-R-Rcpp" role="doc-biblioref">2020</a>)</span> Of course, the C++ function is faster than the R one—this is the very reason of using C++ with R.</p>
+<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="when-optimize.html#cb196-1"></a><span class="kw">library</span>(<span class="st">&quot;Rcpp&quot;</span>)</span>
+<span id="cb196-2"><a href="when-optimize.html#cb196-2"></a><span class="co"># A C++ function to compute the mean</span></span>
+<span id="cb196-3"><a href="when-optimize.html#cb196-3"></a><span class="kw">cppFunction</span>(<span class="st">&quot;</span></span>
+<span id="cb196-4"><a href="when-optimize.html#cb196-4"></a><span class="st">double mean_cpp(NumericVector x) {</span></span>
+<span id="cb196-5"><a href="when-optimize.html#cb196-5"></a><span class="st">  int j;</span></span>
+<span id="cb196-6"><a href="when-optimize.html#cb196-6"></a><span class="st">  int size = x.size();</span></span>
+<span id="cb196-7"><a href="when-optimize.html#cb196-7"></a><span class="st">  double res = 0;</span></span>
+<span id="cb196-8"><a href="when-optimize.html#cb196-8"></a><span class="st">  for (j = 0; j &lt; size; j++){</span></span>
+<span id="cb196-9"><a href="when-optimize.html#cb196-9"></a><span class="st">    res = res + x[j];</span></span>
+<span id="cb196-10"><a href="when-optimize.html#cb196-10"></a><span class="st">  }</span></span>
+<span id="cb196-11"><a href="when-optimize.html#cb196-11"></a><span class="st">  return res / size;</span></span>
+<span id="cb196-12"><a href="when-optimize.html#cb196-12"></a><span class="st">}&quot;</span>)</span>
+<span id="cb196-13"><a href="when-optimize.html#cb196-13"></a></span>
+<span id="cb196-14"><a href="when-optimize.html#cb196-14"></a><span class="co"># Computing the mean using base R and C++, </span></span>
+<span id="cb196-15"><a href="when-optimize.html#cb196-15"></a><span class="co"># and comparing the time spent on each</span></span>
+<span id="cb196-16"><a href="when-optimize.html#cb196-16"></a>benched &lt;-<span class="st"> </span>bench<span class="op">::</span><span class="kw">mark</span>(</span>
+<span id="cb196-17"><a href="when-optimize.html#cb196-17"></a>  <span class="dt">cpp =</span> <span class="kw">mean_cpp</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100000</span>),</span>
+<span id="cb196-18"><a href="when-optimize.html#cb196-18"></a>  <span class="dt">native =</span> <span class="kw">mean</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100000</span>), </span>
+<span id="cb196-19"><a href="when-optimize.html#cb196-19"></a>  <span class="dt">iterations =</span> <span class="dv">1000</span></span>
+<span id="cb196-20"><a href="when-optimize.html#cb196-20"></a>)</span>
+<span id="cb196-21"><a href="when-optimize.html#cb196-21"></a>benched</span></code></pre></div>
 <pre><code># A tibble: 2 x 6
   expression    min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:&gt; &lt;bch:&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 cpp         193µs  248µs     3041.     784KB     15.3
-2 native      525µs  651µs     1461.        0B      0  </code></pre>
+1 cpp         218µs  236µs     3007.     784KB     15.1
+2 native      685µs  687µs     1419.        0B      0  </code></pre>
 <p>(Note: we will come back to <code>bench::mark</code> later)</p>
 <p>Though, how much time gain is worth being sure you will get someone in your team to take over the maintenance if needed?
-In other words, given that (in our example), we are gaining around -4.026510^{-4} on the execution time of our function, is it worth switching to C++?
+In other words, given that (in our example), we are gaining around -4.50810^{-4} on the execution time of our function, is it worth switching to C++?
 Using external languages or complex data structures implies that from the start, you will need to think about who and how your code base will be maintained over the years.
 Chances are that if you plan on using a <code>{shiny}</code> application during a span of several years, various R developers will be working on the project, and including C++ code inside your application means that these future developer will either be required to know C++, or they will not be able to maintain this piece of code.</p>
 <p>So, to sum up, there are three ways to optimize your application &amp; R code, and the bad news is that you can not optimize for all of them:</p>
@@ -614,8 +614,7 @@ Chances are that if you plan on using a <code>{shiny}</code> application during 
 <h3><span class="header-section-number">14.2.1</span> Profiling R code</h3>
 <div id="a.-identifying-bottlenecks" class="section level4 unnumbered">
 <h4>A. Identifying bottlenecks</h4>
-<p>The best way to profile R code is by using the <code>{profvis}</code> <span class="citation">(Chang, Luraschi, and Mastny <a href="#ref-R-profvis" role="doc-biblioref">2019</a>)</span> package<a href="#fn54" class="footnote-ref" id="fnref54"><sup>54</sup></a>
-, a package designed to evaluate how much time each part of a function call take.
+<p>The best way to profile R code is by using the <code>{profvis}</code> <span class="citation">(Chang, Luraschi, and Mastny <a href="#ref-R-profvis" role="doc-biblioref">2019</a>)</span> package<a href="#fn54" class="footnote-ref" id="fnref54"><sup>54</sup></a> , a package designed to evaluate how much time each part of a function call take.
 With <code>{profvis}</code>, you can spot the bottleneck of your function.
 Without an automated tool to do the profiling, the developers would have to profile by guessing, which will, most of the time, come with bad results:</p>
 <blockquote>
@@ -628,43 +627,42 @@ Without an automated tool to do the profiling, the developers would have to prof
 </div></p>
 </blockquote>
 <p>Instead of guessing, it is safe bet to go for a tool like <code>{profvis}</code>, which allows to have a detailed view of what takes a long time to run in your R code.</p>
-<p>Using this package is quite straightforward: put the code you want to benchmark inside the <code>profvis()</code> function<a href="#fn55" class="footnote-ref" id="fnref55"><sup>55</sup></a>
-, wait for the code to run, and… that is it, you now have an analysis of your code running time.</p>
+<p>Using this package is quite straightforward: put the code you want to benchmark inside the <code>profvis()</code> function<a href="#fn55" class="footnote-ref" id="fnref55"><sup>55</sup></a> , wait for the code to run, and… that is it, you now have an analysis of your code running time.</p>
 <p>Here is an example with 3 nested functions, <code>top()</code>, <code>middle()</code> and <code>bottom()</code>, where <code>top()</code> calls <code>middle()</code> which calls <code>bottom()</code>:</p>
-<div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="when-optimize.html#cb206-1"></a><span class="kw">library</span>(profvis)</span>
-<span id="cb206-2"><a href="when-optimize.html#cb206-2"></a>top &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb206-3"><a href="when-optimize.html#cb206-3"></a>  <span class="co"># We use profvis::pause() because Sys.sleep() doesn&#39;t </span></span>
-<span id="cb206-4"><a href="when-optimize.html#cb206-4"></a>  <span class="co"># show in the flame graph</span></span>
-<span id="cb206-5"><a href="when-optimize.html#cb206-5"></a>  <span class="kw">pause</span>(<span class="fl">0.1</span>)</span>
-<span id="cb206-6"><a href="when-optimize.html#cb206-6"></a>  <span class="co"># Running a series of function with lapply()</span></span>
-<span id="cb206-7"><a href="when-optimize.html#cb206-7"></a>  <span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="cf">function</span>(x){</span>
-<span id="cb206-8"><a href="when-optimize.html#cb206-8"></a>    x <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
-<span id="cb206-9"><a href="when-optimize.html#cb206-9"></a>  })</span>
-<span id="cb206-10"><a href="when-optimize.html#cb206-10"></a>  <span class="co"># Calling a lower level function</span></span>
-<span id="cb206-11"><a href="when-optimize.html#cb206-11"></a>  <span class="kw">middle</span>()</span>
-<span id="cb206-12"><a href="when-optimize.html#cb206-12"></a>}</span>
-<span id="cb206-13"><a href="when-optimize.html#cb206-13"></a></span>
-<span id="cb206-14"><a href="when-optimize.html#cb206-14"></a>middle &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb206-15"><a href="when-optimize.html#cb206-15"></a>  <span class="co"># Pausing before computing, and calling other functions</span></span>
-<span id="cb206-16"><a href="when-optimize.html#cb206-16"></a>  <span class="kw">pause</span>(<span class="fl">0.2</span>)</span>
-<span id="cb206-17"><a href="when-optimize.html#cb206-17"></a>  <span class="fl">1e4</span> <span class="op">*</span><span class="st"> </span><span class="dv">9</span></span>
-<span id="cb206-18"><a href="when-optimize.html#cb206-18"></a>  <span class="kw">bottom_a</span>()</span>
-<span id="cb206-19"><a href="when-optimize.html#cb206-19"></a>  <span class="kw">bottom_b</span>()</span>
-<span id="cb206-20"><a href="when-optimize.html#cb206-20"></a>}</span>
-<span id="cb206-21"><a href="when-optimize.html#cb206-21"></a></span>
-<span id="cb206-22"><a href="when-optimize.html#cb206-22"></a><span class="co"># Both will pause and print, _a for 0.5 seconds, </span></span>
-<span id="cb206-23"><a href="when-optimize.html#cb206-23"></a><span class="co"># _b for 2 seconds</span></span>
-<span id="cb206-24"><a href="when-optimize.html#cb206-24"></a>bottom_a &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb206-25"><a href="when-optimize.html#cb206-25"></a>  <span class="kw">pause</span>(<span class="fl">0.5</span>)</span>
-<span id="cb206-26"><a href="when-optimize.html#cb206-26"></a>  <span class="kw">print</span>(<span class="st">&quot;hey&quot;</span>)</span>
-<span id="cb206-27"><a href="when-optimize.html#cb206-27"></a>}</span>
-<span id="cb206-28"><a href="when-optimize.html#cb206-28"></a>bottom_b &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb206-29"><a href="when-optimize.html#cb206-29"></a>  <span class="kw">pause</span>(<span class="dv">2</span>)</span>
-<span id="cb206-30"><a href="when-optimize.html#cb206-30"></a>  <span class="kw">print</span>(<span class="st">&quot;hey&quot;</span>)</span>
-<span id="cb206-31"><a href="when-optimize.html#cb206-31"></a>}</span>
-<span id="cb206-32"><a href="when-optimize.html#cb206-32"></a><span class="kw">profvis</span>({</span>
-<span id="cb206-33"><a href="when-optimize.html#cb206-33"></a>  <span class="kw">top</span>()</span>
-<span id="cb206-34"><a href="when-optimize.html#cb206-34"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="when-optimize.html#cb198-1"></a><span class="kw">library</span>(profvis)</span>
+<span id="cb198-2"><a href="when-optimize.html#cb198-2"></a>top &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb198-3"><a href="when-optimize.html#cb198-3"></a>  <span class="co"># We use profvis::pause() because Sys.sleep() doesn&#39;t </span></span>
+<span id="cb198-4"><a href="when-optimize.html#cb198-4"></a>  <span class="co"># show in the flame graph</span></span>
+<span id="cb198-5"><a href="when-optimize.html#cb198-5"></a>  <span class="kw">pause</span>(<span class="fl">0.1</span>)</span>
+<span id="cb198-6"><a href="when-optimize.html#cb198-6"></a>  <span class="co"># Running a series of function with lapply()</span></span>
+<span id="cb198-7"><a href="when-optimize.html#cb198-7"></a>  <span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="cf">function</span>(x){</span>
+<span id="cb198-8"><a href="when-optimize.html#cb198-8"></a>    x <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
+<span id="cb198-9"><a href="when-optimize.html#cb198-9"></a>  })</span>
+<span id="cb198-10"><a href="when-optimize.html#cb198-10"></a>  <span class="co"># Calling a lower level function</span></span>
+<span id="cb198-11"><a href="when-optimize.html#cb198-11"></a>  <span class="kw">middle</span>()</span>
+<span id="cb198-12"><a href="when-optimize.html#cb198-12"></a>}</span>
+<span id="cb198-13"><a href="when-optimize.html#cb198-13"></a></span>
+<span id="cb198-14"><a href="when-optimize.html#cb198-14"></a>middle &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb198-15"><a href="when-optimize.html#cb198-15"></a>  <span class="co"># Pausing before computing, and calling other functions</span></span>
+<span id="cb198-16"><a href="when-optimize.html#cb198-16"></a>  <span class="kw">pause</span>(<span class="fl">0.2</span>)</span>
+<span id="cb198-17"><a href="when-optimize.html#cb198-17"></a>  <span class="fl">1e4</span> <span class="op">*</span><span class="st"> </span><span class="dv">9</span></span>
+<span id="cb198-18"><a href="when-optimize.html#cb198-18"></a>  <span class="kw">bottom_a</span>()</span>
+<span id="cb198-19"><a href="when-optimize.html#cb198-19"></a>  <span class="kw">bottom_b</span>()</span>
+<span id="cb198-20"><a href="when-optimize.html#cb198-20"></a>}</span>
+<span id="cb198-21"><a href="when-optimize.html#cb198-21"></a></span>
+<span id="cb198-22"><a href="when-optimize.html#cb198-22"></a><span class="co"># Both will pause and print, _a for 0.5 seconds, </span></span>
+<span id="cb198-23"><a href="when-optimize.html#cb198-23"></a><span class="co"># _b for 2 seconds</span></span>
+<span id="cb198-24"><a href="when-optimize.html#cb198-24"></a>bottom_a &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb198-25"><a href="when-optimize.html#cb198-25"></a>  <span class="kw">pause</span>(<span class="fl">0.5</span>)</span>
+<span id="cb198-26"><a href="when-optimize.html#cb198-26"></a>  <span class="kw">print</span>(<span class="st">&quot;hey&quot;</span>)</span>
+<span id="cb198-27"><a href="when-optimize.html#cb198-27"></a>}</span>
+<span id="cb198-28"><a href="when-optimize.html#cb198-28"></a>bottom_b &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb198-29"><a href="when-optimize.html#cb198-29"></a>  <span class="kw">pause</span>(<span class="dv">2</span>)</span>
+<span id="cb198-30"><a href="when-optimize.html#cb198-30"></a>  <span class="kw">print</span>(<span class="st">&quot;hey&quot;</span>)</span>
+<span id="cb198-31"><a href="when-optimize.html#cb198-31"></a>}</span>
+<span id="cb198-32"><a href="when-optimize.html#cb198-32"></a><span class="kw">profvis</span>({</span>
+<span id="cb198-33"><a href="when-optimize.html#cb198-33"></a>  <span class="kw">top</span>()</span>
+<span id="cb198-34"><a href="when-optimize.html#cb198-34"></a>})</span></code></pre></div>
 <p>What you see now is what is called a <code>flame graph</code>: it is a detailed timing of how your function has run, with a clear decomposition of the call stack.
 What you see on top window is the expression evaluated, and on the bottom a detail of the call stack, with what looks like a little bit like a Gantt diagram.
 This result reads as such: the wider the function call, the more time it has taken R to compute this piece of code.
@@ -693,13 +691,13 @@ FIGURE 14.3: <code>{profvis}</code> data tab
 </p>
 </div>
 <p>If you are working on profiling the memory usage, you can also use the <code>{profmem}</code> <span class="citation">(Bengtsson <a href="#ref-R-profmem" role="doc-biblioref">2018</a>)</span> package which, instead of focusing on execution time, will record the memory usage of calls.</p>
-<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="when-optimize.html#cb207-1"></a><span class="kw">library</span>(profmem)</span>
-<span id="cb207-2"><a href="when-optimize.html#cb207-2"></a><span class="co"># Computing the memory used by each c</span></span>
-<span id="cb207-3"><a href="when-optimize.html#cb207-3"></a>p &lt;-<span class="st"> </span><span class="kw">profmem</span>({</span>
-<span id="cb207-4"><a href="when-optimize.html#cb207-4"></a>  x &lt;-<span class="st"> </span><span class="kw">raw</span>(<span class="dv">1000</span>)</span>
-<span id="cb207-5"><a href="when-optimize.html#cb207-5"></a>  A &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>), <span class="dt">ncol =</span> <span class="dv">10</span>)</span>
-<span id="cb207-6"><a href="when-optimize.html#cb207-6"></a>})</span>
-<span id="cb207-7"><a href="when-optimize.html#cb207-7"></a>p</span></code></pre></div>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="when-optimize.html#cb199-1"></a><span class="kw">library</span>(profmem)</span>
+<span id="cb199-2"><a href="when-optimize.html#cb199-2"></a><span class="co"># Computing the memory used by each c</span></span>
+<span id="cb199-3"><a href="when-optimize.html#cb199-3"></a>p &lt;-<span class="st"> </span><span class="kw">profmem</span>({</span>
+<span id="cb199-4"><a href="when-optimize.html#cb199-4"></a>  x &lt;-<span class="st"> </span><span class="kw">raw</span>(<span class="dv">1000</span>)</span>
+<span id="cb199-5"><a href="when-optimize.html#cb199-5"></a>  A &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>), <span class="dt">ncol =</span> <span class="dv">10</span>)</span>
+<span id="cb199-6"><a href="when-optimize.html#cb199-6"></a>})</span>
+<span id="cb199-7"><a href="when-optimize.html#cb199-7"></a>p</span></code></pre></div>
 <pre><code>Rprofmem memory profiling of:
 {
     x &lt;- raw(1000)
@@ -730,11 +728,11 @@ Memory allocations:
 20    alloc   256          &lt;internal&gt;
 total       16176                    </code></pre>
 <p>You can also get the total allocated memory with:</p>
-<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="when-optimize.html#cb209-1"></a><span class="kw">total</span>(p)</span></code></pre></div>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="when-optimize.html#cb201-1"></a><span class="kw">total</span>(p)</span></code></pre></div>
 <pre><code>[1] 16176</code></pre>
 <p>And extract specific values based on the memory allocation:</p>
-<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="when-optimize.html#cb211-1"></a>p2 &lt;-<span class="st"> </span><span class="kw">subset</span>(p, bytes <span class="op">&gt;</span><span class="st"> </span><span class="dv">1000</span>)</span>
-<span id="cb211-2"><a href="when-optimize.html#cb211-2"></a><span class="kw">print</span>(p2)</span></code></pre></div>
+<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb203-1"><a href="when-optimize.html#cb203-1"></a>p2 &lt;-<span class="st"> </span><span class="kw">subset</span>(p, bytes <span class="op">&gt;</span><span class="st"> </span><span class="dv">1000</span>)</span>
+<span id="cb203-2"><a href="when-optimize.html#cb203-2"></a><span class="kw">print</span>(p2)</span></code></pre></div>
 <pre><code>Rprofmem memory profiling of:
 {
     x &lt;- raw(1000)
@@ -772,34 +770,34 @@ This will also be helpful for the future: either for you in other projects (you 
 This function takes a series of named elements, each containing an R expression that will be timed.
 Note that by default, the <code>mark()</code> function compares the output of each function,</p>
 <p>Once the timing is done, you will get a data.frame with various metrics about the benchmark.</p>
-<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="when-optimize.html#cb213-1"></a><span class="co"># Multiplying each element of a vector going from 1 to size</span></span>
-<span id="cb213-2"><a href="when-optimize.html#cb213-2"></a><span class="co"># with a for loop </span></span>
-<span id="cb213-3"><a href="when-optimize.html#cb213-3"></a>for_loop &lt;-<span class="st"> </span><span class="cf">function</span>(size){</span>
-<span id="cb213-4"><a href="when-optimize.html#cb213-4"></a>  res &lt;-<span class="st"> </span><span class="kw">numeric</span>(size)</span>
-<span id="cb213-5"><a href="when-optimize.html#cb213-5"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>size){</span>
-<span id="cb213-6"><a href="when-optimize.html#cb213-6"></a>    res[i] &lt;-<span class="st"> </span>i <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
-<span id="cb213-7"><a href="when-optimize.html#cb213-7"></a>  }</span>
-<span id="cb213-8"><a href="when-optimize.html#cb213-8"></a>  <span class="kw">return</span>(res)</span>
-<span id="cb213-9"><a href="when-optimize.html#cb213-9"></a>}</span>
-<span id="cb213-10"><a href="when-optimize.html#cb213-10"></a><span class="co"># Doing the same thing using a vectorized function</span></span>
-<span id="cb213-11"><a href="when-optimize.html#cb213-11"></a>vectorized &lt;-<span class="st"> </span><span class="cf">function</span>(size){</span>
-<span id="cb213-12"><a href="when-optimize.html#cb213-12"></a>  (<span class="dv">1</span><span class="op">:</span>size) <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
-<span id="cb213-13"><a href="when-optimize.html#cb213-13"></a>}</span>
-<span id="cb213-14"><a href="when-optimize.html#cb213-14"></a>res &lt;-<span class="st"> </span>bench<span class="op">::</span><span class="kw">mark</span>(</span>
-<span id="cb213-15"><a href="when-optimize.html#cb213-15"></a>  <span class="dt">for_loop =</span> <span class="kw">for_loop</span>(<span class="dv">1000</span>), </span>
-<span id="cb213-16"><a href="when-optimize.html#cb213-16"></a>  <span class="dt">vectorized =</span> <span class="kw">vectorized</span>(<span class="dv">1000</span>), </span>
-<span id="cb213-17"><a href="when-optimize.html#cb213-17"></a>  <span class="dt">iterations =</span> <span class="dv">1000</span></span>
-<span id="cb213-18"><a href="when-optimize.html#cb213-18"></a>)</span>
-<span id="cb213-19"><a href="when-optimize.html#cb213-19"></a>res</span></code></pre></div>
+<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="when-optimize.html#cb205-1"></a><span class="co"># Multiplying each element of a vector going from 1 to size</span></span>
+<span id="cb205-2"><a href="when-optimize.html#cb205-2"></a><span class="co"># with a for loop </span></span>
+<span id="cb205-3"><a href="when-optimize.html#cb205-3"></a>for_loop &lt;-<span class="st"> </span><span class="cf">function</span>(size){</span>
+<span id="cb205-4"><a href="when-optimize.html#cb205-4"></a>  res &lt;-<span class="st"> </span><span class="kw">numeric</span>(size)</span>
+<span id="cb205-5"><a href="when-optimize.html#cb205-5"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>size){</span>
+<span id="cb205-6"><a href="when-optimize.html#cb205-6"></a>    res[i] &lt;-<span class="st"> </span>i <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
+<span id="cb205-7"><a href="when-optimize.html#cb205-7"></a>  }</span>
+<span id="cb205-8"><a href="when-optimize.html#cb205-8"></a>  <span class="kw">return</span>(res)</span>
+<span id="cb205-9"><a href="when-optimize.html#cb205-9"></a>}</span>
+<span id="cb205-10"><a href="when-optimize.html#cb205-10"></a><span class="co"># Doing the same thing using a vectorized function</span></span>
+<span id="cb205-11"><a href="when-optimize.html#cb205-11"></a>vectorized &lt;-<span class="st"> </span><span class="cf">function</span>(size){</span>
+<span id="cb205-12"><a href="when-optimize.html#cb205-12"></a>  (<span class="dv">1</span><span class="op">:</span>size) <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
+<span id="cb205-13"><a href="when-optimize.html#cb205-13"></a>}</span>
+<span id="cb205-14"><a href="when-optimize.html#cb205-14"></a>res &lt;-<span class="st"> </span>bench<span class="op">::</span><span class="kw">mark</span>(</span>
+<span id="cb205-15"><a href="when-optimize.html#cb205-15"></a>  <span class="dt">for_loop =</span> <span class="kw">for_loop</span>(<span class="dv">1000</span>), </span>
+<span id="cb205-16"><a href="when-optimize.html#cb205-16"></a>  <span class="dt">vectorized =</span> <span class="kw">vectorized</span>(<span class="dv">1000</span>), </span>
+<span id="cb205-17"><a href="when-optimize.html#cb205-17"></a>  <span class="dt">iterations =</span> <span class="dv">1000</span></span>
+<span id="cb205-18"><a href="when-optimize.html#cb205-18"></a>)</span>
+<span id="cb205-19"><a href="when-optimize.html#cb205-19"></a>res</span></code></pre></div>
 <pre><code># A tibble: 2 x 6
   expression    min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:&gt; &lt;bch:&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 for_loop   54.1µs 62.5µs    13971.    32.4KB        0
-2 vectorized  2.8µs  3.6µs   119660.    11.8KB        0</code></pre>
+1 for_loop   72.7µs 74.5µs    13097.    32.4KB        0
+2 vectorized  3.3µs    4µs   131640.    11.8KB        0</code></pre>
 <p>Here, we have an empiric evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest.</p>
 <p>If you want a graphical analysis, <code>{bench}</code> comes with an <code>autoplot</code> method for <code>{ggplot2}</code> <span class="citation">(Wickham, Chang, et al. <a href="#ref-R-ggplot2" role="doc-biblioref">2020</a>)</span>:</p>
 
-<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb215-1"><a href="when-optimize.html#cb215-1"></a>ggplot2<span class="op">::</span><span class="kw">autoplot</span>(res)</span></code></pre></div>
+<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="when-optimize.html#cb207-1"></a>ggplot2<span class="op">::</span><span class="kw">autoplot</span>(res)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:14-when-optimize-10"></span>
 <img src="engineering-production-grade-shiny-apps_files/figure-html/14-when-optimize-10-1.png" alt="{bench} autoplot" width="100%" />
 <p class="caption">
@@ -827,12 +825,10 @@ To do that, we can use standard web development tools: as said several times, a 
 There are thousands of tools available to do exactly that, and going through all of them would probably not make a lot of sense.</p>
 <p>Let’s focus on getting started with a basic but powerful tool, that comes for free inside your browser: <a href="https://developers.google.com/web/tools/lighthouse">Google Lighthouse</a>, one of the famous tool for profiling web pages, and which is bundled into recent versions of Google Chrome.
 The nice thing is that this tool not only covers what you see (i.e. not only what you are actually rendering on your personal computer), but can also audit your app with various configurations, notably on mobile, with low bandwidth and/or mimicking 3G connection.
-Being able to perform audit of our application as seen on a mobile device is a real strength: we are developing application on our computer, and might not be regularly checking how our application is performing on a mobile.
-Yet a large portion of the web navigation is performed on a mobile or tablet.</p>
+<strong>Being able to perform audit of our application as seen on a mobile device is a real strength: we are developing application on our computer, and might not be regularly checking how our application is performing on a mobile. Yet a large portion of the web navigation is performed on a mobile or tablet</strong>.</p>
 <p>Already in 2016, Google <a href="https://www.thinkwithgoogle.com/data/web-traffic-from-smartphones-and-tablets/">wrote</a> that “<em>More than half of all web traffic now comes from smartphones and tablets</em>”.
 Knowing the exact number of visitors that browse through mobile is hard: the web is vast, and not all website record the traffic they receive.
-Yet many, if not all, studies around how the web is browsed are reporting the same results: more traffic is performed via mobile than via computer<a href="#fn56" class="footnote-ref" id="fnref56"><sup>56</sup></a>
-.</p>
+Yet many, if not all, studies around how the web is browsed are reporting the same results: more traffic is performed via mobile than via computer<a href="#fn56" class="footnote-ref" id="fnref56"><sup>56</sup></a> .</p>
 <p>And, the pro of running it in your browser is that it can perform the analysis on locally deployed applications: in other word, you can launch your <code>{shiny}</code> application in your R console, open the app in Google Chrome, and run the audit.
 A lot of online services needs an URL to do the audit!</p>
 <p>Each result from the audit comes with a series of advises and changes you can make on your application to make it better, with links to know more about the specific issue.</p>
@@ -845,8 +841,7 @@ A lot of online services needs an URL to do the audit!</p>
 <li>Configure your report (or leave the default)</li>
 <li>Click on “Generate Report”</li>
 </ul>
-<p>Note that you can also install a command line tool with <code>npm install -g lighthouse</code><a href="#fn58" class="footnote-ref" id="fnref58"><sup>58</sup></a>
-, then run <code>lighthouse http://urlto.audit</code>: it will produce either a JSON (if asked) or an HTML report (the default).</p>
+<p>Note that you can also install a command line tool with <code>npm install -g lighthouse</code><a href="#fn58" class="footnote-ref" id="fnref58"><sup>58</sup></a> , then run <code>lighthouse http://urlto.audit</code>: it will produce either a JSON (if asked) or an HTML report (the default).</p>
 
 <div class="figure" style="text-align: center"><span id="fig:14-when-optimize-11"></span>
 <img src="img/lighthouse-audit.png" alt="Launching LightHouse audit from the Google Chrome" width="100%" />
@@ -864,10 +859,12 @@ FIGURE 14.6: LightHouse audit results
 </div>
 <p>Once the audit is finished, you have some basic but useful indications about your application:</p>
 <ul>
-<li><p>Performance. This metric mostly analyzes the rendering time of the page: for example how many time does it take to load the app in full, that is to say how many time it takes from the first byte received to the app being fully ready to be used, the time between the very first call to the server and the very first response, etc.
+<li><p>Performance.
+This metric mostly analyzes the rendering time of the page: for example how many time does it take to load the app in full, that is to say how many time it takes from the first byte received to the app being fully ready to be used, the time between the very first call to the server and the very first response, etc.
 With <code>{shiny}</code> <span class="citation">(Chang et al. <a href="#ref-R-shiny" role="doc-biblioref">2020</a>)</span>, you should get low performance here, notably due to the fact that it is serving external dependencies that you might not be able to control.
 For example, the report from <code>{hexmake}</code> <span class="citation">(Fay <a href="#ref-R-hexmake" role="doc-biblioref">2020</a><a href="#ref-R-hexmake" role="doc-biblioref">g</a>)</span> suggests to “Eliminate render-blocking resources”, and most of them are not controlled by the shiny developer: they come bundled with <code>shiny::fluidPage()</code> itself.</p></li>
-<li><p>Accessibility. Google Lighthouse performs a series of tests about accessibility (see our chapter about accessibility for more information).</p></li>
+<li><p>Accessibility.
+Google Lighthouse performs a series of tests about accessibility (see our chapter about accessibility for more information).</p></li>
 <li><p>Best practices bundles a list of “misc” best practices around web applications.</p></li>
 <li><p>SEO: search engine optimization, or how will your app perform when it comes to search engine indexation<a href="#fn59" class="footnote-ref" id="fnref59"><sup>59</sup></a>.</p></li>
 <li><p>Progressive Web App (PWA): a PWA is an app that can run on any device, <em>“reaching anyone, anywhere, on any device with a single codebase”</em>.
@@ -876,30 +873,30 @@ Google audit your application to see if your application fits with this idea.</p
 <p>Profiling web page is a wide topic and a lot of things can be done to enhance the global page performance.
 That being said, if you have a limited time to invest in optimizing the front-end performance of the application, Google Lighthouse is a perfect tool, and can be your go-to audit tool for your application.</p>
 <p>And if you want to do if from R, the npm lighthouse module allows to output the audit in JSON, which can then be brought back to R!</p>
-<div class="sourceCode" id="cb216"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb216-1"><a href="when-optimize.html#cb216-1"></a><span class="ex">lighthouse</span> --output json \</span>
-<span id="cb216-2"><a href="when-optimize.html#cb216-2"></a>  --output-path data-raw/output.json \</span>
-<span id="cb216-3"><a href="when-optimize.html#cb216-3"></a>  http://localhost:2811</span></code></pre></div>
+<div class="sourceCode" id="cb208"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb208-1"><a href="when-optimize.html#cb208-1"></a><span class="ex">lighthouse</span> --output json \</span>
+<span id="cb208-2"><a href="when-optimize.html#cb208-2"></a>  --output-path data-raw/output.json \</span>
+<span id="cb208-3"><a href="when-optimize.html#cb208-3"></a>  http://localhost:2811</span></code></pre></div>
 <p>Then, being a JSON file, you can call if from R:</p>
-<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="when-optimize.html#cb217-1"></a><span class="co"># Reading the JSON output of your lighthouse audit, </span></span>
-<span id="cb217-2"><a href="when-optimize.html#cb217-2"></a><span class="co"># and displaying the Speed Index value</span></span>
-<span id="cb217-3"><a href="when-optimize.html#cb217-3"></a>lighthouse_report &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">read_json</span>(<span class="st">&quot;data-raw/output.json&quot;</span>)</span>
-<span id="cb217-4"><a href="when-optimize.html#cb217-4"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span><span class="op">$</span>displayValue</span></code></pre></div>
+<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="when-optimize.html#cb209-1"></a><span class="co"># Reading the JSON output of your lighthouse audit, </span></span>
+<span id="cb209-2"><a href="when-optimize.html#cb209-2"></a><span class="co"># and displaying the Speed Index value</span></span>
+<span id="cb209-3"><a href="when-optimize.html#cb209-3"></a>lighthouse_report &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">read_json</span>(<span class="st">&quot;data-raw/output.json&quot;</span>)</span>
+<span id="cb209-4"><a href="when-optimize.html#cb209-4"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span><span class="op">$</span>displayValue</span></code></pre></div>
 <pre><code>[1] &quot;5.4 s&quot;</code></pre>
 <p>The results are contained in the <code>audits</code> sections of this object, and each of these sub-elements contains a <code>description</code> field, detailing what the metric means.</p>
 <p>Here are for example some of the results, focused on performance, with there respective description:</p>
 </div>
 <div id="first-meaningful-paint" class="section level5 unnumbered">
 <h5>“First Meaningful Paint”</h5>
-<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb219-1"><a href="when-optimize.html#cb219-1"></a><span class="co"># Each audit point contains a description, </span></span>
-<span id="cb219-2"><a href="when-optimize.html#cb219-2"></a><span class="co"># that explains what this value stands for</span></span>
-<span id="cb219-3"><a href="when-optimize.html#cb219-3"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">first-meaningful-paint</span><span class="st">`</span><span class="op">$</span>description</span></code></pre></div>
+<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="when-optimize.html#cb211-1"></a><span class="co"># Each audit point contains a description, </span></span>
+<span id="cb211-2"><a href="when-optimize.html#cb211-2"></a><span class="co"># that explains what this value stands for</span></span>
+<span id="cb211-3"><a href="when-optimize.html#cb211-3"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">first-meaningful-paint</span><span class="st">`</span><span class="op">$</span>description</span></code></pre></div>
 <pre><code>[1] &quot;First Meaningful Paint measures when the primary&quot;
 [2] &quot;content of a page is visible. [Learn&quot;            
 [3] &quot;more](https://web.dev/first-meaningful-paint).&quot;  </code></pre>
-<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="when-optimize.html#cb221-1"></a><span class="co"># We can turn the results into a data frame</span></span>
-<span id="cb221-2"><a href="when-optimize.html#cb221-2"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">first-meaningful-paint</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
-<span id="cb221-3"><a href="when-optimize.html#cb221-3"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
-<span id="cb221-4"><a href="when-optimize.html#cb221-4"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue)</span></code></pre></div>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="when-optimize.html#cb213-1"></a><span class="co"># We can turn the results into a data frame</span></span>
+<span id="cb213-2"><a href="when-optimize.html#cb213-2"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">first-meaningful-paint</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
+<span id="cb213-3"><a href="when-optimize.html#cb213-3"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
+<span id="cb213-4"><a href="when-optimize.html#cb213-4"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue)</span></code></pre></div>
 <pre><code># A tibble: 1 x 3
   title                  score displayValue
   &lt;chr&gt;                  &lt;dbl&gt; &lt;chr&gt;       
@@ -907,13 +904,13 @@ That being said, if you have a limited time to invest in optimizing the front-en
 </div>
 <div id="speed-index" class="section level5 unnumbered">
 <h5>“Speed Index”</h5>
-<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="when-optimize.html#cb223-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span><span class="op">$</span>description</span></code></pre></div>
+<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb215-1"><a href="when-optimize.html#cb215-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span><span class="op">$</span>description</span></code></pre></div>
 <pre><code>[1] &quot;Speed Index shows how quickly the contents of a page&quot;
 [2] &quot;are visibly populated. [Learn&quot;                       
 [3] &quot;more](https://web.dev/speed-index).&quot;                 </code></pre>
-<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="when-optimize.html#cb225-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
-<span id="cb225-2"><a href="when-optimize.html#cb225-2"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
-<span id="cb225-3"><a href="when-optimize.html#cb225-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue) </span></code></pre></div>
+<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="when-optimize.html#cb217-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
+<span id="cb217-2"><a href="when-optimize.html#cb217-2"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
+<span id="cb217-3"><a href="when-optimize.html#cb217-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue) </span></code></pre></div>
 <pre><code># A tibble: 1 x 3
   title       score displayValue
   &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;       
@@ -921,17 +918,16 @@ That being said, if you have a limited time to invest in optimizing the front-en
 </div>
 <div id="estimated-input-latency" class="section level5 unnumbered">
 <h5>“Estimated Input Latency”</h5>
-<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb227-1"><a href="when-optimize.html#cb227-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">estimated-input-latency</span><span class="st">`</span><span class="op">$</span>description <span class="op">%&gt;%</span></span>
-<span id="cb227-2"><a href="when-optimize.html#cb227-2"></a><span class="st">  </span><span class="kw">strwrap</span>(<span class="dt">width =</span> <span class="dv">55</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb219-1"><a href="when-optimize.html#cb219-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">estimated-input-latency</span><span class="st">`</span><span class="op">$</span>description </span></code></pre></div>
 <pre><code>[1] &quot;Estimated Input Latency is an estimate of how long&quot;   
 [2] &quot;your app takes to respond to user input, in&quot;          
 [3] &quot;milliseconds, during the busiest 5s window of page&quot;   
 [4] &quot;load. If your latency is higher than 50 ms, users may&quot;
 [5] &quot;perceive your app as laggy. [Learn&quot;                   
 [6] &quot;more](https://web.dev/estimated-input-latency).&quot;      </code></pre>
-<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="when-optimize.html#cb229-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">estimated-input-latency</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
-<span id="cb229-2"><a href="when-optimize.html#cb229-2"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
-<span id="cb229-3"><a href="when-optimize.html#cb229-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue) </span></code></pre></div>
+<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="when-optimize.html#cb221-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">estimated-input-latency</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
+<span id="cb221-2"><a href="when-optimize.html#cb221-2"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
+<span id="cb221-3"><a href="when-optimize.html#cb221-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue) </span></code></pre></div>
 <pre><code># A tibble: 1 x 3
   title                   score displayValue
   &lt;chr&gt;                   &lt;int&gt; &lt;chr&gt;       
@@ -939,13 +935,13 @@ That being said, if you have a limited time to invest in optimizing the front-en
 </div>
 <div id="total-blocking-time" class="section level5 unnumbered">
 <h5>“Total Blocking Time”</h5>
-<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="when-optimize.html#cb231-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">total-blocking-time</span><span class="st">`</span><span class="op">$</span>description </span></code></pre></div>
+<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="when-optimize.html#cb223-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">total-blocking-time</span><span class="st">`</span><span class="op">$</span>description </span></code></pre></div>
 <pre><code>[1] &quot;Sum of all time periods between FCP and Time to&quot;       
 [2] &quot;Interactive, when task length exceeded 50ms, expressed&quot;
 [3] &quot;in milliseconds.&quot;                                      </code></pre>
-<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="when-optimize.html#cb233-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">total-blocking-time</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
-<span id="cb233-2"><a href="when-optimize.html#cb233-2"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
-<span id="cb233-3"><a href="when-optimize.html#cb233-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue)</span></code></pre></div>
+<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="when-optimize.html#cb225-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">total-blocking-time</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
+<span id="cb225-2"><a href="when-optimize.html#cb225-2"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
+<span id="cb225-3"><a href="when-optimize.html#cb225-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue)</span></code></pre></div>
 <pre><code># A tibble: 1 x 3
   title               score displayValue
   &lt;chr&gt;               &lt;int&gt; &lt;chr&gt;       
@@ -953,13 +949,13 @@ That being said, if you have a limited time to invest in optimizing the front-en
 </div>
 <div id="time-to-first-byte" class="section level5 unnumbered">
 <h5>“Time to first Byte”</h5>
-<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="when-optimize.html#cb235-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">time-to-first-byte</span><span class="st">`</span><span class="op">$</span>description </span></code></pre></div>
+<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb227-1"><a href="when-optimize.html#cb227-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">time-to-first-byte</span><span class="st">`</span><span class="op">$</span>description </span></code></pre></div>
 <pre><code>[1] &quot;Time To First Byte identifies the time at which your&quot;
 [2] &quot;server sends a response. [Learn&quot;                     
 [3] &quot;more](https://web.dev/time-to-first-byte).&quot;          </code></pre>
-<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="when-optimize.html#cb237-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">time-to-first-byte</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
-<span id="cb237-2"><a href="when-optimize.html#cb237-2"></a><span class="st">  </span>.[<span class="kw">c</span>(<span class="st">&quot;title&quot;</span>, <span class="st">&quot;score&quot;</span>, <span class="st">&quot;displayValue&quot;</span>)] <span class="op">%&gt;%</span></span>
-<span id="cb237-3"><a href="when-optimize.html#cb237-3"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>() </span></code></pre></div>
+<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="when-optimize.html#cb229-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">time-to-first-byte</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
+<span id="cb229-2"><a href="when-optimize.html#cb229-2"></a><span class="st">  </span>.[<span class="kw">c</span>(<span class="st">&quot;title&quot;</span>, <span class="st">&quot;score&quot;</span>, <span class="st">&quot;displayValue&quot;</span>)] <span class="op">%&gt;%</span></span>
+<span id="cb229-3"><a href="when-optimize.html#cb229-3"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>() </span></code></pre></div>
 <pre><code># A tibble: 1 x 3
   title                      score displayValue        
   &lt;chr&gt;                      &lt;int&gt; &lt;chr&gt;               
@@ -975,13 +971,13 @@ The general idea being that line breaks, spaces and a specific set of characters
 Why not removing them when they are served in a larger software?
 This is what <em>minification</em> does.</p>
 <p>Here is an example of how minification works, taken from <em>Empirical Study on Effects of Script Minification and HTTP Compression for Traffic Reduction</em> <span class="citation">(Sakamoto et al. <a href="#ref-Sakamoto2015" role="doc-biblioref">2015</a>)</span>:</p>
-<div class="sourceCode" id="cb239"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb239-1"><a href="when-optimize.html#cb239-1"></a><span class="kw">var</span> sum <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb239-2"><a href="when-optimize.html#cb239-2"></a><span class="cf">for</span> ( <span class="kw">var</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;=</span><span class="dv">10</span><span class="op">;</span> i <span class="op">++</span> ) <span class="op">{</span></span>
-<span id="cb239-3"><a href="when-optimize.html#cb239-3"></a>  sum <span class="op">+=</span> i <span class="op">;</span></span>
-<span id="cb239-4"><a href="when-optimize.html#cb239-4"></a><span class="op">}</span></span>
-<span id="cb239-5"><a href="when-optimize.html#cb239-5"></a><span class="at">alert</span>( sum ) <span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb231"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb231-1"><a href="when-optimize.html#cb231-1"></a><span class="kw">var</span> sum <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb231-2"><a href="when-optimize.html#cb231-2"></a><span class="cf">for</span> ( <span class="kw">var</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;=</span><span class="dv">10</span><span class="op">;</span> i <span class="op">++</span> ) <span class="op">{</span></span>
+<span id="cb231-3"><a href="when-optimize.html#cb231-3"></a>  sum <span class="op">+=</span> i <span class="op">;</span></span>
+<span id="cb231-4"><a href="when-optimize.html#cb231-4"></a><span class="op">}</span></span>
+<span id="cb231-5"><a href="when-optimize.html#cb231-5"></a><span class="at">alert</span>( sum ) <span class="op">;</span></span></code></pre></div>
 <p>is minified into:</p>
-<div class="sourceCode" id="cb240"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb240-1"><a href="when-optimize.html#cb240-1"></a><span class="kw">var</span> sum<span class="op">=</span><span class="dv">0</span><span class="op">;</span><span class="cf">for</span>(<span class="kw">var</span> i<span class="op">=</span><span class="dv">0</span><span class="op">;</span>i<span class="op">&lt;=</span><span class="dv">10</span><span class="op">;</span>i<span class="op">++</span>)<span class="op">{</span>sum<span class="op">+=</span>i<span class="op">};</span><span class="at">alert</span>(sum)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb232"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb232-1"><a href="when-optimize.html#cb232-1"></a><span class="kw">var</span> sum<span class="op">=</span><span class="dv">0</span><span class="op">;</span><span class="cf">for</span>(<span class="kw">var</span> i<span class="op">=</span><span class="dv">0</span><span class="op">;</span>i<span class="op">&lt;=</span><span class="dv">10</span><span class="op">;</span>i<span class="op">++</span>)<span class="op">{</span>sum<span class="op">+=</span>i<span class="op">};</span><span class="at">alert</span>(sum)<span class="op">;</span></span></code></pre></div>
 <p>Both these code blocks behave the same way, but the second one will be lighter when saved to a file: this is the very core principle of minification of files.
 It is something pretty common to do when building web applications: on the web, every byte counts, so the lighter your external resources the better.
 Minifiction is something important as the heavier your resources, the longer your application will take to launch, and:</p>
@@ -991,25 +987,26 @@ Minifiction is something important as the heavier your resources, the longer you
 </ul>
 <p>And do not forget,</p>
 <blockquote>
-<p>Extremely high-speed network infrastructures are becoming more and more popular in developed countries. However, we still face crowded and low-speed Wi-Fi environments on airport, cafe, international conference, etc. Especially, a network environment of mobile devices requires efficient usage of network bandwidth.<br />
+<p>Extremely high-speed network infrastructures are becoming more and more popular in developed countries.
+However, we still face crowded and low-speed Wi-Fi environments on airport, cafe, international conference, etc.
+Especially, a network environment of mobile devices requires efficient usage of network bandwidth.<br />
 <span class="citation">(Sakamoto et al. <a href="#ref-Sakamoto2015" role="doc-biblioref">2015</a>)</span></p>
 </blockquote>
 <p>To minify JavaScript, HTML and CSS files from R, you can use the <code>{minifyr}</code> <span class="citation">(Fay <a href="#ref-R-minifyr" role="doc-biblioref">2020</a><a href="#ref-R-minifyr" role="doc-biblioref">h</a>)</span> package, that wraps the <code>node-minify</code> NodeJS library.
 For example, compare the size of this file from <code>{shiny}</code>:</p>
-<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="when-optimize.html#cb241-1"></a><span class="co"># Displaying the file size of a CSS file from {shiny}</span></span>
-<span id="cb241-2"><a href="when-optimize.html#cb241-2"></a>fs<span class="op">::</span><span class="kw">file_size</span>(</span>
-<span id="cb241-3"><a href="when-optimize.html#cb241-3"></a>  <span class="kw">system.file</span>(<span class="st">&quot;www/shared/shiny.css&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;shiny&quot;</span>)</span>
-<span id="cb241-4"><a href="when-optimize.html#cb241-4"></a>) </span></code></pre></div>
+<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="when-optimize.html#cb233-1"></a><span class="co"># Displaying the file size of a CSS file from {shiny}</span></span>
+<span id="cb233-2"><a href="when-optimize.html#cb233-2"></a>fs<span class="op">::</span><span class="kw">file_size</span>(</span>
+<span id="cb233-3"><a href="when-optimize.html#cb233-3"></a>  <span class="kw">system.file</span>(<span class="st">&quot;www/shared/shiny.css&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;shiny&quot;</span>)</span>
+<span id="cb233-4"><a href="when-optimize.html#cb233-4"></a>) </span></code></pre></div>
 <pre><code>8.4K</code></pre>
 <p>To its minified version:</p>
-<div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="when-optimize.html#cb243-1"></a><span class="co"># Using the {minifyr} package to minify the CSS file</span></span>
-<span id="cb243-2"><a href="when-optimize.html#cb243-2"></a>minified &lt;-<span class="st"> </span>minifyr<span class="op">::</span><span class="kw">minifyr_css_cleancss</span>(</span>
-<span id="cb243-3"><a href="when-optimize.html#cb243-3"></a>  <span class="kw">system.file</span>(<span class="st">&quot;www/shared/shiny.css&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;shiny&quot;</span>), </span>
-<span id="cb243-4"><a href="when-optimize.html#cb243-4"></a>  <span class="st">&quot;shinyminifed.css&quot;</span></span>
-<span id="cb243-5"><a href="when-optimize.html#cb243-5"></a>) </span></code></pre></div>
-<div class="sourceCode" id="cb244"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb244-1"><a href="when-optimize.html#cb244-1"></a><span class="co"># Minifying can help you gain kilobytes</span></span>
-<span id="cb244-2"><a href="when-optimize.html#cb244-2"></a>fs<span class="op">::</span><span class="kw">file_size</span>(minified)</span></code></pre></div>
-<div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="when-optimize.html#cb245-1"></a><span class="kw">cat</span>(<span class="st">&quot;5.91K&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="when-optimize.html#cb235-1"></a><span class="co"># Using the {minifyr} package to minify the CSS file</span></span>
+<span id="cb235-2"><a href="when-optimize.html#cb235-2"></a>minified &lt;-<span class="st"> </span>minifyr<span class="op">::</span><span class="kw">minifyr_css_cleancss</span>(</span>
+<span id="cb235-3"><a href="when-optimize.html#cb235-3"></a>  <span class="kw">system.file</span>(<span class="st">&quot;www/shared/shiny.css&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;shiny&quot;</span>), </span>
+<span id="cb235-4"><a href="when-optimize.html#cb235-4"></a>  <span class="st">&quot;shinyminifed.css&quot;</span></span>
+<span id="cb235-5"><a href="when-optimize.html#cb235-5"></a>) </span></code></pre></div>
+<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb236-1"><a href="when-optimize.html#cb236-1"></a><span class="co"># Minifying can help you gain kilobytes</span></span>
+<span id="cb236-2"><a href="when-optimize.html#cb236-2"></a>fs<span class="op">::</span><span class="kw">file_size</span>(minified)</span></code></pre></div>
 <pre><code>5.91K</code></pre>
 <p>That might not seem like much (a couple of KB) at a small scale, but as it can be done automatically, why not leverage these small performances gain when building larger applications?
 Of course, minification will not suddenly make your application blazing fast, but that’s something you should consider when deploying an application to production, notably if you use a lot of packages with interactive widget: they might contain CSS and JavaScript files that are not minified.</p>
@@ -1023,17 +1020,6 @@ But most package that extend <code>{shiny}</code> are not, so minifying the CSS 
 <li><code>minify_package_js()</code>, <code>minify_package_css()</code>, <code>minify_package_html()</code> and <code>minify_package_json()</code> will minify the CSS and JavaScript files contained inside a package installed on the machine</li>
 </ul>
 <p>Here is what it can look like inside a <code>Dockerfile</code>:<a href="#fn60" class="footnote-ref" id="fnref60"><sup>60</sup></a></p>
-<pre><code>FROM rocker/shiny-verse:3.6.3
-
-RUN apt-get -y install curl
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get install -y nodejs
-
-RUN Rscript -e &#39;remotes::install_github(&quot;colinfay/minifyr&quot;)&#39;
-RUN Rscript -e &#39;remotes::install_cran(&quot;cicerone&quot;)&#39;
-RUN Rscript -e &#39;library(minifyr); \
-  minifyr_npm_install(TRUE); \
-  minify_package_js(&quot;cicerone&quot;, minifyr_js_uglify)&#39;</code></pre>
 </div>
 </div>
 </div>
@@ -1071,7 +1057,7 @@ RUN Rscript -e &#39;library(minifyr); \
 <p>Fay, Colin, Vincent Guyader, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
 </div>
 <div id="ref-R-bench">
-<p>Hester, Jim. 2020a. <em>Bench: High Precision Timing of R Expressions</em>. <a href="https://github.com/r-lib/bench">https://github.com/r-lib/bench</a>.</p>
+<p>Hester, Jim. 2020a. <em>Bench: High Precision Timing of R Expressions</em>.</p>
 </div>
 <div id="ref-lemaire2020">
 <p>Lemaire, Maude. 2020. <em>Refactoring at Scale</em>. Henry Holt. <a href="https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/">https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/</a>.</p>
@@ -1092,7 +1078,6 @@ RUN Rscript -e &#39;library(minifyr); \
 <li id="fn57"><p>This mode opens an “anonymous” session, in the sense that you don’t have access to your account and extensions, and that the visits will not be recorded in your history.<a href="when-optimize.html#fnref57" class="footnote-back">↩︎</a></p></li>
 <li id="fn58"><p>Being a NodeJS application, you will need to have NodeJS installed on your machine.<a href="when-optimize.html#fnref58" class="footnote-back">↩︎</a></p></li>
 <li id="fn59"><p>Search engine indexation refers to how Google is ranking your website in the search results for a given query.<a href="when-optimize.html#fnref59" class="footnote-back">↩︎</a></p></li>
-<li id="fn60"><p>Note that you will need to install NodeJS inside the container<a href="when-optimize.html#fnref60" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 <hr/>

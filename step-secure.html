@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-11-23" />
+<meta name="date" content="2020-11-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -510,7 +510,7 @@ And also, the application load, <em>i.e</em> how much time and memory is require
 <li>The business-logic functions are separated from your interactive-logic functions.</li>
 <li>Your application is inside a package.</li>
 </ul>
-<p>On top of being a sane organization approach, using this separation inside a package structure allows to leverage all the tooling that has been built for testing “standard” packages.</p>
+<p>On top of being a sane organization approach, <strong>using this separation inside a package structure allows to leverage all the tooling that has been built for testing “standard” packages</strong>.</p>
 <p>R developers have been developing packages for a long time, and at the time of writing these lines (April 2020), more than 15,000 packages are available on CRAN.
 To sustain these developments, a lot of tools have been created to secure the development process, and especially tools for creating unit tests for your package.</p>
 <p>Unit tests are a general concept in software engineering that describes the process of writing a form of assessment to check the validity of your code.
@@ -518,17 +518,16 @@ A simplified explanation is that if you write a function called <code>meaning_of
 Using unit tests is a way to secure your work in the future, be it for future you, for your collaborator, or for anybody wanting to collaborate to the project: if anyone comes and change the code behind the <code>meaning_of_life()</code> function, and the result is no longer <code>42</code>, the developer working on this piece of code will be able to catch it.
 The general idea is to detect bugs and breaking changes at the moment they are happening, not once it is too late.</p>
 <p>There are several packages in R that can be used to implement unit testing, and you can even implement your own tests.
-One of the most popular right now<a href="#fn47" class="footnote-ref" id="fnref47"><sup>47</sup></a>
-is <code>{testthat}</code> <span class="citation">(Wickham <a href="#ref-R-testthat" role="doc-biblioref">2020</a>)</span>.
+One of the most popular right now<a href="#fn47" class="footnote-ref" id="fnref47"><sup>47</sup></a> is <code>{testthat}</code> <span class="citation">(Wickham <a href="#ref-R-testthat" role="doc-biblioref">2020</a>)</span>.
 This testing framework lets you write a series of tests and expectations, which are then launched when calling <code>test()</code> from <code>{devtools}</code> <span class="citation">(Wickham, Hester, and Chang <a href="#ref-R-devtools" role="doc-biblioref">2020</a>)</span>, either locally or in you CI system.</p>
 <p>Here is an example of testing that the <code>meaning_of_life</code> will always be <code>42</code>.</p>
-<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="step-secure.html#cb136-1"></a><span class="co"># Creating a testing context, with one expectation</span></span>
-<span id="cb136-2"><a href="step-secure.html#cb136-2"></a><span class="kw">test_that</span>(<span class="st">&quot;The meaning of life is 42&quot;</span>, {</span>
-<span id="cb136-3"><a href="step-secure.html#cb136-3"></a>  <span class="kw">expect_equal</span>(</span>
-<span id="cb136-4"><a href="step-secure.html#cb136-4"></a>    <span class="kw">meaning_of_life</span>(), </span>
-<span id="cb136-5"><a href="step-secure.html#cb136-5"></a>    <span class="dv">42</span></span>
-<span id="cb136-6"><a href="step-secure.html#cb136-6"></a>  )</span>
-<span id="cb136-7"><a href="step-secure.html#cb136-7"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb130-1"><a href="step-secure.html#cb130-1"></a><span class="co"># Creating a testing context, with one expectation</span></span>
+<span id="cb130-2"><a href="step-secure.html#cb130-2"></a><span class="kw">test_that</span>(<span class="st">&quot;The meaning of life is 42&quot;</span>, {</span>
+<span id="cb130-3"><a href="step-secure.html#cb130-3"></a>  <span class="kw">expect_equal</span>(</span>
+<span id="cb130-4"><a href="step-secure.html#cb130-4"></a>    <span class="kw">meaning_of_life</span>(), </span>
+<span id="cb130-5"><a href="step-secure.html#cb130-5"></a>    <span class="dv">42</span></span>
+<span id="cb130-6"><a href="step-secure.html#cb130-6"></a>  )</span>
+<span id="cb130-7"><a href="step-secure.html#cb130-7"></a>})</span></code></pre></div>
 <p>Once you have this test skeleton set, you will be able to detect any change to this function.</p>
 <p>If you want to learn more about how to use <code>{testthat}</code>, you can refer to the following resources:</p>
 <ul>
@@ -542,35 +541,35 @@ This testing framework lets you write a series of tests and expectations, which 
 <p>At the time of writing these lines, the <code>{shiny}</code> team is actively working on a new way to test <code>{shiny}</code> server functions.
 These features are still a work-in-progress, and are not available in the stable version of <code>{shiny}</code> we have used in this book (1.5.0).
 Given that these features are still subject to change, we will not go into details about these new features, but here is a preview of what it will look like:</p>
-<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="step-secure.html#cb137-1"></a><span class="co"># Given the following module</span></span>
-<span id="cb137-2"><a href="step-secure.html#cb137-2"></a>computation_module_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb137-3"><a href="step-secure.html#cb137-3"></a>  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</span>
-<span id="cb137-4"><a href="step-secure.html#cb137-4"></a>  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>(</span>
-<span id="cb137-5"><a href="step-secure.html#cb137-5"></a>    <span class="dt">value =</span> <span class="ot">NULL</span></span>
-<span id="cb137-6"><a href="step-secure.html#cb137-6"></a>  )</span>
-<span id="cb137-7"><a href="step-secure.html#cb137-7"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>selector , {</span>
-<span id="cb137-8"><a href="step-secure.html#cb137-8"></a>    r<span class="op">$</span>value &lt;-<span class="st"> </span>input<span class="op">$</span>selector <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
-<span id="cb137-9"><a href="step-secure.html#cb137-9"></a>  })</span>
-<span id="cb137-10"><a href="step-secure.html#cb137-10"></a>  </span>
-<span id="cb137-11"><a href="step-secure.html#cb137-11"></a>}</span>
-<span id="cb137-12"><a href="step-secure.html#cb137-12"></a></span>
-<span id="cb137-13"><a href="step-secure.html#cb137-13"></a><span class="co"># We can test it that way</span></span>
-<span id="cb137-14"><a href="step-secure.html#cb137-14"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb137-15"><a href="step-secure.html#cb137-15"></a><span class="kw">library</span>(testthat)</span>
-<span id="cb137-16"><a href="step-secure.html#cb137-16"></a><span class="kw">testModule</span>(computation_module_server, {</span>
-<span id="cb137-17"><a href="step-secure.html#cb137-17"></a></span>
-<span id="cb137-18"><a href="step-secure.html#cb137-18"></a>  <span class="co"># Give input$selector a value</span></span>
-<span id="cb137-19"><a href="step-secure.html#cb137-19"></a>  session<span class="op">$</span><span class="kw">setInputs</span>(<span class="dt">selector =</span> <span class="dv">1</span>)</span>
-<span id="cb137-20"><a href="step-secure.html#cb137-20"></a>  <span class="co"># Call {testthat} functions</span></span>
-<span id="cb137-21"><a href="step-secure.html#cb137-21"></a>  <span class="kw">expect_equal</span>(r<span class="op">$</span>value, <span class="dv">10</span>)</span>
-<span id="cb137-22"><a href="step-secure.html#cb137-22"></a></span>
-<span id="cb137-23"><a href="step-secure.html#cb137-23"></a>  <span class="co"># Give input$selector a value</span></span>
-<span id="cb137-24"><a href="step-secure.html#cb137-24"></a>  session<span class="op">$</span><span class="kw">setInputs</span>(<span class="dt">selector =</span> <span class="dv">2</span>)</span>
-<span id="cb137-25"><a href="step-secure.html#cb137-25"></a>  <span class="co"># Call {testthat} functions</span></span>
-<span id="cb137-26"><a href="step-secure.html#cb137-26"></a>  <span class="kw">expect_equal</span>(r<span class="op">$</span>value, <span class="dv">20</span>)</span>
-<span id="cb137-27"><a href="step-secure.html#cb137-27"></a></span>
-<span id="cb137-28"><a href="step-secure.html#cb137-28"></a></span>
-<span id="cb137-29"><a href="step-secure.html#cb137-29"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="step-secure.html#cb131-1"></a><span class="co"># Given the following module</span></span>
+<span id="cb131-2"><a href="step-secure.html#cb131-2"></a>computation_module_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb131-3"><a href="step-secure.html#cb131-3"></a>  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</span>
+<span id="cb131-4"><a href="step-secure.html#cb131-4"></a>  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>(</span>
+<span id="cb131-5"><a href="step-secure.html#cb131-5"></a>    <span class="dt">value =</span> <span class="ot">NULL</span></span>
+<span id="cb131-6"><a href="step-secure.html#cb131-6"></a>  )</span>
+<span id="cb131-7"><a href="step-secure.html#cb131-7"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>selector , {</span>
+<span id="cb131-8"><a href="step-secure.html#cb131-8"></a>    r<span class="op">$</span>value &lt;-<span class="st"> </span>input<span class="op">$</span>selector <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
+<span id="cb131-9"><a href="step-secure.html#cb131-9"></a>  })</span>
+<span id="cb131-10"><a href="step-secure.html#cb131-10"></a>  </span>
+<span id="cb131-11"><a href="step-secure.html#cb131-11"></a>}</span>
+<span id="cb131-12"><a href="step-secure.html#cb131-12"></a></span>
+<span id="cb131-13"><a href="step-secure.html#cb131-13"></a><span class="co"># We can test it that way</span></span>
+<span id="cb131-14"><a href="step-secure.html#cb131-14"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb131-15"><a href="step-secure.html#cb131-15"></a><span class="kw">library</span>(testthat)</span>
+<span id="cb131-16"><a href="step-secure.html#cb131-16"></a><span class="kw">testModule</span>(computation_module_server, {</span>
+<span id="cb131-17"><a href="step-secure.html#cb131-17"></a></span>
+<span id="cb131-18"><a href="step-secure.html#cb131-18"></a>  <span class="co"># Give input$selector a value</span></span>
+<span id="cb131-19"><a href="step-secure.html#cb131-19"></a>  session<span class="op">$</span><span class="kw">setInputs</span>(<span class="dt">selector =</span> <span class="dv">1</span>)</span>
+<span id="cb131-20"><a href="step-secure.html#cb131-20"></a>  <span class="co"># Call {testthat} functions</span></span>
+<span id="cb131-21"><a href="step-secure.html#cb131-21"></a>  <span class="kw">expect_equal</span>(r<span class="op">$</span>value, <span class="dv">10</span>)</span>
+<span id="cb131-22"><a href="step-secure.html#cb131-22"></a></span>
+<span id="cb131-23"><a href="step-secure.html#cb131-23"></a>  <span class="co"># Give input$selector a value</span></span>
+<span id="cb131-24"><a href="step-secure.html#cb131-24"></a>  session<span class="op">$</span><span class="kw">setInputs</span>(<span class="dt">selector =</span> <span class="dv">2</span>)</span>
+<span id="cb131-25"><a href="step-secure.html#cb131-25"></a>  <span class="co"># Call {testthat} functions</span></span>
+<span id="cb131-26"><a href="step-secure.html#cb131-26"></a>  <span class="kw">expect_equal</span>(r<span class="op">$</span>value, <span class="dv">20</span>)</span>
+<span id="cb131-27"><a href="step-secure.html#cb131-27"></a></span>
+<span id="cb131-28"><a href="step-secure.html#cb131-28"></a></span>
+<span id="cb131-29"><a href="step-secure.html#cb131-29"></a>})</span></code></pre></div>
 <p>This methodology is still under-development, so we won’t go deeper into this subject, but if you want to follow the update on this topic, please refer to the <a href="https://shiny.rstudio.com/articles/integration-testing.html">Server function testing with Shiny</a> article on the <code>{shiny}</code> website.</p>
 </div>
 <div id="testing-the-interactive-logic" class="section level3">
@@ -582,55 +581,54 @@ Given that these features are still subject to change, we will not go into detai
 <p><code>puppeteer</code> is a NodeJS module that drives a Google Chrome headless session and mimic a session on the app.</p>
 <p>And good news, there is a Google Chrome extension, called <a href="https://chrome.google.com/webstore/detail/puppeteer-recorder/djeegiggegleadkkbgopoonhjimgehda">Puppeteer Recorder</a>, that allows you to create, while visiting a webpage, the <code>pupepeteer</code> script to reproduce your visit.
 Here is, for example, a very small javascript script for testing <code>{hexmake}</code> <span class="citation">(Fay <a href="#ref-R-hexmake" role="doc-biblioref">2020</a><a href="#ref-R-hexmake" role="doc-biblioref">g</a>)</span>, generated by this extension.</p>
-<div class="sourceCode" id="cb138"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb138-1"><a href="step-secure.html#cb138-1"></a><span class="co">// Require the node module</span></span>
-<span id="cb138-2"><a href="step-secure.html#cb138-2"></a><span class="kw">const</span> puppeteer <span class="op">=</span> <span class="at">require</span>(<span class="st">&#39;puppeteer&#39;</span>)<span class="op">;</span></span>
-<span id="cb138-3"><a href="step-secure.html#cb138-3"></a>(<span class="kw">async</span> () <span class="kw">=&gt;</span> <span class="op">{</span></span>
-<span id="cb138-4"><a href="step-secure.html#cb138-4"></a><span class="co">// launch puppeteer and connect to the page</span></span>
-<span id="cb138-5"><a href="step-secure.html#cb138-5"></a><span class="kw">const</span> browser <span class="op">=</span> <span class="cf">await</span> <span class="va">puppeteer</span>.<span class="at">launch</span>()</span>
-<span id="cb138-6"><a href="step-secure.html#cb138-6"></a><span class="kw">const</span> page <span class="op">=</span> <span class="cf">await</span> <span class="va">browser</span>.<span class="at">newPage</span>()</span>
-<span id="cb138-7"><a href="step-secure.html#cb138-7"></a><span class="cf">await</span> <span class="va">page</span>.<span class="at">goto</span>(<span class="st">&#39;http://localhost:2811/&#39;</span>)</span>
-<span id="cb138-8"><a href="step-secure.html#cb138-8"></a></span>
-<span id="cb138-9"><a href="step-secure.html#cb138-9"></a><span class="co">// We&#39;re waiting for a DOM element to be ready</span></span>
-<span id="cb138-10"><a href="step-secure.html#cb138-10"></a><span class="cf">await</span> <span class="va">page</span>.<span class="at">waitForSelector</span>(<span class="st">&#39;.row &gt; .col &gt; </span><span class="sc">\</span></span>
-<span id="cb138-11"><a href="step-secure.html#cb138-11"></a><span class="st">    .rounded &gt; details:nth-child(3) &gt; summary&#39;</span>)</span>
-<span id="cb138-12"><a href="step-secure.html#cb138-12"></a>    <span class="co">// Now it&#39;s ready, we can click on it</span></span>
-<span id="cb138-13"><a href="step-secure.html#cb138-13"></a>    <span class="cf">await</span> <span class="va">page</span>.<span class="at">click</span>(<span class="st">&#39;.row &gt; .col &gt; .rounded &gt; </span><span class="sc">\</span></span>
-<span id="cb138-14"><a href="step-secure.html#cb138-14"></a><span class="st">    details:nth-child(3) &gt; summary&#39;</span>)</span>
-<span id="cb138-15"><a href="step-secure.html#cb138-15"></a>    </span>
-<span id="cb138-16"><a href="step-secure.html#cb138-16"></a>    <span class="co">// Now our test is over, we can close the connection</span></span>
-<span id="cb138-17"><a href="step-secure.html#cb138-17"></a>    <span class="cf">await</span> <span class="va">browser</span>.<span class="at">close</span>()</span>
-<span id="cb138-18"><a href="step-secure.html#cb138-18"></a><span class="op">}</span>)()</span></code></pre></div>
+<div class="sourceCode" id="cb132"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb132-1"><a href="step-secure.html#cb132-1"></a><span class="co">// Require the node module</span></span>
+<span id="cb132-2"><a href="step-secure.html#cb132-2"></a><span class="kw">const</span> puppeteer <span class="op">=</span> <span class="at">require</span>(<span class="st">&#39;puppeteer&#39;</span>)<span class="op">;</span></span>
+<span id="cb132-3"><a href="step-secure.html#cb132-3"></a>(<span class="kw">async</span> () <span class="kw">=&gt;</span> <span class="op">{</span></span>
+<span id="cb132-4"><a href="step-secure.html#cb132-4"></a><span class="co">// launch puppeteer and connect to the page</span></span>
+<span id="cb132-5"><a href="step-secure.html#cb132-5"></a><span class="kw">const</span> browser <span class="op">=</span> <span class="cf">await</span> <span class="va">puppeteer</span>.<span class="at">launch</span>()</span>
+<span id="cb132-6"><a href="step-secure.html#cb132-6"></a><span class="kw">const</span> page <span class="op">=</span> <span class="cf">await</span> <span class="va">browser</span>.<span class="at">newPage</span>()</span>
+<span id="cb132-7"><a href="step-secure.html#cb132-7"></a><span class="cf">await</span> <span class="va">page</span>.<span class="at">goto</span>(<span class="st">&#39;http://localhost:2811/&#39;</span>)</span>
+<span id="cb132-8"><a href="step-secure.html#cb132-8"></a></span>
+<span id="cb132-9"><a href="step-secure.html#cb132-9"></a><span class="co">// We&#39;re waiting for a DOM element to be ready</span></span>
+<span id="cb132-10"><a href="step-secure.html#cb132-10"></a><span class="cf">await</span> <span class="va">page</span>.<span class="at">waitForSelector</span>(<span class="st">&#39;.row &gt; .col &gt; </span><span class="sc">\</span></span>
+<span id="cb132-11"><a href="step-secure.html#cb132-11"></a><span class="st">    .rounded &gt; details:nth-child(3) &gt; summary&#39;</span>)</span>
+<span id="cb132-12"><a href="step-secure.html#cb132-12"></a>    <span class="co">// Now it&#39;s ready, we can click on it</span></span>
+<span id="cb132-13"><a href="step-secure.html#cb132-13"></a>    <span class="cf">await</span> <span class="va">page</span>.<span class="at">click</span>(<span class="st">&#39;.row &gt; .col &gt; .rounded &gt; </span><span class="sc">\</span></span>
+<span id="cb132-14"><a href="step-secure.html#cb132-14"></a><span class="st">    details:nth-child(3) &gt; summary&#39;</span>)</span>
+<span id="cb132-15"><a href="step-secure.html#cb132-15"></a>    </span>
+<span id="cb132-16"><a href="step-secure.html#cb132-16"></a>    <span class="co">// Now our test is over, we can close the connection</span></span>
+<span id="cb132-17"><a href="step-secure.html#cb132-17"></a>    <span class="cf">await</span> <span class="va">browser</span>.<span class="at">close</span>()</span>
+<span id="cb132-18"><a href="step-secure.html#cb132-18"></a><span class="op">}</span>)()</span></code></pre></div>
 <p>Be aware though that this extension does not record everything, at least with the version used while writing this book (<code>0.7.1</code>).
-For example, typing inside a text input is not recorded: that is completely doable inside <code>puppeteer</code>, yet not recorded by this extension<a href="#fn48" class="footnote-ref" id="fnref48"><sup>48</sup></a>
-.</p>
+For example, typing inside a text input is not recorded: that is completely doable inside <code>puppeteer</code>, yet not recorded by this extension<a href="#fn48" class="footnote-ref" id="fnref48"><sup>48</sup></a> .</p>
 <p>Once you have this piece of code, put it into a NodeJS script, and replay the session as many time as you need.
 If ever one of the steps can not be replayed as recorded, the script will fail, notifying you of a regression.</p>
 <p>Several packages in R mimic what <code>puppeteer</code> does (Google Chrome headless orchestration), with notably <code>{crrri}</code> <span class="citation">(Lesur and Dervieux <a href="#ref-R-crrri" role="doc-biblioref">2020</a>)</span> and <code>{chromote}</code> <span class="citation">(Chang <a href="#ref-R-chromote" role="doc-biblioref">2020</a>)</span>.
 These packages can be used to launch and manipulate a Google Chrome headless session, meaning that you can programmatically navigate and interact with a webpage from R.
 And to do the tests in a <code>puppeteer</code> spirit, you can refer to the <code>{crrry}</code> package <span class="citation">(Fay <a href="#ref-R-crrry" role="doc-biblioref">2020</a><a href="#ref-R-crrry" role="doc-biblioref">c</a>)</span>, which contains a series of wrapper functions around <code>{crrri}</code>, specifically designed for <code>{shiny}</code>.</p>
 <p>Here is an example:</p>
-<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb139-1"><a href="step-secure.html#cb139-1"></a><span class="co"># Creating a new test instance</span></span>
-<span id="cb139-2"><a href="step-secure.html#cb139-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
-<span id="cb139-3"><a href="step-secure.html#cb139-3"></a>  <span class="co"># Using the `find_chrome()` function to guess where the </span></span>
-<span id="cb139-4"><a href="step-secure.html#cb139-4"></a>  <span class="co"># Chrome bin is on our machine</span></span>
-<span id="cb139-5"><a href="step-secure.html#cb139-5"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
-<span id="cb139-6"><a href="step-secure.html#cb139-6"></a>  <span class="co"># Launching Chrome on a random available port on our machine</span></span>
-<span id="cb139-7"><a href="step-secure.html#cb139-7"></a>  <span class="co"># Note that you will need httpuv &gt;= 1.5.2 if you want to use </span></span>
-<span id="cb139-8"><a href="step-secure.html#cb139-8"></a>  <span class="co"># this function</span></span>
-<span id="cb139-9"><a href="step-secure.html#cb139-9"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(), </span>
-<span id="cb139-10"><a href="step-secure.html#cb139-10"></a>  <span class="co"># Specifying the page we want to connect to</span></span>
-<span id="cb139-11"><a href="step-secure.html#cb139-11"></a>  <span class="dt">url =</span> <span class="st">&quot;https://connect.thinkr.fr/hexmake/&quot;</span>,</span>
-<span id="cb139-12"><a href="step-secure.html#cb139-12"></a>  <span class="co"># Do everything on the terminal, with no window open</span></span>
-<span id="cb139-13"><a href="step-secure.html#cb139-13"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
-<span id="cb139-14"><a href="step-secure.html#cb139-14"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="step-secure.html#cb133-1"></a><span class="co"># Creating a new test instance</span></span>
+<span id="cb133-2"><a href="step-secure.html#cb133-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
+<span id="cb133-3"><a href="step-secure.html#cb133-3"></a>  <span class="co"># Using the `find_chrome()` function to guess where the </span></span>
+<span id="cb133-4"><a href="step-secure.html#cb133-4"></a>  <span class="co"># Chrome bin is on our machine</span></span>
+<span id="cb133-5"><a href="step-secure.html#cb133-5"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
+<span id="cb133-6"><a href="step-secure.html#cb133-6"></a>  <span class="co"># Launching Chrome on a random available port on our machine</span></span>
+<span id="cb133-7"><a href="step-secure.html#cb133-7"></a>  <span class="co"># Note that you will need httpuv &gt;= 1.5.2 if you want to use </span></span>
+<span id="cb133-8"><a href="step-secure.html#cb133-8"></a>  <span class="co"># this function</span></span>
+<span id="cb133-9"><a href="step-secure.html#cb133-9"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(), </span>
+<span id="cb133-10"><a href="step-secure.html#cb133-10"></a>  <span class="co"># Specifying the page we want to connect to</span></span>
+<span id="cb133-11"><a href="step-secure.html#cb133-11"></a>  <span class="dt">url =</span> <span class="st">&quot;https://connect.thinkr.fr/hexmake/&quot;</span>,</span>
+<span id="cb133-12"><a href="step-secure.html#cb133-12"></a>  <span class="co"># Do everything on the terminal, with no window open</span></span>
+<span id="cb133-13"><a href="step-secure.html#cb133-13"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
+<span id="cb133-14"><a href="step-secure.html#cb133-14"></a>)</span></code></pre></div>
 <pre><code>Running \
   &#39;/Applications/Google Chrome.app/Contents/MacOS/Google Chrome&#39; \
   --no-first-run --headless \
   &#39;--user-data-dir=/Users/colin/Library/Application Support/
     r-crrri/chrome-data-dir-dhutmfux&#39; \
   &#39;--remote-debugging-port=40698&#39;</code></pre>
-<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="step-secure.html#cb141-1"></a><span class="co"># We&#39;ll wait for the application to be ready to accept inputs</span></span>
-<span id="cb141-2"><a href="step-secure.html#cb141-2"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="step-secure.html#cb135-1"></a><span class="co"># We&#39;ll wait for the application to be ready to accept inputs</span></span>
+<span id="cb135-2"><a href="step-secure.html#cb135-2"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span></code></pre></div>
 <pre><code>Shiny is computing
 ✓ Shiny is still running</code></pre>
 <p>You can then call one of the <code>test</code> object methods:</p>
@@ -641,14 +639,14 @@ And to do the tests in a <code>puppeteer</code> spirit, you can refer to the <co
 <li><code>click_on_id</code> clicks on a given id</li>
 </ul>
 <p>Of course, the interesting part is doing “bulk testing” of your application, for example by setting a series of values to an input:</p>
-<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="step-secure.html#cb143-1"></a><span class="cf">for</span> (i <span class="cf">in</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]){</span>
-<span id="cb143-2"><a href="step-secure.html#cb143-2"></a>  <span class="co"># We&#39;ll be setting a series of letters, one by one</span></span>
-<span id="cb143-3"><a href="step-secure.html#cb143-3"></a>  <span class="co"># for the package name input</span></span>
-<span id="cb143-4"><a href="step-secure.html#cb143-4"></a>  test<span class="op">$</span><span class="kw">shiny_set_input</span>(</span>
-<span id="cb143-5"><a href="step-secure.html#cb143-5"></a>    <span class="st">&quot;main_ui_1-left_ui_1-pkg_name_ui_1-package&quot;</span>, </span>
-<span id="cb143-6"><a href="step-secure.html#cb143-6"></a>    i</span>
-<span id="cb143-7"><a href="step-secure.html#cb143-7"></a>  )</span>
-<span id="cb143-8"><a href="step-secure.html#cb143-8"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="step-secure.html#cb137-1"></a><span class="cf">for</span> (i <span class="cf">in</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]){</span>
+<span id="cb137-2"><a href="step-secure.html#cb137-2"></a>  <span class="co"># We&#39;ll be setting a series of letters, one by one</span></span>
+<span id="cb137-3"><a href="step-secure.html#cb137-3"></a>  <span class="co"># for the package name input</span></span>
+<span id="cb137-4"><a href="step-secure.html#cb137-4"></a>  test<span class="op">$</span><span class="kw">shiny_set_input</span>(</span>
+<span id="cb137-5"><a href="step-secure.html#cb137-5"></a>    <span class="st">&quot;main_ui_1-left_ui_1-pkg_name_ui_1-package&quot;</span>, </span>
+<span id="cb137-6"><a href="step-secure.html#cb137-6"></a>    i</span>
+<span id="cb137-7"><a href="step-secure.html#cb137-7"></a>  )</span>
+<span id="cb137-8"><a href="step-secure.html#cb137-8"></a>}</span></code></pre></div>
 <pre><code>-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package--
 Shiny is computing
 ✓ Shiny is still running
@@ -665,8 +663,8 @@ Shiny is computing
 Shiny is computing
 ✓ Shiny is still running</code></pre>
 <p>And once your test is done, do not forget to close the connection!</p>
-<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb145-1"><a href="step-secure.html#cb145-1"></a><span class="co"># Closing the connection</span></span>
-<span id="cb145-2"><a href="step-secure.html#cb145-2"></a>test<span class="op">$</span><span class="kw">stop</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb139-1"><a href="step-secure.html#cb139-1"></a><span class="co"># Closing the connection</span></span>
+<span id="cb139-2"><a href="step-secure.html#cb139-2"></a>test<span class="op">$</span><span class="kw">stop</span>()</span></code></pre></div>
 </div>
 <div id="b.-monkey-test" class="section level4 unnumbered">
 <h4>B. Monkey test</h4>
@@ -674,13 +672,13 @@ Shiny is computing
 In other words, if you develop and think “a user will never do that”, just expect a user to eventually do “that”.</p>
 <p>But how can we get prepared for the unexpected?
 How can we test the “crazy behavior” that user will adopt?
-In web development, there exists a methodology called “Monkey testing”, which consists of launching a series of random event on a webpage: random text in input, scrolling, clicking, zooming… and see if the application crashes or not.
+In web development, there exists a methodology called “Monkey testing”, which consists of <strong>launching a series of random event on a webpage: random text in input, scrolling, clicking, zooming… and see if the application crashes or not</strong>.
 This software testing method allows to test the robustness of the application, by seeing how much it can handle unexpected behaviors.</p>
 <p>Several JavaScript libraries exist when it comes to monkey testing, one of the most popular (and easy to use) library is called <a href="https://github.com/marmelab/gremlins.js"><code>gremlin.js</code></a>.
 This library is particularly interesting when it comes to <code>{shiny}</code> as it does not need external installation: you can add the library as a bookmark on your browser, navigate to the application, and launch the testing (click on the “Generate Bookmarklet” link on the <a href="(https://github.com/marmelab/gremlins.js)">top of the README</a>).
-Figure <a href="step-secure.html#fig:11-step-by-step-secure-6">11.1</a> show an example of running gremlins on the prenoms application.</p>
+Figure <a href="#fig:11-step-by-step-secure-6"><strong>??</strong></a> show an example of running gremlins on the prenoms application.</p>
 
-<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-6"></span>
+<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-7"></span>
 <img src="img/gremlins.png" alt="Example of using gremlins.js on the “prenoms” {shiny} application." width="100%" />
 <p class="caption">
 FIGURE 11.1: Example of using <code>gremlins.js</code> on the “prenoms” <code>{shiny}</code> application.
@@ -688,52 +686,52 @@ FIGURE 11.1: Example of using <code>gremlins.js</code> on the “prenoms” <cod
 </div>
 <p>And if you want to scale this, you can also combine it with <code>{shinyloadtest}</code> <span class="citation">(Dipert, Schloerke, and Borges <a href="#ref-R-shinyloadtest" role="doc-biblioref">2020</a>)</span>: launch a session recording, run <code>gremlins</code> one or several time inside the recording, then replay it with multiple sessions.</p>
 <p>With <code>{crrry}</code>, this <code>gremlins</code> test comes for free:</p>
-<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="step-secure.html#cb146-1"></a><span class="co"># Creating a new test instance</span></span>
-<span id="cb146-2"><a href="step-secure.html#cb146-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
-<span id="cb146-3"><a href="step-secure.html#cb146-3"></a>  <span class="co"># Using the `find_chrome()` function to guess where the </span></span>
-<span id="cb146-4"><a href="step-secure.html#cb146-4"></a>  <span class="co"># Chrome bin is on our machine</span></span>
-<span id="cb146-5"><a href="step-secure.html#cb146-5"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
-<span id="cb146-6"><a href="step-secure.html#cb146-6"></a>  <span class="co"># Launching Chrome on a random available port on our machine</span></span>
-<span id="cb146-7"><a href="step-secure.html#cb146-7"></a>  <span class="co"># Note that you will need httpuv &gt;= 1.5.2 if you want to use </span></span>
-<span id="cb146-8"><a href="step-secure.html#cb146-8"></a>  <span class="co"># this function</span></span>
-<span id="cb146-9"><a href="step-secure.html#cb146-9"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(), </span>
-<span id="cb146-10"><a href="step-secure.html#cb146-10"></a>  <span class="co"># Specifying the page we want to connect to</span></span>
-<span id="cb146-11"><a href="step-secure.html#cb146-11"></a>  <span class="dt">url =</span> <span class="st">&quot;https://connect.thinkr.fr/hexmake/&quot;</span>,</span>
-<span id="cb146-12"><a href="step-secure.html#cb146-12"></a>  <span class="co"># Do everything on the terminal, with no window open</span></span>
-<span id="cb146-13"><a href="step-secure.html#cb146-13"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
-<span id="cb146-14"><a href="step-secure.html#cb146-14"></a>)</span>
-<span id="cb146-15"><a href="step-secure.html#cb146-15"></a><span class="co"># We&#39;ll wait for the application to be ready to accept inputs</span></span>
-<span id="cb146-16"><a href="step-secure.html#cb146-16"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span>
-<span id="cb146-17"><a href="step-secure.html#cb146-17"></a><span class="co"># We launch the horde of gremlins</span></span>
-<span id="cb146-18"><a href="step-secure.html#cb146-18"></a>test<span class="op">$</span><span class="kw">gremlins_horde</span>()</span>
-<span id="cb146-19"><a href="step-secure.html#cb146-19"></a><span class="co"># Sleep, let the gremlins do their job</span></span>
-<span id="cb146-20"><a href="step-secure.html#cb146-20"></a><span class="kw">Sys.sleep</span>(<span class="dv">10</span>)</span>
-<span id="cb146-21"><a href="step-secure.html#cb146-21"></a><span class="co"># Check that the app is still working</span></span>
-<span id="cb146-22"><a href="step-secure.html#cb146-22"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span>
-<span id="cb146-23"><a href="step-secure.html#cb146-23"></a><span class="co"># Stop the connection</span></span>
-<span id="cb146-24"><a href="step-secure.html#cb146-24"></a>test<span class="op">$</span><span class="kw">stop</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="step-secure.html#cb140-1"></a><span class="co"># Creating a new test instance</span></span>
+<span id="cb140-2"><a href="step-secure.html#cb140-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
+<span id="cb140-3"><a href="step-secure.html#cb140-3"></a>  <span class="co"># Using the `find_chrome()` function to guess where the </span></span>
+<span id="cb140-4"><a href="step-secure.html#cb140-4"></a>  <span class="co"># Chrome bin is on our machine</span></span>
+<span id="cb140-5"><a href="step-secure.html#cb140-5"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
+<span id="cb140-6"><a href="step-secure.html#cb140-6"></a>  <span class="co"># Launching Chrome on a random available port on our machine</span></span>
+<span id="cb140-7"><a href="step-secure.html#cb140-7"></a>  <span class="co"># Note that you will need httpuv &gt;= 1.5.2 if you want to use </span></span>
+<span id="cb140-8"><a href="step-secure.html#cb140-8"></a>  <span class="co"># this function</span></span>
+<span id="cb140-9"><a href="step-secure.html#cb140-9"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(), </span>
+<span id="cb140-10"><a href="step-secure.html#cb140-10"></a>  <span class="co"># Specifying the page we want to connect to</span></span>
+<span id="cb140-11"><a href="step-secure.html#cb140-11"></a>  <span class="dt">url =</span> <span class="st">&quot;https://connect.thinkr.fr/hexmake/&quot;</span>,</span>
+<span id="cb140-12"><a href="step-secure.html#cb140-12"></a>  <span class="co"># Do everything on the terminal, with no window open</span></span>
+<span id="cb140-13"><a href="step-secure.html#cb140-13"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
+<span id="cb140-14"><a href="step-secure.html#cb140-14"></a>)</span>
+<span id="cb140-15"><a href="step-secure.html#cb140-15"></a><span class="co"># We&#39;ll wait for the application to be ready to accept inputs</span></span>
+<span id="cb140-16"><a href="step-secure.html#cb140-16"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span>
+<span id="cb140-17"><a href="step-secure.html#cb140-17"></a><span class="co"># We launch the horde of gremlins</span></span>
+<span id="cb140-18"><a href="step-secure.html#cb140-18"></a>test<span class="op">$</span><span class="kw">gremlins_horde</span>()</span>
+<span id="cb140-19"><a href="step-secure.html#cb140-19"></a><span class="co"># Sleep, let the gremlins do their job</span></span>
+<span id="cb140-20"><a href="step-secure.html#cb140-20"></a><span class="kw">Sys.sleep</span>(<span class="dv">10</span>)</span>
+<span id="cb140-21"><a href="step-secure.html#cb140-21"></a><span class="co"># Check that the app is still working</span></span>
+<span id="cb140-22"><a href="step-secure.html#cb140-22"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span>
+<span id="cb140-23"><a href="step-secure.html#cb140-23"></a><span class="co"># Stop the connection</span></span>
+<span id="cb140-24"><a href="step-secure.html#cb140-24"></a>test<span class="op">$</span><span class="kw">stop</span>()</span></code></pre></div>
 </div>
 <div id="c.-shinytest" class="section level4 unnumbered">
 <h4>C. <code>{shinytest}</code></h4>
 <p>Finally, if you prefer a <code>{shiny}</code> specific package, you can go for <code>{shinytest}</code> <span class="citation">(Chang and Csárdi <a href="#ref-R-shinytest" role="doc-biblioref">2019</a>)</span>.
-This package, created and maintained by RStudio, allows you to do a series of screenshots of your application, and then replays your app and compare the previously taken screenshots to the current state of your application, allowing you to detect any changes in the interface.</p>
+This package, created and maintained by RStudio, <strong>allows you to do a series of screenshots of your application, and then replays your app and compare the previously taken screenshots to the current state of your application</strong>, allowing you to detect any changes in the interface.</p>
 <p>If you are building your application with <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span>, you will need to add an <code>app.R</code> file at the root of your package, then run <code>shinytest::recordTest()</code>:</p>
-<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="step-secure.html#cb147-1"></a><span class="co"># Create an app.R file at the root of the package</span></span>
-<span id="cb147-2"><a href="step-secure.html#cb147-2"></a>golem<span class="op">::</span><span class="kw">add_rstudioconnect_file</span>()</span>
-<span id="cb147-3"><a href="step-secure.html#cb147-3"></a><span class="co"># Launch a test, and record a series of </span></span>
-<span id="cb147-4"><a href="step-secure.html#cb147-4"></a><span class="co"># snapshots of your application</span></span>
-<span id="cb147-5"><a href="step-secure.html#cb147-5"></a>shinytest<span class="op">::</span><span class="kw">recordTest</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="step-secure.html#cb141-1"></a><span class="co"># Create an app.R file at the root of the package</span></span>
+<span id="cb141-2"><a href="step-secure.html#cb141-2"></a>golem<span class="op">::</span><span class="kw">add_rstudioconnect_file</span>()</span>
+<span id="cb141-3"><a href="step-secure.html#cb141-3"></a><span class="co"># Launch a test, and record a series of </span></span>
+<span id="cb141-4"><a href="step-secure.html#cb141-4"></a><span class="co"># snapshots of your application</span></span>
+<span id="cb141-5"><a href="step-secure.html#cb141-5"></a>shinytest<span class="op">::</span><span class="kw">recordTest</span>()</span></code></pre></div>
 <p>Once this function is run, a new window opens: it contains your app, and a “Screenshot” button on the right.
-Using this button, you can take various recording of your shiny application at different states, as show in figure <a href="step-secure.html#fig:11-step-by-step-secure-9">11.2</a>.</p>
+Using this button, you can take various recording of your shiny application at different states, as show in figure <a href="#fig:11-step-by-step-secure-9"><strong>??</strong></a>.</p>
 
-<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-9"></span>
+<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-10"></span>
 <img src="img/shinytest.png" alt="General view of a {shinytest} window." width="100%" />
 <p class="caption">
 FIGURE 11.2: General view of a <code>{shinytest}</code> window.
 </p>
 </div>
 <p>Then, you can do some changes in your app, and run:</p>
-<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="step-secure.html#cb148-1"></a>shinytest<span class="op">::</span><span class="kw">testApp</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="step-secure.html#cb142-1"></a>shinytest<span class="op">::</span><span class="kw">testApp</span>()</span></code></pre></div>
 <p>If the <code>{shinytest}</code> package detects a visual change in the application, you will be immediately alerted, with a report of the difference from the snapshots you took and the current state of the application.</p>
 </div>
 </div>
@@ -741,56 +739,56 @@ FIGURE 11.2: General view of a <code>{shinytest}</code> window.
 <h3><span class="header-section-number">11.1.4</span> Testing the app load</h3>
 <div id="a.-shinyloadtest" class="section level4 unnumbered">
 <h4>A. <code>{shinyloadtest}</code></h4>
-<p><code>{shinyloadtest}</code> <span class="citation">(Dipert, Schloerke, and Borges <a href="#ref-R-shinyloadtest" role="doc-biblioref">2020</a>)</span> tests how an application behaves when one, two, three, twenty, one hundred users connect to the app, and gives you a visual report about the connection and response time of each session.
+<p><code>{shinyloadtest}</code> <span class="citation">(Dipert, Schloerke, and Borges <a href="#ref-R-shinyloadtest" role="doc-biblioref">2020</a>)</span> <strong>tests how an application behaves when one, two, three, twenty, one hundred users connect to the app and use it</strong>, and gives you a visual report about the connection and response time of each session.
 The idea with <code>{shinyloadtest}</code> is to first record a session where you mimic a user behavior, then <code>shinycannon</code>, a command line tool coming with <code>{shinyloadtest}</code>, replays the recording several times.
 Once the session has been replayed several times mimicking the session you have recorded, you have access to a report of the behavior of your app.</p>
-<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="step-secure.html#cb149-1"></a><span class="kw">library</span>(shinyloadtest)</span></code></pre></div>
-<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="step-secure.html#cb150-1"></a><span class="co"># Starting your app in another process</span></span>
-<span id="cb150-2"><a href="step-secure.html#cb150-2"></a>p &lt;-<span class="st"> </span>processx<span class="op">::</span>process<span class="op">$</span><span class="kw">new</span>(</span>
-<span id="cb150-3"><a href="step-secure.html#cb150-3"></a>  <span class="st">&quot;Rscript&quot;</span>, </span>
-<span id="cb150-4"><a href="step-secure.html#cb150-4"></a>  <span class="kw">c</span>( <span class="st">&quot;-e&quot;</span>,  <span class="st">&quot;options(&#39;shiny.port&#39;= 2811);hexmake::run_app()&quot;</span> )</span>
-<span id="cb150-5"><a href="step-secure.html#cb150-5"></a>)</span>
-<span id="cb150-6"><a href="step-secure.html#cb150-6"></a><span class="co"># We wait for the app to be ready</span></span>
-<span id="cb150-7"><a href="step-secure.html#cb150-7"></a><span class="kw">Sys.sleep</span>(<span class="dv">5</span>) </span>
-<span id="cb150-8"><a href="step-secure.html#cb150-8"></a><span class="co"># Check that the process is alive</span></span>
-<span id="cb150-9"><a href="step-secure.html#cb150-9"></a>p<span class="op">$</span><span class="kw">is_alive</span>()</span>
-<span id="cb150-10"><a href="step-secure.html#cb150-10"></a><span class="co"># Open the app in our browser just to be sure</span></span>
-<span id="cb150-11"><a href="step-secure.html#cb150-11"></a><span class="kw">browseURL</span>(<span class="st">&quot;http:://localhost:2811&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="step-secure.html#cb143-1"></a><span class="kw">library</span>(shinyloadtest)</span></code></pre></div>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="step-secure.html#cb144-1"></a><span class="co"># Starting your app in another process</span></span>
+<span id="cb144-2"><a href="step-secure.html#cb144-2"></a>p &lt;-<span class="st"> </span>processx<span class="op">::</span>process<span class="op">$</span><span class="kw">new</span>(</span>
+<span id="cb144-3"><a href="step-secure.html#cb144-3"></a>  <span class="st">&quot;Rscript&quot;</span>, </span>
+<span id="cb144-4"><a href="step-secure.html#cb144-4"></a>  <span class="kw">c</span>( <span class="st">&quot;-e&quot;</span>,  <span class="st">&quot;options(&#39;shiny.port&#39;= 2811);hexmake::run_app()&quot;</span> )</span>
+<span id="cb144-5"><a href="step-secure.html#cb144-5"></a>)</span>
+<span id="cb144-6"><a href="step-secure.html#cb144-6"></a><span class="co"># We wait for the app to be ready</span></span>
+<span id="cb144-7"><a href="step-secure.html#cb144-7"></a><span class="kw">Sys.sleep</span>(<span class="dv">5</span>) </span>
+<span id="cb144-8"><a href="step-secure.html#cb144-8"></a><span class="co"># Check that the process is alive</span></span>
+<span id="cb144-9"><a href="step-secure.html#cb144-9"></a>p<span class="op">$</span><span class="kw">is_alive</span>()</span>
+<span id="cb144-10"><a href="step-secure.html#cb144-10"></a><span class="co"># Open the app in our browser just to be sure</span></span>
+<span id="cb144-11"><a href="step-secure.html#cb144-11"></a><span class="kw">browseURL</span>(<span class="st">&quot;http:://localhost:2811&quot;</span>)</span></code></pre></div>
 <p>Record the tests, potentially in a new dir:</p>
-<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="step-secure.html#cb151-1"></a><span class="co"># Creating a directory to receive the logs</span></span>
-<span id="cb151-2"><a href="step-secure.html#cb151-2"></a>fs<span class="op">::</span><span class="kw">dir_create</span>(<span class="st">&quot;shinylogs&quot;</span>)</span>
-<span id="cb151-3"><a href="step-secure.html#cb151-3"></a><span class="co"># Performing the session recording inside this new folder</span></span>
-<span id="cb151-4"><a href="step-secure.html#cb151-4"></a>withr<span class="op">::</span><span class="kw">with_dir</span>(</span>
-<span id="cb151-5"><a href="step-secure.html#cb151-5"></a>  <span class="st">&quot;shinylogs&quot;</span>, {</span>
-<span id="cb151-6"><a href="step-secure.html#cb151-6"></a>    <span class="co"># Launch the recording of an app session, using port 1234</span></span>
-<span id="cb151-7"><a href="step-secure.html#cb151-7"></a>    shinyloadtest<span class="op">::</span><span class="kw">record_session</span>(</span>
-<span id="cb151-8"><a href="step-secure.html#cb151-8"></a>      <span class="st">&quot;http://localhost:2811&quot;</span>, </span>
-<span id="cb151-9"><a href="step-secure.html#cb151-9"></a>      <span class="dt">port =</span> <span class="dv">1234</span></span>
-<span id="cb151-10"><a href="step-secure.html#cb151-10"></a>    ) </span>
-<span id="cb151-11"><a href="step-secure.html#cb151-11"></a>  }</span>
-<span id="cb151-12"><a href="step-secure.html#cb151-12"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb145-1"><a href="step-secure.html#cb145-1"></a><span class="co"># Creating a directory to receive the logs</span></span>
+<span id="cb145-2"><a href="step-secure.html#cb145-2"></a>fs<span class="op">::</span><span class="kw">dir_create</span>(<span class="st">&quot;shinylogs&quot;</span>)</span>
+<span id="cb145-3"><a href="step-secure.html#cb145-3"></a><span class="co"># Performing the session recording inside this new folder</span></span>
+<span id="cb145-4"><a href="step-secure.html#cb145-4"></a>withr<span class="op">::</span><span class="kw">with_dir</span>(</span>
+<span id="cb145-5"><a href="step-secure.html#cb145-5"></a>  <span class="st">&quot;shinylogs&quot;</span>, {</span>
+<span id="cb145-6"><a href="step-secure.html#cb145-6"></a>    <span class="co"># Launch the recording of an app session, using port 1234</span></span>
+<span id="cb145-7"><a href="step-secure.html#cb145-7"></a>    shinyloadtest<span class="op">::</span><span class="kw">record_session</span>(</span>
+<span id="cb145-8"><a href="step-secure.html#cb145-8"></a>      <span class="st">&quot;http://localhost:2811&quot;</span>, </span>
+<span id="cb145-9"><a href="step-secure.html#cb145-9"></a>      <span class="dt">port =</span> <span class="dv">1234</span></span>
+<span id="cb145-10"><a href="step-secure.html#cb145-10"></a>    ) </span>
+<span id="cb145-11"><a href="step-secure.html#cb145-11"></a>  }</span>
+<span id="cb145-12"><a href="step-secure.html#cb145-12"></a>)</span></code></pre></div>
 <p>We now have a series of one or more recording/s inside the <code>shinylogs/</code> folder:</p>
 <p>Then, let’s switch to our command line, and rerun the session with <code>shinycannon</code>.
 The <code>shinycannon</code> command line tools take several arguments: the path the <code>.log</code> file, the URL of the app, <code>--workers</code> specify the number of concurrent connections to run, and the <code>--output-dir</code> argument specifies where the report should be written.</p>
 <p>Then, go to your terminal and run:</p>
-<div class="sourceCode" id="cb152"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb152-1"><a href="step-secure.html#cb152-1"></a><span class="ex">shinycannon</span> shinylogs/recording.log \</span>
-<span id="cb152-2"><a href="step-secure.html#cb152-2"></a>http://localhost:2811 --workers 10 \</span>
-<span id="cb152-3"><a href="step-secure.html#cb152-3"></a>--output-dir shinylogs/run1</span></code></pre></div>
+<div class="sourceCode" id="cb146"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb146-1"><a href="step-secure.html#cb146-1"></a><span class="ex">shinycannon</span> shinylogs/recording.log \</span>
+<span id="cb146-2"><a href="step-secure.html#cb146-2"></a>  http://localhost:2811 --workers 10 \</span>
+<span id="cb146-3"><a href="step-secure.html#cb146-3"></a>  --output-dir shinylogs/run1</span></code></pre></div>
 <p>And now, we have new files inside the folder, corresponding to the session recordings.</p>
-<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="step-secure.html#cb153-1"></a><span class="co"># printing the structure of shinylogs</span></span>
-<span id="cb153-2"><a href="step-secure.html#cb153-2"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;shinylogs&quot;</span>, <span class="dt">recurse =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="step-secure.html#cb147-1"></a><span class="co"># printing the structure of shinylogs</span></span>
+<span id="cb147-2"><a href="step-secure.html#cb147-2"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;shinylogs&quot;</span>, <span class="dt">recurse =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <pre><code>shinylogs
 ├── recording.log
 ├── run1
 ├── run2
 └── run3</code></pre>
 <p>Good news: we do not have to manually analyze these files—<code>{shinyloadtest}</code> offers a series of wrapper functions to do that.</p>
-<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="step-secure.html#cb155-1"></a><span class="co"># Bringing the runs in the R session</span></span>
-<span id="cb155-2"><a href="step-secure.html#cb155-2"></a>shinyload_runs &lt;-<span class="st"> </span><span class="kw">load_runs</span>(</span>
-<span id="cb155-3"><a href="step-secure.html#cb155-3"></a>  <span class="st">&quot;5 workers&quot;</span> =<span class="st"> &quot;shinylogs/run1&quot;</span></span>
-<span id="cb155-4"><a href="step-secure.html#cb155-4"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="step-secure.html#cb149-1"></a><span class="co"># Bringing the runs in the R session</span></span>
+<span id="cb149-2"><a href="step-secure.html#cb149-2"></a>shinyload_runs &lt;-<span class="st"> </span><span class="kw">load_runs</span>(</span>
+<span id="cb149-3"><a href="step-secure.html#cb149-3"></a>  <span class="st">&quot;5 workers&quot;</span> =<span class="st"> &quot;shinylogs/run1&quot;</span></span>
+<span id="cb149-4"><a href="step-secure.html#cb149-4"></a>)</span></code></pre></div>
 <p>We now have a data.frame that looks like this:</p>
-<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="step-secure.html#cb156-1"></a>dplyr<span class="op">::</span><span class="kw">glimpse</span>(<span class="kw">head</span>(shinyload_runs))</span></code></pre></div>
+<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="step-secure.html#cb150-1"></a>dplyr<span class="op">::</span><span class="kw">glimpse</span>(<span class="kw">head</span>(shinyload_runs))</span></code></pre></div>
 <pre><code>Rows: 6
 Columns: 13
 $ run               &lt;ord&gt; 5 workers, 5 workers, 5 wo…
@@ -812,9 +810,9 @@ For example:</p>
 <li><code>slt_session_duration()</code> plots the session duration, with the various types of event that takes computation time: JS and CSS load, R computation…</li>
 </ul>
 
-<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="step-secure.html#cb158-1"></a><span class="kw">slt_session_duration</span>(shinyload_runs)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-20"></span>
-<img src="engineering-production-grade-shiny-apps_files/figure-html/11-step-by-step-secure-20-1.png" alt="Session duration" width="100%" />
+<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="step-secure.html#cb152-1"></a><span class="kw">slt_session_duration</span>(shinyload_runs)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-21"></span>
+<img src="engineering-production-grade-shiny-apps_files/figure-html/11-step-by-step-secure-21-1.png" alt="Session duration" width="100%" />
 <p class="caption">
 FIGURE 11.3: Session duration
 </p>
@@ -825,11 +823,11 @@ FIGURE 11.3: Session duration
 <!-- slt_waterfall(shinyload_runs) -->
 <!-- ``` -->
 <p>And if you need to bundle everything into an HTML reports, <code>shinyloadtest_report()</code> is what you are looking for.</p>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="step-secure.html#cb159-1"></a><span class="co"># Generating the report</span></span>
-<span id="cb159-2"><a href="step-secure.html#cb159-2"></a><span class="kw">shinyloadtest_report</span>(shinyload_runs)</span></code></pre></div>
-<p>This function will generate an HTML report of all the things computed by <code>{shinyloadtest}</code>, as show in figure <a href="step-secure.html#fig:11-step-by-step-secure-22">11.4</a>.</p>
+<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="step-secure.html#cb153-1"></a><span class="co"># Generating the report</span></span>
+<span id="cb153-2"><a href="step-secure.html#cb153-2"></a><span class="kw">shinyloadtest_report</span>(shinyload_runs)</span></code></pre></div>
+<p>This function will generate an HTML report of all the things computed by <code>{shinyloadtest}</code>, as show in figure <a href="#fig:11-step-by-step-secure-22"><strong>??</strong></a>.</p>
 
-<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-22"></span>
+<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-23"></span>
 <img src="img/shinyloadtestreport.png" alt="Webpage generated by shinyloadtest_report()" width="100%" />
 <p class="caption">
 FIGURE 11.4: Webpage generated by <code>shinyloadtest_report()</code>
@@ -855,69 +853,68 @@ You should probably set a different port for <code>{shinyloadtest}</code>, so th
 <p>Another thing you might want to monitor is the memory/CPU usage of your application, which <code>{shinyloadtest}</code> does not natively provide: the package records the load from the browser point of view, not from the server one.
 That’s where <code>{dockerstats}</code> <span class="citation">(Fay <a href="#ref-R-dockerstats" role="doc-biblioref">2020</a><a href="#ref-R-dockerstats" role="doc-biblioref">d</a>)</span> can come into play: this package is a wrapper around the command line <code>docker stats</code>, and returns an R data.frame with the stats.</p>
 <p>You can get the <code>{dockerstats}</code> package from GitHub with:</p>
-<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="step-secure.html#cb160-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;ColinFay/dockerstats&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="step-secure.html#cb154-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;ColinFay/dockerstats&quot;</span>)</span></code></pre></div>
 <p>Or from npm via:</p>
-<div class="sourceCode" id="cb161"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb161-1"><a href="step-secure.html#cb161-1"></a><span class="ex">npm</span> install -g r-dockerstats</span></code></pre></div>
-<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="step-secure.html#cb162-1"></a><span class="kw">library</span>(dockerstats)</span></code></pre></div>
+<div class="sourceCode" id="cb155"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb155-1"><a href="step-secure.html#cb155-1"></a><span class="ex">npm</span> install -g r-dockerstats</span></code></pre></div>
+<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="step-secure.html#cb156-1"></a><span class="kw">library</span>(dockerstats)</span></code></pre></div>
 <p>With these stats, we can monitor the load on the app when it is run in a docker container.</p>
 <p>We will start by launching the container using a <code>system()</code> call: here, we are running the <code>{hexmake}</code> application, bundled in the <code>colinfay/hexmake</code> docker image, on port 2811.
 We also make sure we give it a name with <code>--name</code>, so that we can call it in our <code>dockerstats()</code> call later on.</p>
-<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="step-secure.html#cb163-1"></a><span class="co"># We are launching the docker container </span></span>
-<span id="cb163-2"><a href="step-secure.html#cb163-2"></a><span class="co"># using R system() command. Here, we are </span></span>
-<span id="cb163-3"><a href="step-secure.html#cb163-3"></a><span class="co"># running the container image called </span></span>
-<span id="cb163-4"><a href="step-secure.html#cb163-4"></a><span class="co"># colinfay/hexmake. We are naming the </span></span>
-<span id="cb163-5"><a href="step-secure.html#cb163-5"></a><span class="co"># container hexmake using the --name flag, </span></span>
-<span id="cb163-6"><a href="step-secure.html#cb163-6"></a><span class="co"># --rm means the container will be removed </span></span>
-<span id="cb163-7"><a href="step-secure.html#cb163-7"></a><span class="co"># when stopped, and finally the -p flag defines </span></span>
-<span id="cb163-8"><a href="step-secure.html#cb163-8"></a><span class="co"># how to bind the ports of the container</span></span>
-<span id="cb163-9"><a href="step-secure.html#cb163-9"></a><span class="co"># with the ports of the host (left is the host,</span></span>
-<span id="cb163-10"><a href="step-secure.html#cb163-10"></a><span class="co">#  right is the container): in other word, here, </span></span>
-<span id="cb163-11"><a href="step-secure.html#cb163-11"></a><span class="co">#  we bind port 80 of our container to the port 2811</span></span>
-<span id="cb163-12"><a href="step-secure.html#cb163-12"></a><span class="co"># of our machine.</span></span>
-<span id="cb163-13"><a href="step-secure.html#cb163-13"></a><span class="kw">system</span>(</span>
-<span id="cb163-14"><a href="step-secure.html#cb163-14"></a>  <span class="st">&quot;docker run --name hexmake --rm -p 2811:80 colinfay/hexmake&quot;</span>, </span>
-<span id="cb163-15"><a href="step-secure.html#cb163-15"></a>  <span class="dt">wait =</span> <span class="ot">FALSE</span></span>
-<span id="cb163-16"><a href="step-secure.html#cb163-16"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="step-secure.html#cb157-1"></a><span class="co"># We are launching the docker container </span></span>
+<span id="cb157-2"><a href="step-secure.html#cb157-2"></a><span class="co"># using R system() command. Here, we are </span></span>
+<span id="cb157-3"><a href="step-secure.html#cb157-3"></a><span class="co"># running the container image called </span></span>
+<span id="cb157-4"><a href="step-secure.html#cb157-4"></a><span class="co"># colinfay/hexmake. We are naming the </span></span>
+<span id="cb157-5"><a href="step-secure.html#cb157-5"></a><span class="co"># container hexmake using the --name flag, </span></span>
+<span id="cb157-6"><a href="step-secure.html#cb157-6"></a><span class="co"># --rm means the container will be removed </span></span>
+<span id="cb157-7"><a href="step-secure.html#cb157-7"></a><span class="co"># when stopped, and finally the -p flag defines </span></span>
+<span id="cb157-8"><a href="step-secure.html#cb157-8"></a><span class="co"># how to bind the ports of the container</span></span>
+<span id="cb157-9"><a href="step-secure.html#cb157-9"></a><span class="co"># with the ports of the host (left is the host,</span></span>
+<span id="cb157-10"><a href="step-secure.html#cb157-10"></a><span class="co">#  right is the container): in other word, here, </span></span>
+<span id="cb157-11"><a href="step-secure.html#cb157-11"></a><span class="co">#  we bind port 80 of our container to the port 2811</span></span>
+<span id="cb157-12"><a href="step-secure.html#cb157-12"></a><span class="co"># of our machine.</span></span>
+<span id="cb157-13"><a href="step-secure.html#cb157-13"></a><span class="kw">system</span>(</span>
+<span id="cb157-14"><a href="step-secure.html#cb157-14"></a>  <span class="st">&quot;docker run --name hexmake --rm -p 2811:80 colinfay/hexmake&quot;</span>, </span>
+<span id="cb157-15"><a href="step-secure.html#cb157-15"></a>  <span class="dt">wait =</span> <span class="ot">FALSE</span></span>
+<span id="cb157-16"><a href="step-secure.html#cb157-16"></a>)</span></code></pre></div>
 <p>Let’s say now we want the stats for the hexmake container:</p>
-<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="step-secure.html#cb164-1"></a><span class="co"># Waiting for the container to be ready </span></span>
-<span id="cb164-2"><a href="step-secure.html#cb164-2"></a><span class="kw">Sys.sleep</span>(<span class="dv">30</span>)</span>
-<span id="cb164-3"><a href="step-secure.html#cb164-3"></a><span class="co"># Showing the docker stats for hexmake</span></span>
-<span id="cb164-4"><a href="step-secure.html#cb164-4"></a><span class="kw">dockerstats</span>(<span class="st">&quot;hexmake&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb164-5"><a href="step-secure.html#cb164-5"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="step-secure.html#cb158-1"></a><span class="co"># Waiting for the container to be ready </span></span>
+<span id="cb158-2"><a href="step-secure.html#cb158-2"></a><span class="kw">Sys.sleep</span>(<span class="dv">30</span>)</span>
+<span id="cb158-3"><a href="step-secure.html#cb158-3"></a><span class="co"># Showing the docker stats for hexmake</span></span>
+<span id="cb158-4"><a href="step-secure.html#cb158-4"></a><span class="kw">dockerstats</span>(<span class="st">&quot;hexmake&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb158-5"><a href="step-secure.html#cb158-5"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()</span></code></pre></div>
 <pre><code># A tibble: 1 x 14
   Container Name  ID    CPUPerc MemUsage MemLimit
   &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;   
-1 hexmake   hexm… 3ae4…    0.09 115.6MiB 6.791GiB
+1 hexmake   hexm… 4259…    0.05 113.8MiB 6.791GiB
 # … with 8 more variables: MemPerc &lt;dbl&gt;, NetI &lt;chr&gt;,
 #   NetO &lt;chr&gt;, BlockI &lt;chr&gt;, BlockO &lt;chr&gt;,
 #   PIDs &lt;int&gt;, record_time &lt;chr&gt;, extra &lt;chr&gt;</code></pre>
 <p>Of course, right now nobody is using the app, so the usage can be pretty small.
 But let’s push it a little bit by mimicking a lot of connections.</p>
 <p>To do that, we can replay our <code>shinycannon</code> call, with at the same time using the <code>dockerstats_recurse()</code> function, that will recursively call <code>dockerstats()</code> on a regular interval.</p>
-<div class="sourceCode" id="cb166"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb166-1"><a href="step-secure.html#cb166-1"></a><span class="co"># Replaying the recording</span></span>
-<span id="cb166-2"><a href="step-secure.html#cb166-2"></a><span class="ex">shinycannon</span> shinylogs/recording.log <span class="dt">\ </span></span>
-<span id="cb166-3"><a href="step-secure.html#cb166-3"></a><span class="co"># Specificying the host url and the number of &quot;visitors&quot;</span></span>
-<span id="cb166-4"><a href="step-secure.html#cb166-4"></a><span class="ex">http</span>://localhost:2811 --workers 10 \</span>
-<span id="cb166-5"><a href="step-secure.html#cb166-5"></a># Define where the recording will be outputed</span>
-<span id="cb166-6"><a href="step-secure.html#cb166-6"></a><span class="ex">--output-dir</span> shinylogs/run3</span></code></pre></div>
-<p>Let’s launch at the same time a <code>dockerstats_recurse()</code>
-For example, here, we will print, on each loop, the <code>MemUsage</code> of the container, then saving the data inside a <code>dockerstats.csv</code> file.</p>
-<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="step-secure.html#cb167-1"></a><span class="co"># Calling recursive the dockerstats function. </span></span>
-<span id="cb167-2"><a href="step-secure.html#cb167-2"></a><span class="co"># The callback function takes a function, and define</span></span>
-<span id="cb167-3"><a href="step-secure.html#cb167-3"></a><span class="co"># what to do with the data.frame each time the </span></span>
-<span id="cb167-4"><a href="step-secure.html#cb167-4"></a><span class="co"># dockerstats results are computed.</span></span>
-<span id="cb167-5"><a href="step-secure.html#cb167-5"></a><span class="kw">dockerstats_recurse</span>(</span>
-<span id="cb167-6"><a href="step-secure.html#cb167-6"></a>  <span class="st">&quot;hexmake&quot;</span>,</span>
-<span id="cb167-7"><a href="step-secure.html#cb167-7"></a>  <span class="co"># append_csv is a {dockerstats} function that will </span></span>
-<span id="cb167-8"><a href="step-secure.html#cb167-8"></a>  <span class="co"># apped the output to a given csv</span></span>
-<span id="cb167-9"><a href="step-secure.html#cb167-9"></a>  <span class="dt">callback =</span> <span class="kw">append_csv</span>(</span>
-<span id="cb167-10"><a href="step-secure.html#cb167-10"></a>    <span class="dt">file =</span> <span class="st">&quot;shinylogs/dockerstats.csv&quot;</span>, </span>
-<span id="cb167-11"><a href="step-secure.html#cb167-11"></a>    <span class="dt">print =</span> <span class="ot">TRUE</span></span>
-<span id="cb167-12"><a href="step-secure.html#cb167-12"></a>  )</span>
-<span id="cb167-13"><a href="step-secure.html#cb167-13"></a>)</span></code></pre></div>
-<p>Figure <a href="step-secure.html#fig:11-step-by-step-secure-30">11.5</a> is what both these processes look side to side.</p>
+<div class="sourceCode" id="cb160"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb160-1"><a href="step-secure.html#cb160-1"></a><span class="co"># Replaying the recording</span></span>
+<span id="cb160-2"><a href="step-secure.html#cb160-2"></a><span class="ex">shinycannon</span> shinylogs/recording.log <span class="dt">\ </span></span>
+<span id="cb160-3"><a href="step-secure.html#cb160-3"></a><span class="co"># Specificying the host url and the number of &quot;visitors&quot;</span></span>
+<span id="cb160-4"><a href="step-secure.html#cb160-4"></a>  <span class="ex">http</span>://localhost:2811 --workers 10 \</span>
+<span id="cb160-5"><a href="step-secure.html#cb160-5"></a># Define where the recording will be outputed</span>
+<span id="cb160-6"><a href="step-secure.html#cb160-6"></a>  <span class="ex">--output-dir</span> shinylogs/run3</span></code></pre></div>
+<p>Let’s launch at the same time a <code>dockerstats_recurse()</code> For example, here, we will print, on each loop, the <code>MemUsage</code> of the container, then saving the data inside a <code>dockerstats.csv</code> file.</p>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="step-secure.html#cb161-1"></a><span class="co"># Calling recursive the dockerstats function. </span></span>
+<span id="cb161-2"><a href="step-secure.html#cb161-2"></a><span class="co"># The callback function takes a function, and define</span></span>
+<span id="cb161-3"><a href="step-secure.html#cb161-3"></a><span class="co"># what to do with the data.frame each time the </span></span>
+<span id="cb161-4"><a href="step-secure.html#cb161-4"></a><span class="co"># dockerstats results are computed.</span></span>
+<span id="cb161-5"><a href="step-secure.html#cb161-5"></a><span class="kw">dockerstats_recurse</span>(</span>
+<span id="cb161-6"><a href="step-secure.html#cb161-6"></a>  <span class="st">&quot;hexmake&quot;</span>,</span>
+<span id="cb161-7"><a href="step-secure.html#cb161-7"></a>  <span class="co"># append_csv is a {dockerstats} function that will </span></span>
+<span id="cb161-8"><a href="step-secure.html#cb161-8"></a>  <span class="co"># apped the output to a given csv</span></span>
+<span id="cb161-9"><a href="step-secure.html#cb161-9"></a>  <span class="dt">callback =</span> <span class="kw">append_csv</span>(</span>
+<span id="cb161-10"><a href="step-secure.html#cb161-10"></a>    <span class="dt">file =</span> <span class="st">&quot;shinylogs/dockerstats.csv&quot;</span>, </span>
+<span id="cb161-11"><a href="step-secure.html#cb161-11"></a>    <span class="dt">print =</span> <span class="ot">TRUE</span></span>
+<span id="cb161-12"><a href="step-secure.html#cb161-12"></a>  )</span>
+<span id="cb161-13"><a href="step-secure.html#cb161-13"></a>)</span></code></pre></div>
+<p>Figure <a href="#fig:11-step-by-step-secure-30"><strong>??</strong></a> is what both these processes look side to side.</p>
 
-<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-30"></span>
+<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-31"></span>
 <img src="img/hexmake-dockerstats.png" alt="{dockerstats} and shinycannon running side-by-side at the same time." width="100%" />
 <p class="caption">
 FIGURE 11.5: <code>{dockerstats}</code> and <code>shinycannon</code> running side-by-side at the same time.
@@ -925,12 +922,12 @@ FIGURE 11.5: <code>{dockerstats}</code> and <code>shinycannon</code> running sid
 </div>
 <p>As you can see, as the number of connections grow, the memory usage grows.
 And we now have a csv with the evolution of the <code>docker stats</code> records over time!</p>
-<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="step-secure.html#cb168-1"></a><span class="co"># read_appended_csv() allows to read a csv that has been </span></span>
-<span id="cb168-2"><a href="step-secure.html#cb168-2"></a><span class="co"># constructed with the append_csv() function</span></span>
-<span id="cb168-3"><a href="step-secure.html#cb168-3"></a>docker_stats &lt;-<span class="st"> </span><span class="kw">read_appended_csv</span>(</span>
-<span id="cb168-4"><a href="step-secure.html#cb168-4"></a>  <span class="st">&quot;shinylogs/dockerstats.csv&quot;</span></span>
-<span id="cb168-5"><a href="step-secure.html#cb168-5"></a>)</span></code></pre></div>
-<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="step-secure.html#cb169-1"></a>dplyr<span class="op">::</span><span class="kw">glimpse</span>(<span class="kw">head</span>(docker_stats))</span></code></pre></div>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="step-secure.html#cb162-1"></a><span class="co"># read_appended_csv() allows to read a csv that has been </span></span>
+<span id="cb162-2"><a href="step-secure.html#cb162-2"></a><span class="co"># constructed with the append_csv() function</span></span>
+<span id="cb162-3"><a href="step-secure.html#cb162-3"></a>docker_stats &lt;-<span class="st"> </span><span class="kw">read_appended_csv</span>(</span>
+<span id="cb162-4"><a href="step-secure.html#cb162-4"></a>  <span class="st">&quot;shinylogs/dockerstats.csv&quot;</span></span>
+<span id="cb162-5"><a href="step-secure.html#cb162-5"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="step-secure.html#cb163-1"></a>dplyr<span class="op">::</span><span class="kw">glimpse</span>(<span class="kw">head</span>(docker_stats))</span></code></pre></div>
 <pre><code>Rows: 6
 Columns: 14
 $ Container   &lt;chr&gt; &quot;hexmake&quot;, &quot;hexmake&quot;, &quot;hexmake&quot;,…
@@ -950,48 +947,48 @@ $ extra       &lt;lgl&gt; NA, NA, NA, NA, NA, NA</code></pre>
 <p>If you need a deeper look into the connection between application actions and the docker stats, you can also combine <code>{dockerstats}</code> with <code>{crrry}</code>, the idea being that you can record the CPU usage at the exact moment the application performs a specific computation.</p>
 <p>Let’s record the computation of the <code>hexmake</code> container containing the same app as before.</p>
 <p>First, launch the container:</p>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="step-secure.html#cb171-1"></a><span class="co"># Launching the container a second time, </span></span>
-<span id="cb171-2"><a href="step-secure.html#cb171-2"></a><span class="co"># but name it xmk2 and serve it on port 2708</span></span>
-<span id="cb171-3"><a href="step-secure.html#cb171-3"></a><span class="kw">system</span>(</span>
-<span id="cb171-4"><a href="step-secure.html#cb171-4"></a>  <span class="st">&quot;docker run -p 2708:80 --rm --name xmk2 -d colinfay/hexmake&quot;</span>, </span>
-<span id="cb171-5"><a href="step-secure.html#cb171-5"></a>  <span class="dt">wait =</span> <span class="ot">FALSE</span></span>
-<span id="cb171-6"><a href="step-secure.html#cb171-6"></a>)</span>
-<span id="cb171-7"><a href="step-secure.html#cb171-7"></a><span class="kw">Sys.sleep</span>(<span class="dv">60</span>) <span class="co"># Let the container launch</span></span></code></pre></div>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="step-secure.html#cb165-1"></a><span class="co"># Launching the container a second time, </span></span>
+<span id="cb165-2"><a href="step-secure.html#cb165-2"></a><span class="co"># but name it xmk2 and serve it on port 2708</span></span>
+<span id="cb165-3"><a href="step-secure.html#cb165-3"></a><span class="kw">system</span>(</span>
+<span id="cb165-4"><a href="step-secure.html#cb165-4"></a>  <span class="st">&quot;docker run -p 2708:80 --rm --name xmk2 -d colinfay/hexmake&quot;</span>, </span>
+<span id="cb165-5"><a href="step-secure.html#cb165-5"></a>  <span class="dt">wait =</span> <span class="ot">FALSE</span></span>
+<span id="cb165-6"><a href="step-secure.html#cb165-6"></a>)</span>
+<span id="cb165-7"><a href="step-secure.html#cb165-7"></a><span class="kw">Sys.sleep</span>(<span class="dv">60</span>) <span class="co"># Let the container launch</span></span></code></pre></div>
 <p>Then, a <code>{crrry}</code> job:</p>
-<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="step-secure.html#cb172-1"></a><span class="co"># See previous version of this code for a commented explanation </span></span>
-<span id="cb172-2"><a href="step-secure.html#cb172-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
-<span id="cb172-3"><a href="step-secure.html#cb172-3"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
-<span id="cb172-4"><a href="step-secure.html#cb172-4"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(),</span>
-<span id="cb172-5"><a href="step-secure.html#cb172-5"></a>  <span class="dt">url =</span><span class="st">&quot;http://localhost:2708&quot;</span>,</span>
-<span id="cb172-6"><a href="step-secure.html#cb172-6"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
-<span id="cb172-7"><a href="step-secure.html#cb172-7"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="step-secure.html#cb166-1"></a><span class="co"># See previous version of this code for a commented explanation </span></span>
+<span id="cb166-2"><a href="step-secure.html#cb166-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
+<span id="cb166-3"><a href="step-secure.html#cb166-3"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
+<span id="cb166-4"><a href="step-secure.html#cb166-4"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(),</span>
+<span id="cb166-5"><a href="step-secure.html#cb166-5"></a>  <span class="dt">url =</span><span class="st">&quot;http://localhost:2708&quot;</span>,</span>
+<span id="cb166-6"><a href="step-secure.html#cb166-6"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
+<span id="cb166-7"><a href="step-secure.html#cb166-7"></a>)</span></code></pre></div>
 <pre><code>Running &#39;/Applications/Google 
   Chrome.app/Contents/MacOS/Google Chrome&#39; 
   --no-first-run --headless \
   &#39;--user-data-dir=/Users/colin/Library/Application     
   Support/r-crrri/chrome-data-dir-thyhpptv&#39; \
   &#39;--remote-debugging-port=48938&#39;</code></pre>
-<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="step-secure.html#cb174-1"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="step-secure.html#cb168-1"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span></code></pre></div>
 <pre><code>Shiny is computing
 ✓ Shiny is still running</code></pre>
-<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="step-secure.html#cb176-1"></a><span class="co"># We are creating a first data.frame that records the launch </span></span>
-<span id="cb176-2"><a href="step-secure.html#cb176-2"></a><span class="co"># of the container.</span></span>
-<span id="cb176-3"><a href="step-secure.html#cb176-3"></a>results &lt;-<span class="st"> </span>dockerstats<span class="op">::</span><span class="kw">dockerstats</span>(<span class="st">&quot;xmk2&quot;</span>, <span class="dt">extra =</span> <span class="st">&quot;launch&quot;</span>)</span>
-<span id="cb176-4"><a href="step-secure.html#cb176-4"></a></span>
-<span id="cb176-5"><a href="step-secure.html#cb176-5"></a><span class="cf">for</span> (i <span class="cf">in</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>]){</span>
-<span id="cb176-6"><a href="step-secure.html#cb176-6"></a>  <span class="co"># We will be setting a letter for the package name input</span></span>
-<span id="cb176-7"><a href="step-secure.html#cb176-7"></a>  test<span class="op">$</span><span class="kw">shiny_set_input</span>(</span>
-<span id="cb176-8"><a href="step-secure.html#cb176-8"></a>    <span class="st">&quot;main_ui_1-left_ui_1-pkg_name_ui_1-package&quot;</span>, </span>
-<span id="cb176-9"><a href="step-secure.html#cb176-9"></a>    i</span>
-<span id="cb176-10"><a href="step-secure.html#cb176-10"></a>  )</span>
-<span id="cb176-11"><a href="step-secure.html#cb176-11"></a>  <span class="co"># Once the input is set, we call dockerstats() </span></span>
-<span id="cb176-12"><a href="step-secure.html#cb176-12"></a>  <span class="co"># for this container and bind the results to </span></span>
-<span id="cb176-13"><a href="step-secure.html#cb176-13"></a>  <span class="co"># the previously created data.frame</span></span>
-<span id="cb176-14"><a href="step-secure.html#cb176-14"></a>  results &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
-<span id="cb176-15"><a href="step-secure.html#cb176-15"></a>    results, </span>
-<span id="cb176-16"><a href="step-secure.html#cb176-16"></a>    dockerstats<span class="op">::</span><span class="kw">dockerstats</span>(<span class="st">&quot;xmk2&quot;</span>, <span class="dt">extra =</span> i)</span>
-<span id="cb176-17"><a href="step-secure.html#cb176-17"></a>  )</span>
-<span id="cb176-18"><a href="step-secure.html#cb176-18"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="step-secure.html#cb170-1"></a><span class="co"># We are creating a first data.frame that records the launch </span></span>
+<span id="cb170-2"><a href="step-secure.html#cb170-2"></a><span class="co"># of the container.</span></span>
+<span id="cb170-3"><a href="step-secure.html#cb170-3"></a>results &lt;-<span class="st"> </span>dockerstats<span class="op">::</span><span class="kw">dockerstats</span>(<span class="st">&quot;xmk2&quot;</span>, <span class="dt">extra =</span> <span class="st">&quot;launch&quot;</span>)</span>
+<span id="cb170-4"><a href="step-secure.html#cb170-4"></a></span>
+<span id="cb170-5"><a href="step-secure.html#cb170-5"></a><span class="cf">for</span> (i <span class="cf">in</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>]){</span>
+<span id="cb170-6"><a href="step-secure.html#cb170-6"></a>  <span class="co"># We will be setting a letter for the package name input</span></span>
+<span id="cb170-7"><a href="step-secure.html#cb170-7"></a>  test<span class="op">$</span><span class="kw">shiny_set_input</span>(</span>
+<span id="cb170-8"><a href="step-secure.html#cb170-8"></a>    <span class="st">&quot;main_ui_1-left_ui_1-pkg_name_ui_1-package&quot;</span>, </span>
+<span id="cb170-9"><a href="step-secure.html#cb170-9"></a>    i</span>
+<span id="cb170-10"><a href="step-secure.html#cb170-10"></a>  )</span>
+<span id="cb170-11"><a href="step-secure.html#cb170-11"></a>  <span class="co"># Once the input is set, we call dockerstats() </span></span>
+<span id="cb170-12"><a href="step-secure.html#cb170-12"></a>  <span class="co"># for this container and bind the results to </span></span>
+<span id="cb170-13"><a href="step-secure.html#cb170-13"></a>  <span class="co"># the previously created data.frame</span></span>
+<span id="cb170-14"><a href="step-secure.html#cb170-14"></a>  results &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
+<span id="cb170-15"><a href="step-secure.html#cb170-15"></a>    results, </span>
+<span id="cb170-16"><a href="step-secure.html#cb170-16"></a>    dockerstats<span class="op">::</span><span class="kw">dockerstats</span>(<span class="st">&quot;xmk2&quot;</span>, <span class="dt">extra =</span> i)</span>
+<span id="cb170-17"><a href="step-secure.html#cb170-17"></a>  )</span>
+<span id="cb170-18"><a href="step-secure.html#cb170-18"></a>}</span></code></pre></div>
 <pre><code>-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
@@ -1022,51 +1019,43 @@ Shiny is computing
 -- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running</code></pre>
-<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="step-secure.html#cb178-1"></a><span class="kw">try</span>({</span>
-<span id="cb178-2"><a href="step-secure.html#cb178-2"></a>  <span class="co"># Stopping the docker container</span></span>
-<span id="cb178-3"><a href="step-secure.html#cb178-3"></a>  <span class="kw">system</span>(<span class="st">&quot;docker kill xmk2&quot;</span>)</span>
-<span id="cb178-4"><a href="step-secure.html#cb178-4"></a>  </span>
-<span id="cb178-5"><a href="step-secure.html#cb178-5"></a>  <span class="co"># Stopping the tests</span></span>
-<span id="cb178-6"><a href="step-secure.html#cb178-6"></a>  test<span class="op">$</span><span class="kw">stop</span>()</span>
-<span id="cb178-7"><a href="step-secure.html#cb178-7"></a>})</span></code></pre></div>
-<pre><code>Error in try({ : object &#39;test&#39; not found</code></pre>
 <p>And draw a small graph of this evolution:</p>
 
-<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="step-secure.html#cb180-1"></a><span class="kw">library</span>(dplyr, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb180-2"><a href="step-secure.html#cb180-2"></a><span class="co"># We are converting the MemUsage and record_time columns </span></span>
-<span id="cb180-3"><a href="step-secure.html#cb180-3"></a><span class="co"># to a format that can be used in {ggplot2}</span></span>
-<span id="cb180-4"><a href="step-secure.html#cb180-4"></a>results &lt;-<span class="st"> </span>results <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb180-5"><a href="step-secure.html#cb180-5"></a><span class="st">  </span><span class="kw">mutate</span>(</span>
-<span id="cb180-6"><a href="step-secure.html#cb180-6"></a>    <span class="dt">MemUsage =</span> <span class="kw">to_mib</span>(MemUsage), </span>
-<span id="cb180-7"><a href="step-secure.html#cb180-7"></a>    <span class="dt">record_time =</span> <span class="kw">as.POSIXct</span>(record_time)</span>
-<span id="cb180-8"><a href="step-secure.html#cb180-8"></a>  )</span>
-<span id="cb180-9"><a href="step-secure.html#cb180-9"></a><span class="kw">library</span>(ggplot2)</span>
-<span id="cb180-10"><a href="step-secure.html#cb180-10"></a><span class="co"># Using the record time as an x axis, </span></span>
-<span id="cb180-11"><a href="step-secure.html#cb180-11"></a><span class="co"># then adding the MemUsage as a line (to watch the </span></span>
-<span id="cb180-12"><a href="step-secure.html#cb180-12"></a><span class="co"># evolution over time), then we add the &#39;extra&#39; column, </span></span>
-<span id="cb180-13"><a href="step-secure.html#cb180-13"></a><span class="co"># that contains the letters, as vertical lines + as </span></span>
-<span id="cb180-14"><a href="step-secure.html#cb180-14"></a><span class="co"># label</span></span>
-<span id="cb180-15"><a href="step-secure.html#cb180-15"></a><span class="kw">ggplot</span>(</span>
-<span id="cb180-16"><a href="step-secure.html#cb180-16"></a>  <span class="dt">data =</span> results, </span>
-<span id="cb180-17"><a href="step-secure.html#cb180-17"></a>  <span class="kw">aes</span>(<span class="dt">x =</span> record_time)</span>
-<span id="cb180-18"><a href="step-secure.html#cb180-18"></a>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb180-19"><a href="step-secure.html#cb180-19"></a><span class="st">  </span><span class="kw">geom_line</span>(</span>
-<span id="cb180-20"><a href="step-secure.html#cb180-20"></a>    <span class="kw">aes</span>(<span class="dt">y =</span> MemUsage)</span>
-<span id="cb180-21"><a href="step-secure.html#cb180-21"></a>  ) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb180-22"><a href="step-secure.html#cb180-22"></a><span class="st">  </span><span class="kw">geom_vline</span>(</span>
-<span id="cb180-23"><a href="step-secure.html#cb180-23"></a>    <span class="kw">aes</span>(<span class="dt">xintercept =</span> record_time)</span>
-<span id="cb180-24"><a href="step-secure.html#cb180-24"></a>  ) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb180-25"><a href="step-secure.html#cb180-25"></a><span class="st">  </span><span class="kw">geom_label</span>(</span>
-<span id="cb180-26"><a href="step-secure.html#cb180-26"></a>    <span class="kw">aes</span>(</span>
-<span id="cb180-27"><a href="step-secure.html#cb180-27"></a>      <span class="dt">y =</span> <span class="kw">max</span>(MemUsage), </span>
-<span id="cb180-28"><a href="step-secure.html#cb180-28"></a>      <span class="dt">label =</span> extra</span>
-<span id="cb180-29"><a href="step-secure.html#cb180-29"></a>    )</span>
-<span id="cb180-30"><a href="step-secure.html#cb180-30"></a>  ) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb180-31"><a href="step-secure.html#cb180-31"></a><span class="st">  </span><span class="kw">labs</span>(</span>
-<span id="cb180-32"><a href="step-secure.html#cb180-32"></a>    <span class="dt">title =</span> <span class="st">&quot;MemUsage of 10 inputs for package name&quot;</span></span>
-<span id="cb180-33"><a href="step-secure.html#cb180-33"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-37"></span>
-<img src="engineering-production-grade-shiny-apps_files/figure-html/11-step-by-step-secure-37-1.png" alt="Plot of the {dockerstats} evolution" width="672" />
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="step-secure.html#cb172-1"></a><span class="kw">library</span>(dplyr, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb172-2"><a href="step-secure.html#cb172-2"></a><span class="co"># We are converting the MemUsage and record_time columns </span></span>
+<span id="cb172-3"><a href="step-secure.html#cb172-3"></a><span class="co"># to a format that can be used in {ggplot2}</span></span>
+<span id="cb172-4"><a href="step-secure.html#cb172-4"></a>results &lt;-<span class="st"> </span>results <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb172-5"><a href="step-secure.html#cb172-5"></a><span class="st">  </span><span class="kw">mutate</span>(</span>
+<span id="cb172-6"><a href="step-secure.html#cb172-6"></a>    <span class="dt">MemUsage =</span> <span class="kw">to_mib</span>(MemUsage), </span>
+<span id="cb172-7"><a href="step-secure.html#cb172-7"></a>    <span class="dt">record_time =</span> <span class="kw">as.POSIXct</span>(record_time)</span>
+<span id="cb172-8"><a href="step-secure.html#cb172-8"></a>  )</span>
+<span id="cb172-9"><a href="step-secure.html#cb172-9"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb172-10"><a href="step-secure.html#cb172-10"></a><span class="co"># Using the record time as an x axis, </span></span>
+<span id="cb172-11"><a href="step-secure.html#cb172-11"></a><span class="co"># then adding the MemUsage as a line (to watch the </span></span>
+<span id="cb172-12"><a href="step-secure.html#cb172-12"></a><span class="co"># evolution over time), then we add the &#39;extra&#39; column, </span></span>
+<span id="cb172-13"><a href="step-secure.html#cb172-13"></a><span class="co"># that contains the letters, as vertical lines + as </span></span>
+<span id="cb172-14"><a href="step-secure.html#cb172-14"></a><span class="co"># label</span></span>
+<span id="cb172-15"><a href="step-secure.html#cb172-15"></a><span class="kw">ggplot</span>(</span>
+<span id="cb172-16"><a href="step-secure.html#cb172-16"></a>  <span class="dt">data =</span> results, </span>
+<span id="cb172-17"><a href="step-secure.html#cb172-17"></a>  <span class="kw">aes</span>(<span class="dt">x =</span> record_time)</span>
+<span id="cb172-18"><a href="step-secure.html#cb172-18"></a>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb172-19"><a href="step-secure.html#cb172-19"></a><span class="st">  </span><span class="kw">geom_line</span>(</span>
+<span id="cb172-20"><a href="step-secure.html#cb172-20"></a>    <span class="kw">aes</span>(<span class="dt">y =</span> MemUsage)</span>
+<span id="cb172-21"><a href="step-secure.html#cb172-21"></a>  ) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb172-22"><a href="step-secure.html#cb172-22"></a><span class="st">  </span><span class="kw">geom_vline</span>(</span>
+<span id="cb172-23"><a href="step-secure.html#cb172-23"></a>    <span class="kw">aes</span>(<span class="dt">xintercept =</span> record_time)</span>
+<span id="cb172-24"><a href="step-secure.html#cb172-24"></a>  ) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb172-25"><a href="step-secure.html#cb172-25"></a><span class="st">  </span><span class="kw">geom_label</span>(</span>
+<span id="cb172-26"><a href="step-secure.html#cb172-26"></a>    <span class="kw">aes</span>(</span>
+<span id="cb172-27"><a href="step-secure.html#cb172-27"></a>      <span class="dt">y =</span> <span class="kw">max</span>(MemUsage), </span>
+<span id="cb172-28"><a href="step-secure.html#cb172-28"></a>      <span class="dt">label =</span> extra</span>
+<span id="cb172-29"><a href="step-secure.html#cb172-29"></a>    )</span>
+<span id="cb172-30"><a href="step-secure.html#cb172-30"></a>  ) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb172-31"><a href="step-secure.html#cb172-31"></a><span class="st">  </span><span class="kw">labs</span>(</span>
+<span id="cb172-32"><a href="step-secure.html#cb172-32"></a>    <span class="dt">title =</span> <span class="st">&quot;MemUsage of 10 inputs for package name&quot;</span></span>
+<span id="cb172-33"><a href="step-secure.html#cb172-33"></a>  )</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-43"></span>
+<img src="engineering-production-grade-shiny-apps_files/figure-html/11-step-by-step-secure-43-1.png" alt="Plot of the {dockerstats} evolution" width="672" />
 <p class="caption">
 FIGURE 11.6: Plot of the <code>{dockerstats}</code> evolution
 </p>
@@ -1078,11 +1067,11 @@ FIGURE 11.6: Plot of the <code>{dockerstats}</code> evolution
 <h2><span class="header-section-number">11.2</span> A reproducible environment</h2>
 <p>One of the challenges of building an app that needs to be sent to production is that you will need to work in a reproducible environment.
 What does this mean?
-When building a production application, you are building a piece of software that will be launched on another computer, be it a server in the cloud or someone else’s computer.
+<strong>When building a production application, you are building a piece of software that will be launched on another computer, be it a server in the cloud or someone else’s computer</strong>.
 Once your app is built, there are few chances that you will launch it on your own computer and that external users will connect to your computer.
 What will happen is that you will either give your users a package (which will be the simplest way to share it: bundle the packaged app to a <code>tar.gz</code>, then let people install it either manually or from a package repository), or a URL where they can connect and use your app.</p>
 <p>If you follow the <code>{golem}</code> workflow and all the good practices for a solid package, the application you have built should be deployable on another computer that has R.
-In that second case, you will have to think about how you can create your app in a reproducible environment: in other words, be sure that the app is deployed under the same configuration as your local application—R version, package versions, system requirements, environment variables…</p>
+In that second case, <strong>you will have to think about how you can create your app in a reproducible environment</strong>: in other words, be sure that the app is deployed under the same configuration as your local application—R version, package versions, system requirements, environment variables…</p>
 <p>To help you achieve that, we will introduce two tools in the next section: <code>{renv}</code> <span class="citation">(Ushey <a href="#ref-R-renv" role="doc-biblioref">2020</a>)</span>, and <a href="https://www.docker.com/">Docker</a>.</p>
 <div id="renv" class="section level3">
 <h3><span class="header-section-number">11.2.1</span> <code>{renv}</code></h3>
@@ -1092,44 +1081,43 @@ In that second case, you will have to think about how you can create your app in
 And also, how can we be sure that, working as a team, we will be able to work together using the same package versions?</p>
 <p>From one package version to another, functions and behaviors change.
 Most of the time, new version means new functions, and new features.
-But from time to time, a new version means breaking changes.
-Monitoring these changes and how they potentially break our code is an hard task: be it because checking versions of packages on various machines can take time, or because debugging these bugs in your application logs is not straightforward.
+But from time to time, a new version means breaking change<strong>s. Monitoring these changes and how they potentially break our code is an hard task: be it because checking versions of packages on various machines can take time</strong>, or because debugging these bugs in your application logs is not straightforward.
 And of course, the moment when we discover the error might not be the perfect time for us, as we might not have enough free time on our calendar to debug the application which has stopped running…</p>
 <p>Let’s take for example this traceback from the logs of an application we sent one day on a Shiny Server:</p>
-<div class="sourceCode" id="cb181"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb181-1"><a href="step-secure.html#cb181-1"></a><span class="ex">root@westeros-vm</span>:/var/log/shiny-server# cat thewall(...)<span class="ex">.log</span></span>
-<span id="cb181-2"><a href="step-secure.html#cb181-2"></a><span class="ex">***</span> caught segfault ***</span>
-<span id="cb181-3"><a href="step-secure.html#cb181-3"></a>[<span class="ex">...</span>]</span>
-<span id="cb181-4"><a href="step-secure.html#cb181-4"></a><span class="ex">address</span> 0x5100004d, cause <span class="st">&#39;memory not mapped&#39;</span></span>
-<span id="cb181-5"><a href="step-secure.html#cb181-5"></a></span>
-<span id="cb181-6"><a href="step-secure.html#cb181-6"></a><span class="ex">Traceback</span>:</span>
-<span id="cb181-7"><a href="step-secure.html#cb181-7"></a><span class="ex">1</span>: rcpp_sf_to_geojson(sf, digits, factors_as_string)</span>
-<span id="cb181-8"><a href="step-secure.html#cb181-8"></a><span class="ex">2</span>: sf_geojson.sf(data)</span>
-<span id="cb181-9"><a href="step-secure.html#cb181-9"></a><span class="ex">3</span>: geojsonsf::sf_geojson(data)</span>
-<span id="cb181-10"><a href="step-secure.html#cb181-10"></a><span class="ex">4</span>: addGlifyPolygons(., data = pol_V1, color = les_couleurs, </span>
-<span id="cb181-11"><a href="step-secure.html#cb181-11"></a><span class="ex">popup</span> = <span class="st">&quot;val&quot;</span>, opacity = 1)</span>
-<span id="cb181-12"><a href="step-secure.html#cb181-12"></a><span class="ex">5</span>: function_list[[i]](value)</span>
-<span id="cb181-13"><a href="step-secure.html#cb181-13"></a><span class="ex">6</span>: freduce(value, <span class="kw">`</span><span class="ex">_function_list</span><span class="kw">`</span>)</span>
-<span id="cb181-14"><a href="step-secure.html#cb181-14"></a><span class="ex">7</span>: <span class="kw">`</span><span class="ex">_fseq</span><span class="kw">`</span>(<span class="kw">`</span><span class="ex">_lhs</span><span class="kw">`</span>)</span>
-<span id="cb181-15"><a href="step-secure.html#cb181-15"></a><span class="ex">8</span>: eval(quote(<span class="kw">`</span><span class="ex">_fseq</span><span class="kw">`</span>(<span class="kw">`</span><span class="ex">_lhs</span><span class="kw">`</span>)), <span class="fu">env</span>, env)</span>
-<span id="cb181-16"><a href="step-secure.html#cb181-16"></a>[<span class="ex">...</span>]</span>
-<span id="cb181-17"><a href="step-secure.html#cb181-17"></a><span class="ex">105</span>: captureStackTraces({</span>
-<span id="cb181-18"><a href="step-secure.html#cb181-18"></a><span class="kw">while</span> <span class="kw">(</span>!<span class="ex">.globals</span><span class="va">$stopped</span><span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb181-19"><a href="step-secure.html#cb181-19"></a><span class="ex">..stacktracefloor..</span>(serviceApp())</span>
-<span id="cb181-20"><a href="step-secure.html#cb181-20"></a><span class="ex">Sys.sleep</span>(0.001)    <span class="kw">}</span>})</span>
-<span id="cb181-21"><a href="step-secure.html#cb181-21"></a><span class="ex">106</span>: ..stacktraceoff..(captureStackTraces({</span>
-<span id="cb181-22"><a href="step-secure.html#cb181-22"></a><span class="kw">while</span> <span class="kw">(</span>!<span class="ex">.globals</span><span class="va">$stopped</span><span class="kw">)</span> <span class="kw">{</span>                </span>
-<span id="cb181-23"><a href="step-secure.html#cb181-23"></a><span class="ex">..stacktracefloor..</span>(serviceApp())</span>
-<span id="cb181-24"><a href="step-secure.html#cb181-24"></a><span class="ex">Sys.sleep</span>(0.001)    <span class="kw">}</span>}))</span>
-<span id="cb181-25"><a href="step-secure.html#cb181-25"></a><span class="ex">107</span>: runApp(Sys.getenv(<span class="st">&quot;SHINY_APP&quot;</span>), </span>
-<span id="cb181-26"><a href="step-secure.html#cb181-26"></a><span class="ex">port</span> = port, </span>
-<span id="cb181-27"><a href="step-secure.html#cb181-27"></a><span class="ex">launch.browser</span> = FALSE)</span>
-<span id="cb181-28"><a href="step-secure.html#cb181-28"></a><span class="ex">An</span> irrecoverable exception occurred. R is aborting now ...</span></code></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb173-1"><a href="step-secure.html#cb173-1"></a><span class="ex">root@westeros-vm</span>:/var/log/shiny-server# cat thewall(...)<span class="ex">.log</span></span>
+<span id="cb173-2"><a href="step-secure.html#cb173-2"></a><span class="ex">***</span> caught segfault ***</span>
+<span id="cb173-3"><a href="step-secure.html#cb173-3"></a>[<span class="ex">...</span>]</span>
+<span id="cb173-4"><a href="step-secure.html#cb173-4"></a><span class="ex">address</span> 0x5100004d, cause <span class="st">&#39;memory not mapped&#39;</span></span>
+<span id="cb173-5"><a href="step-secure.html#cb173-5"></a></span>
+<span id="cb173-6"><a href="step-secure.html#cb173-6"></a><span class="ex">Traceback</span>:</span>
+<span id="cb173-7"><a href="step-secure.html#cb173-7"></a><span class="ex">1</span>: rcpp_sf_to_geojson(sf, digits, factors_as_string)</span>
+<span id="cb173-8"><a href="step-secure.html#cb173-8"></a><span class="ex">2</span>: sf_geojson.sf(data)</span>
+<span id="cb173-9"><a href="step-secure.html#cb173-9"></a><span class="ex">3</span>: geojsonsf::sf_geojson(data)</span>
+<span id="cb173-10"><a href="step-secure.html#cb173-10"></a><span class="ex">4</span>: addGlifyPolygons(., data = pol_V1, color = les_couleurs, </span>
+<span id="cb173-11"><a href="step-secure.html#cb173-11"></a><span class="ex">popup</span> = <span class="st">&quot;val&quot;</span>, opacity = 1)</span>
+<span id="cb173-12"><a href="step-secure.html#cb173-12"></a><span class="ex">5</span>: function_list[[i]](value)</span>
+<span id="cb173-13"><a href="step-secure.html#cb173-13"></a><span class="ex">6</span>: freduce(value, <span class="kw">`</span><span class="ex">_function_list</span><span class="kw">`</span>)</span>
+<span id="cb173-14"><a href="step-secure.html#cb173-14"></a><span class="ex">7</span>: <span class="kw">`</span><span class="ex">_fseq</span><span class="kw">`</span>(<span class="kw">`</span><span class="ex">_lhs</span><span class="kw">`</span>)</span>
+<span id="cb173-15"><a href="step-secure.html#cb173-15"></a><span class="ex">8</span>: eval(quote(<span class="kw">`</span><span class="ex">_fseq</span><span class="kw">`</span>(<span class="kw">`</span><span class="ex">_lhs</span><span class="kw">`</span>)), <span class="fu">env</span>, env)</span>
+<span id="cb173-16"><a href="step-secure.html#cb173-16"></a>[<span class="ex">...</span>]</span>
+<span id="cb173-17"><a href="step-secure.html#cb173-17"></a><span class="ex">105</span>: captureStackTraces({</span>
+<span id="cb173-18"><a href="step-secure.html#cb173-18"></a><span class="kw">while</span> <span class="kw">(</span>!<span class="ex">.globals</span><span class="va">$stopped</span><span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb173-19"><a href="step-secure.html#cb173-19"></a><span class="ex">..stacktracefloor..</span>(serviceApp())</span>
+<span id="cb173-20"><a href="step-secure.html#cb173-20"></a><span class="ex">Sys.sleep</span>(0.001)    <span class="kw">}</span>})</span>
+<span id="cb173-21"><a href="step-secure.html#cb173-21"></a><span class="ex">106</span>: ..stacktraceoff..(captureStackTraces({</span>
+<span id="cb173-22"><a href="step-secure.html#cb173-22"></a><span class="kw">while</span> <span class="kw">(</span>!<span class="ex">.globals</span><span class="va">$stopped</span><span class="kw">)</span> <span class="kw">{</span>                </span>
+<span id="cb173-23"><a href="step-secure.html#cb173-23"></a><span class="ex">..stacktracefloor..</span>(serviceApp())</span>
+<span id="cb173-24"><a href="step-secure.html#cb173-24"></a><span class="ex">Sys.sleep</span>(0.001)    <span class="kw">}</span>}))</span>
+<span id="cb173-25"><a href="step-secure.html#cb173-25"></a><span class="ex">107</span>: runApp(Sys.getenv(<span class="st">&quot;SHINY_APP&quot;</span>), </span>
+<span id="cb173-26"><a href="step-secure.html#cb173-26"></a><span class="ex">port</span> = port, </span>
+<span id="cb173-27"><a href="step-secure.html#cb173-27"></a><span class="ex">launch.browser</span> = FALSE)</span>
+<span id="cb173-28"><a href="step-secure.html#cb173-28"></a><span class="ex">An</span> irrecoverable exception occurred. R is aborting now ...</span></code></pre></div>
 <p>Pretty hard to debug, isn’t it?
 What has actually happened?
-On that specific case, it turned out that the package version from <code>{geojsonsf}</code> <span class="citation">(Cooley <a href="#ref-R-geojsonsf" role="doc-biblioref">2020</a>)</span> was <code>1.2.1</code> on our development machine, and the one on the <code>{shiny}</code> server was updated to <code>1.3.0</code>, and there was a breaking change in the package, as shown in figure <a href="step-secure.html#fig:11-step-by-step-secure-38">11.7</a>.
+On that specific case, it turned out that the package version from <code>{geojsonsf}</code> <span class="citation">(Cooley <a href="#ref-R-geojsonsf" role="doc-biblioref">2020</a>)</span> was <code>1.2.1</code> on our development machine, and the one on the <code>{shiny}</code> server was updated to <code>1.3.0</code>, and there was a breaking change in the package, as shown in figure <a href="#fig:11-step-by-step-secure-38"><strong>??</strong></a>.
 These kind of bugs are even harder to detect as <code>{geojsonsf}</code> was not a direct dependency of our app, but a dependency of one of our dependency, making it slightly more complex to identify.</p>
 
-<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-38"></span>
+<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-44"></span>
 <img src="img/geojson.png" alt="Breaking changes in {geojsonsf}, a dependency of a dependency of our {shiny} application." width="100%" />
 <p class="caption">
 FIGURE 11.7: Breaking changes in <code>{geojsonsf}</code>, a dependency of a dependency of our <code>{shiny}</code> application.
@@ -1153,13 +1141,12 @@ That means that you can have <code>{geojsonsf}</code> version <code>1.2.1</code>
 </div></p>
 </blockquote>
 <p>The first thing to do with <code>{renv}</code> is initiating it with the <code>init()</code> function.</p>
-<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="step-secure.html#cb182-1"></a><span class="co"># Loading and initiaing {renv}</span></span>
-<span id="cb182-2"><a href="step-secure.html#cb182-2"></a><span class="kw">library</span>(renv)</span>
-<span id="cb182-3"><a href="step-secure.html#cb182-3"></a><span class="kw">init</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="step-secure.html#cb174-1"></a><span class="co"># Loading and initiaing {renv}</span></span>
+<span id="cb174-2"><a href="step-secure.html#cb174-2"></a><span class="kw">library</span>(renv)</span>
+<span id="cb174-3"><a href="step-secure.html#cb174-3"></a><span class="kw">init</span>()</span></code></pre></div>
 <p>This function does several things:</p>
 <ul>
-<li>Create/modify the <code>.Rprofile</code> file at the root of your project.
-Here is an example of what this files may look like inside an empty project:</li>
+<li>Create/modify the <code>.Rprofile</code> file at the root of your project. Here is an example of what this files may look like inside an empty project:</li>
 </ul>
 <pre><code>source(&quot;renv/activate.R&quot;)</code></pre>
 <p>In this example, there is just one call to a script, one located at <code>renv/activate.R</code>.</p>
@@ -1168,11 +1155,10 @@ Here is an example of what this files may look like inside an empty project:</li
 </ul>
 <p>As we have initiated an empty project, we do not have any dependencies here.
 If you run this command in a project that already has scripts and dependencies, <code>{renv}</code> will try to locate them all, and add them to this file.
-Note that these packages may come from CRAN, Bioconductor, GitHub, GitLab,
-Bitbucket, and even local repositories.</p>
+Note that these packages may come from CRAN, Bioconductor, GitHub, GitLab, Bitbucket, and even local repositories.</p>
 <p>The <code>renv/</code> folder contains a series of files that store your settings and the necessary packages, using a structure that mimics a local repository.</p>
-<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="step-secure.html#cb184-1"></a><span class="co"># Displaying the strucuture of the folder</span></span>
-<span id="cb184-2"><a href="step-secure.html#cb184-2"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;data-raw/renvinit/&quot;</span>, <span class="dt">recurse =</span> <span class="dv">5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="step-secure.html#cb176-1"></a><span class="co"># Displaying the structure of the folder</span></span>
+<span id="cb176-2"><a href="step-secure.html#cb176-2"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;data-raw/renvinit/&quot;</span>, <span class="dt">recurse =</span> <span class="dv">5</span>)</span></code></pre></div>
 <pre><code>data-raw/renvinit/
 ├── renv
 │   ├── activate.R
@@ -1185,14 +1171,14 @@ Bitbucket, and even local repositories.</p>
 The fastest way to install new packages in your <code>{renv}</code> powered project is by using the <code>install.packages</code> function, which is shimmed by <code>{renv}</code>.
 This shim will search into the local cache to see if the package has already been cached, and if it is not, it will install and link it.</p>
 <p>Now, we need to install a new package, for example <code>{attempt}</code> <span class="citation">(Fay <a href="#ref-R-attempt" role="doc-biblioref">2020</a><a href="#ref-R-attempt" role="doc-biblioref">a</a>)</span>:</p>
-<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="step-secure.html#cb186-1"></a><span class="co"># Installing attempt</span></span>
-<span id="cb186-2"><a href="step-secure.html#cb186-2"></a><span class="kw">install.packages</span>(<span class="st">&quot;attempt&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="step-secure.html#cb178-1"></a><span class="co"># Installing attempt</span></span>
+<span id="cb178-2"><a href="step-secure.html#cb178-2"></a><span class="kw">install.packages</span>(<span class="st">&quot;attempt&quot;</span>)</span></code></pre></div>
 <p>We will now add a little call to this library now:</p>
-<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="step-secure.html#cb187-1"></a><span class="co"># Create a fake script that launches {attempt}</span></span>
-<span id="cb187-2"><a href="step-secure.html#cb187-2"></a><span class="kw">write</span>(<span class="st">&quot;library(attempt)&quot;</span>, <span class="st">&quot;script.R&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="step-secure.html#cb179-1"></a><span class="co"># Create a fake script that launches {attempt}</span></span>
+<span id="cb179-2"><a href="step-secure.html#cb179-2"></a><span class="kw">write</span>(<span class="st">&quot;library(attempt)&quot;</span>, <span class="st">&quot;script.R&quot;</span>)</span></code></pre></div>
 <p>Once you want to update your <code>{renv}</code> <code>Lockfile</code>, call <code>snapshot()</code></p>
-<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="step-secure.html#cb188-1"></a><span class="co"># Snapshoting the current status of the environment</span></span>
-<span id="cb188-2"><a href="step-secure.html#cb188-2"></a>renv<span class="op">::</span><span class="kw">snapshot</span>(<span class="dt">confirm =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="step-secure.html#cb180-1"></a><span class="co"># Snapshoting the current status of the environment</span></span>
+<span id="cb180-2"><a href="step-secure.html#cb180-2"></a>renv<span class="op">::</span><span class="kw">snapshot</span>(<span class="dt">confirm =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <p>Note that if you are building an application as a package, use <code>renv::snapshot(type = "explicit")</code> (need version &gt; <code>0.9.3-99</code>): this will only capture the dependencies listed in the <code>DESCRIPTION</code> file.
 If you don’t specify this <code>type = "explicit"</code>, <code>{renv}</code> will go and look for all the package it can find in your file, and notably in your <code>.Rhistory</code>, meaning that if you one day used a function from <code>{dplyr}</code> but that your current package doesn’t use it anymore, <code>{renv}</code> will include it.</p>
 <pre><code>{
@@ -1252,8 +1238,8 @@ If you want to know more, we invite you to refer to the <a href="https://rstudio
 <h4>A. R, Docker, <code>{shiny}</code></h4>
 <p>Docker is a program that allows to download, install, create, launch and stop multiple operating systems, called containers, on a machine, which will be called the host.
 This host can be your local computer, or the server where you deploy your application/s.</p>
-<p>Docker was designed for enclosing software environments inside an image that can later be launched.
-The general idea is that with Docker, you are defining in a <code>Dockerfile</code> all the “rules” that are used to create a given environment, and then you can use this file (and the linked files, for example the R package containing your app) to deploy your application on any given server that can run Docker.
+<p>Docker was designed for <strong>enclosing software environments inside an image that can later be launched</strong>.
+The general idea is that with Docker, you are defining in a <code>Dockerfile</code> all the “rules” that are used to create a given environment, and then you can use this file (and the linked files, for example the R package containing your app) to <strong>deploy your application on any given server that can run Docker</strong>.
 That way, if the <code>Dockerfile</code> can compile on your machine and if you can run it, it should work everywhere (of course, it is a little bit more complex than that, but you get the idea).</p>
 <p>Why Docker in the context of <code>{shiny}</code> apps?
 Because Docker allows you to abstract away the complexity of managing multiple versions of R and multiple version of the same package, or even different versions of the same system requirement.
@@ -1261,7 +1247,7 @@ For example, let’s take our example with the breaking change in <code>{geojson
 With Docker, we can safely specify a <code>1.2.1</code> version in our image, and changing versions on the server would not have broken our code.</p>
 <p>By using Docker for your deployment, you can build and deploy an application with the very same version of packages and R as the one on your computer.
 And of course, you can change them without breaking the rest of the machine: everything that happens in a container stays in a container.
-That way, if your are building your application with an older version of <code>{shiny}</code>, you are sure that sending it to production will not break everything: the version inside the Docker is the same as the one from your machine.
+That way, if your are building your application with an older version of <code>{shiny}</code>, <strong>you are sure that sending it to production will not break everything: the version inside the Docker is the same as the one from your machine</strong>.
 And later, if you update <code>{shiny}</code> and start a new project, you can deploy your app with another version of the package.
 Same goes for your version of R.</p>
 </div>
@@ -1271,7 +1257,7 @@ Same goes for your version of R.</p>
 If you are building your app with <code>{golem}</code>, the creation of the <code>Dockerfile</code> is just one function away!
 If you have a look at the <code>03_deploy.R</code> file in the <code>dev</code> folder, you will find a series of functions that can create the <code>Dockerfile</code> for your project: either as a generic docker image, or for <code>{shiny}</code>Proxy or Heroku.</p>
 <p>For example, to create a <code>Dockerfile</code> for a <code>{golem}</code> project, you can run, from the root of your package:</p>
-<div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb190-1"><a href="step-secure.html#cb190-1"></a>golem<span class="op">::</span><span class="kw">add_dockerfile</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="step-secure.html#cb182-1"></a>golem<span class="op">::</span><span class="kw">add_dockerfile</span>()</span></code></pre></div>
 <p>Let’s take some time to understand this file, or and details how we could be building it from scratch.</p>
 <ol style="list-style-type: decimal">
 <li><code>FROM</code></li>
@@ -1280,7 +1266,7 @@ If you have a look at the <code>03_deploy.R</code> file in the <code>dev</code> 
 <p>This line defines what version of R to use for deploying your application.
 This <code>FROM</code> line is the one that sets an image to start from: you rarely (if ever) build a Docker image from nothing, but instead you use an existing image on top of which you build your own image.
 Here, we choose one of the <a href="https://hub.docker.com/r/rocker/r-ver/">r-ver</a> docker images, based on the output of:</p>
-<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb192-1"><a href="step-secure.html#cb192-1"></a><span class="kw">R.Version</span>()<span class="op">$</span>version.string</span></code></pre></div>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="step-secure.html#cb184-1"></a><span class="kw">R.Version</span>()<span class="op">$</span>version.string</span></code></pre></div>
 <pre><code>[1] &quot;R version 4.0.3 (2020-10-10)&quot;</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li><code>RUN</code></li>
@@ -1294,10 +1280,9 @@ libssl-dev libxml2-dev make \
 zlib1g-dev &amp;&amp; rm -rf /var/lib/apt/lists/*</code></pre>
 <p>In the subsequent <code>RUN</code> calls, <code>{golem}</code> chooses to call <code>remotes::install_version()</code> to be sure we install the version of the package that matches the one from your computer.</p>
 <pre><code>RUN Rscript -e \
-&#39;remotes::install_version(&quot;xfun&quot;,upgrade=&quot;never&quot;,version=&quot;0.19&quot;)&#39;
-</code></pre>
+&#39;remotes::install_version(&quot;xfun&quot;,upgrade=&quot;never&quot;,version=&quot;0.19&quot;)&#39;</code></pre>
 <p>As you can see, it matches the local version:</p>
-<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="step-secure.html#cb196-1"></a><span class="kw">packageVersion</span>(<span class="st">&quot;xfun&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="step-secure.html#cb188-1"></a><span class="kw">packageVersion</span>(<span class="st">&quot;xfun&quot;</span>)</span></code></pre></div>
 <pre><code>[1] ‘0.19’</code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li><code>ADD</code></li>
@@ -1322,19 +1307,19 @@ With a <code>{shiny}</code> app, this command is the one that launches the appli
 <h4>C. <code>{dockerfiler}</code></h4>
 <p>If you want to do everything from the R command line, the <code>{dockerfiler}</code> <span class="citation">(Fay <a href="#ref-R-dockerfiler" role="doc-biblioref">2019</a>)</span> package is here for you!
 This package allows you to generate a <code>Dockerfile</code> straight from R:</p>
-<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="step-secure.html#cb201-1"></a><span class="kw">library</span>(dockerfiler)</span>
-<span id="cb201-2"><a href="step-secure.html#cb201-2"></a><span class="co"># Creating a new Dockerfile object</span></span>
-<span id="cb201-3"><a href="step-secure.html#cb201-3"></a>my_dock &lt;-<span class="st"> </span>Dockerfile<span class="op">$</span><span class="kw">new</span>()</span>
-<span id="cb201-4"><a href="step-secure.html#cb201-4"></a><span class="co"># Adding RUN, ADD, WORKDIR and EXPOSE commands</span></span>
-<span id="cb201-5"><a href="step-secure.html#cb201-5"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="st">&quot;apt-get update &amp;&amp; apt-get install -y git-core&quot;</span>)</span>
-<span id="cb201-6"><a href="step-secure.html#cb201-6"></a>my_dock<span class="op">$</span><span class="kw">ADD</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;/&quot;</span>)</span>
-<span id="cb201-7"><a href="step-secure.html#cb201-7"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="st">&quot;mkdir /build_zone&quot;</span>)</span>
-<span id="cb201-8"><a href="step-secure.html#cb201-8"></a>my_dock<span class="op">$</span><span class="kw">ADD</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;/build_zone&quot;</span>)</span>
-<span id="cb201-9"><a href="step-secure.html#cb201-9"></a>my_dock<span class="op">$</span><span class="kw">WORKDIR</span>(<span class="st">&quot;/build_zone&quot;</span>)</span>
-<span id="cb201-10"><a href="step-secure.html#cb201-10"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="kw">r</span>(remotes<span class="op">::</span><span class="kw">install_local</span>(<span class="dt">upgrade=</span><span class="st">&quot;never&quot;</span>)))</span>
-<span id="cb201-11"><a href="step-secure.html#cb201-11"></a>my_dock<span class="op">$</span><span class="kw">EXPOSE</span>(<span class="dv">80</span>)</span>
-<span id="cb201-12"><a href="step-secure.html#cb201-12"></a><span class="co"># Viewing the Dockerfile</span></span>
-<span id="cb201-13"><a href="step-secure.html#cb201-13"></a>my_dock</span></code></pre></div>
+<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="step-secure.html#cb193-1"></a><span class="kw">library</span>(dockerfiler)</span>
+<span id="cb193-2"><a href="step-secure.html#cb193-2"></a><span class="co"># Creating a new Dockerfile object</span></span>
+<span id="cb193-3"><a href="step-secure.html#cb193-3"></a>my_dock &lt;-<span class="st"> </span>Dockerfile<span class="op">$</span><span class="kw">new</span>()</span>
+<span id="cb193-4"><a href="step-secure.html#cb193-4"></a><span class="co"># Adding RUN, ADD, WORKDIR and EXPOSE commands</span></span>
+<span id="cb193-5"><a href="step-secure.html#cb193-5"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="st">&quot;apt-get update &amp;&amp; apt-get install -y git-core&quot;</span>)</span>
+<span id="cb193-6"><a href="step-secure.html#cb193-6"></a>my_dock<span class="op">$</span><span class="kw">ADD</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;/&quot;</span>)</span>
+<span id="cb193-7"><a href="step-secure.html#cb193-7"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="st">&quot;mkdir /build_zone&quot;</span>)</span>
+<span id="cb193-8"><a href="step-secure.html#cb193-8"></a>my_dock<span class="op">$</span><span class="kw">ADD</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;/build_zone&quot;</span>)</span>
+<span id="cb193-9"><a href="step-secure.html#cb193-9"></a>my_dock<span class="op">$</span><span class="kw">WORKDIR</span>(<span class="st">&quot;/build_zone&quot;</span>)</span>
+<span id="cb193-10"><a href="step-secure.html#cb193-10"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="kw">r</span>(remotes<span class="op">::</span><span class="kw">install_local</span>(<span class="dt">upgrade=</span><span class="st">&quot;never&quot;</span>)))</span>
+<span id="cb193-11"><a href="step-secure.html#cb193-11"></a>my_dock<span class="op">$</span><span class="kw">EXPOSE</span>(<span class="dv">80</span>)</span>
+<span id="cb193-12"><a href="step-secure.html#cb193-12"></a><span class="co"># Viewing the Dockerfile</span></span>
+<span id="cb193-13"><a href="step-secure.html#cb193-13"></a>my_dock</span></code></pre></div>
 <pre><code>FROM rocker/r-base
 RUN apt-get update &amp;&amp; apt-get install -y git-core
 ADD . /
