@@ -27,7 +27,7 @@ paks <- c(
   "tidymodules", "shinyjs", "htmlwidgets", 
   "hunspell", "rhub", "spelling", "tufte", "uuid", 
   "attachment", "remotes", "usethis", "namer", "desc", "spelling", "tufte", 
-  "dockerstats", "spelling"
+  "dockerstats", "spelling", "tidymodules"
 ) 
 
 paks <- unique(paks)
