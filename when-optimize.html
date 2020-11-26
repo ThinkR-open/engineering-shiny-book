@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2020-11-24" />
+<meta name="date" content="2020-11-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -160,8 +160,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#want-to-help"><i class="fa fa-check"></i>Want to help?</a></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#other-resources"><i class="fa fa-check"></i>Other resources</a><ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#getting-started-with-shiny"><i class="fa fa-check"></i>Getting started with Shiny</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#shiny-into-production"><i class="fa fa-check"></i>Shiny into production</a></li>
+<li><a href="index.html#getting-started-with-shiny">Getting started with <code>{shiny}</code></a></li>
+<li><a href="index.html#shiny-into-production"><code>{shiny}</code> into production</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i>Disclaimer</a></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information-and-conventions"><i class="fa fa-check"></i>Software information and conventions</a></li>
@@ -177,8 +177,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="applications-presentation.html#minifying"><code>{minifying}</code></a></li>
 <li class="chapter" data-level="" data-path="applications-presentation.html"><a href="applications-presentation.html#other-applications"><i class="fa fa-check"></i>Other applications</a></li>
 </ul></li>
-<li class="part"><span><b>I Building Successful Shiny Apps</b></span></li>
-<li class="chapter" data-level="1" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html"><i class="fa fa-check"></i><b>1</b> About Successful Shiny Apps</a><ul>
+<li class="part"><span><b>I Building Successful <code>{shiny}</code> Apps</b></span></li>
+<li class="chapter" data-level="1" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html"><i class="fa fa-check"></i><b>1</b> About Successful <code>{shiny}</code> Apps</a><ul>
 <li class="chapter" data-level="1.1" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#a-very-short-introduction-to-shiny"><i class="fa fa-check"></i><b>1.1</b> A (very) short introduction to <code>{shiny}</code></a></li>
 <li class="chapter" data-level="1.2" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#complex-shiny"><i class="fa fa-check"></i><b>1.2</b> What is a Complex <code>{shiny}</code> Application?</a><ul>
 <li class="chapter" data-level="1.2.1" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#reaching-the-cliff-of-complexity"><i class="fa fa-check"></i><b>1.2.1</b> Reaching the cliff of complexity</a></li>
@@ -592,11 +592,11 @@ Also, are the extra hours/days spent rewriting a working code-base worth the spe
 <pre><code># A tibble: 2 x 6
   expression    min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:&gt; &lt;bch:&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 cpp         218µs  236µs     3007.     784KB     15.1
-2 native      685µs  687µs     1419.        0B      0  </code></pre>
+1 cpp         164µs  220µs     3144.     784KB     15.8
+2 native      661µs  796µs     1200.        0B      0  </code></pre>
 <p>(Note: we will come back to <code>bench::mark</code> later)</p>
 <p>Though, how much time gain is worth being sure you will get someone in your team to take over the maintenance if needed?
-In other words, given that (in our example), we are gaining around -4.50810^{-4} on the execution time of our function, is it worth switching to C++?
+In other words, given that (in our example), we are gaining around -5.76410^{-4} on the execution time of our function, is it worth switching to C++?
 Using external languages or complex data structures implies that from the start, you will need to think about who and how your code base will be maintained over the years.
 Chances are that if you plan on using a <code>{shiny}</code> application during a span of several years, various R developers will be working on the project, and including C++ code inside your application means that these future developer will either be required to know C++, or they will not be able to maintain this piece of code.</p>
 <p>So, to sum up, there are three ways to optimize your application &amp; R code, and the bad news is that you can not optimize for all of them:</p>
@@ -792,8 +792,8 @@ Note that by default, the <code>mark()</code> function compares the output of ea
 <pre><code># A tibble: 2 x 6
   expression    min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:&gt; &lt;bch:&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 for_loop   72.7µs 74.5µs    13097.    32.4KB        0
-2 vectorized  3.3µs    4µs   131640.    11.8KB        0</code></pre>
+1 for_loop   50.5µs 54.9µs    16414.    32.4KB        0
+2 vectorized  2.4µs    3µs   158833.    11.8KB        0</code></pre>
 <p>Here, we have an empiric evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest.</p>
 <p>If you want a graphical analysis, <code>{bench}</code> comes with an <code>autoplot</code> method for <code>{ggplot2}</code> <span class="citation">(Wickham, Chang, et al. <a href="#ref-R-ggplot2" role="doc-biblioref">2020</a>)</span>:</p>
 
