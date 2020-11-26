@@ -496,56 +496,56 @@ Most of the time, issues come from the fact that <strong>there is too much react
 <p>Of course, it is a nice feature to make everything react instantly to changes, but when building larger apps it is easy to create monsters, i.e complicated, messy reactive graphs where everything is updated too much and too often.
 Or worse, we generate endless reactive loops, aka “the reactive inferno” where A invalidates B which invalidates C which invalidates A which invalidates B which invalidates C…</p>
 <p>Let’s take a small example of a reactive inferno:</p>
-<div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb239-1"><a href="optim-caveat.html#cb239-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb239-2"><a href="optim-caveat.html#cb239-2"></a><span class="kw">library</span>(lubridate)</span>
-<span id="cb239-3"><a href="optim-caveat.html#cb239-3"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb239-4"><a href="optim-caveat.html#cb239-4"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb239-5"><a href="optim-caveat.html#cb239-5"></a>    <span class="co"># Adding a first input which allow </span></span>
-<span id="cb239-6"><a href="optim-caveat.html#cb239-6"></a>    <span class="co"># to select a specific date</span></span>
-<span id="cb239-7"><a href="optim-caveat.html#cb239-7"></a>    <span class="kw">dateInput</span>(</span>
-<span id="cb239-8"><a href="optim-caveat.html#cb239-8"></a>      <span class="st">&quot;date&quot;</span>, </span>
-<span id="cb239-9"><a href="optim-caveat.html#cb239-9"></a>      <span class="st">&quot;choose a date&quot;</span></span>
-<span id="cb239-10"><a href="optim-caveat.html#cb239-10"></a>    ), </span>
-<span id="cb239-11"><a href="optim-caveat.html#cb239-11"></a>    <span class="co"># Adding a second input allowing </span></span>
-<span id="cb239-12"><a href="optim-caveat.html#cb239-12"></a>    <span class="co"># to specify a year</span></span>
-<span id="cb239-13"><a href="optim-caveat.html#cb239-13"></a>    <span class="kw">selectInput</span>(</span>
-<span id="cb239-14"><a href="optim-caveat.html#cb239-14"></a>      <span class="st">&quot;year&quot;</span>, </span>
-<span id="cb239-15"><a href="optim-caveat.html#cb239-15"></a>      <span class="st">&quot;Choose a year&quot;</span>, </span>
-<span id="cb239-16"><a href="optim-caveat.html#cb239-16"></a>      <span class="dt">choices =</span> <span class="dv">2010</span><span class="op">:</span><span class="dv">2030</span></span>
-<span id="cb239-17"><a href="optim-caveat.html#cb239-17"></a>    )</span>
-<span id="cb239-18"><a href="optim-caveat.html#cb239-18"></a>  )</span>
-<span id="cb239-19"><a href="optim-caveat.html#cb239-19"></a>}</span>
-<span id="cb239-20"><a href="optim-caveat.html#cb239-20"></a></span>
-<span id="cb239-21"><a href="optim-caveat.html#cb239-21"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb239-22"><a href="optim-caveat.html#cb239-22"></a>  input, </span>
-<span id="cb239-23"><a href="optim-caveat.html#cb239-23"></a>  output, </span>
-<span id="cb239-24"><a href="optim-caveat.html#cb239-24"></a>  session</span>
-<span id="cb239-25"><a href="optim-caveat.html#cb239-25"></a>){</span>
-<span id="cb239-26"><a href="optim-caveat.html#cb239-26"></a>  <span class="co"># We want the year to be update whenever </span></span>
-<span id="cb239-27"><a href="optim-caveat.html#cb239-27"></a>  <span class="co"># the dateInput is updated</span></span>
-<span id="cb239-28"><a href="optim-caveat.html#cb239-28"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>date , {</span>
-<span id="cb239-29"><a href="optim-caveat.html#cb239-29"></a>    <span class="kw">updateSelectInput</span>(</span>
-<span id="cb239-30"><a href="optim-caveat.html#cb239-30"></a>      session, </span>
-<span id="cb239-31"><a href="optim-caveat.html#cb239-31"></a>      <span class="st">&quot;year&quot;</span>, </span>
-<span id="cb239-32"><a href="optim-caveat.html#cb239-32"></a>      <span class="dt">selected =</span> <span class="kw">year</span>(input<span class="op">$</span>date)</span>
-<span id="cb239-33"><a href="optim-caveat.html#cb239-33"></a>    )</span>
-<span id="cb239-34"><a href="optim-caveat.html#cb239-34"></a>  })</span>
-<span id="cb239-35"><a href="optim-caveat.html#cb239-35"></a>  </span>
-<span id="cb239-36"><a href="optim-caveat.html#cb239-36"></a>  <span class="co"># We want the date to be update whenever </span></span>
-<span id="cb239-37"><a href="optim-caveat.html#cb239-37"></a>  <span class="co"># the selectInput is updated</span></span>
-<span id="cb239-38"><a href="optim-caveat.html#cb239-38"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>year , {</span>
-<span id="cb239-39"><a href="optim-caveat.html#cb239-39"></a>    <span class="kw">updateDateInput</span>(</span>
-<span id="cb239-40"><a href="optim-caveat.html#cb239-40"></a>      session, </span>
-<span id="cb239-41"><a href="optim-caveat.html#cb239-41"></a>      <span class="st">&quot;date&quot;</span>, </span>
-<span id="cb239-42"><a href="optim-caveat.html#cb239-42"></a>      <span class="dt">value =</span> lubridate<span class="op">::</span><span class="kw">as_date</span>(</span>
-<span id="cb239-43"><a href="optim-caveat.html#cb239-43"></a>        <span class="kw">sprintf</span>(<span class="st">&quot;%s-01-01&quot;</span>, input<span class="op">$</span>year)</span>
-<span id="cb239-44"><a href="optim-caveat.html#cb239-44"></a>      )</span>
-<span id="cb239-45"><a href="optim-caveat.html#cb239-45"></a>    )</span>
-<span id="cb239-46"><a href="optim-caveat.html#cb239-46"></a>  })</span>
-<span id="cb239-47"><a href="optim-caveat.html#cb239-47"></a>  </span>
-<span id="cb239-48"><a href="optim-caveat.html#cb239-48"></a>}</span>
-<span id="cb239-49"><a href="optim-caveat.html#cb239-49"></a></span>
-<span id="cb239-50"><a href="optim-caveat.html#cb239-50"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb238"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb238-1"><a href="optim-caveat.html#cb238-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb238-2"><a href="optim-caveat.html#cb238-2"></a><span class="kw">library</span>(lubridate)</span>
+<span id="cb238-3"><a href="optim-caveat.html#cb238-3"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb238-4"><a href="optim-caveat.html#cb238-4"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb238-5"><a href="optim-caveat.html#cb238-5"></a>    <span class="co"># Adding a first input which allow </span></span>
+<span id="cb238-6"><a href="optim-caveat.html#cb238-6"></a>    <span class="co"># to select a specific date</span></span>
+<span id="cb238-7"><a href="optim-caveat.html#cb238-7"></a>    <span class="kw">dateInput</span>(</span>
+<span id="cb238-8"><a href="optim-caveat.html#cb238-8"></a>      <span class="st">&quot;date&quot;</span>, </span>
+<span id="cb238-9"><a href="optim-caveat.html#cb238-9"></a>      <span class="st">&quot;choose a date&quot;</span></span>
+<span id="cb238-10"><a href="optim-caveat.html#cb238-10"></a>    ), </span>
+<span id="cb238-11"><a href="optim-caveat.html#cb238-11"></a>    <span class="co"># Adding a second input allowing </span></span>
+<span id="cb238-12"><a href="optim-caveat.html#cb238-12"></a>    <span class="co"># to specify a year</span></span>
+<span id="cb238-13"><a href="optim-caveat.html#cb238-13"></a>    <span class="kw">selectInput</span>(</span>
+<span id="cb238-14"><a href="optim-caveat.html#cb238-14"></a>      <span class="st">&quot;year&quot;</span>, </span>
+<span id="cb238-15"><a href="optim-caveat.html#cb238-15"></a>      <span class="st">&quot;Choose a year&quot;</span>, </span>
+<span id="cb238-16"><a href="optim-caveat.html#cb238-16"></a>      <span class="dt">choices =</span> <span class="dv">2010</span><span class="op">:</span><span class="dv">2030</span></span>
+<span id="cb238-17"><a href="optim-caveat.html#cb238-17"></a>    )</span>
+<span id="cb238-18"><a href="optim-caveat.html#cb238-18"></a>  )</span>
+<span id="cb238-19"><a href="optim-caveat.html#cb238-19"></a>}</span>
+<span id="cb238-20"><a href="optim-caveat.html#cb238-20"></a></span>
+<span id="cb238-21"><a href="optim-caveat.html#cb238-21"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb238-22"><a href="optim-caveat.html#cb238-22"></a>  input, </span>
+<span id="cb238-23"><a href="optim-caveat.html#cb238-23"></a>  output, </span>
+<span id="cb238-24"><a href="optim-caveat.html#cb238-24"></a>  session</span>
+<span id="cb238-25"><a href="optim-caveat.html#cb238-25"></a>){</span>
+<span id="cb238-26"><a href="optim-caveat.html#cb238-26"></a>  <span class="co"># We want the year to be update whenever </span></span>
+<span id="cb238-27"><a href="optim-caveat.html#cb238-27"></a>  <span class="co"># the dateInput is updated</span></span>
+<span id="cb238-28"><a href="optim-caveat.html#cb238-28"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>date , {</span>
+<span id="cb238-29"><a href="optim-caveat.html#cb238-29"></a>    <span class="kw">updateSelectInput</span>(</span>
+<span id="cb238-30"><a href="optim-caveat.html#cb238-30"></a>      session, </span>
+<span id="cb238-31"><a href="optim-caveat.html#cb238-31"></a>      <span class="st">&quot;year&quot;</span>, </span>
+<span id="cb238-32"><a href="optim-caveat.html#cb238-32"></a>      <span class="dt">selected =</span> <span class="kw">year</span>(input<span class="op">$</span>date)</span>
+<span id="cb238-33"><a href="optim-caveat.html#cb238-33"></a>    )</span>
+<span id="cb238-34"><a href="optim-caveat.html#cb238-34"></a>  })</span>
+<span id="cb238-35"><a href="optim-caveat.html#cb238-35"></a>  </span>
+<span id="cb238-36"><a href="optim-caveat.html#cb238-36"></a>  <span class="co"># We want the date to be update whenever </span></span>
+<span id="cb238-37"><a href="optim-caveat.html#cb238-37"></a>  <span class="co"># the selectInput is updated</span></span>
+<span id="cb238-38"><a href="optim-caveat.html#cb238-38"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>year , {</span>
+<span id="cb238-39"><a href="optim-caveat.html#cb238-39"></a>    <span class="kw">updateDateInput</span>(</span>
+<span id="cb238-40"><a href="optim-caveat.html#cb238-40"></a>      session, </span>
+<span id="cb238-41"><a href="optim-caveat.html#cb238-41"></a>      <span class="st">&quot;date&quot;</span>, </span>
+<span id="cb238-42"><a href="optim-caveat.html#cb238-42"></a>      <span class="dt">value =</span> lubridate<span class="op">::</span><span class="kw">as_date</span>(</span>
+<span id="cb238-43"><a href="optim-caveat.html#cb238-43"></a>        <span class="kw">sprintf</span>(<span class="st">&quot;%s-01-01&quot;</span>, input<span class="op">$</span>year)</span>
+<span id="cb238-44"><a href="optim-caveat.html#cb238-44"></a>      )</span>
+<span id="cb238-45"><a href="optim-caveat.html#cb238-45"></a>    )</span>
+<span id="cb238-46"><a href="optim-caveat.html#cb238-46"></a>  })</span>
+<span id="cb238-47"><a href="optim-caveat.html#cb238-47"></a>  </span>
+<span id="cb238-48"><a href="optim-caveat.html#cb238-48"></a>}</span>
+<span id="cb238-49"><a href="optim-caveat.html#cb238-49"></a></span>
+<span id="cb238-50"><a href="optim-caveat.html#cb238-50"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>Here, we want to handle something pretty common:</p>
 <ul>
 <li>The user can pick a <code>date</code> and the <code>year</code> input is updated</li>
@@ -555,82 +555,82 @@ Or worse, we generate endless reactive loops, aka “the reactive inferno” whe
 <p>And the more you work on your app, the more complex it gets, and the more you will be likely to end up in the reactive inferno.
 In this section, we will deal with reactivity and how to have more control on it, and about a way to share data across modules without relying on passing along reactive objects.</p>
 <p>If you want to implement this pattern, here is a small workaround using <code>observeEvent(ignoreInit = TRUE)</code>, and <code>req()</code>:</p>
-<div class="sourceCode" id="cb240"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb240-1"><a href="optim-caveat.html#cb240-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb240-2"><a href="optim-caveat.html#cb240-2"></a><span class="kw">library</span>(lubridate)</span>
-<span id="cb240-3"><a href="optim-caveat.html#cb240-3"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb240-4"><a href="optim-caveat.html#cb240-4"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb240-5"><a href="optim-caveat.html#cb240-5"></a>    <span class="co"># Adding a first input which allow to select a specific date</span></span>
-<span id="cb240-6"><a href="optim-caveat.html#cb240-6"></a>    <span class="kw">dateInput</span>(</span>
-<span id="cb240-7"><a href="optim-caveat.html#cb240-7"></a>      <span class="st">&quot;date&quot;</span>, </span>
-<span id="cb240-8"><a href="optim-caveat.html#cb240-8"></a>      <span class="st">&quot;choose a date&quot;</span></span>
-<span id="cb240-9"><a href="optim-caveat.html#cb240-9"></a>    ), </span>
-<span id="cb240-10"><a href="optim-caveat.html#cb240-10"></a>    <span class="co"># Adding a second input allowing to specify a year</span></span>
-<span id="cb240-11"><a href="optim-caveat.html#cb240-11"></a>    <span class="kw">selectInput</span>(</span>
-<span id="cb240-12"><a href="optim-caveat.html#cb240-12"></a>      <span class="st">&quot;year&quot;</span>, </span>
-<span id="cb240-13"><a href="optim-caveat.html#cb240-13"></a>      <span class="st">&quot;Choose a year&quot;</span>, </span>
-<span id="cb240-14"><a href="optim-caveat.html#cb240-14"></a>      <span class="dt">choices =</span> <span class="dv">2010</span><span class="op">:</span><span class="dv">2030</span></span>
-<span id="cb240-15"><a href="optim-caveat.html#cb240-15"></a>    )</span>
-<span id="cb240-16"><a href="optim-caveat.html#cb240-16"></a>  )</span>
-<span id="cb240-17"><a href="optim-caveat.html#cb240-17"></a>}</span>
-<span id="cb240-18"><a href="optim-caveat.html#cb240-18"></a></span>
-<span id="cb240-19"><a href="optim-caveat.html#cb240-19"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb240-20"><a href="optim-caveat.html#cb240-20"></a>  input, </span>
-<span id="cb240-21"><a href="optim-caveat.html#cb240-21"></a>  output, </span>
-<span id="cb240-22"><a href="optim-caveat.html#cb240-22"></a>  session</span>
-<span id="cb240-23"><a href="optim-caveat.html#cb240-23"></a>){</span>
-<span id="cb240-24"><a href="optim-caveat.html#cb240-24"></a>  <span class="co"># Setting a reactiveValues list that will </span></span>
-<span id="cb240-25"><a href="optim-caveat.html#cb240-25"></a>  <span class="co"># keep track of the latest changes</span></span>
-<span id="cb240-26"><a href="optim-caveat.html#cb240-26"></a>  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>(</span>
-<span id="cb240-27"><a href="optim-caveat.html#cb240-27"></a>    <span class="dt">date =</span> <span class="ot">NULL</span>, </span>
-<span id="cb240-28"><a href="optim-caveat.html#cb240-28"></a>    <span class="dt">year =</span> <span class="ot">NULL</span></span>
-<span id="cb240-29"><a href="optim-caveat.html#cb240-29"></a>  )</span>
-<span id="cb240-30"><a href="optim-caveat.html#cb240-30"></a>  </span>
-<span id="cb240-31"><a href="optim-caveat.html#cb240-31"></a>  <span class="co"># When the date is changed,</span></span>
-<span id="cb240-32"><a href="optim-caveat.html#cb240-32"></a>  <span class="co">#  we set its value inside r$date</span></span>
-<span id="cb240-33"><a href="optim-caveat.html#cb240-33"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>date , {</span>
-<span id="cb240-34"><a href="optim-caveat.html#cb240-34"></a>    r<span class="op">$</span>date &lt;-<span class="st"> </span>input<span class="op">$</span>date</span>
-<span id="cb240-35"><a href="optim-caveat.html#cb240-35"></a>  }, <span class="dt">ignoreInit =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb240-36"><a href="optim-caveat.html#cb240-36"></a>  </span>
-<span id="cb240-37"><a href="optim-caveat.html#cb240-37"></a>  <span class="co"># Whenever r$date is changed, we launch an observer</span></span>
-<span id="cb240-38"><a href="optim-caveat.html#cb240-38"></a>  <span class="kw">observeEvent</span>( r<span class="op">$</span>date , {</span>
-<span id="cb240-39"><a href="optim-caveat.html#cb240-39"></a>    <span class="co"># We use req() to control the update </span></span>
-<span id="cb240-40"><a href="optim-caveat.html#cb240-40"></a>    <span class="co"># of the selectInput(), which </span></span>
-<span id="cb240-41"><a href="optim-caveat.html#cb240-41"></a>    <span class="co"># is updated only if the year of the </span></span>
-<span id="cb240-42"><a href="optim-caveat.html#cb240-42"></a>    <span class="co"># input is different from the year</span></span>
-<span id="cb240-43"><a href="optim-caveat.html#cb240-43"></a>    <span class="co"># of the date input</span></span>
-<span id="cb240-44"><a href="optim-caveat.html#cb240-44"></a>    <span class="kw">req</span>(<span class="kw">year</span>(r<span class="op">$</span>date) <span class="op">!=</span><span class="st"> </span>input<span class="op">$</span>year)</span>
-<span id="cb240-45"><a href="optim-caveat.html#cb240-45"></a>    <span class="kw">updateSelectInput</span>(</span>
-<span id="cb240-46"><a href="optim-caveat.html#cb240-46"></a>      session, </span>
-<span id="cb240-47"><a href="optim-caveat.html#cb240-47"></a>      <span class="st">&quot;year&quot;</span>, </span>
-<span id="cb240-48"><a href="optim-caveat.html#cb240-48"></a>      <span class="dt">selected =</span> <span class="kw">year</span>(r<span class="op">$</span>date)</span>
-<span id="cb240-49"><a href="optim-caveat.html#cb240-49"></a>    )</span>
-<span id="cb240-50"><a href="optim-caveat.html#cb240-50"></a>  }, <span class="dt">ignoreInit =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb240-51"><a href="optim-caveat.html#cb240-51"></a>  </span>
-<span id="cb240-52"><a href="optim-caveat.html#cb240-52"></a>  <span class="co"># When the year is changed, we set its value inside r$year</span></span>
-<span id="cb240-53"><a href="optim-caveat.html#cb240-53"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>year , {</span>
-<span id="cb240-54"><a href="optim-caveat.html#cb240-54"></a>    r<span class="op">$</span>year &lt;-<span class="st"> </span>input<span class="op">$</span>year</span>
-<span id="cb240-55"><a href="optim-caveat.html#cb240-55"></a>  }, <span class="dt">ignoreInit =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb240-56"><a href="optim-caveat.html#cb240-56"></a>  </span>
-<span id="cb240-57"><a href="optim-caveat.html#cb240-57"></a>  <span class="co"># Whenever r$year is changed, we launch an observer</span></span>
-<span id="cb240-58"><a href="optim-caveat.html#cb240-58"></a>  <span class="kw">observeEvent</span>( r<span class="op">$</span>year , {</span>
-<span id="cb240-59"><a href="optim-caveat.html#cb240-59"></a>    <span class="co"># We use req() to control the update </span></span>
-<span id="cb240-60"><a href="optim-caveat.html#cb240-60"></a>    <span class="co"># of the dateInput(), which </span></span>
-<span id="cb240-61"><a href="optim-caveat.html#cb240-61"></a>    <span class="co"># is updated only if the year of the </span></span>
-<span id="cb240-62"><a href="optim-caveat.html#cb240-62"></a>    <span class="co"># input is different from the year</span></span>
-<span id="cb240-63"><a href="optim-caveat.html#cb240-63"></a>    <span class="co"># of the date input</span></span>
-<span id="cb240-64"><a href="optim-caveat.html#cb240-64"></a>    <span class="kw">req</span>(r<span class="op">$</span>year <span class="op">!=</span><span class="st"> </span><span class="kw">year</span>(input<span class="op">$</span>date))</span>
-<span id="cb240-65"><a href="optim-caveat.html#cb240-65"></a>    new_date &lt;-<span class="st"> </span>input<span class="op">$</span>date</span>
-<span id="cb240-66"><a href="optim-caveat.html#cb240-66"></a>    <span class="kw">year</span>(new_date) &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(r<span class="op">$</span>year)</span>
-<span id="cb240-67"><a href="optim-caveat.html#cb240-67"></a>    <span class="kw">updateDateInput</span>(</span>
-<span id="cb240-68"><a href="optim-caveat.html#cb240-68"></a>      session, </span>
-<span id="cb240-69"><a href="optim-caveat.html#cb240-69"></a>      <span class="st">&quot;date&quot;</span>, </span>
-<span id="cb240-70"><a href="optim-caveat.html#cb240-70"></a>      <span class="dt">value =</span> new_date</span>
-<span id="cb240-71"><a href="optim-caveat.html#cb240-71"></a>    )</span>
-<span id="cb240-72"><a href="optim-caveat.html#cb240-72"></a>  }, <span class="dt">ignoreInit =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb240-73"><a href="optim-caveat.html#cb240-73"></a>  </span>
-<span id="cb240-74"><a href="optim-caveat.html#cb240-74"></a>}</span>
-<span id="cb240-75"><a href="optim-caveat.html#cb240-75"></a></span>
-<span id="cb240-76"><a href="optim-caveat.html#cb240-76"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb239-1"><a href="optim-caveat.html#cb239-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb239-2"><a href="optim-caveat.html#cb239-2"></a><span class="kw">library</span>(lubridate)</span>
+<span id="cb239-3"><a href="optim-caveat.html#cb239-3"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb239-4"><a href="optim-caveat.html#cb239-4"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb239-5"><a href="optim-caveat.html#cb239-5"></a>    <span class="co"># Adding a first input which allow to select a specific date</span></span>
+<span id="cb239-6"><a href="optim-caveat.html#cb239-6"></a>    <span class="kw">dateInput</span>(</span>
+<span id="cb239-7"><a href="optim-caveat.html#cb239-7"></a>      <span class="st">&quot;date&quot;</span>, </span>
+<span id="cb239-8"><a href="optim-caveat.html#cb239-8"></a>      <span class="st">&quot;choose a date&quot;</span></span>
+<span id="cb239-9"><a href="optim-caveat.html#cb239-9"></a>    ), </span>
+<span id="cb239-10"><a href="optim-caveat.html#cb239-10"></a>    <span class="co"># Adding a second input allowing to specify a year</span></span>
+<span id="cb239-11"><a href="optim-caveat.html#cb239-11"></a>    <span class="kw">selectInput</span>(</span>
+<span id="cb239-12"><a href="optim-caveat.html#cb239-12"></a>      <span class="st">&quot;year&quot;</span>, </span>
+<span id="cb239-13"><a href="optim-caveat.html#cb239-13"></a>      <span class="st">&quot;Choose a year&quot;</span>, </span>
+<span id="cb239-14"><a href="optim-caveat.html#cb239-14"></a>      <span class="dt">choices =</span> <span class="dv">2010</span><span class="op">:</span><span class="dv">2030</span></span>
+<span id="cb239-15"><a href="optim-caveat.html#cb239-15"></a>    )</span>
+<span id="cb239-16"><a href="optim-caveat.html#cb239-16"></a>  )</span>
+<span id="cb239-17"><a href="optim-caveat.html#cb239-17"></a>}</span>
+<span id="cb239-18"><a href="optim-caveat.html#cb239-18"></a></span>
+<span id="cb239-19"><a href="optim-caveat.html#cb239-19"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb239-20"><a href="optim-caveat.html#cb239-20"></a>  input, </span>
+<span id="cb239-21"><a href="optim-caveat.html#cb239-21"></a>  output, </span>
+<span id="cb239-22"><a href="optim-caveat.html#cb239-22"></a>  session</span>
+<span id="cb239-23"><a href="optim-caveat.html#cb239-23"></a>){</span>
+<span id="cb239-24"><a href="optim-caveat.html#cb239-24"></a>  <span class="co"># Setting a reactiveValues list that will </span></span>
+<span id="cb239-25"><a href="optim-caveat.html#cb239-25"></a>  <span class="co"># keep track of the latest changes</span></span>
+<span id="cb239-26"><a href="optim-caveat.html#cb239-26"></a>  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>(</span>
+<span id="cb239-27"><a href="optim-caveat.html#cb239-27"></a>    <span class="dt">date =</span> <span class="ot">NULL</span>, </span>
+<span id="cb239-28"><a href="optim-caveat.html#cb239-28"></a>    <span class="dt">year =</span> <span class="ot">NULL</span></span>
+<span id="cb239-29"><a href="optim-caveat.html#cb239-29"></a>  )</span>
+<span id="cb239-30"><a href="optim-caveat.html#cb239-30"></a>  </span>
+<span id="cb239-31"><a href="optim-caveat.html#cb239-31"></a>  <span class="co"># When the date is changed,</span></span>
+<span id="cb239-32"><a href="optim-caveat.html#cb239-32"></a>  <span class="co">#  we set its value inside r$date</span></span>
+<span id="cb239-33"><a href="optim-caveat.html#cb239-33"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>date , {</span>
+<span id="cb239-34"><a href="optim-caveat.html#cb239-34"></a>    r<span class="op">$</span>date &lt;-<span class="st"> </span>input<span class="op">$</span>date</span>
+<span id="cb239-35"><a href="optim-caveat.html#cb239-35"></a>  }, <span class="dt">ignoreInit =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb239-36"><a href="optim-caveat.html#cb239-36"></a>  </span>
+<span id="cb239-37"><a href="optim-caveat.html#cb239-37"></a>  <span class="co"># Whenever r$date is changed, we launch an observer</span></span>
+<span id="cb239-38"><a href="optim-caveat.html#cb239-38"></a>  <span class="kw">observeEvent</span>( r<span class="op">$</span>date , {</span>
+<span id="cb239-39"><a href="optim-caveat.html#cb239-39"></a>    <span class="co"># We use req() to control the update </span></span>
+<span id="cb239-40"><a href="optim-caveat.html#cb239-40"></a>    <span class="co"># of the selectInput(), which </span></span>
+<span id="cb239-41"><a href="optim-caveat.html#cb239-41"></a>    <span class="co"># is updated only if the year of the </span></span>
+<span id="cb239-42"><a href="optim-caveat.html#cb239-42"></a>    <span class="co"># input is different from the year</span></span>
+<span id="cb239-43"><a href="optim-caveat.html#cb239-43"></a>    <span class="co"># of the date input</span></span>
+<span id="cb239-44"><a href="optim-caveat.html#cb239-44"></a>    <span class="kw">req</span>(<span class="kw">year</span>(r<span class="op">$</span>date) <span class="op">!=</span><span class="st"> </span>input<span class="op">$</span>year)</span>
+<span id="cb239-45"><a href="optim-caveat.html#cb239-45"></a>    <span class="kw">updateSelectInput</span>(</span>
+<span id="cb239-46"><a href="optim-caveat.html#cb239-46"></a>      session, </span>
+<span id="cb239-47"><a href="optim-caveat.html#cb239-47"></a>      <span class="st">&quot;year&quot;</span>, </span>
+<span id="cb239-48"><a href="optim-caveat.html#cb239-48"></a>      <span class="dt">selected =</span> <span class="kw">year</span>(r<span class="op">$</span>date)</span>
+<span id="cb239-49"><a href="optim-caveat.html#cb239-49"></a>    )</span>
+<span id="cb239-50"><a href="optim-caveat.html#cb239-50"></a>  }, <span class="dt">ignoreInit =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb239-51"><a href="optim-caveat.html#cb239-51"></a>  </span>
+<span id="cb239-52"><a href="optim-caveat.html#cb239-52"></a>  <span class="co"># When the year is changed, we set its value inside r$year</span></span>
+<span id="cb239-53"><a href="optim-caveat.html#cb239-53"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>year , {</span>
+<span id="cb239-54"><a href="optim-caveat.html#cb239-54"></a>    r<span class="op">$</span>year &lt;-<span class="st"> </span>input<span class="op">$</span>year</span>
+<span id="cb239-55"><a href="optim-caveat.html#cb239-55"></a>  }, <span class="dt">ignoreInit =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb239-56"><a href="optim-caveat.html#cb239-56"></a>  </span>
+<span id="cb239-57"><a href="optim-caveat.html#cb239-57"></a>  <span class="co"># Whenever r$year is changed, we launch an observer</span></span>
+<span id="cb239-58"><a href="optim-caveat.html#cb239-58"></a>  <span class="kw">observeEvent</span>( r<span class="op">$</span>year , {</span>
+<span id="cb239-59"><a href="optim-caveat.html#cb239-59"></a>    <span class="co"># We use req() to control the update </span></span>
+<span id="cb239-60"><a href="optim-caveat.html#cb239-60"></a>    <span class="co"># of the dateInput(), which </span></span>
+<span id="cb239-61"><a href="optim-caveat.html#cb239-61"></a>    <span class="co"># is updated only if the year of the </span></span>
+<span id="cb239-62"><a href="optim-caveat.html#cb239-62"></a>    <span class="co"># input is different from the year</span></span>
+<span id="cb239-63"><a href="optim-caveat.html#cb239-63"></a>    <span class="co"># of the date input</span></span>
+<span id="cb239-64"><a href="optim-caveat.html#cb239-64"></a>    <span class="kw">req</span>(r<span class="op">$</span>year <span class="op">!=</span><span class="st"> </span><span class="kw">year</span>(input<span class="op">$</span>date))</span>
+<span id="cb239-65"><a href="optim-caveat.html#cb239-65"></a>    new_date &lt;-<span class="st"> </span>input<span class="op">$</span>date</span>
+<span id="cb239-66"><a href="optim-caveat.html#cb239-66"></a>    <span class="kw">year</span>(new_date) &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(r<span class="op">$</span>year)</span>
+<span id="cb239-67"><a href="optim-caveat.html#cb239-67"></a>    <span class="kw">updateDateInput</span>(</span>
+<span id="cb239-68"><a href="optim-caveat.html#cb239-68"></a>      session, </span>
+<span id="cb239-69"><a href="optim-caveat.html#cb239-69"></a>      <span class="st">&quot;date&quot;</span>, </span>
+<span id="cb239-70"><a href="optim-caveat.html#cb239-70"></a>      <span class="dt">value =</span> new_date</span>
+<span id="cb239-71"><a href="optim-caveat.html#cb239-71"></a>    )</span>
+<span id="cb239-72"><a href="optim-caveat.html#cb239-72"></a>  }, <span class="dt">ignoreInit =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb239-73"><a href="optim-caveat.html#cb239-73"></a>  </span>
+<span id="cb239-74"><a href="optim-caveat.html#cb239-74"></a>}</span>
+<span id="cb239-75"><a href="optim-caveat.html#cb239-75"></a></span>
+<span id="cb239-76"><a href="optim-caveat.html#cb239-76"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
 <div id="observe-vs-observeevent" class="section level3">
 <h3><span class="header-section-number">15.1.2</span> <code>observe</code> vs <code>observeEvent</code></h3>
@@ -643,71 +643,118 @@ This function updates <strong>every time a reactive object it contains is invali
 Yes, this works well if you have a small amount of reactive objects in the observer, but that gets tricky whenever you start adding things a long list of things inside your <code>observe()</code>, as you might be launching a computation 10 times if your reactive scope contains 10 reactive objects that are somehow invalidated in chain.
 And believe us, we have seen pieces of code where the <code>observe()</code> contains hundreds of lines of code, with reactives objects all over the place, with one <code>observe()</code> context being invalidated dozens of times when one input changes in the application.</p>
 <p>For example, let’s start with that:</p>
-<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="optim-caveat.html#cb241-1"></a><span class="co">## DO NOT DO GLOBAL VARIABLES, IT&#39;S JUST TO SIMPLIFY THE EXAMPLE</span></span>
-<span id="cb241-2"><a href="optim-caveat.html#cb241-2"></a><span class="co"># We initiate a counter that will help to track how many times </span></span>
-<span id="cb241-3"><a href="optim-caveat.html#cb241-3"></a><span class="co"># some pieces of the code are called</span></span>
-<span id="cb241-4"><a href="optim-caveat.html#cb241-4"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
-<span id="cb241-5"><a href="optim-caveat.html#cb241-5"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb241-6"><a href="optim-caveat.html#cb241-6"></a><span class="kw">library</span>(cli)</span>
-<span id="cb241-7"><a href="optim-caveat.html#cb241-7"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb241-8"><a href="optim-caveat.html#cb241-8"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb241-9"><a href="optim-caveat.html#cb241-9"></a>    <span class="co"># We are adding a simple text input </span></span>
-<span id="cb241-10"><a href="optim-caveat.html#cb241-10"></a>    <span class="co"># that will be printed to the console</span></span>
-<span id="cb241-11"><a href="optim-caveat.html#cb241-11"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;Text&quot;</span>)</span>
-<span id="cb241-12"><a href="optim-caveat.html#cb241-12"></a>  )</span>
-<span id="cb241-13"><a href="optim-caveat.html#cb241-13"></a>}</span>
-<span id="cb241-14"><a href="optim-caveat.html#cb241-14"></a></span>
-<span id="cb241-15"><a href="optim-caveat.html#cb241-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb241-16"><a href="optim-caveat.html#cb241-16"></a>  <span class="kw">observe</span>({</span>
-<span id="cb241-17"><a href="optim-caveat.html#cb241-17"></a>    <span class="co"># Every time this reactive context is invalidated, </span></span>
-<span id="cb241-18"><a href="optim-caveat.html#cb241-18"></a>    <span class="co"># we add 1 to the i value</span></span>
-<span id="cb241-19"><a href="optim-caveat.html#cb241-19"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb241-20"><a href="optim-caveat.html#cb241-20"></a>    <span class="co"># We print the i value to the console, </span></span>
-<span id="cb241-21"><a href="optim-caveat.html#cb241-21"></a>    <span class="co"># and the value of input$txt</span></span>
-<span id="cb241-22"><a href="optim-caveat.html#cb241-22"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb241-23"><a href="optim-caveat.html#cb241-23"></a>    <span class="kw">print</span>(input<span class="op">$</span>txt)</span>
-<span id="cb241-24"><a href="optim-caveat.html#cb241-24"></a>  })</span>
-<span id="cb241-25"><a href="optim-caveat.html#cb241-25"></a>}</span>
-<span id="cb241-26"><a href="optim-caveat.html#cb241-26"></a></span>
-<span id="cb241-27"><a href="optim-caveat.html#cb241-27"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb240"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb240-1"><a href="optim-caveat.html#cb240-1"></a><span class="co">## DO NOT DO GLOBAL VARIABLES, IT&#39;S JUST TO SIMPLIFY THE EXAMPLE</span></span>
+<span id="cb240-2"><a href="optim-caveat.html#cb240-2"></a><span class="co"># We initiate a counter that will help to track how many times </span></span>
+<span id="cb240-3"><a href="optim-caveat.html#cb240-3"></a><span class="co"># some pieces of the code are called</span></span>
+<span id="cb240-4"><a href="optim-caveat.html#cb240-4"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
+<span id="cb240-5"><a href="optim-caveat.html#cb240-5"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb240-6"><a href="optim-caveat.html#cb240-6"></a><span class="kw">library</span>(cli)</span>
+<span id="cb240-7"><a href="optim-caveat.html#cb240-7"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb240-8"><a href="optim-caveat.html#cb240-8"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb240-9"><a href="optim-caveat.html#cb240-9"></a>    <span class="co"># We are adding a simple text input </span></span>
+<span id="cb240-10"><a href="optim-caveat.html#cb240-10"></a>    <span class="co"># that will be printed to the console</span></span>
+<span id="cb240-11"><a href="optim-caveat.html#cb240-11"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;Text&quot;</span>)</span>
+<span id="cb240-12"><a href="optim-caveat.html#cb240-12"></a>  )</span>
+<span id="cb240-13"><a href="optim-caveat.html#cb240-13"></a>}</span>
+<span id="cb240-14"><a href="optim-caveat.html#cb240-14"></a></span>
+<span id="cb240-15"><a href="optim-caveat.html#cb240-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb240-16"><a href="optim-caveat.html#cb240-16"></a>  <span class="kw">observe</span>({</span>
+<span id="cb240-17"><a href="optim-caveat.html#cb240-17"></a>    <span class="co"># Every time this reactive context is invalidated, </span></span>
+<span id="cb240-18"><a href="optim-caveat.html#cb240-18"></a>    <span class="co"># we add 1 to the i value</span></span>
+<span id="cb240-19"><a href="optim-caveat.html#cb240-19"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb240-20"><a href="optim-caveat.html#cb240-20"></a>    <span class="co"># We print the i value to the console, </span></span>
+<span id="cb240-21"><a href="optim-caveat.html#cb240-21"></a>    <span class="co"># and the value of input$txt</span></span>
+<span id="cb240-22"><a href="optim-caveat.html#cb240-22"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
+<span id="cb240-23"><a href="optim-caveat.html#cb240-23"></a>    <span class="kw">print</span>(input<span class="op">$</span>txt)</span>
+<span id="cb240-24"><a href="optim-caveat.html#cb240-24"></a>  })</span>
+<span id="cb240-25"><a href="optim-caveat.html#cb240-25"></a>}</span>
+<span id="cb240-26"><a href="optim-caveat.html#cb240-26"></a></span>
+<span id="cb240-27"><a href="optim-caveat.html#cb240-27"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>Oh, and then, let’s add a small <code>selectInput()</code>:</p>
+<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="optim-caveat.html#cb241-1"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
+<span id="cb241-2"><a href="optim-caveat.html#cb241-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb241-3"><a href="optim-caveat.html#cb241-3"></a><span class="kw">library</span>(cli)</span>
+<span id="cb241-4"><a href="optim-caveat.html#cb241-4"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb241-5"><a href="optim-caveat.html#cb241-5"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb241-6"><a href="optim-caveat.html#cb241-6"></a>    <span class="co"># We are adding a simple text input </span></span>
+<span id="cb241-7"><a href="optim-caveat.html#cb241-7"></a>    <span class="co"># that will be printed to the console</span></span>
+<span id="cb241-8"><a href="optim-caveat.html#cb241-8"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;Text&quot;</span>),</span>
+<span id="cb241-9"><a href="optim-caveat.html#cb241-9"></a>    <span class="co"># We add a selectInput() to allow text transformation</span></span>
+<span id="cb241-10"><a href="optim-caveat.html#cb241-10"></a>    <span class="kw">selectInput</span>(</span>
+<span id="cb241-11"><a href="optim-caveat.html#cb241-11"></a>      <span class="st">&quot;casefolding&quot;</span>, </span>
+<span id="cb241-12"><a href="optim-caveat.html#cb241-12"></a>      <span class="st">&quot;Casefolding&quot;</span>, </span>
+<span id="cb241-13"><a href="optim-caveat.html#cb241-13"></a>      <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)</span>
+<span id="cb241-14"><a href="optim-caveat.html#cb241-14"></a>    )</span>
+<span id="cb241-15"><a href="optim-caveat.html#cb241-15"></a>  )</span>
+<span id="cb241-16"><a href="optim-caveat.html#cb241-16"></a>}</span>
+<span id="cb241-17"><a href="optim-caveat.html#cb241-17"></a></span>
+<span id="cb241-18"><a href="optim-caveat.html#cb241-18"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb241-19"><a href="optim-caveat.html#cb241-19"></a>  <span class="kw">observe</span>({</span>
+<span id="cb241-20"><a href="optim-caveat.html#cb241-20"></a>    <span class="co"># Every time this reactive context </span></span>
+<span id="cb241-21"><a href="optim-caveat.html#cb241-21"></a>    <span class="co"># is invalidated, we add 1 to the i value</span></span>
+<span id="cb241-22"><a href="optim-caveat.html#cb241-22"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb241-23"><a href="optim-caveat.html#cb241-23"></a>    <span class="co"># We print the i value to the console</span></span>
+<span id="cb241-24"><a href="optim-caveat.html#cb241-24"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
+<span id="cb241-25"><a href="optim-caveat.html#cb241-25"></a>    <span class="co"># If the user select lower, then the text is </span></span>
+<span id="cb241-26"><a href="optim-caveat.html#cb241-26"></a>    <span class="co"># passed through tolower, otherwise it&#39;s passed </span></span>
+<span id="cb241-27"><a href="optim-caveat.html#cb241-27"></a>    <span class="co"># through toupper</span></span>
+<span id="cb241-28"><a href="optim-caveat.html#cb241-28"></a>    <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
+<span id="cb241-29"><a href="optim-caveat.html#cb241-29"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(input<span class="op">$</span>txt))</span>
+<span id="cb241-30"><a href="optim-caveat.html#cb241-30"></a>    } <span class="cf">else</span>  {</span>
+<span id="cb241-31"><a href="optim-caveat.html#cb241-31"></a>      <span class="kw">print</span>(<span class="kw">toupper</span>(input<span class="op">$</span>txt))</span>
+<span id="cb241-32"><a href="optim-caveat.html#cb241-32"></a>    }</span>
+<span id="cb241-33"><a href="optim-caveat.html#cb241-33"></a>  })</span>
+<span id="cb241-34"><a href="optim-caveat.html#cb241-34"></a>}</span>
+<span id="cb241-35"><a href="optim-caveat.html#cb241-35"></a></span>
+<span id="cb241-36"><a href="optim-caveat.html#cb241-36"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>And, as time goes by, we add another control flow to our <code>observe()</code>:</p>
 <div class="sourceCode" id="cb242"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb242-1"><a href="optim-caveat.html#cb242-1"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
 <span id="cb242-2"><a href="optim-caveat.html#cb242-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb242-3"><a href="optim-caveat.html#cb242-3"></a><span class="kw">library</span>(cli)</span>
-<span id="cb242-4"><a href="optim-caveat.html#cb242-4"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb242-5"><a href="optim-caveat.html#cb242-5"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb242-6"><a href="optim-caveat.html#cb242-6"></a>    <span class="co"># We are adding a simple text input </span></span>
-<span id="cb242-7"><a href="optim-caveat.html#cb242-7"></a>    <span class="co"># that will be printed to the console</span></span>
-<span id="cb242-8"><a href="optim-caveat.html#cb242-8"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;Text&quot;</span>),</span>
-<span id="cb242-9"><a href="optim-caveat.html#cb242-9"></a>    <span class="co"># We add a selectInput() to allow text transformation</span></span>
-<span id="cb242-10"><a href="optim-caveat.html#cb242-10"></a>    <span class="kw">selectInput</span>(</span>
-<span id="cb242-11"><a href="optim-caveat.html#cb242-11"></a>      <span class="st">&quot;casefolding&quot;</span>, </span>
-<span id="cb242-12"><a href="optim-caveat.html#cb242-12"></a>      <span class="st">&quot;Casefolding&quot;</span>, </span>
-<span id="cb242-13"><a href="optim-caveat.html#cb242-13"></a>      <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)</span>
-<span id="cb242-14"><a href="optim-caveat.html#cb242-14"></a>    )</span>
-<span id="cb242-15"><a href="optim-caveat.html#cb242-15"></a>  )</span>
-<span id="cb242-16"><a href="optim-caveat.html#cb242-16"></a>}</span>
-<span id="cb242-17"><a href="optim-caveat.html#cb242-17"></a></span>
-<span id="cb242-18"><a href="optim-caveat.html#cb242-18"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb242-19"><a href="optim-caveat.html#cb242-19"></a>  <span class="kw">observe</span>({</span>
-<span id="cb242-20"><a href="optim-caveat.html#cb242-20"></a>    <span class="co"># Every time this reactive context </span></span>
-<span id="cb242-21"><a href="optim-caveat.html#cb242-21"></a>    <span class="co"># is invalidated, we add 1 to the i value</span></span>
-<span id="cb242-22"><a href="optim-caveat.html#cb242-22"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb242-23"><a href="optim-caveat.html#cb242-23"></a>    <span class="co"># We print the i value to the console</span></span>
-<span id="cb242-24"><a href="optim-caveat.html#cb242-24"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb242-25"><a href="optim-caveat.html#cb242-25"></a>    <span class="co"># If the user select lower, then the text is </span></span>
-<span id="cb242-26"><a href="optim-caveat.html#cb242-26"></a>    <span class="co"># passed through tolower, otherwise it&#39;s passed </span></span>
-<span id="cb242-27"><a href="optim-caveat.html#cb242-27"></a>    <span class="co"># through toupper</span></span>
-<span id="cb242-28"><a href="optim-caveat.html#cb242-28"></a>    <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
-<span id="cb242-29"><a href="optim-caveat.html#cb242-29"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(input<span class="op">$</span>txt))</span>
-<span id="cb242-30"><a href="optim-caveat.html#cb242-30"></a>    } <span class="cf">else</span>  {</span>
-<span id="cb242-31"><a href="optim-caveat.html#cb242-31"></a>      <span class="kw">print</span>(<span class="kw">toupper</span>(input<span class="op">$</span>txt))</span>
-<span id="cb242-32"><a href="optim-caveat.html#cb242-32"></a>    }</span>
-<span id="cb242-33"><a href="optim-caveat.html#cb242-33"></a>  })</span>
-<span id="cb242-34"><a href="optim-caveat.html#cb242-34"></a>}</span>
-<span id="cb242-35"><a href="optim-caveat.html#cb242-35"></a></span>
-<span id="cb242-36"><a href="optim-caveat.html#cb242-36"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>And, as time goes by, we add another control flow to our <code>observe()</code>:</p>
+<span id="cb242-4"><a href="optim-caveat.html#cb242-4"></a><span class="kw">library</span>(stringi)</span>
+<span id="cb242-5"><a href="optim-caveat.html#cb242-5"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb242-6"><a href="optim-caveat.html#cb242-6"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb242-7"><a href="optim-caveat.html#cb242-7"></a>    <span class="co"># We are adding a simple text input </span></span>
+<span id="cb242-8"><a href="optim-caveat.html#cb242-8"></a>    <span class="co"># that will be printed to the console</span></span>
+<span id="cb242-9"><a href="optim-caveat.html#cb242-9"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;Text&quot;</span>),</span>
+<span id="cb242-10"><a href="optim-caveat.html#cb242-10"></a>    <span class="co"># We add a selectInput() to allow text transformation</span></span>
+<span id="cb242-11"><a href="optim-caveat.html#cb242-11"></a>    <span class="kw">selectInput</span>(</span>
+<span id="cb242-12"><a href="optim-caveat.html#cb242-12"></a>      <span class="st">&quot;casefolding&quot;</span>, </span>
+<span id="cb242-13"><a href="optim-caveat.html#cb242-13"></a>      <span class="st">&quot;Casefolding&quot;</span>, </span>
+<span id="cb242-14"><a href="optim-caveat.html#cb242-14"></a>      <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)</span>
+<span id="cb242-15"><a href="optim-caveat.html#cb242-15"></a>    )</span>
+<span id="cb242-16"><a href="optim-caveat.html#cb242-16"></a>    <span class="co"># A new checkbox to reverse (or not) the input text</span></span>
+<span id="cb242-17"><a href="optim-caveat.html#cb242-17"></a>    <span class="kw">checkboxInput</span>(<span class="st">&quot;rev&quot;</span>, <span class="st">&quot;reverse&quot;</span>)</span>
+<span id="cb242-18"><a href="optim-caveat.html#cb242-18"></a>  )</span>
+<span id="cb242-19"><a href="optim-caveat.html#cb242-19"></a>}</span>
+<span id="cb242-20"><a href="optim-caveat.html#cb242-20"></a></span>
+<span id="cb242-21"><a href="optim-caveat.html#cb242-21"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb242-22"><a href="optim-caveat.html#cb242-22"></a>  <span class="kw">observe</span>({</span>
+<span id="cb242-23"><a href="optim-caveat.html#cb242-23"></a>    <span class="co"># Every time this reactive context </span></span>
+<span id="cb242-24"><a href="optim-caveat.html#cb242-24"></a>    <span class="co"># is invalidated, we add 1 to the i value</span></span>
+<span id="cb242-25"><a href="optim-caveat.html#cb242-25"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb242-26"><a href="optim-caveat.html#cb242-26"></a>    <span class="co"># We print the i value to the console</span></span>
+<span id="cb242-27"><a href="optim-caveat.html#cb242-27"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
+<span id="cb242-28"><a href="optim-caveat.html#cb242-28"></a>    <span class="co"># Use input_txt as a container for our input</span></span>
+<span id="cb242-29"><a href="optim-caveat.html#cb242-29"></a>    input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
+<span id="cb242-30"><a href="optim-caveat.html#cb242-30"></a>    <span class="cf">if</span> (input<span class="op">$</span>rev){</span>
+<span id="cb242-31"><a href="optim-caveat.html#cb242-31"></a>      <span class="co"># If the input$rev is select, we reverse the text</span></span>
+<span id="cb242-32"><a href="optim-caveat.html#cb242-32"></a>      input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(input_txt)</span>
+<span id="cb242-33"><a href="optim-caveat.html#cb242-33"></a>    }</span>
+<span id="cb242-34"><a href="optim-caveat.html#cb242-34"></a>    <span class="co"># If the user select lower, then the text is </span></span>
+<span id="cb242-35"><a href="optim-caveat.html#cb242-35"></a>    <span class="co"># passed through tolower, otherwise it&#39;s passed </span></span>
+<span id="cb242-36"><a href="optim-caveat.html#cb242-36"></a>    <span class="co"># through toupper</span></span>
+<span id="cb242-37"><a href="optim-caveat.html#cb242-37"></a>    <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
+<span id="cb242-38"><a href="optim-caveat.html#cb242-38"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(input_txt))</span>
+<span id="cb242-39"><a href="optim-caveat.html#cb242-39"></a>    } <span class="cf">else</span>  {</span>
+<span id="cb242-40"><a href="optim-caveat.html#cb242-40"></a>      <span class="kw">print</span>(<span class="kw">toupper</span>(input_txt))</span>
+<span id="cb242-41"><a href="optim-caveat.html#cb242-41"></a>    }</span>
+<span id="cb242-42"><a href="optim-caveat.html#cb242-42"></a>  })</span>
+<span id="cb242-43"><a href="optim-caveat.html#cb242-43"></a>}</span>
+<span id="cb242-44"><a href="optim-caveat.html#cb242-44"></a></span>
+<span id="cb242-45"><a href="optim-caveat.html#cb242-45"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>And it would be nice to keep the selected values into a reactive list, so that we can reuse it elsewhere.
+And maybe you would like to add a checkbox so that the logs are printed to the console only if checked.</p>
 <div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="optim-caveat.html#cb243-1"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
 <span id="cb243-2"><a href="optim-caveat.html#cb243-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb243-3"><a href="optim-caveat.html#cb243-3"></a><span class="kw">library</span>(cli)</span>
@@ -729,80 +776,33 @@ And believe us, we have seen pieces of code where the <code>observe()</code> con
 <span id="cb243-19"><a href="optim-caveat.html#cb243-19"></a>}</span>
 <span id="cb243-20"><a href="optim-caveat.html#cb243-20"></a></span>
 <span id="cb243-21"><a href="optim-caveat.html#cb243-21"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb243-22"><a href="optim-caveat.html#cb243-22"></a>  <span class="kw">observe</span>({</span>
-<span id="cb243-23"><a href="optim-caveat.html#cb243-23"></a>    <span class="co"># Every time this reactive context </span></span>
-<span id="cb243-24"><a href="optim-caveat.html#cb243-24"></a>    <span class="co"># is invalidated, we add 1 to the i value</span></span>
-<span id="cb243-25"><a href="optim-caveat.html#cb243-25"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb243-26"><a href="optim-caveat.html#cb243-26"></a>    <span class="co"># We print the i value to the console</span></span>
-<span id="cb243-27"><a href="optim-caveat.html#cb243-27"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb243-28"><a href="optim-caveat.html#cb243-28"></a>    <span class="co"># Use input_txt as a container for our input</span></span>
-<span id="cb243-29"><a href="optim-caveat.html#cb243-29"></a>    input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
+<span id="cb243-22"><a href="optim-caveat.html#cb243-22"></a>  <span class="co"># We are using a reactiveValues to keep this input value</span></span>
+<span id="cb243-23"><a href="optim-caveat.html#cb243-23"></a>  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>()</span>
+<span id="cb243-24"><a href="optim-caveat.html#cb243-24"></a>  <span class="kw">observe</span>({</span>
+<span id="cb243-25"><a href="optim-caveat.html#cb243-25"></a>    <span class="co"># Every time this reactive context </span></span>
+<span id="cb243-26"><a href="optim-caveat.html#cb243-26"></a>    <span class="co"># is invalidated, we add 1 to the i value</span></span>
+<span id="cb243-27"><a href="optim-caveat.html#cb243-27"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb243-28"><a href="optim-caveat.html#cb243-28"></a>    <span class="co"># We print the i value to the console</span></span>
+<span id="cb243-29"><a href="optim-caveat.html#cb243-29"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
 <span id="cb243-30"><a href="optim-caveat.html#cb243-30"></a>    <span class="cf">if</span> (input<span class="op">$</span>rev){</span>
 <span id="cb243-31"><a href="optim-caveat.html#cb243-31"></a>      <span class="co"># If the input$rev is select, we reverse the text</span></span>
-<span id="cb243-32"><a href="optim-caveat.html#cb243-32"></a>      input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(input_txt)</span>
-<span id="cb243-33"><a href="optim-caveat.html#cb243-33"></a>    }</span>
-<span id="cb243-34"><a href="optim-caveat.html#cb243-34"></a>    <span class="co"># If the user select lower, then the text is </span></span>
-<span id="cb243-35"><a href="optim-caveat.html#cb243-35"></a>    <span class="co"># passed through tolower, otherwise it&#39;s passed </span></span>
-<span id="cb243-36"><a href="optim-caveat.html#cb243-36"></a>    <span class="co"># through toupper</span></span>
-<span id="cb243-37"><a href="optim-caveat.html#cb243-37"></a>    <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
-<span id="cb243-38"><a href="optim-caveat.html#cb243-38"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(input_txt))</span>
-<span id="cb243-39"><a href="optim-caveat.html#cb243-39"></a>    } <span class="cf">else</span>  {</span>
-<span id="cb243-40"><a href="optim-caveat.html#cb243-40"></a>      <span class="kw">print</span>(<span class="kw">toupper</span>(input_txt))</span>
-<span id="cb243-41"><a href="optim-caveat.html#cb243-41"></a>    }</span>
-<span id="cb243-42"><a href="optim-caveat.html#cb243-42"></a>  })</span>
-<span id="cb243-43"><a href="optim-caveat.html#cb243-43"></a>}</span>
-<span id="cb243-44"><a href="optim-caveat.html#cb243-44"></a></span>
-<span id="cb243-45"><a href="optim-caveat.html#cb243-45"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>And it would be nice to keep the selected values into a reactive list, so that we can reuse it elsewhere.
-And maybe you would like to add a checkbox so that the logs are printed to the console only if checked.</p>
-<div class="sourceCode" id="cb244"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb244-1"><a href="optim-caveat.html#cb244-1"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
-<span id="cb244-2"><a href="optim-caveat.html#cb244-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb244-3"><a href="optim-caveat.html#cb244-3"></a><span class="kw">library</span>(cli)</span>
-<span id="cb244-4"><a href="optim-caveat.html#cb244-4"></a><span class="kw">library</span>(stringi)</span>
-<span id="cb244-5"><a href="optim-caveat.html#cb244-5"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb244-6"><a href="optim-caveat.html#cb244-6"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb244-7"><a href="optim-caveat.html#cb244-7"></a>    <span class="co"># We are adding a simple text input </span></span>
-<span id="cb244-8"><a href="optim-caveat.html#cb244-8"></a>    <span class="co"># that will be printed to the console</span></span>
-<span id="cb244-9"><a href="optim-caveat.html#cb244-9"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;Text&quot;</span>),</span>
-<span id="cb244-10"><a href="optim-caveat.html#cb244-10"></a>    <span class="co"># We add a selectInput() to allow text transformation</span></span>
-<span id="cb244-11"><a href="optim-caveat.html#cb244-11"></a>    <span class="kw">selectInput</span>(</span>
-<span id="cb244-12"><a href="optim-caveat.html#cb244-12"></a>      <span class="st">&quot;casefolding&quot;</span>, </span>
-<span id="cb244-13"><a href="optim-caveat.html#cb244-13"></a>      <span class="st">&quot;Casefolding&quot;</span>, </span>
-<span id="cb244-14"><a href="optim-caveat.html#cb244-14"></a>      <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)</span>
-<span id="cb244-15"><a href="optim-caveat.html#cb244-15"></a>    )</span>
-<span id="cb244-16"><a href="optim-caveat.html#cb244-16"></a>    <span class="co"># A new checkbox to reverse (or not) the input text</span></span>
-<span id="cb244-17"><a href="optim-caveat.html#cb244-17"></a>    <span class="kw">checkboxInput</span>(<span class="st">&quot;rev&quot;</span>, <span class="st">&quot;reverse&quot;</span>)</span>
-<span id="cb244-18"><a href="optim-caveat.html#cb244-18"></a>  )</span>
-<span id="cb244-19"><a href="optim-caveat.html#cb244-19"></a>}</span>
-<span id="cb244-20"><a href="optim-caveat.html#cb244-20"></a></span>
-<span id="cb244-21"><a href="optim-caveat.html#cb244-21"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb244-22"><a href="optim-caveat.html#cb244-22"></a>  <span class="co"># We are using a reactiveValues to keep this input value</span></span>
-<span id="cb244-23"><a href="optim-caveat.html#cb244-23"></a>  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>()</span>
-<span id="cb244-24"><a href="optim-caveat.html#cb244-24"></a>  <span class="kw">observe</span>({</span>
-<span id="cb244-25"><a href="optim-caveat.html#cb244-25"></a>    <span class="co"># Every time this reactive context </span></span>
-<span id="cb244-26"><a href="optim-caveat.html#cb244-26"></a>    <span class="co"># is invalidated, we add 1 to the i value</span></span>
-<span id="cb244-27"><a href="optim-caveat.html#cb244-27"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb244-28"><a href="optim-caveat.html#cb244-28"></a>    <span class="co"># We print the i value to the console</span></span>
-<span id="cb244-29"><a href="optim-caveat.html#cb244-29"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb244-30"><a href="optim-caveat.html#cb244-30"></a>    <span class="cf">if</span> (input<span class="op">$</span>rev){</span>
-<span id="cb244-31"><a href="optim-caveat.html#cb244-31"></a>      <span class="co"># If the input$rev is select, we reverse the text</span></span>
-<span id="cb244-32"><a href="optim-caveat.html#cb244-32"></a>      r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
-<span id="cb244-33"><a href="optim-caveat.html#cb244-33"></a>    } <span class="cf">else</span> {</span>
-<span id="cb244-34"><a href="optim-caveat.html#cb244-34"></a>      <span class="co"># Otherwise, we leave it as it is</span></span>
-<span id="cb244-35"><a href="optim-caveat.html#cb244-35"></a>      r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
-<span id="cb244-36"><a href="optim-caveat.html#cb244-36"></a>    }</span>
-<span id="cb244-37"><a href="optim-caveat.html#cb244-37"></a>    <span class="co"># If the user select lower, then the text is </span></span>
-<span id="cb244-38"><a href="optim-caveat.html#cb244-38"></a>    <span class="co"># passed through tolower, otherwise it&#39;s passed </span></span>
-<span id="cb244-39"><a href="optim-caveat.html#cb244-39"></a>    <span class="co"># through toupper</span></span>
-<span id="cb244-40"><a href="optim-caveat.html#cb244-40"></a>    <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
-<span id="cb244-41"><a href="optim-caveat.html#cb244-41"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb244-42"><a href="optim-caveat.html#cb244-42"></a>    } <span class="cf">else</span>  {</span>
-<span id="cb244-43"><a href="optim-caveat.html#cb244-43"></a>      <span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb244-44"><a href="optim-caveat.html#cb244-44"></a>    }</span>
-<span id="cb244-45"><a href="optim-caveat.html#cb244-45"></a>  })</span>
-<span id="cb244-46"><a href="optim-caveat.html#cb244-46"></a>}</span>
-<span id="cb244-47"><a href="optim-caveat.html#cb244-47"></a></span>
-<span id="cb244-48"><a href="optim-caveat.html#cb244-48"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<span id="cb243-32"><a href="optim-caveat.html#cb243-32"></a>      r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
+<span id="cb243-33"><a href="optim-caveat.html#cb243-33"></a>    } <span class="cf">else</span> {</span>
+<span id="cb243-34"><a href="optim-caveat.html#cb243-34"></a>      <span class="co"># Otherwise, we leave it as it is</span></span>
+<span id="cb243-35"><a href="optim-caveat.html#cb243-35"></a>      r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
+<span id="cb243-36"><a href="optim-caveat.html#cb243-36"></a>    }</span>
+<span id="cb243-37"><a href="optim-caveat.html#cb243-37"></a>    <span class="co"># If the user select lower, then the text is </span></span>
+<span id="cb243-38"><a href="optim-caveat.html#cb243-38"></a>    <span class="co"># passed through tolower, otherwise it&#39;s passed </span></span>
+<span id="cb243-39"><a href="optim-caveat.html#cb243-39"></a>    <span class="co"># through toupper</span></span>
+<span id="cb243-40"><a href="optim-caveat.html#cb243-40"></a>    <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
+<span id="cb243-41"><a href="optim-caveat.html#cb243-41"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb243-42"><a href="optim-caveat.html#cb243-42"></a>    } <span class="cf">else</span>  {</span>
+<span id="cb243-43"><a href="optim-caveat.html#cb243-43"></a>      <span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb243-44"><a href="optim-caveat.html#cb243-44"></a>    }</span>
+<span id="cb243-45"><a href="optim-caveat.html#cb243-45"></a>  })</span>
+<span id="cb243-46"><a href="optim-caveat.html#cb243-46"></a>}</span>
+<span id="cb243-47"><a href="optim-caveat.html#cb243-47"></a></span>
+<span id="cb243-48"><a href="optim-caveat.html#cb243-48"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>Ok, now can you tell how many potential invalidation points we have got here?
 Three: whenever <code>input$txt</code>, <code>input$rev</code> or <code>input$casefolding</code> change.
 Of course, three is not that much, but you get the idea.</p>
@@ -817,38 +817,38 @@ No, they usually try and miss, restart, change things, amplifying the reactivity
 That’s why (well, in 99% of cases), it is safer to go with <code>observeEvent</code>, as it allows to see at a glance what are the condition under which the content is invalidated and re-evaluated.
 Then, if a reactive context is invalidated, <strong>you know why</strong>.
 For example, here is where the reactive invalidation can happen (lines with a <code>*</code>)<a href="#fn61" class="footnote-ref" id="fnref61"><sup>61</sup></a>:</p>
-<div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="optim-caveat.html#cb245-1"></a><span class="kw">observe</span>({</span>
-<span id="cb245-2"><a href="optim-caveat.html#cb245-2"></a>i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb245-3"><a href="optim-caveat.html#cb245-3"></a><span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb245-4"><a href="optim-caveat.html#cb245-4"></a><span class="op">*</span><span class="st"> </span><span class="cf">if</span> (input<span class="op">$</span>rev){</span>
-<span id="cb245-5"><a href="optim-caveat.html#cb245-5"></a><span class="op">*</span><span class="st">   </span>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
-<span id="cb245-6"><a href="optim-caveat.html#cb245-6"></a>} <span class="cf">else</span> {</span>
-<span id="cb245-7"><a href="optim-caveat.html#cb245-7"></a><span class="op">*</span><span class="st">   </span>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
-<span id="cb245-8"><a href="optim-caveat.html#cb245-8"></a>}</span>
-<span id="cb245-9"><a href="optim-caveat.html#cb245-9"></a><span class="op">*</span><span class="st"> </span><span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
-<span id="cb245-10"><a href="optim-caveat.html#cb245-10"></a><span class="op">*</span><span class="st">   </span><span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb245-11"><a href="optim-caveat.html#cb245-11"></a>} <span class="cf">else</span>  {</span>
-<span id="cb245-12"><a href="optim-caveat.html#cb245-12"></a><span class="op">*</span><span class="st">   </span><span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb245-13"><a href="optim-caveat.html#cb245-13"></a>}</span>
-<span id="cb245-14"><a href="optim-caveat.html#cb245-14"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb244"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb244-1"><a href="optim-caveat.html#cb244-1"></a><span class="kw">observe</span>({</span>
+<span id="cb244-2"><a href="optim-caveat.html#cb244-2"></a>i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb244-3"><a href="optim-caveat.html#cb244-3"></a><span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
+<span id="cb244-4"><a href="optim-caveat.html#cb244-4"></a><span class="op">*</span><span class="st"> </span><span class="cf">if</span> (input<span class="op">$</span>rev){</span>
+<span id="cb244-5"><a href="optim-caveat.html#cb244-5"></a><span class="op">*</span><span class="st">   </span>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
+<span id="cb244-6"><a href="optim-caveat.html#cb244-6"></a>} <span class="cf">else</span> {</span>
+<span id="cb244-7"><a href="optim-caveat.html#cb244-7"></a><span class="op">*</span><span class="st">   </span>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
+<span id="cb244-8"><a href="optim-caveat.html#cb244-8"></a>}</span>
+<span id="cb244-9"><a href="optim-caveat.html#cb244-9"></a><span class="op">*</span><span class="st"> </span><span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
+<span id="cb244-10"><a href="optim-caveat.html#cb244-10"></a><span class="op">*</span><span class="st">   </span><span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb244-11"><a href="optim-caveat.html#cb244-11"></a>} <span class="cf">else</span>  {</span>
+<span id="cb244-12"><a href="optim-caveat.html#cb244-12"></a><span class="op">*</span><span class="st">   </span><span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb244-13"><a href="optim-caveat.html#cb244-13"></a>}</span>
+<span id="cb244-14"><a href="optim-caveat.html#cb244-14"></a>})</span></code></pre></div>
 <p>Whereas in this refactored code using <code>observeEvent()</code>, it is easier to identify where the invalidation can happen:</p>
-<div class="sourceCode" id="cb246"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb246-1"><a href="optim-caveat.html#cb246-1"></a><span class="kw">observeEvent</span>( <span class="kw">c</span>(</span>
-<span id="cb246-2"><a href="optim-caveat.html#cb246-2"></a><span class="op">*</span><span class="st">  </span>input<span class="op">$</span>rev, </span>
-<span id="cb246-3"><a href="optim-caveat.html#cb246-3"></a><span class="op">*</span><span class="st">  </span>input<span class="op">$</span>txt</span>
-<span id="cb246-4"><a href="optim-caveat.html#cb246-4"></a>),{</span>
-<span id="cb246-5"><a href="optim-caveat.html#cb246-5"></a>i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb246-6"><a href="optim-caveat.html#cb246-6"></a><span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb246-7"><a href="optim-caveat.html#cb246-7"></a><span class="cf">if</span> (input<span class="op">$</span>rev){</span>
-<span id="cb246-8"><a href="optim-caveat.html#cb246-8"></a>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
-<span id="cb246-9"><a href="optim-caveat.html#cb246-9"></a>} <span class="cf">else</span> {</span>
-<span id="cb246-10"><a href="optim-caveat.html#cb246-10"></a>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
-<span id="cb246-11"><a href="optim-caveat.html#cb246-11"></a>}</span>
-<span id="cb246-12"><a href="optim-caveat.html#cb246-12"></a><span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
-<span id="cb246-13"><a href="optim-caveat.html#cb246-13"></a><span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb246-14"><a href="optim-caveat.html#cb246-14"></a>} <span class="cf">else</span>  {</span>
-<span id="cb246-15"><a href="optim-caveat.html#cb246-15"></a><span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb246-16"><a href="optim-caveat.html#cb246-16"></a>}</span>
-<span id="cb246-17"><a href="optim-caveat.html#cb246-17"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="optim-caveat.html#cb245-1"></a><span class="kw">observeEvent</span>( <span class="kw">c</span>(</span>
+<span id="cb245-2"><a href="optim-caveat.html#cb245-2"></a><span class="op">*</span><span class="st">  </span>input<span class="op">$</span>rev, </span>
+<span id="cb245-3"><a href="optim-caveat.html#cb245-3"></a><span class="op">*</span><span class="st">  </span>input<span class="op">$</span>txt</span>
+<span id="cb245-4"><a href="optim-caveat.html#cb245-4"></a>),{</span>
+<span id="cb245-5"><a href="optim-caveat.html#cb245-5"></a>i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb245-6"><a href="optim-caveat.html#cb245-6"></a><span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
+<span id="cb245-7"><a href="optim-caveat.html#cb245-7"></a><span class="cf">if</span> (input<span class="op">$</span>rev){</span>
+<span id="cb245-8"><a href="optim-caveat.html#cb245-8"></a>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
+<span id="cb245-9"><a href="optim-caveat.html#cb245-9"></a>} <span class="cf">else</span> {</span>
+<span id="cb245-10"><a href="optim-caveat.html#cb245-10"></a>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
+<span id="cb245-11"><a href="optim-caveat.html#cb245-11"></a>}</span>
+<span id="cb245-12"><a href="optim-caveat.html#cb245-12"></a><span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
+<span id="cb245-13"><a href="optim-caveat.html#cb245-13"></a><span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb245-14"><a href="optim-caveat.html#cb245-14"></a>} <span class="cf">else</span>  {</span>
+<span id="cb245-15"><a href="optim-caveat.html#cb245-15"></a><span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb245-16"><a href="optim-caveat.html#cb245-16"></a>}</span>
+<span id="cb245-17"><a href="optim-caveat.html#cb245-17"></a>})</span></code></pre></div>
 </div>
 <div id="building-triggers-and-watchers" class="section level3">
 <h3><span class="header-section-number">15.1.3</span> Building triggers and watchers</h3>
@@ -856,7 +856,7 @@ For example, here is where the reactive invalidation can happen (lines with a <c
 <p>These objects are launched with an <code>init</code> function, then these flags are triggered with <code>trigger()</code>, and wherever we want these flags to invalidate a reactive context, we <code>watch()</code> these flags.</p>
 <p>The idea here is to get a full control over the reactive flow: we only invalidate contexts when we want, making the general flow of the app more predictable.
 These flags are available using the <code>{gargoyle}</code> <span class="citation">(Fay <a href="#ref-R-gargoyle" role="doc-biblioref">2020</a><a href="#ref-R-gargoyle" role="doc-biblioref">e</a>)</span> package, that can be installed from GitHub with:</p>
-<div class="sourceCode" id="cb247"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb247-1"><a href="optim-caveat.html#cb247-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;ColinFay/gargoyle&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb246"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb246-1"><a href="optim-caveat.html#cb246-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;ColinFay/gargoyle&quot;</span>)</span></code></pre></div>
 <ul>
 <li><p><code>gargoyle::init("this")</code> initiate a <code>"this"</code> flag: most of the time you will be generating them at the <code>app_server()</code> level</p></li>
 <li><p><code>gargoyle::watch("this")</code> sets the flag inside a reactive context, so that it will be invalidated every time you <code>trigger("this")</code> this flag.</p></li>
@@ -869,76 +869,76 @@ The idea here is to allow a complete control over when the image is recomputed: 
 That might seems like a lot of extra work, but that is definitely worth considering on the long run, as it will help optimizing the rendering (fewer computation) and lowering the number of errors that can result from too much reactivity inside an application.</p>
 <p>Here is a small example of this implementation, using an environment to store the value.
 When using this pattern, we do not rely on any reactive value invalidating the reactive context: the second result is only displayed when the <code>"render2"</code> flag is triggered, giving us a full control on how the reactivity is propagated.</p>
-<div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb248-1"><a href="optim-caveat.html#cb248-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb248-2"><a href="optim-caveat.html#cb248-2"></a><span class="kw">library</span>(gargoyle)</span>
-<span id="cb248-3"><a href="optim-caveat.html#cb248-3"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb248-4"><a href="optim-caveat.html#cb248-4"></a>  <span class="kw">fluidPage</span>(</span>
-<span id="cb248-5"><a href="optim-caveat.html#cb248-5"></a>    <span class="kw">tagList</span>(</span>
-<span id="cb248-6"><a href="optim-caveat.html#cb248-6"></a>      <span class="co"># Creating an action button to launch the computation</span></span>
-<span id="cb248-7"><a href="optim-caveat.html#cb248-7"></a>      <span class="kw">actionButton</span>(<span class="st">&quot;compute&quot;</span>, <span class="st">&quot;Compute&quot;</span>), </span>
-<span id="cb248-8"><a href="optim-caveat.html#cb248-8"></a>      <span class="co"># Output for all runif()</span></span>
-<span id="cb248-9"><a href="optim-caveat.html#cb248-9"></a>      <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;result&quot;</span>), </span>
-<span id="cb248-10"><a href="optim-caveat.html#cb248-10"></a>      <span class="co"># This output will change only if runif() &gt; 0.5</span></span>
-<span id="cb248-11"><a href="optim-caveat.html#cb248-11"></a>      <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;result2&quot;</span>),</span>
-<span id="cb248-12"><a href="optim-caveat.html#cb248-12"></a>      <span class="co"># This button will reset x$results to 0, we use it </span></span>
-<span id="cb248-13"><a href="optim-caveat.html#cb248-13"></a>      <span class="co"># to show that it won&#39;t launch a series of reactivity </span></span>
-<span id="cb248-14"><a href="optim-caveat.html#cb248-14"></a>      <span class="co"># invalidation</span></span>
-<span id="cb248-15"><a href="optim-caveat.html#cb248-15"></a>      <span class="kw">actionButton</span>(<span class="st">&quot;reset&quot;</span>, <span class="st">&quot;Reset x&quot;</span>)</span>
-<span id="cb248-16"><a href="optim-caveat.html#cb248-16"></a>    )</span>
-<span id="cb248-17"><a href="optim-caveat.html#cb248-17"></a>  )</span>
-<span id="cb248-18"><a href="optim-caveat.html#cb248-18"></a>}</span>
-<span id="cb248-19"><a href="optim-caveat.html#cb248-19"></a></span>
-<span id="cb248-20"><a href="optim-caveat.html#cb248-20"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb248-21"><a href="optim-caveat.html#cb248-21"></a>  input, </span>
-<span id="cb248-22"><a href="optim-caveat.html#cb248-22"></a>  output, </span>
-<span id="cb248-23"><a href="optim-caveat.html#cb248-23"></a>  session</span>
-<span id="cb248-24"><a href="optim-caveat.html#cb248-24"></a>){</span>
-<span id="cb248-25"><a href="optim-caveat.html#cb248-25"></a>  </span>
-<span id="cb248-26"><a href="optim-caveat.html#cb248-26"></a>  <span class="co"># Mimic an R6 class, i.e a non-reactive object</span></span>
-<span id="cb248-27"><a href="optim-caveat.html#cb248-27"></a>  x &lt;-<span class="st"> </span><span class="kw">environment</span>()</span>
-<span id="cb248-28"><a href="optim-caveat.html#cb248-28"></a>  </span>
-<span id="cb248-29"><a href="optim-caveat.html#cb248-29"></a>  <span class="co"># Creating two watchers</span></span>
-<span id="cb248-30"><a href="optim-caveat.html#cb248-30"></a>  <span class="kw">init</span>(<span class="st">&quot;render_result&quot;</span>, <span class="st">&quot;render_result2&quot;</span>)</span>
-<span id="cb248-31"><a href="optim-caveat.html#cb248-31"></a>  </span>
-<span id="cb248-32"><a href="optim-caveat.html#cb248-32"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>compute , {</span>
-<span id="cb248-33"><a href="optim-caveat.html#cb248-33"></a>    <span class="co"># When the user presses compute, we launch runif()</span></span>
-<span id="cb248-34"><a href="optim-caveat.html#cb248-34"></a>    x<span class="op">$</span>results &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>)</span>
-<span id="cb248-35"><a href="optim-caveat.html#cb248-35"></a>    <span class="co"># Every time a new value is stored, we render result</span></span>
-<span id="cb248-36"><a href="optim-caveat.html#cb248-36"></a>    <span class="kw">trigger</span>(<span class="st">&quot;render_result&quot;</span>)</span>
-<span id="cb248-37"><a href="optim-caveat.html#cb248-37"></a>    <span class="co"># Only render the second result if x$results is over 0.5</span></span>
-<span id="cb248-38"><a href="optim-caveat.html#cb248-38"></a>    <span class="cf">if</span> (x<span class="op">$</span>results <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.5</span>){</span>
-<span id="cb248-39"><a href="optim-caveat.html#cb248-39"></a>      <span class="kw">trigger</span>(<span class="st">&quot;render_result2&quot;</span>)</span>
-<span id="cb248-40"><a href="optim-caveat.html#cb248-40"></a>    }</span>
-<span id="cb248-41"><a href="optim-caveat.html#cb248-41"></a>  })</span>
-<span id="cb248-42"><a href="optim-caveat.html#cb248-42"></a>  </span>
-<span id="cb248-43"><a href="optim-caveat.html#cb248-43"></a>  output<span class="op">$</span>result &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
-<span id="cb248-44"><a href="optim-caveat.html#cb248-44"></a>    <span class="co"># Will be rendered every time</span></span>
-<span id="cb248-45"><a href="optim-caveat.html#cb248-45"></a>    <span class="kw">watch</span>(<span class="st">&quot;render_result&quot;</span>)</span>
-<span id="cb248-46"><a href="optim-caveat.html#cb248-46"></a>    <span class="co"># require x$results before rendering the output</span></span>
-<span id="cb248-47"><a href="optim-caveat.html#cb248-47"></a>    <span class="kw">req</span>(x<span class="op">$</span>results)</span>
-<span id="cb248-48"><a href="optim-caveat.html#cb248-48"></a>    x<span class="op">$</span>results</span>
-<span id="cb248-49"><a href="optim-caveat.html#cb248-49"></a>  })</span>
-<span id="cb248-50"><a href="optim-caveat.html#cb248-50"></a>  </span>
-<span id="cb248-51"><a href="optim-caveat.html#cb248-51"></a>  </span>
-<span id="cb248-52"><a href="optim-caveat.html#cb248-52"></a>  output<span class="op">$</span>result2 &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
-<span id="cb248-53"><a href="optim-caveat.html#cb248-53"></a>    <span class="co"># This will only be rendered if trigger(&quot;render_result2&quot;)</span></span>
-<span id="cb248-54"><a href="optim-caveat.html#cb248-54"></a>    <span class="co"># is called</span></span>
-<span id="cb248-55"><a href="optim-caveat.html#cb248-55"></a>    <span class="kw">watch</span>(<span class="st">&quot;render_result2&quot;</span>)</span>
-<span id="cb248-56"><a href="optim-caveat.html#cb248-56"></a>    <span class="kw">req</span>(x<span class="op">$</span>results)</span>
-<span id="cb248-57"><a href="optim-caveat.html#cb248-57"></a>    x<span class="op">$</span>results</span>
-<span id="cb248-58"><a href="optim-caveat.html#cb248-58"></a>  })</span>
-<span id="cb248-59"><a href="optim-caveat.html#cb248-59"></a>  </span>
-<span id="cb248-60"><a href="optim-caveat.html#cb248-60"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>reset , {</span>
-<span id="cb248-61"><a href="optim-caveat.html#cb248-61"></a>    <span class="co"># This resets x$results. This code block is here</span></span>
-<span id="cb248-62"><a href="optim-caveat.html#cb248-62"></a>    <span class="co"># to show that reactivity is not triggered in this app </span></span>
-<span id="cb248-63"><a href="optim-caveat.html#cb248-63"></a>    <span class="co"># unless a trigger() is called</span></span>
-<span id="cb248-64"><a href="optim-caveat.html#cb248-64"></a>    x<span class="op">$</span>results &lt;-<span class="st">  </span><span class="dv">0</span></span>
-<span id="cb248-65"><a href="optim-caveat.html#cb248-65"></a>    <span class="kw">print</span>(x<span class="op">$</span>results)</span>
-<span id="cb248-66"><a href="optim-caveat.html#cb248-66"></a>  })</span>
-<span id="cb248-67"><a href="optim-caveat.html#cb248-67"></a>  </span>
-<span id="cb248-68"><a href="optim-caveat.html#cb248-68"></a>}</span>
-<span id="cb248-69"><a href="optim-caveat.html#cb248-69"></a></span>
-<span id="cb248-70"><a href="optim-caveat.html#cb248-70"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb247"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb247-1"><a href="optim-caveat.html#cb247-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb247-2"><a href="optim-caveat.html#cb247-2"></a><span class="kw">library</span>(gargoyle)</span>
+<span id="cb247-3"><a href="optim-caveat.html#cb247-3"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb247-4"><a href="optim-caveat.html#cb247-4"></a>  <span class="kw">fluidPage</span>(</span>
+<span id="cb247-5"><a href="optim-caveat.html#cb247-5"></a>    <span class="kw">tagList</span>(</span>
+<span id="cb247-6"><a href="optim-caveat.html#cb247-6"></a>      <span class="co"># Creating an action button to launch the computation</span></span>
+<span id="cb247-7"><a href="optim-caveat.html#cb247-7"></a>      <span class="kw">actionButton</span>(<span class="st">&quot;compute&quot;</span>, <span class="st">&quot;Compute&quot;</span>), </span>
+<span id="cb247-8"><a href="optim-caveat.html#cb247-8"></a>      <span class="co"># Output for all runif()</span></span>
+<span id="cb247-9"><a href="optim-caveat.html#cb247-9"></a>      <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;result&quot;</span>), </span>
+<span id="cb247-10"><a href="optim-caveat.html#cb247-10"></a>      <span class="co"># This output will change only if runif() &gt; 0.5</span></span>
+<span id="cb247-11"><a href="optim-caveat.html#cb247-11"></a>      <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;result2&quot;</span>),</span>
+<span id="cb247-12"><a href="optim-caveat.html#cb247-12"></a>      <span class="co"># This button will reset x$results to 0, we use it </span></span>
+<span id="cb247-13"><a href="optim-caveat.html#cb247-13"></a>      <span class="co"># to show that it won&#39;t launch a series of reactivity </span></span>
+<span id="cb247-14"><a href="optim-caveat.html#cb247-14"></a>      <span class="co"># invalidation</span></span>
+<span id="cb247-15"><a href="optim-caveat.html#cb247-15"></a>      <span class="kw">actionButton</span>(<span class="st">&quot;reset&quot;</span>, <span class="st">&quot;Reset x&quot;</span>)</span>
+<span id="cb247-16"><a href="optim-caveat.html#cb247-16"></a>    )</span>
+<span id="cb247-17"><a href="optim-caveat.html#cb247-17"></a>  )</span>
+<span id="cb247-18"><a href="optim-caveat.html#cb247-18"></a>}</span>
+<span id="cb247-19"><a href="optim-caveat.html#cb247-19"></a></span>
+<span id="cb247-20"><a href="optim-caveat.html#cb247-20"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb247-21"><a href="optim-caveat.html#cb247-21"></a>  input, </span>
+<span id="cb247-22"><a href="optim-caveat.html#cb247-22"></a>  output, </span>
+<span id="cb247-23"><a href="optim-caveat.html#cb247-23"></a>  session</span>
+<span id="cb247-24"><a href="optim-caveat.html#cb247-24"></a>){</span>
+<span id="cb247-25"><a href="optim-caveat.html#cb247-25"></a>  </span>
+<span id="cb247-26"><a href="optim-caveat.html#cb247-26"></a>  <span class="co"># Mimic an R6 class, i.e a non-reactive object</span></span>
+<span id="cb247-27"><a href="optim-caveat.html#cb247-27"></a>  x &lt;-<span class="st"> </span><span class="kw">environment</span>()</span>
+<span id="cb247-28"><a href="optim-caveat.html#cb247-28"></a>  </span>
+<span id="cb247-29"><a href="optim-caveat.html#cb247-29"></a>  <span class="co"># Creating two watchers</span></span>
+<span id="cb247-30"><a href="optim-caveat.html#cb247-30"></a>  <span class="kw">init</span>(<span class="st">&quot;render_result&quot;</span>, <span class="st">&quot;render_result2&quot;</span>)</span>
+<span id="cb247-31"><a href="optim-caveat.html#cb247-31"></a>  </span>
+<span id="cb247-32"><a href="optim-caveat.html#cb247-32"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>compute , {</span>
+<span id="cb247-33"><a href="optim-caveat.html#cb247-33"></a>    <span class="co"># When the user presses compute, we launch runif()</span></span>
+<span id="cb247-34"><a href="optim-caveat.html#cb247-34"></a>    x<span class="op">$</span>results &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>)</span>
+<span id="cb247-35"><a href="optim-caveat.html#cb247-35"></a>    <span class="co"># Every time a new value is stored, we render result</span></span>
+<span id="cb247-36"><a href="optim-caveat.html#cb247-36"></a>    <span class="kw">trigger</span>(<span class="st">&quot;render_result&quot;</span>)</span>
+<span id="cb247-37"><a href="optim-caveat.html#cb247-37"></a>    <span class="co"># Only render the second result if x$results is over 0.5</span></span>
+<span id="cb247-38"><a href="optim-caveat.html#cb247-38"></a>    <span class="cf">if</span> (x<span class="op">$</span>results <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.5</span>){</span>
+<span id="cb247-39"><a href="optim-caveat.html#cb247-39"></a>      <span class="kw">trigger</span>(<span class="st">&quot;render_result2&quot;</span>)</span>
+<span id="cb247-40"><a href="optim-caveat.html#cb247-40"></a>    }</span>
+<span id="cb247-41"><a href="optim-caveat.html#cb247-41"></a>  })</span>
+<span id="cb247-42"><a href="optim-caveat.html#cb247-42"></a>  </span>
+<span id="cb247-43"><a href="optim-caveat.html#cb247-43"></a>  output<span class="op">$</span>result &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb247-44"><a href="optim-caveat.html#cb247-44"></a>    <span class="co"># Will be rendered every time</span></span>
+<span id="cb247-45"><a href="optim-caveat.html#cb247-45"></a>    <span class="kw">watch</span>(<span class="st">&quot;render_result&quot;</span>)</span>
+<span id="cb247-46"><a href="optim-caveat.html#cb247-46"></a>    <span class="co"># require x$results before rendering the output</span></span>
+<span id="cb247-47"><a href="optim-caveat.html#cb247-47"></a>    <span class="kw">req</span>(x<span class="op">$</span>results)</span>
+<span id="cb247-48"><a href="optim-caveat.html#cb247-48"></a>    x<span class="op">$</span>results</span>
+<span id="cb247-49"><a href="optim-caveat.html#cb247-49"></a>  })</span>
+<span id="cb247-50"><a href="optim-caveat.html#cb247-50"></a>  </span>
+<span id="cb247-51"><a href="optim-caveat.html#cb247-51"></a>  </span>
+<span id="cb247-52"><a href="optim-caveat.html#cb247-52"></a>  output<span class="op">$</span>result2 &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb247-53"><a href="optim-caveat.html#cb247-53"></a>    <span class="co"># This will only be rendered if trigger(&quot;render_result2&quot;)</span></span>
+<span id="cb247-54"><a href="optim-caveat.html#cb247-54"></a>    <span class="co"># is called</span></span>
+<span id="cb247-55"><a href="optim-caveat.html#cb247-55"></a>    <span class="kw">watch</span>(<span class="st">&quot;render_result2&quot;</span>)</span>
+<span id="cb247-56"><a href="optim-caveat.html#cb247-56"></a>    <span class="kw">req</span>(x<span class="op">$</span>results)</span>
+<span id="cb247-57"><a href="optim-caveat.html#cb247-57"></a>    x<span class="op">$</span>results</span>
+<span id="cb247-58"><a href="optim-caveat.html#cb247-58"></a>  })</span>
+<span id="cb247-59"><a href="optim-caveat.html#cb247-59"></a>  </span>
+<span id="cb247-60"><a href="optim-caveat.html#cb247-60"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>reset , {</span>
+<span id="cb247-61"><a href="optim-caveat.html#cb247-61"></a>    <span class="co"># This resets x$results. This code block is here</span></span>
+<span id="cb247-62"><a href="optim-caveat.html#cb247-62"></a>    <span class="co"># to show that reactivity is not triggered in this app </span></span>
+<span id="cb247-63"><a href="optim-caveat.html#cb247-63"></a>    <span class="co"># unless a trigger() is called</span></span>
+<span id="cb247-64"><a href="optim-caveat.html#cb247-64"></a>    x<span class="op">$</span>results &lt;-<span class="st">  </span><span class="dv">0</span></span>
+<span id="cb247-65"><a href="optim-caveat.html#cb247-65"></a>    <span class="kw">print</span>(x<span class="op">$</span>results)</span>
+<span id="cb247-66"><a href="optim-caveat.html#cb247-66"></a>  })</span>
+<span id="cb247-67"><a href="optim-caveat.html#cb247-67"></a>  </span>
+<span id="cb247-68"><a href="optim-caveat.html#cb247-68"></a>}</span>
+<span id="cb247-69"><a href="optim-caveat.html#cb247-69"></a></span>
+<span id="cb247-70"><a href="optim-caveat.html#cb247-70"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
 <div id="using-r6-as-a-data-storage" class="section level3">
 <h3><span class="header-section-number">15.1.4</span> Using R6 as a data storage</h3>
@@ -950,91 +950,91 @@ Why would we want to do that?</p>
 <p>Basically, the idea is to hold the whole logic of your <strong>data</strong> <strong>reading/cleaning/processing/outputting inside an R6 class</strong>.
 An object of this class is then initiated at the top level of your application, and you can pass this object to the sub-modules.
 Of course, this makes even more sense if you are combining it with the trigger/watch pattern from before!</p>
-<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb249-1"><a href="optim-caveat.html#cb249-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb249-2"><a href="optim-caveat.html#cb249-2"></a>data_cleaning_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
-<span id="cb249-3"><a href="optim-caveat.html#cb249-3"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
-<span id="cb249-4"><a href="optim-caveat.html#cb249-4"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb249-5"><a href="optim-caveat.html#cb249-5"></a>    <span class="co"># Defining the UI for your first module</span></span>
-<span id="cb249-6"><a href="optim-caveat.html#cb249-6"></a>    <span class="co"># [...]</span></span>
-<span id="cb249-7"><a href="optim-caveat.html#cb249-7"></a>  )</span>
-<span id="cb249-8"><a href="optim-caveat.html#cb249-8"></a>}</span>
-<span id="cb249-9"><a href="optim-caveat.html#cb249-9"></a></span>
-<span id="cb249-10"><a href="optim-caveat.html#cb249-10"></a>data_cleaning_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, r6){</span>
-<span id="cb249-11"><a href="optim-caveat.html#cb249-11"></a>  </span>
-<span id="cb249-12"><a href="optim-caveat.html#cb249-12"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>launch_cleaning , {</span>
-<span id="cb249-13"><a href="optim-caveat.html#cb249-13"></a>    <span class="co"># Once the launch_cleaning input is triggered, we </span></span>
-<span id="cb249-14"><a href="optim-caveat.html#cb249-14"></a>    <span class="co"># use the internal method from our r6 object </span></span>
-<span id="cb249-15"><a href="optim-caveat.html#cb249-15"></a>    r6<span class="op">$</span><span class="kw">clean</span>(<span class="dt">arg1 =</span> input<span class="op">$</span>a, <span class="dt">arg2 =</span> input<span class="op">$</span>b)</span>
-<span id="cb249-16"><a href="optim-caveat.html#cb249-16"></a>    <span class="co"># Triggering the plot</span></span>
-<span id="cb249-17"><a href="optim-caveat.html#cb249-17"></a>    <span class="kw">trigger</span>(<span class="st">&quot;plot&quot;</span>)</span>
-<span id="cb249-18"><a href="optim-caveat.html#cb249-18"></a>  })</span>
-<span id="cb249-19"><a href="optim-caveat.html#cb249-19"></a>  </span>
-<span id="cb249-20"><a href="optim-caveat.html#cb249-20"></a>}</span>
-<span id="cb249-21"><a href="optim-caveat.html#cb249-21"></a></span>
-<span id="cb249-22"><a href="optim-caveat.html#cb249-22"></a>plotting_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
-<span id="cb249-23"><a href="optim-caveat.html#cb249-23"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
-<span id="cb249-24"><a href="optim-caveat.html#cb249-24"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb249-25"><a href="optim-caveat.html#cb249-25"></a>    <span class="co"># Defining the UI for your second module</span></span>
-<span id="cb249-26"><a href="optim-caveat.html#cb249-26"></a>    <span class="co"># [...]</span></span>
-<span id="cb249-27"><a href="optim-caveat.html#cb249-27"></a>  )</span>
-<span id="cb249-28"><a href="optim-caveat.html#cb249-28"></a>}</span>
-<span id="cb249-29"><a href="optim-caveat.html#cb249-29"></a></span>
-<span id="cb249-30"><a href="optim-caveat.html#cb249-30"></a>plotting_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, r6){</span>
-<span id="cb249-31"><a href="optim-caveat.html#cb249-31"></a>  </span>
-<span id="cb249-32"><a href="optim-caveat.html#cb249-32"></a>  <span class="co"># Rendering, inside this second module, the plot based on the </span></span>
-<span id="cb249-33"><a href="optim-caveat.html#cb249-33"></a>  <span class="co"># cleaning done in the other module</span></span>
-<span id="cb249-34"><a href="optim-caveat.html#cb249-34"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb249-35"><a href="optim-caveat.html#cb249-35"></a>    <span class="co"># We use the trigger/watch pattern from before</span></span>
-<span id="cb249-36"><a href="optim-caveat.html#cb249-36"></a>    <span class="kw">watch</span>(<span class="st">&quot;plot&quot;</span>)</span>
-<span id="cb249-37"><a href="optim-caveat.html#cb249-37"></a>    <span class="co"># Calling the plot() method from our R6 object</span></span>
-<span id="cb249-38"><a href="optim-caveat.html#cb249-38"></a>    r6<span class="op">$</span><span class="kw">plot</span>()</span>
-<span id="cb249-39"><a href="optim-caveat.html#cb249-39"></a>  })</span>
-<span id="cb249-40"><a href="optim-caveat.html#cb249-40"></a>}</span>
-<span id="cb249-41"><a href="optim-caveat.html#cb249-41"></a></span>
-<span id="cb249-42"><a href="optim-caveat.html#cb249-42"></a></span>
-<span id="cb249-43"><a href="optim-caveat.html#cb249-43"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb249-44"><a href="optim-caveat.html#cb249-44"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb249-45"><a href="optim-caveat.html#cb249-45"></a>    <span class="co"># Putting our two module UIs here</span></span>
-<span id="cb249-46"><a href="optim-caveat.html#cb249-46"></a>    <span class="kw">data_cleaning_ui</span>(<span class="st">&quot;data_cleaning_ui&quot;</span>),</span>
-<span id="cb249-47"><a href="optim-caveat.html#cb249-47"></a>    <span class="kw">plotting_ui</span>(<span class="st">&quot;plotting_ui&quot;</span>)</span>
-<span id="cb249-48"><a href="optim-caveat.html#cb249-48"></a>  )</span>
-<span id="cb249-49"><a href="optim-caveat.html#cb249-49"></a>}</span>
-<span id="cb249-50"><a href="optim-caveat.html#cb249-50"></a></span>
-<span id="cb249-51"><a href="optim-caveat.html#cb249-51"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb249-52"><a href="optim-caveat.html#cb249-52"></a>  input, </span>
-<span id="cb249-53"><a href="optim-caveat.html#cb249-53"></a>  output, </span>
-<span id="cb249-54"><a href="optim-caveat.html#cb249-54"></a>  session</span>
-<span id="cb249-55"><a href="optim-caveat.html#cb249-55"></a>){</span>
-<span id="cb249-56"><a href="optim-caveat.html#cb249-56"></a>  <span class="co"># We start by creating a new instance of th</span></span>
-<span id="cb249-57"><a href="optim-caveat.html#cb249-57"></a>  r6 &lt;-<span class="st"> </span>MyDataProcessing<span class="op">$</span><span class="kw">new</span>()</span>
-<span id="cb249-58"><a href="optim-caveat.html#cb249-58"></a>  <span class="co"># Passing this object to the two server functions</span></span>
-<span id="cb249-59"><a href="optim-caveat.html#cb249-59"></a>  <span class="kw">callModule</span>(data_cleaning_server, <span class="st">&quot;data_cleaning_ui&quot;</span>, r6)</span>
-<span id="cb249-60"><a href="optim-caveat.html#cb249-60"></a>  <span class="kw">callModule</span>(plotting_server, <span class="st">&quot;plotting_ui&quot;</span>, r6)</span>
-<span id="cb249-61"><a href="optim-caveat.html#cb249-61"></a>}</span>
-<span id="cb249-62"><a href="optim-caveat.html#cb249-62"></a></span>
-<span id="cb249-63"><a href="optim-caveat.html#cb249-63"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb248-1"><a href="optim-caveat.html#cb248-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb248-2"><a href="optim-caveat.html#cb248-2"></a>data_cleaning_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
+<span id="cb248-3"><a href="optim-caveat.html#cb248-3"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
+<span id="cb248-4"><a href="optim-caveat.html#cb248-4"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb248-5"><a href="optim-caveat.html#cb248-5"></a>    <span class="co"># Defining the UI for your first module</span></span>
+<span id="cb248-6"><a href="optim-caveat.html#cb248-6"></a>    <span class="co"># [...]</span></span>
+<span id="cb248-7"><a href="optim-caveat.html#cb248-7"></a>  )</span>
+<span id="cb248-8"><a href="optim-caveat.html#cb248-8"></a>}</span>
+<span id="cb248-9"><a href="optim-caveat.html#cb248-9"></a></span>
+<span id="cb248-10"><a href="optim-caveat.html#cb248-10"></a>data_cleaning_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, r6){</span>
+<span id="cb248-11"><a href="optim-caveat.html#cb248-11"></a>  </span>
+<span id="cb248-12"><a href="optim-caveat.html#cb248-12"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>launch_cleaning , {</span>
+<span id="cb248-13"><a href="optim-caveat.html#cb248-13"></a>    <span class="co"># Once the launch_cleaning input is triggered, we </span></span>
+<span id="cb248-14"><a href="optim-caveat.html#cb248-14"></a>    <span class="co"># use the internal method from our r6 object </span></span>
+<span id="cb248-15"><a href="optim-caveat.html#cb248-15"></a>    r6<span class="op">$</span><span class="kw">clean</span>(<span class="dt">arg1 =</span> input<span class="op">$</span>a, <span class="dt">arg2 =</span> input<span class="op">$</span>b)</span>
+<span id="cb248-16"><a href="optim-caveat.html#cb248-16"></a>    <span class="co"># Triggering the plot</span></span>
+<span id="cb248-17"><a href="optim-caveat.html#cb248-17"></a>    <span class="kw">trigger</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb248-18"><a href="optim-caveat.html#cb248-18"></a>  })</span>
+<span id="cb248-19"><a href="optim-caveat.html#cb248-19"></a>  </span>
+<span id="cb248-20"><a href="optim-caveat.html#cb248-20"></a>}</span>
+<span id="cb248-21"><a href="optim-caveat.html#cb248-21"></a></span>
+<span id="cb248-22"><a href="optim-caveat.html#cb248-22"></a>plotting_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
+<span id="cb248-23"><a href="optim-caveat.html#cb248-23"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
+<span id="cb248-24"><a href="optim-caveat.html#cb248-24"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb248-25"><a href="optim-caveat.html#cb248-25"></a>    <span class="co"># Defining the UI for your second module</span></span>
+<span id="cb248-26"><a href="optim-caveat.html#cb248-26"></a>    <span class="co"># [...]</span></span>
+<span id="cb248-27"><a href="optim-caveat.html#cb248-27"></a>  )</span>
+<span id="cb248-28"><a href="optim-caveat.html#cb248-28"></a>}</span>
+<span id="cb248-29"><a href="optim-caveat.html#cb248-29"></a></span>
+<span id="cb248-30"><a href="optim-caveat.html#cb248-30"></a>plotting_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, r6){</span>
+<span id="cb248-31"><a href="optim-caveat.html#cb248-31"></a>  </span>
+<span id="cb248-32"><a href="optim-caveat.html#cb248-32"></a>  <span class="co"># Rendering, inside this second module, the plot based on the </span></span>
+<span id="cb248-33"><a href="optim-caveat.html#cb248-33"></a>  <span class="co"># cleaning done in the other module</span></span>
+<span id="cb248-34"><a href="optim-caveat.html#cb248-34"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb248-35"><a href="optim-caveat.html#cb248-35"></a>    <span class="co"># We use the trigger/watch pattern from before</span></span>
+<span id="cb248-36"><a href="optim-caveat.html#cb248-36"></a>    <span class="kw">watch</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb248-37"><a href="optim-caveat.html#cb248-37"></a>    <span class="co"># Calling the plot() method from our R6 object</span></span>
+<span id="cb248-38"><a href="optim-caveat.html#cb248-38"></a>    r6<span class="op">$</span><span class="kw">plot</span>()</span>
+<span id="cb248-39"><a href="optim-caveat.html#cb248-39"></a>  })</span>
+<span id="cb248-40"><a href="optim-caveat.html#cb248-40"></a>}</span>
+<span id="cb248-41"><a href="optim-caveat.html#cb248-41"></a></span>
+<span id="cb248-42"><a href="optim-caveat.html#cb248-42"></a></span>
+<span id="cb248-43"><a href="optim-caveat.html#cb248-43"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb248-44"><a href="optim-caveat.html#cb248-44"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb248-45"><a href="optim-caveat.html#cb248-45"></a>    <span class="co"># Putting our two module UIs here</span></span>
+<span id="cb248-46"><a href="optim-caveat.html#cb248-46"></a>    <span class="kw">data_cleaning_ui</span>(<span class="st">&quot;data_cleaning_ui&quot;</span>),</span>
+<span id="cb248-47"><a href="optim-caveat.html#cb248-47"></a>    <span class="kw">plotting_ui</span>(<span class="st">&quot;plotting_ui&quot;</span>)</span>
+<span id="cb248-48"><a href="optim-caveat.html#cb248-48"></a>  )</span>
+<span id="cb248-49"><a href="optim-caveat.html#cb248-49"></a>}</span>
+<span id="cb248-50"><a href="optim-caveat.html#cb248-50"></a></span>
+<span id="cb248-51"><a href="optim-caveat.html#cb248-51"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb248-52"><a href="optim-caveat.html#cb248-52"></a>  input, </span>
+<span id="cb248-53"><a href="optim-caveat.html#cb248-53"></a>  output, </span>
+<span id="cb248-54"><a href="optim-caveat.html#cb248-54"></a>  session</span>
+<span id="cb248-55"><a href="optim-caveat.html#cb248-55"></a>){</span>
+<span id="cb248-56"><a href="optim-caveat.html#cb248-56"></a>  <span class="co"># We start by creating a new instance of th</span></span>
+<span id="cb248-57"><a href="optim-caveat.html#cb248-57"></a>  r6 &lt;-<span class="st"> </span>MyDataProcessing<span class="op">$</span><span class="kw">new</span>()</span>
+<span id="cb248-58"><a href="optim-caveat.html#cb248-58"></a>  <span class="co"># Passing this object to the two server functions</span></span>
+<span id="cb248-59"><a href="optim-caveat.html#cb248-59"></a>  <span class="kw">callModule</span>(data_cleaning_server, <span class="st">&quot;data_cleaning_ui&quot;</span>, r6)</span>
+<span id="cb248-60"><a href="optim-caveat.html#cb248-60"></a>  <span class="kw">callModule</span>(plotting_server, <span class="st">&quot;plotting_ui&quot;</span>, r6)</span>
+<span id="cb248-61"><a href="optim-caveat.html#cb248-61"></a>}</span>
+<span id="cb248-62"><a href="optim-caveat.html#cb248-62"></a></span>
+<span id="cb248-63"><a href="optim-caveat.html#cb248-63"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
 <div id="b.-get-sure-it-is-tested" class="section level4 unnumbered">
 <h4>B. Get sure it is tested</h4>
 <p>During the process of building a robust <code>{shiny}</code> app, we strongly suggest that you test as many things as you can.
 This is where using an R6 for your business logic of your app makes sense: this allows you to build the whole testing of your application data logic outside of any reactive context: you simply build unit tests just as any other function.</p>
 <p>For example, let’s say we have the following R6 generator:</p>
-<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="optim-caveat.html#cb250-1"></a>MyData &lt;-<span class="st"> </span>R6<span class="op">::</span><span class="kw">R6Class</span>(</span>
-<span id="cb250-2"><a href="optim-caveat.html#cb250-2"></a>  <span class="st">&quot;MyData&quot;</span>, </span>
-<span id="cb250-3"><a href="optim-caveat.html#cb250-3"></a>  <span class="co"># Defining our public methods, that will be </span></span>
-<span id="cb250-4"><a href="optim-caveat.html#cb250-4"></a>  <span class="co"># the dataset container, and a summary function</span></span>
-<span id="cb250-5"><a href="optim-caveat.html#cb250-5"></a>  <span class="dt">public =</span> <span class="kw">list</span>(</span>
-<span id="cb250-6"><a href="optim-caveat.html#cb250-6"></a>    <span class="dt">data =</span> <span class="ot">NULL</span>,</span>
-<span id="cb250-7"><a href="optim-caveat.html#cb250-7"></a>    <span class="dt">initialize =</span> <span class="cf">function</span>(data){</span>
-<span id="cb250-8"><a href="optim-caveat.html#cb250-8"></a>      self<span class="op">$</span>data &lt;-<span class="st"> </span>data</span>
-<span id="cb250-9"><a href="optim-caveat.html#cb250-9"></a>    }, </span>
-<span id="cb250-10"><a href="optim-caveat.html#cb250-10"></a>    <span class="dt">summarize =</span> <span class="cf">function</span>(){</span>
-<span id="cb250-11"><a href="optim-caveat.html#cb250-11"></a>      <span class="kw">summary</span>(self<span class="op">$</span>data)</span>
-<span id="cb250-12"><a href="optim-caveat.html#cb250-12"></a>    }</span>
-<span id="cb250-13"><a href="optim-caveat.html#cb250-13"></a>  )</span>
-<span id="cb250-14"><a href="optim-caveat.html#cb250-14"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb249-1"><a href="optim-caveat.html#cb249-1"></a>MyData &lt;-<span class="st"> </span>R6<span class="op">::</span><span class="kw">R6Class</span>(</span>
+<span id="cb249-2"><a href="optim-caveat.html#cb249-2"></a>  <span class="st">&quot;MyData&quot;</span>, </span>
+<span id="cb249-3"><a href="optim-caveat.html#cb249-3"></a>  <span class="co"># Defining our public methods, that will be </span></span>
+<span id="cb249-4"><a href="optim-caveat.html#cb249-4"></a>  <span class="co"># the dataset container, and a summary function</span></span>
+<span id="cb249-5"><a href="optim-caveat.html#cb249-5"></a>  <span class="dt">public =</span> <span class="kw">list</span>(</span>
+<span id="cb249-6"><a href="optim-caveat.html#cb249-6"></a>    <span class="dt">data =</span> <span class="ot">NULL</span>,</span>
+<span id="cb249-7"><a href="optim-caveat.html#cb249-7"></a>    <span class="dt">initialize =</span> <span class="cf">function</span>(data){</span>
+<span id="cb249-8"><a href="optim-caveat.html#cb249-8"></a>      self<span class="op">$</span>data &lt;-<span class="st"> </span>data</span>
+<span id="cb249-9"><a href="optim-caveat.html#cb249-9"></a>    }, </span>
+<span id="cb249-10"><a href="optim-caveat.html#cb249-10"></a>    <span class="dt">summarize =</span> <span class="cf">function</span>(){</span>
+<span id="cb249-11"><a href="optim-caveat.html#cb249-11"></a>      <span class="kw">summary</span>(self<span class="op">$</span>data)</span>
+<span id="cb249-12"><a href="optim-caveat.html#cb249-12"></a>    }</span>
+<span id="cb249-13"><a href="optim-caveat.html#cb249-13"></a>  )</span>
+<span id="cb249-14"><a href="optim-caveat.html#cb249-14"></a>)</span></code></pre></div>
 <p>We can then build a test for this class using <code>{testthat}</code>:</p>
-<div class="sourceCode" id="cb251"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb251-1"><a href="optim-caveat.html#cb251-1"></a><span class="kw">library</span>(testthat)</span></code></pre></div>
+<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="optim-caveat.html#cb250-1"></a><span class="kw">library</span>(testthat)</span></code></pre></div>
 <pre><code>
 Attaching package: &#39;testthat&#39;</code></pre>
 <pre><code>The following object is masked from &#39;package:purrr&#39;:
@@ -1046,23 +1046,23 @@ Attaching package: &#39;testthat&#39;</code></pre>
 <pre><code>The following objects are masked from &#39;package:magrittr&#39;:
 
     equals, is_less_than, not</code></pre>
-<div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb256-1"><a href="optim-caveat.html#cb256-1"></a><span class="kw">test_that</span>(<span class="st">&quot;R6 Class works&quot;</span>, {</span>
-<span id="cb256-2"><a href="optim-caveat.html#cb256-2"></a>  <span class="co"># We define a new instance of this class, that will contain </span></span>
-<span id="cb256-3"><a href="optim-caveat.html#cb256-3"></a>  <span class="co"># the mtcars data.frame</span></span>
-<span id="cb256-4"><a href="optim-caveat.html#cb256-4"></a>  my_data &lt;-<span class="st"> </span>MyData<span class="op">$</span><span class="kw">new</span>(mtcars)</span>
-<span id="cb256-5"><a href="optim-caveat.html#cb256-5"></a>  <span class="co"># We will expect my_data to have two classes: &quot;MyData&quot; and &quot;R6&quot;</span></span>
-<span id="cb256-6"><a href="optim-caveat.html#cb256-6"></a>  <span class="kw">expect_is</span>(my_data, <span class="st">&quot;MyData&quot;</span>)</span>
-<span id="cb256-7"><a href="optim-caveat.html#cb256-7"></a>  <span class="kw">expect_is</span>(my_data, <span class="st">&quot;R6&quot;</span>)</span>
-<span id="cb256-8"><a href="optim-caveat.html#cb256-8"></a>  <span class="co"># And the summarize method to return a table</span></span>
-<span id="cb256-9"><a href="optim-caveat.html#cb256-9"></a>  <span class="kw">expect_is</span>(my_data<span class="op">$</span><span class="kw">summarize</span>(), <span class="st">&quot;table&quot;</span>)</span>
-<span id="cb256-10"><a href="optim-caveat.html#cb256-10"></a>  <span class="co"># We would expect the data contained in the object </span></span>
-<span id="cb256-11"><a href="optim-caveat.html#cb256-11"></a>  <span class="co"># to match the one taken as input to new()</span></span>
-<span id="cb256-12"><a href="optim-caveat.html#cb256-12"></a>  <span class="kw">expect_equal</span>(my_data<span class="op">$</span>data, mtcars)</span>
-<span id="cb256-13"><a href="optim-caveat.html#cb256-13"></a>  <span class="co"># And the summarize method to be equal to the summary()</span></span>
-<span id="cb256-14"><a href="optim-caveat.html#cb256-14"></a>  <span class="co">#  on the input object</span></span>
-<span id="cb256-15"><a href="optim-caveat.html#cb256-15"></a>  <span class="kw">expect_equal</span>(my_data<span class="op">$</span><span class="kw">summarize</span>(), <span class="kw">summary</span>(mtcars))</span>
-<span id="cb256-16"><a href="optim-caveat.html#cb256-16"></a>})</span></code></pre></div>
-<pre><code>Test passed 🎉</code></pre>
+<div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb255-1"><a href="optim-caveat.html#cb255-1"></a><span class="kw">test_that</span>(<span class="st">&quot;R6 Class works&quot;</span>, {</span>
+<span id="cb255-2"><a href="optim-caveat.html#cb255-2"></a>  <span class="co"># We define a new instance of this class, that will contain </span></span>
+<span id="cb255-3"><a href="optim-caveat.html#cb255-3"></a>  <span class="co"># the mtcars data.frame</span></span>
+<span id="cb255-4"><a href="optim-caveat.html#cb255-4"></a>  my_data &lt;-<span class="st"> </span>MyData<span class="op">$</span><span class="kw">new</span>(mtcars)</span>
+<span id="cb255-5"><a href="optim-caveat.html#cb255-5"></a>  <span class="co"># We will expect my_data to have two classes: &quot;MyData&quot; and &quot;R6&quot;</span></span>
+<span id="cb255-6"><a href="optim-caveat.html#cb255-6"></a>  <span class="kw">expect_is</span>(my_data, <span class="st">&quot;MyData&quot;</span>)</span>
+<span id="cb255-7"><a href="optim-caveat.html#cb255-7"></a>  <span class="kw">expect_is</span>(my_data, <span class="st">&quot;R6&quot;</span>)</span>
+<span id="cb255-8"><a href="optim-caveat.html#cb255-8"></a>  <span class="co"># And the summarize method to return a table</span></span>
+<span id="cb255-9"><a href="optim-caveat.html#cb255-9"></a>  <span class="kw">expect_is</span>(my_data<span class="op">$</span><span class="kw">summarize</span>(), <span class="st">&quot;table&quot;</span>)</span>
+<span id="cb255-10"><a href="optim-caveat.html#cb255-10"></a>  <span class="co"># We would expect the data contained in the object </span></span>
+<span id="cb255-11"><a href="optim-caveat.html#cb255-11"></a>  <span class="co"># to match the one taken as input to new()</span></span>
+<span id="cb255-12"><a href="optim-caveat.html#cb255-12"></a>  <span class="kw">expect_equal</span>(my_data<span class="op">$</span>data, mtcars)</span>
+<span id="cb255-13"><a href="optim-caveat.html#cb255-13"></a>  <span class="co"># And the summarize method to be equal to the summary()</span></span>
+<span id="cb255-14"><a href="optim-caveat.html#cb255-14"></a>  <span class="co">#  on the input object</span></span>
+<span id="cb255-15"><a href="optim-caveat.html#cb255-15"></a>  <span class="kw">expect_equal</span>(my_data<span class="op">$</span><span class="kw">summarize</span>(), <span class="kw">summary</span>(mtcars))</span>
+<span id="cb255-16"><a href="optim-caveat.html#cb255-16"></a>})</span></code></pre></div>
+<pre><code>Test passed 🥇</code></pre>
 <p>Using R6 allows to rely on these battle-tested tools when it comes to testing functions.
 Something which is made more complex when using other patterns like <code>reactiveValues()</code>.</p>
 </div>
@@ -1072,7 +1072,7 @@ Something which is made more complex when using other patterns like <code>reacti
 <p>Getting a good sense of how reactivity is actually working in your app is not an easy task: the reactivity logic is a graph, and it happens very quickly when you run the app so it’s very hard to follow everything.</p>
 <p><code>whereami::whereami()</code>’s <span class="citation">(Sidi and Müller <a href="#ref-R-whereami" role="doc-biblioref">2019</a>)</span> goal is simple: informing you about where it is called, <em>i.e</em> from what file and at which line, and how many times.
 For example, if you add it inside a RMarkdown inside a book written with book (like the one you are reading now), you will get:</p>
-<div class="sourceCode" id="cb258"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb258-1"><a href="optim-caveat.html#cb258-1"></a>whereami<span class="op">::</span><span class="kw">whereami</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb257-1"><a href="optim-caveat.html#cb257-1"></a>whereami<span class="op">::</span><span class="kw">whereami</span>()</span></code></pre></div>
 <pre><code>-- Running From: Console -------------------------------------</code></pre>
 <p>Combining <code>cat_where()</code> will implement a reactive logging to your console while developing: that way, you can instantaneously know what reactive contexts are invalidated while using the application.
 Of course, you still have to implement it by hand, but that is definitely worth the effort: seeing in real time, in your console, which line is run allows you to detect unexpected behavior.
@@ -1120,116 +1120,116 @@ In this case, the smaller the message size the better!</p>
 </blockquote>
 <p>We will see in the last chapter of this book how you can integrate JS inside your <code>{shiny}</code> app, and how even basic functions can be useful for making your app server lighter.
 For example, compare:</p>
+<div class="sourceCode" id="cb259"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb259-1"><a href="optim-caveat.html#cb259-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb259-2"><a href="optim-caveat.html#cb259-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb259-3"><a href="optim-caveat.html#cb259-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb259-4"><a href="optim-caveat.html#cb259-4"></a>    <span class="co"># Adding a button with an onclick event, </span></span>
+<span id="cb259-5"><a href="optim-caveat.html#cb259-5"></a>    <span class="co"># that will show or hide the plot</span></span>
+<span id="cb259-6"><a href="optim-caveat.html#cb259-6"></a>    <span class="kw">actionButton</span>(</span>
+<span id="cb259-7"><a href="optim-caveat.html#cb259-7"></a>      <span class="st">&quot;change&quot;</span>, </span>
+<span id="cb259-8"><a href="optim-caveat.html#cb259-8"></a>      <span class="st">&quot;show/hide graph&quot;</span>, </span>
+<span id="cb259-9"><a href="optim-caveat.html#cb259-9"></a>      <span class="co"># The toggle() function hide or show the queried element</span></span>
+<span id="cb259-10"><a href="optim-caveat.html#cb259-10"></a>      <span class="dt">onclick =</span> <span class="st">&quot;$(&#39;#plot&#39;).toggle()&quot;</span></span>
+<span id="cb259-11"><a href="optim-caveat.html#cb259-11"></a>    ), </span>
+<span id="cb259-12"><a href="optim-caveat.html#cb259-12"></a>    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb259-13"><a href="optim-caveat.html#cb259-13"></a>  )</span>
+<span id="cb259-14"><a href="optim-caveat.html#cb259-14"></a>}</span>
+<span id="cb259-15"><a href="optim-caveat.html#cb259-15"></a></span>
+<span id="cb259-16"><a href="optim-caveat.html#cb259-16"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb259-17"><a href="optim-caveat.html#cb259-17"></a>  input, </span>
+<span id="cb259-18"><a href="optim-caveat.html#cb259-18"></a>  output, </span>
+<span id="cb259-19"><a href="optim-caveat.html#cb259-19"></a>  session</span>
+<span id="cb259-20"><a href="optim-caveat.html#cb259-20"></a>){</span>
+<span id="cb259-21"><a href="optim-caveat.html#cb259-21"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb259-22"><a href="optim-caveat.html#cb259-22"></a>    <span class="co"># This renderPlot will only be called once</span></span>
+<span id="cb259-23"><a href="optim-caveat.html#cb259-23"></a>    cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;Rendering plot&quot;</span>)</span>
+<span id="cb259-24"><a href="optim-caveat.html#cb259-24"></a>    <span class="kw">plot</span>(iris)</span>
+<span id="cb259-25"><a href="optim-caveat.html#cb259-25"></a>  })</span>
+<span id="cb259-26"><a href="optim-caveat.html#cb259-26"></a>}</span>
+<span id="cb259-27"><a href="optim-caveat.html#cb259-27"></a></span>
+<span id="cb259-28"><a href="optim-caveat.html#cb259-28"></a><span class="kw">shinyApp</span>(ui, server) </span></code></pre></div>
+<p>to</p>
 <div class="sourceCode" id="cb260"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb260-1"><a href="optim-caveat.html#cb260-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb260-2"><a href="optim-caveat.html#cb260-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
 <span id="cb260-3"><a href="optim-caveat.html#cb260-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb260-4"><a href="optim-caveat.html#cb260-4"></a>    <span class="co"># Adding a button with an onclick event, </span></span>
-<span id="cb260-5"><a href="optim-caveat.html#cb260-5"></a>    <span class="co"># that will show or hide the plot</span></span>
-<span id="cb260-6"><a href="optim-caveat.html#cb260-6"></a>    <span class="kw">actionButton</span>(</span>
-<span id="cb260-7"><a href="optim-caveat.html#cb260-7"></a>      <span class="st">&quot;change&quot;</span>, </span>
-<span id="cb260-8"><a href="optim-caveat.html#cb260-8"></a>      <span class="st">&quot;show/hide graph&quot;</span>, </span>
-<span id="cb260-9"><a href="optim-caveat.html#cb260-9"></a>      <span class="co"># The toggle() function hide or show the queried element</span></span>
-<span id="cb260-10"><a href="optim-caveat.html#cb260-10"></a>      <span class="dt">onclick =</span> <span class="st">&quot;$(&#39;#plot&#39;).toggle()&quot;</span></span>
-<span id="cb260-11"><a href="optim-caveat.html#cb260-11"></a>    ), </span>
-<span id="cb260-12"><a href="optim-caveat.html#cb260-12"></a>    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
-<span id="cb260-13"><a href="optim-caveat.html#cb260-13"></a>  )</span>
-<span id="cb260-14"><a href="optim-caveat.html#cb260-14"></a>}</span>
-<span id="cb260-15"><a href="optim-caveat.html#cb260-15"></a></span>
-<span id="cb260-16"><a href="optim-caveat.html#cb260-16"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb260-17"><a href="optim-caveat.html#cb260-17"></a>  input, </span>
-<span id="cb260-18"><a href="optim-caveat.html#cb260-18"></a>  output, </span>
-<span id="cb260-19"><a href="optim-caveat.html#cb260-19"></a>  session</span>
-<span id="cb260-20"><a href="optim-caveat.html#cb260-20"></a>){</span>
-<span id="cb260-21"><a href="optim-caveat.html#cb260-21"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb260-22"><a href="optim-caveat.html#cb260-22"></a>    <span class="co"># This renderPlot will only be called once</span></span>
-<span id="cb260-23"><a href="optim-caveat.html#cb260-23"></a>    cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;Rendering plot&quot;</span>)</span>
-<span id="cb260-24"><a href="optim-caveat.html#cb260-24"></a>    <span class="kw">plot</span>(iris)</span>
-<span id="cb260-25"><a href="optim-caveat.html#cb260-25"></a>  })</span>
-<span id="cb260-26"><a href="optim-caveat.html#cb260-26"></a>}</span>
-<span id="cb260-27"><a href="optim-caveat.html#cb260-27"></a></span>
-<span id="cb260-28"><a href="optim-caveat.html#cb260-28"></a><span class="kw">shinyApp</span>(ui, server) </span></code></pre></div>
-<p>to</p>
-<div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb261-1"><a href="optim-caveat.html#cb261-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb261-2"><a href="optim-caveat.html#cb261-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb261-3"><a href="optim-caveat.html#cb261-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb261-4"><a href="optim-caveat.html#cb261-4"></a>    <span class="co"># We use a pattern without JavaScript</span></span>
-<span id="cb261-5"><a href="optim-caveat.html#cb261-5"></a>    <span class="kw">actionButton</span>(<span class="st">&quot;change&quot;</span>, <span class="st">&quot;show/hide graph&quot;</span>), </span>
-<span id="cb261-6"><a href="optim-caveat.html#cb261-6"></a>    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
-<span id="cb261-7"><a href="optim-caveat.html#cb261-7"></a>  )</span>
-<span id="cb261-8"><a href="optim-caveat.html#cb261-8"></a>}</span>
-<span id="cb261-9"><a href="optim-caveat.html#cb261-9"></a></span>
-<span id="cb261-10"><a href="optim-caveat.html#cb261-10"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb261-11"><a href="optim-caveat.html#cb261-11"></a>  input, </span>
-<span id="cb261-12"><a href="optim-caveat.html#cb261-12"></a>  output, </span>
-<span id="cb261-13"><a href="optim-caveat.html#cb261-13"></a>  session</span>
-<span id="cb261-14"><a href="optim-caveat.html#cb261-14"></a>){</span>
-<span id="cb261-15"><a href="optim-caveat.html#cb261-15"></a>  </span>
-<span id="cb261-16"><a href="optim-caveat.html#cb261-16"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb261-17"><a href="optim-caveat.html#cb261-17"></a>    <span class="co"># Here, every time the button is clicked, this reactive </span></span>
-<span id="cb261-18"><a href="optim-caveat.html#cb261-18"></a>    <span class="co"># context will be invalidated, and the code re-evaluated</span></span>
-<span id="cb261-19"><a href="optim-caveat.html#cb261-19"></a>    cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;Rendering plot&quot;</span>)</span>
-<span id="cb261-20"><a href="optim-caveat.html#cb261-20"></a>    <span class="co"># Simulate a show and hide pattern</span></span>
-<span id="cb261-21"><a href="optim-caveat.html#cb261-21"></a>    <span class="kw">req</span>(input<span class="op">$</span>change <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)</span>
-<span id="cb261-22"><a href="optim-caveat.html#cb261-22"></a>    <span class="kw">plot</span>(iris)</span>
-<span id="cb261-23"><a href="optim-caveat.html#cb261-23"></a>  })</span>
-<span id="cb261-24"><a href="optim-caveat.html#cb261-24"></a>  </span>
-<span id="cb261-25"><a href="optim-caveat.html#cb261-25"></a>}</span>
-<span id="cb261-26"><a href="optim-caveat.html#cb261-26"></a></span>
-<span id="cb261-27"><a href="optim-caveat.html#cb261-27"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<span id="cb260-4"><a href="optim-caveat.html#cb260-4"></a>    <span class="co"># We use a pattern without JavaScript</span></span>
+<span id="cb260-5"><a href="optim-caveat.html#cb260-5"></a>    <span class="kw">actionButton</span>(<span class="st">&quot;change&quot;</span>, <span class="st">&quot;show/hide graph&quot;</span>), </span>
+<span id="cb260-6"><a href="optim-caveat.html#cb260-6"></a>    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb260-7"><a href="optim-caveat.html#cb260-7"></a>  )</span>
+<span id="cb260-8"><a href="optim-caveat.html#cb260-8"></a>}</span>
+<span id="cb260-9"><a href="optim-caveat.html#cb260-9"></a></span>
+<span id="cb260-10"><a href="optim-caveat.html#cb260-10"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb260-11"><a href="optim-caveat.html#cb260-11"></a>  input, </span>
+<span id="cb260-12"><a href="optim-caveat.html#cb260-12"></a>  output, </span>
+<span id="cb260-13"><a href="optim-caveat.html#cb260-13"></a>  session</span>
+<span id="cb260-14"><a href="optim-caveat.html#cb260-14"></a>){</span>
+<span id="cb260-15"><a href="optim-caveat.html#cb260-15"></a>  </span>
+<span id="cb260-16"><a href="optim-caveat.html#cb260-16"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb260-17"><a href="optim-caveat.html#cb260-17"></a>    <span class="co"># Here, every time the button is clicked, this reactive </span></span>
+<span id="cb260-18"><a href="optim-caveat.html#cb260-18"></a>    <span class="co"># context will be invalidated, and the code re-evaluated</span></span>
+<span id="cb260-19"><a href="optim-caveat.html#cb260-19"></a>    cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;Rendering plot&quot;</span>)</span>
+<span id="cb260-20"><a href="optim-caveat.html#cb260-20"></a>    <span class="co"># Simulate a show and hide pattern</span></span>
+<span id="cb260-21"><a href="optim-caveat.html#cb260-21"></a>    <span class="kw">req</span>(input<span class="op">$</span>change <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)</span>
+<span id="cb260-22"><a href="optim-caveat.html#cb260-22"></a>    <span class="kw">plot</span>(iris)</span>
+<span id="cb260-23"><a href="optim-caveat.html#cb260-23"></a>  })</span>
+<span id="cb260-24"><a href="optim-caveat.html#cb260-24"></a>  </span>
+<span id="cb260-25"><a href="optim-caveat.html#cb260-25"></a>}</span>
+<span id="cb260-26"><a href="optim-caveat.html#cb260-26"></a></span>
+<span id="cb260-27"><a href="optim-caveat.html#cb260-27"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>The result is the same, but the first version is shorter and easier to reason about: we have one button, and the behavior of the button is contained into itself.
 And, the second solution redraws the plot every time the <code>reactiveValues</code> is updated, making R compute way more than it should, whereas with the JavaScript only solution, the plot is not recomputed every time you need to show it: the plot is drawn by R only once.</p>
 <p>At a local level, the improvements described in this section will not make your application way faster: for example, rendering UI elements (let’s says rendering a simple title) will not be computationally heavy.
 But at a global level, lighter UI computation from the server side helps the general rendering of the app: let’s say you have an output that takes 3 seconds to run, then if the whole UI + output is to be rendered on the server side, the whole UI stays blank until everything is computed.</p>
 <p>Compare:</p>
+<div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb261-1"><a href="optim-caveat.html#cb261-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb261-2"><a href="optim-caveat.html#cb261-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb261-3"><a href="optim-caveat.html#cb261-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb261-4"><a href="optim-caveat.html#cb261-4"></a>    <span class="co"># We make the whole UI be generated by R</span></span>
+<span id="cb261-5"><a href="optim-caveat.html#cb261-5"></a>    <span class="kw">uiOutput</span>(<span class="st">&quot;caption&quot;</span>)</span>
+<span id="cb261-6"><a href="optim-caveat.html#cb261-6"></a>  )</span>
+<span id="cb261-7"><a href="optim-caveat.html#cb261-7"></a>}</span>
+<span id="cb261-8"><a href="optim-caveat.html#cb261-8"></a></span>
+<span id="cb261-9"><a href="optim-caveat.html#cb261-9"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb261-10"><a href="optim-caveat.html#cb261-10"></a>  input, </span>
+<span id="cb261-11"><a href="optim-caveat.html#cb261-11"></a>  output, </span>
+<span id="cb261-12"><a href="optim-caveat.html#cb261-12"></a>  session</span>
+<span id="cb261-13"><a href="optim-caveat.html#cb261-13"></a>){</span>
+<span id="cb261-14"><a href="optim-caveat.html#cb261-14"></a>  output<span class="op">$</span>caption &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
+<span id="cb261-15"><a href="optim-caveat.html#cb261-15"></a>    <span class="co"># Simulate something that takes 3 seconds to run</span></span>
+<span id="cb261-16"><a href="optim-caveat.html#cb261-16"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</span>
+<span id="cb261-17"><a href="optim-caveat.html#cb261-17"></a>    <span class="co"># Returning the UI</span></span>
+<span id="cb261-18"><a href="optim-caveat.html#cb261-18"></a>    <span class="kw">tagList</span>(</span>
+<span id="cb261-19"><a href="optim-caveat.html#cb261-19"></a>      <span class="kw">h3</span>(<span class="st">&quot;test&quot;</span>), </span>
+<span id="cb261-20"><a href="optim-caveat.html#cb261-20"></a>      shinipsum<span class="op">::</span><span class="kw">random_text</span>(<span class="dv">10</span>)</span>
+<span id="cb261-21"><a href="optim-caveat.html#cb261-21"></a>    )</span>
+<span id="cb261-22"><a href="optim-caveat.html#cb261-22"></a>    </span>
+<span id="cb261-23"><a href="optim-caveat.html#cb261-23"></a>  })</span>
+<span id="cb261-24"><a href="optim-caveat.html#cb261-24"></a>}</span>
+<span id="cb261-25"><a href="optim-caveat.html#cb261-25"></a></span>
+<span id="cb261-26"><a href="optim-caveat.html#cb261-26"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>to</p>
 <div class="sourceCode" id="cb262"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb262-1"><a href="optim-caveat.html#cb262-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb262-2"><a href="optim-caveat.html#cb262-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
 <span id="cb262-3"><a href="optim-caveat.html#cb262-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb262-4"><a href="optim-caveat.html#cb262-4"></a>    <span class="co"># We make the whole UI be generated by R</span></span>
-<span id="cb262-5"><a href="optim-caveat.html#cb262-5"></a>    <span class="kw">uiOutput</span>(<span class="st">&quot;caption&quot;</span>)</span>
-<span id="cb262-6"><a href="optim-caveat.html#cb262-6"></a>  )</span>
-<span id="cb262-7"><a href="optim-caveat.html#cb262-7"></a>}</span>
-<span id="cb262-8"><a href="optim-caveat.html#cb262-8"></a></span>
-<span id="cb262-9"><a href="optim-caveat.html#cb262-9"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb262-10"><a href="optim-caveat.html#cb262-10"></a>  input, </span>
-<span id="cb262-11"><a href="optim-caveat.html#cb262-11"></a>  output, </span>
-<span id="cb262-12"><a href="optim-caveat.html#cb262-12"></a>  session</span>
-<span id="cb262-13"><a href="optim-caveat.html#cb262-13"></a>){</span>
-<span id="cb262-14"><a href="optim-caveat.html#cb262-14"></a>  output<span class="op">$</span>caption &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
-<span id="cb262-15"><a href="optim-caveat.html#cb262-15"></a>    <span class="co"># Simulate something that takes 3 seconds to run</span></span>
-<span id="cb262-16"><a href="optim-caveat.html#cb262-16"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</span>
-<span id="cb262-17"><a href="optim-caveat.html#cb262-17"></a>    <span class="co"># Returning the UI</span></span>
-<span id="cb262-18"><a href="optim-caveat.html#cb262-18"></a>    <span class="kw">tagList</span>(</span>
-<span id="cb262-19"><a href="optim-caveat.html#cb262-19"></a>      <span class="kw">h3</span>(<span class="st">&quot;test&quot;</span>), </span>
-<span id="cb262-20"><a href="optim-caveat.html#cb262-20"></a>      shinipsum<span class="op">::</span><span class="kw">random_text</span>(<span class="dv">10</span>)</span>
-<span id="cb262-21"><a href="optim-caveat.html#cb262-21"></a>    )</span>
-<span id="cb262-22"><a href="optim-caveat.html#cb262-22"></a>    </span>
-<span id="cb262-23"><a href="optim-caveat.html#cb262-23"></a>  })</span>
-<span id="cb262-24"><a href="optim-caveat.html#cb262-24"></a>}</span>
-<span id="cb262-25"><a href="optim-caveat.html#cb262-25"></a></span>
-<span id="cb262-26"><a href="optim-caveat.html#cb262-26"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>to</p>
-<div class="sourceCode" id="cb263"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb263-1"><a href="optim-caveat.html#cb263-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb263-2"><a href="optim-caveat.html#cb263-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb263-3"><a href="optim-caveat.html#cb263-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb263-4"><a href="optim-caveat.html#cb263-4"></a>    <span class="co"># Only the text input will be rendered by R</span></span>
-<span id="cb263-5"><a href="optim-caveat.html#cb263-5"></a>    <span class="kw">h3</span>(<span class="st">&quot;test&quot;</span>), </span>
-<span id="cb263-6"><a href="optim-caveat.html#cb263-6"></a>    <span class="kw">textOutput</span>(<span class="st">&quot;caption&quot;</span>)</span>
-<span id="cb263-7"><a href="optim-caveat.html#cb263-7"></a>  )</span>
-<span id="cb263-8"><a href="optim-caveat.html#cb263-8"></a>}</span>
-<span id="cb263-9"><a href="optim-caveat.html#cb263-9"></a></span>
-<span id="cb263-10"><a href="optim-caveat.html#cb263-10"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb263-11"><a href="optim-caveat.html#cb263-11"></a>  input, </span>
-<span id="cb263-12"><a href="optim-caveat.html#cb263-12"></a>  output, </span>
-<span id="cb263-13"><a href="optim-caveat.html#cb263-13"></a>  session</span>
-<span id="cb263-14"><a href="optim-caveat.html#cb263-14"></a>){</span>
-<span id="cb263-15"><a href="optim-caveat.html#cb263-15"></a>  output<span class="op">$</span>caption &lt;-<span class="st"> </span><span class="kw">renderText</span>({</span>
-<span id="cb263-16"><a href="optim-caveat.html#cb263-16"></a>    <span class="co"># Here, we only render the text, not the whole UI</span></span>
-<span id="cb263-17"><a href="optim-caveat.html#cb263-17"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</span>
-<span id="cb263-18"><a href="optim-caveat.html#cb263-18"></a>    shinipsum<span class="op">::</span><span class="kw">random_text</span>(<span class="dv">10</span>)</span>
-<span id="cb263-19"><a href="optim-caveat.html#cb263-19"></a>  })</span>
-<span id="cb263-20"><a href="optim-caveat.html#cb263-20"></a>}</span>
-<span id="cb263-21"><a href="optim-caveat.html#cb263-21"></a></span>
-<span id="cb263-22"><a href="optim-caveat.html#cb263-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<span id="cb262-4"><a href="optim-caveat.html#cb262-4"></a>    <span class="co"># Only the text input will be rendered by R</span></span>
+<span id="cb262-5"><a href="optim-caveat.html#cb262-5"></a>    <span class="kw">h3</span>(<span class="st">&quot;test&quot;</span>), </span>
+<span id="cb262-6"><a href="optim-caveat.html#cb262-6"></a>    <span class="kw">textOutput</span>(<span class="st">&quot;caption&quot;</span>)</span>
+<span id="cb262-7"><a href="optim-caveat.html#cb262-7"></a>  )</span>
+<span id="cb262-8"><a href="optim-caveat.html#cb262-8"></a>}</span>
+<span id="cb262-9"><a href="optim-caveat.html#cb262-9"></a></span>
+<span id="cb262-10"><a href="optim-caveat.html#cb262-10"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb262-11"><a href="optim-caveat.html#cb262-11"></a>  input, </span>
+<span id="cb262-12"><a href="optim-caveat.html#cb262-12"></a>  output, </span>
+<span id="cb262-13"><a href="optim-caveat.html#cb262-13"></a>  session</span>
+<span id="cb262-14"><a href="optim-caveat.html#cb262-14"></a>){</span>
+<span id="cb262-15"><a href="optim-caveat.html#cb262-15"></a>  output<span class="op">$</span>caption &lt;-<span class="st"> </span><span class="kw">renderText</span>({</span>
+<span id="cb262-16"><a href="optim-caveat.html#cb262-16"></a>    <span class="co"># Here, we only render the text, not the whole UI</span></span>
+<span id="cb262-17"><a href="optim-caveat.html#cb262-17"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</span>
+<span id="cb262-18"><a href="optim-caveat.html#cb262-18"></a>    shinipsum<span class="op">::</span><span class="kw">random_text</span>(<span class="dv">10</span>)</span>
+<span id="cb262-19"><a href="optim-caveat.html#cb262-19"></a>  })</span>
+<span id="cb262-20"><a href="optim-caveat.html#cb262-20"></a>}</span>
+<span id="cb262-21"><a href="optim-caveat.html#cb262-21"></a></span>
+<span id="cb262-22"><a href="optim-caveat.html#cb262-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>In the first example, the UI will wait for the server to have rendered, while in the second we will first see the title, then the rendered text after a few seconds.
 That approach makes the user experience better: they know that something is happening, while completely blank page is confusing.</p>
 <p>Also, R being single threaded, manipulating DOM elements from the server side make R busy doing these DOM manipulation while it could be computing something else.
@@ -1239,36 +1239,36 @@ And let’s imagine it takes a quarter of a second to render the DOM element, th
 <h4>B. <code>update*</code> inputs</h4>
 <p>Almost every <code>{shiny}</code> inputs, even the custom ones from packages, come with an <code>update_</code> function that allows to change the input values from the server side, instead of recreating the UI entirely.
 For example, here is a way to update the content of a <code>selectInput</code> from the server side:</p>
-<div class="sourceCode" id="cb264"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb264-1"><a href="optim-caveat.html#cb264-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb264-2"><a href="optim-caveat.html#cb264-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb264-3"><a href="optim-caveat.html#cb264-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb264-4"><a href="optim-caveat.html#cb264-4"></a>    <span class="co"># We start the selectInput empty</span></span>
-<span id="cb264-5"><a href="optim-caveat.html#cb264-5"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;species&quot;</span>, <span class="st">&quot;Species&quot;</span>, <span class="dt">choices =</span> <span class="ot">NULL</span>), </span>
-<span id="cb264-6"><a href="optim-caveat.html#cb264-6"></a>    <span class="co"># The selectInput will be populate </span></span>
-<span id="cb264-7"><a href="optim-caveat.html#cb264-7"></a>    <span class="co"># when the update button is pressed</span></span>
-<span id="cb264-8"><a href="optim-caveat.html#cb264-8"></a>    <span class="kw">actionButton</span>(<span class="st">&quot;update&quot;</span>, <span class="st">&quot;Update&quot;</span>)</span>
-<span id="cb264-9"><a href="optim-caveat.html#cb264-9"></a>  )</span>
-<span id="cb264-10"><a href="optim-caveat.html#cb264-10"></a>}</span>
-<span id="cb264-11"><a href="optim-caveat.html#cb264-11"></a></span>
-<span id="cb264-12"><a href="optim-caveat.html#cb264-12"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb264-13"><a href="optim-caveat.html#cb264-13"></a>  input, </span>
-<span id="cb264-14"><a href="optim-caveat.html#cb264-14"></a>  output, </span>
-<span id="cb264-15"><a href="optim-caveat.html#cb264-15"></a>  session</span>
-<span id="cb264-16"><a href="optim-caveat.html#cb264-16"></a>){</span>
-<span id="cb264-17"><a href="optim-caveat.html#cb264-17"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>update , {</span>
-<span id="cb264-18"><a href="optim-caveat.html#cb264-18"></a>    <span class="co"># Update the selectInput with the species from iris</span></span>
-<span id="cb264-19"><a href="optim-caveat.html#cb264-19"></a>    spc &lt;-<span class="st"> </span><span class="kw">unique</span>(iris<span class="op">$</span>Species)</span>
-<span id="cb264-20"><a href="optim-caveat.html#cb264-20"></a>    <span class="kw">updateSelectInput</span>(</span>
-<span id="cb264-21"><a href="optim-caveat.html#cb264-21"></a>      session, </span>
-<span id="cb264-22"><a href="optim-caveat.html#cb264-22"></a>      <span class="st">&quot;species&quot;</span>, </span>
-<span id="cb264-23"><a href="optim-caveat.html#cb264-23"></a>      <span class="dt">choices =</span> spc, </span>
-<span id="cb264-24"><a href="optim-caveat.html#cb264-24"></a>      <span class="dt">selected =</span> spc[<span class="dv">1</span>]</span>
-<span id="cb264-25"><a href="optim-caveat.html#cb264-25"></a>    )</span>
-<span id="cb264-26"><a href="optim-caveat.html#cb264-26"></a>  })</span>
-<span id="cb264-27"><a href="optim-caveat.html#cb264-27"></a>  </span>
-<span id="cb264-28"><a href="optim-caveat.html#cb264-28"></a>}</span>
-<span id="cb264-29"><a href="optim-caveat.html#cb264-29"></a></span>
-<span id="cb264-30"><a href="optim-caveat.html#cb264-30"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb263"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb263-1"><a href="optim-caveat.html#cb263-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb263-2"><a href="optim-caveat.html#cb263-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb263-3"><a href="optim-caveat.html#cb263-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb263-4"><a href="optim-caveat.html#cb263-4"></a>    <span class="co"># We start the selectInput empty</span></span>
+<span id="cb263-5"><a href="optim-caveat.html#cb263-5"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;species&quot;</span>, <span class="st">&quot;Species&quot;</span>, <span class="dt">choices =</span> <span class="ot">NULL</span>), </span>
+<span id="cb263-6"><a href="optim-caveat.html#cb263-6"></a>    <span class="co"># The selectInput will be populate </span></span>
+<span id="cb263-7"><a href="optim-caveat.html#cb263-7"></a>    <span class="co"># when the update button is pressed</span></span>
+<span id="cb263-8"><a href="optim-caveat.html#cb263-8"></a>    <span class="kw">actionButton</span>(<span class="st">&quot;update&quot;</span>, <span class="st">&quot;Update&quot;</span>)</span>
+<span id="cb263-9"><a href="optim-caveat.html#cb263-9"></a>  )</span>
+<span id="cb263-10"><a href="optim-caveat.html#cb263-10"></a>}</span>
+<span id="cb263-11"><a href="optim-caveat.html#cb263-11"></a></span>
+<span id="cb263-12"><a href="optim-caveat.html#cb263-12"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb263-13"><a href="optim-caveat.html#cb263-13"></a>  input, </span>
+<span id="cb263-14"><a href="optim-caveat.html#cb263-14"></a>  output, </span>
+<span id="cb263-15"><a href="optim-caveat.html#cb263-15"></a>  session</span>
+<span id="cb263-16"><a href="optim-caveat.html#cb263-16"></a>){</span>
+<span id="cb263-17"><a href="optim-caveat.html#cb263-17"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>update , {</span>
+<span id="cb263-18"><a href="optim-caveat.html#cb263-18"></a>    <span class="co"># Update the selectInput with the species from iris</span></span>
+<span id="cb263-19"><a href="optim-caveat.html#cb263-19"></a>    spc &lt;-<span class="st"> </span><span class="kw">unique</span>(iris<span class="op">$</span>Species)</span>
+<span id="cb263-20"><a href="optim-caveat.html#cb263-20"></a>    <span class="kw">updateSelectInput</span>(</span>
+<span id="cb263-21"><a href="optim-caveat.html#cb263-21"></a>      session, </span>
+<span id="cb263-22"><a href="optim-caveat.html#cb263-22"></a>      <span class="st">&quot;species&quot;</span>, </span>
+<span id="cb263-23"><a href="optim-caveat.html#cb263-23"></a>      <span class="dt">choices =</span> spc, </span>
+<span id="cb263-24"><a href="optim-caveat.html#cb263-24"></a>      <span class="dt">selected =</span> spc[<span class="dv">1</span>]</span>
+<span id="cb263-25"><a href="optim-caveat.html#cb263-25"></a>    )</span>
+<span id="cb263-26"><a href="optim-caveat.html#cb263-26"></a>  })</span>
+<span id="cb263-27"><a href="optim-caveat.html#cb263-27"></a>  </span>
+<span id="cb263-28"><a href="optim-caveat.html#cb263-28"></a>}</span>
+<span id="cb263-29"><a href="optim-caveat.html#cb263-29"></a></span>
+<span id="cb263-30"><a href="optim-caveat.html#cb263-30"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>This switch to <code>updateSelectInput</code> makes the code easier to reason about as the <code>selectInput</code> is where it should be: inside the UI, instead of another pattern where we would use <code>renderUI()</code> and <code>uiOutput()</code>.
 Plus, with the <code>update</code> method, we are only changing what is needed, not re-generating the whole input.</p>
 </div>
@@ -1282,39 +1282,39 @@ This method allows to have a lighter DOM: <code>&lt;div&gt;</code> which are not
 <li>Removing an element from the app will not delete the input from the input list. In other word, if you have <code>selectInput("x", "x")</code>, and that you remove this input using <code>removeUI()</code>, you will still have <code>input$x</code> in the server.</li>
 </ul>
 <p>For example, in the following example, the <code>input$val</code> value will not be removed once you have called <code>removeUI(selector = "#val")</code>.</p>
-<div class="sourceCode" id="cb265"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb265-1"><a href="optim-caveat.html#cb265-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb265-2"><a href="optim-caveat.html#cb265-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb265-3"><a href="optim-caveat.html#cb265-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb265-4"><a href="optim-caveat.html#cb265-4"></a>    <span class="co"># Creating a text input that will be removed</span></span>
-<span id="cb265-5"><a href="optim-caveat.html#cb265-5"></a>    <span class="co">#  from the UI whenever the remove button is pressed</span></span>
-<span id="cb265-6"><a href="optim-caveat.html#cb265-6"></a>    <span class="kw">textInput</span>(<span class="st">&quot;value&quot;</span>, <span class="st">&quot;Value&quot;</span>, <span class="st">&quot;place&quot;</span>),</span>
-<span id="cb265-7"><a href="optim-caveat.html#cb265-7"></a>    <span class="kw">actionButton</span>(<span class="st">&quot;remove&quot;</span>, <span class="st">&quot;Remove UI&quot;</span>)</span>
-<span id="cb265-8"><a href="optim-caveat.html#cb265-8"></a>  )</span>
-<span id="cb265-9"><a href="optim-caveat.html#cb265-9"></a>}</span>
-<span id="cb265-10"><a href="optim-caveat.html#cb265-10"></a></span>
-<span id="cb265-11"><a href="optim-caveat.html#cb265-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb265-12"><a href="optim-caveat.html#cb265-12"></a>  input, </span>
-<span id="cb265-13"><a href="optim-caveat.html#cb265-13"></a>  output, </span>
-<span id="cb265-14"><a href="optim-caveat.html#cb265-14"></a>  session</span>
-<span id="cb265-15"><a href="optim-caveat.html#cb265-15"></a>){</span>
-<span id="cb265-16"><a href="optim-caveat.html#cb265-16"></a>  </span>
-<span id="cb265-17"><a href="optim-caveat.html#cb265-17"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>remove , {</span>
-<span id="cb265-18"><a href="optim-caveat.html#cb265-18"></a>    <span class="co"># When the button is pressed,</span></span>
-<span id="cb265-19"><a href="optim-caveat.html#cb265-19"></a>    <span class="co">#  the textInput will be removed from the UI</span></span>
-<span id="cb265-20"><a href="optim-caveat.html#cb265-20"></a>    <span class="kw">removeUI</span>(<span class="dt">selector =</span> <span class="st">&quot;#value&quot;</span>)</span>
-<span id="cb265-21"><a href="optim-caveat.html#cb265-21"></a>  })</span>
-<span id="cb265-22"><a href="optim-caveat.html#cb265-22"></a>  </span>
-<span id="cb265-23"><a href="optim-caveat.html#cb265-23"></a>  <span class="kw">observe</span>({</span>
-<span id="cb265-24"><a href="optim-caveat.html#cb265-24"></a>    <span class="co"># We observe input$value every second. </span></span>
-<span id="cb265-25"><a href="optim-caveat.html#cb265-25"></a>    <span class="co"># You&#39;ll realise that even after the UI</span></span>
-<span id="cb265-26"><a href="optim-caveat.html#cb265-26"></a>    <span class="co"># is removed, input$value is still available.</span></span>
-<span id="cb265-27"><a href="optim-caveat.html#cb265-27"></a>    <span class="kw">invalidateLater</span>(<span class="dv">1000</span>)</span>
-<span id="cb265-28"><a href="optim-caveat.html#cb265-28"></a>    <span class="kw">print</span>(input<span class="op">$</span>value)</span>
-<span id="cb265-29"><a href="optim-caveat.html#cb265-29"></a>  })</span>
-<span id="cb265-30"><a href="optim-caveat.html#cb265-30"></a>  </span>
-<span id="cb265-31"><a href="optim-caveat.html#cb265-31"></a>}</span>
-<span id="cb265-32"><a href="optim-caveat.html#cb265-32"></a></span>
-<span id="cb265-33"><a href="optim-caveat.html#cb265-33"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb264"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb264-1"><a href="optim-caveat.html#cb264-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb264-2"><a href="optim-caveat.html#cb264-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb264-3"><a href="optim-caveat.html#cb264-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb264-4"><a href="optim-caveat.html#cb264-4"></a>    <span class="co"># Creating a text input that will be removed</span></span>
+<span id="cb264-5"><a href="optim-caveat.html#cb264-5"></a>    <span class="co">#  from the UI whenever the remove button is pressed</span></span>
+<span id="cb264-6"><a href="optim-caveat.html#cb264-6"></a>    <span class="kw">textInput</span>(<span class="st">&quot;value&quot;</span>, <span class="st">&quot;Value&quot;</span>, <span class="st">&quot;place&quot;</span>),</span>
+<span id="cb264-7"><a href="optim-caveat.html#cb264-7"></a>    <span class="kw">actionButton</span>(<span class="st">&quot;remove&quot;</span>, <span class="st">&quot;Remove UI&quot;</span>)</span>
+<span id="cb264-8"><a href="optim-caveat.html#cb264-8"></a>  )</span>
+<span id="cb264-9"><a href="optim-caveat.html#cb264-9"></a>}</span>
+<span id="cb264-10"><a href="optim-caveat.html#cb264-10"></a></span>
+<span id="cb264-11"><a href="optim-caveat.html#cb264-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb264-12"><a href="optim-caveat.html#cb264-12"></a>  input, </span>
+<span id="cb264-13"><a href="optim-caveat.html#cb264-13"></a>  output, </span>
+<span id="cb264-14"><a href="optim-caveat.html#cb264-14"></a>  session</span>
+<span id="cb264-15"><a href="optim-caveat.html#cb264-15"></a>){</span>
+<span id="cb264-16"><a href="optim-caveat.html#cb264-16"></a>  </span>
+<span id="cb264-17"><a href="optim-caveat.html#cb264-17"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>remove , {</span>
+<span id="cb264-18"><a href="optim-caveat.html#cb264-18"></a>    <span class="co"># When the button is pressed,</span></span>
+<span id="cb264-19"><a href="optim-caveat.html#cb264-19"></a>    <span class="co">#  the textInput will be removed from the UI</span></span>
+<span id="cb264-20"><a href="optim-caveat.html#cb264-20"></a>    <span class="kw">removeUI</span>(<span class="dt">selector =</span> <span class="st">&quot;#value&quot;</span>)</span>
+<span id="cb264-21"><a href="optim-caveat.html#cb264-21"></a>  })</span>
+<span id="cb264-22"><a href="optim-caveat.html#cb264-22"></a>  </span>
+<span id="cb264-23"><a href="optim-caveat.html#cb264-23"></a>  <span class="kw">observe</span>({</span>
+<span id="cb264-24"><a href="optim-caveat.html#cb264-24"></a>    <span class="co"># We observe input$value every second. </span></span>
+<span id="cb264-25"><a href="optim-caveat.html#cb264-25"></a>    <span class="co"># You&#39;ll realize that even after the UI</span></span>
+<span id="cb264-26"><a href="optim-caveat.html#cb264-26"></a>    <span class="co"># is removed, input$value is still available.</span></span>
+<span id="cb264-27"><a href="optim-caveat.html#cb264-27"></a>    <span class="kw">invalidateLater</span>(<span class="dv">1000</span>)</span>
+<span id="cb264-28"><a href="optim-caveat.html#cb264-28"></a>    <span class="kw">print</span>(input<span class="op">$</span>value)</span>
+<span id="cb264-29"><a href="optim-caveat.html#cb264-29"></a>  })</span>
+<span id="cb264-30"><a href="optim-caveat.html#cb264-30"></a>  </span>
+<span id="cb264-31"><a href="optim-caveat.html#cb264-31"></a>}</span>
+<span id="cb264-32"><a href="optim-caveat.html#cb264-32"></a></span>
+<span id="cb264-33"><a href="optim-caveat.html#cb264-33"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <ul>
 <li>Both these functions take a <code>jQuery</code> selector to select the element in the UI. We will introduce these selectors in chapter @ref(#optimjs).</li>
 </ul>
