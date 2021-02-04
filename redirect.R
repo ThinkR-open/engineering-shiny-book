@@ -8,7 +8,7 @@ make_redirect <- function(from, to){
     '<head><meta http-equiv="refresh" content="0; URL=%s.hml" /></head>', 
     to
   )
-  dest <- fs::path("_book", from, ext = "html")
+  dest <- fs::path("_site", from, ext = "html")
   fs::file_create(dest)
   write(html, dest)
 }
