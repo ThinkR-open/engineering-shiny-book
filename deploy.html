@@ -1,1 +1,746 @@
-<head><meta http-equiv="refresh" content="0; URL=deploy-golem.hml" /></head>
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps</title>
+  <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
+  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
+  <meta property="og:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
+  <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps" />
+  
+  <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
+
+<meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
+
+
+<meta name="date" content="2021-02-04" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+<link rel="prev" href="secure.html"/>
+<link rel="next" href="when-optimize.html"/>
+<script src="libs/jquery/jquery.min.js"></script>
+<link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<script src="libs/accessible-code-block/empty-anchor.js"></script>
+<link href="libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections/anchor-sections.js"></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-149994171-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-149994171-1');
+</script>
+
+
+<style type="text/css">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+<link rel="stylesheet" href="css/thinkr.css" type="text/css" />
+<link rel="stylesheet" href="css/style_gitbook.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Engineering Production-Grade Shiny Apps</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a><ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#motivation"><i class="fa fa-check"></i>Motivation</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#who-is-this-book-for"><i class="fa fa-check"></i>Who is this book for</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#what-is-production"><i class="fa fa-check"></i>What is “production”?</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#book-structure"><i class="fa fa-check"></i>Book structure</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#about-the-authors"><i class="fa fa-check"></i>About the authors</a><ul>
+<li><a href="index.html#colin-fay"><a href="https://colinfay.me/">Colin Fay</a></a></li>
+<li><a href="index.html#sébastien-rochette"><a href="https://statnmap.com/">Sébastien Rochette</a></a></li>
+<li><a href="index.html#vincent-guyader"><a href="https://twitter.com/VincentGuyader">Vincent Guyader</a></a></li>
+<li><a href="index.html#cervan-girard"><a href="https://twitter.com/CervanGirard">Cervan Girard</a></a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#want-to-help"><i class="fa fa-check"></i>Want to help?</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#other-resources"><i class="fa fa-check"></i>Other resources</a><ul>
+<li><a href="index.html#getting-started-with-shiny">Getting started with <code>{shiny}</code></a></li>
+<li><a href="index.html#shiny-into-production"><code>{shiny}</code> into production</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i>Disclaimer</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information-and-conventions"><i class="fa fa-check"></i>Software information and conventions</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a><ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#special-thank"><i class="fa fa-check"></i>Special thank</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#contributors-to-this-book"><i class="fa fa-check"></i>Contributors to this book</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="foreword.html"><a href="foreword.html"><i class="fa fa-check"></i>Foreword</a></li>
+<li class="chapter" data-level="" data-path="applications-presentation.html"><a href="applications-presentation.html"><i class="fa fa-check"></i>Applications presentation</a><ul>
+<li><a href="applications-presentation.html#hexmake"><code>{hexmake}</code></a></li>
+<li><a href="applications-presentation.html#tidytuesday201942"><code>{tidytuesday201942}</code></a></li>
+<li><a href="applications-presentation.html#minifying"><code>{minifying}</code></a></li>
+<li class="chapter" data-level="" data-path="applications-presentation.html"><a href="applications-presentation.html#other-applications"><i class="fa fa-check"></i>Other applications</a></li>
+</ul></li>
+<li class="part"><span><b>I Building Successful <code>{shiny}</code> Apps</b></span></li>
+<li class="chapter" data-level="1" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html"><i class="fa fa-check"></i><b>1</b> About Successful <code>{shiny}</code> Apps</a><ul>
+<li class="chapter" data-level="1.1" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#a-very-short-introduction-to-shiny"><i class="fa fa-check"></i><b>1.1</b> A (very) short introduction to <code>{shiny}</code></a></li>
+<li class="chapter" data-level="1.2" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#complex-shiny"><i class="fa fa-check"></i><b>1.2</b> What is a Complex <code>{shiny}</code> Application?</a><ul>
+<li class="chapter" data-level="1.2.1" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#reaching-the-cliff-of-complexity"><i class="fa fa-check"></i><b>1.2.1</b> Reaching the cliff of complexity</a></li>
+<li class="chapter" data-level="1.2.2" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#balancing-complexities"><i class="fa fa-check"></i><b>1.2.2</b> Balancing complexities</a></li>
+<li class="chapter" data-level="1.2.3" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#assessing-code-complexity"><i class="fa fa-check"></i><b>1.2.3</b> Assessing Code Complexity</a></li>
+<li class="chapter" data-level="1.2.4" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#production-grade-software-engineering"><i class="fa fa-check"></i><b>1.2.4</b> Production Grade Software Engineering</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#what-is-a-successful-shiny-app"><i class="fa fa-check"></i><b>1.3</b> What is a successful <code>{shiny}</code> App?</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#it-exists"><i class="fa fa-check"></i><b>1.3.1</b> It exists</a></li>
+<li class="chapter" data-level="1.3.2" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#it-is-accurate"><i class="fa fa-check"></i><b>1.3.2</b> It is accurate</a></li>
+<li class="chapter" data-level="1.3.3" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#it-is-usable"><i class="fa fa-check"></i><b>1.3.3</b> It is usable</a></li>
+<li class="chapter" data-level="1.3.4" data-path="successfulshinyapp.html"><a href="successfulshinyapp.html#it-is-immortal"><i class="fa fa-check"></i><b>1.3.4</b> It is immortal</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="planning.html"><a href="planning.html"><i class="fa fa-check"></i><b>2</b> Planning Ahead</a><ul>
+<li class="chapter" data-level="2.1" data-path="planning.html"><a href="planning.html#working-with-a-long-term-mindset"><i class="fa fa-check"></i><b>2.1</b> Working with a “long-term” mindset</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="planning.html"><a href="planning.html#prepare-for-success"><i class="fa fa-check"></i><b>2.1.1</b> Prepare for success</a></li>
+<li class="chapter" data-level="2.1.2" data-path="planning.html"><a href="planning.html#develop-with-the-kiss-principle"><i class="fa fa-check"></i><b>2.1.2</b> Develop with the KISS principle</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="planning.html"><a href="planning.html#working-as-a-team-tools-structure"><i class="fa fa-check"></i><b>2.2</b> Working as a team: Tools &amp; Structure</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="planning.html"><a href="planning.html#from-the-tools-point-of-view"><i class="fa fa-check"></i><b>2.2.1</b> From the tools point of view</a></li>
+<li class="chapter" data-level="2.2.2" data-path="planning.html"><a href="planning.html#from-the-team-point-of-view"><i class="fa fa-check"></i><b>2.2.2</b> From the Team Point of View</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="structure.html"><a href="structure.html"><i class="fa fa-check"></i><b>3</b> Structuring your Project</a><ul>
+<li class="chapter" data-level="3.1" data-path="structure.html"><a href="structure.html#shiny-app-as-a-package"><i class="fa fa-check"></i><b>3.1</b> <code>{shiny}</code> App as a Package</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="structure.html"><a href="structure.html#what-is-in-a-production-grade-shiny-app"><i class="fa fa-check"></i><b>3.1.1</b> What is in a production-grade <code>{shiny}</code> App?</a></li>
+<li class="chapter" data-level="3.1.2" data-path="structure.html"><a href="structure.html#resources"><i class="fa fa-check"></i><b>3.1.2</b> Resources</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="structure.html"><a href="structure.html#using-shiny-modules"><i class="fa fa-check"></i><b>3.2</b> Using <code>{shiny}</code> Modules</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="structure.html"><a href="structure.html#why-using-shiny-modules"><i class="fa fa-check"></i><b>3.2.1</b> Why using <code>{shiny}</code> modules?</a></li>
+<li class="chapter" data-level="3.2.2" data-path="structure.html"><a href="structure.html#when-to-use-shiny-modules"><i class="fa fa-check"></i><b>3.2.2</b> When to use <code>{shiny}</code> modules</a></li>
+<li class="chapter" data-level="3.2.3" data-path="structure.html"><a href="structure.html#a-practical-walk-through"><i class="fa fa-check"></i><b>3.2.3</b> A practical walk through</a></li>
+<li class="chapter" data-level="3.2.4" data-path="structure.html"><a href="structure.html#communication-between-modules"><i class="fa fa-check"></i><b>3.2.4</b> Communication between modules</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="structure.html"><a href="structure.html#structuring-your-app"><i class="fa fa-check"></i><b>3.3</b> Structuring your app</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="structure.html"><a href="structure.html#business-logic-application-logic"><i class="fa fa-check"></i><b>3.3.1</b> Business logic &amp; application logic</a></li>
+<li class="chapter" data-level="3.3.2" data-path="structure.html"><a href="structure.html#small-is-beautiful-bis-repetita"><i class="fa fa-check"></i><b>3.3.2</b> Small is beautiful (bis repetita)</a></li>
+<li class="chapter" data-level="3.3.3" data-path="structure.html"><a href="structure.html#conventions-matter"><i class="fa fa-check"></i><b>3.3.3</b> Conventions matter</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="golem.html"><a href="golem.html"><i class="fa fa-check"></i><b>4</b> Introduction to <code>{golem}</code></a><ul>
+<li class="chapter" data-level="4.1" data-path="golem.html"><a href="golem.html#what-is-golem"><i class="fa fa-check"></i><b>4.1</b> What is <code>{golem}</code>?</a></li>
+<li class="chapter" data-level="4.2" data-path="golem.html"><a href="golem.html#understanding-golem-app-structure"><i class="fa fa-check"></i><b>4.2</b> Understanding <code>{golem}</code> app structure</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="golem.html"><a href="golem.html#description-namespace"><i class="fa fa-check"></i><b>4.2.1</b> <code>DESCRIPTION</code> &amp; <code>NAMESPACE</code></a></li>
+<li class="chapter" data-level="4.2.2" data-path="golem.html"><a href="golem.html#r"><i class="fa fa-check"></i><b>4.2.2</b> R/</a></li>
+<li class="chapter" data-level="4.2.3" data-path="golem.html"><a href="golem.html#golem-config"><i class="fa fa-check"></i><b>4.2.3</b> <code>golem-config</code></a></li>
+<li class="chapter" data-level="4.2.4" data-path="golem.html"><a href="golem.html#instappwww"><i class="fa fa-check"></i><b>4.2.4</b> <code>inst/app/www/</code></a></li>
+<li class="chapter" data-level="4.2.5" data-path="golem.html"><a href="golem.html#dev"><i class="fa fa-check"></i><b>4.2.5</b> <code>dev/</code></a></li>
+<li class="chapter" data-level="4.2.6" data-path="golem.html"><a href="golem.html#man"><i class="fa fa-check"></i><b>4.2.6</b> <code>man/</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="workflow.html"><a href="workflow.html"><i class="fa fa-check"></i><b>5</b> The workflow</a><ul>
+<li class="chapter" data-level="5.1" data-path="workflow.html"><a href="workflow.html#step-1-design"><i class="fa fa-check"></i><b>5.1</b> Step 1: Design</a></li>
+<li class="chapter" data-level="5.2" data-path="workflow.html"><a href="workflow.html#step-2-prototype"><i class="fa fa-check"></i><b>5.2</b> Step 2: Prototype</a></li>
+<li class="chapter" data-level="5.3" data-path="workflow.html"><a href="workflow.html#step-3-build"><i class="fa fa-check"></i><b>5.3</b> Step 3: Build</a></li>
+<li class="chapter" data-level="5.4" data-path="workflow.html"><a href="workflow.html#step-4-strengthen"><i class="fa fa-check"></i><b>5.4</b> Step 4: Strengthen</a></li>
+<li class="chapter" data-level="5.5" data-path="workflow.html"><a href="workflow.html#step-5-deploy"><i class="fa fa-check"></i><b>5.5</b> Step 5: Deploy</a></li>
+</ul></li>
+<li class="part"><span><b>II Step 1: Design</b></span></li>
+<li class="chapter" data-level="6" data-path="matters.html"><a href="matters.html"><i class="fa fa-check"></i><b>6</b> UX Matters</a><ul>
+<li class="chapter" data-level="6.1" data-path="matters.html"><a href="matters.html#simplicity-is-gold"><i class="fa fa-check"></i><b>6.1</b> Simplicity is Gold</a><ul>
+<li class="chapter" data-level="6.1.1" data-path="matters.html"><a href="matters.html#how-we-read-the-web-scanning-content"><i class="fa fa-check"></i><b>6.1.1</b> How we read the web: scanning content</a></li>
+<li class="chapter" data-level="6.1.2" data-path="matters.html"><a href="matters.html#building-a-self-evident-app-or-at-least-self-explanatory"><i class="fa fa-check"></i><b>6.1.2</b> Building a self-evident app (or at least self-explanatory)</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="matters.html"><a href="matters.html#the-danger-of-feature-creep"><i class="fa fa-check"></i><b>6.2</b> The danger of feature-creep</a><ul>
+<li class="chapter" data-level="6.2.1" data-path="matters.html"><a href="matters.html#what-is-feature-creep"><i class="fa fa-check"></i><b>6.2.1</b> What is feature-creep?</a></li>
+<li class="chapter" data-level="6.2.2" data-path="matters.html"><a href="matters.html#too-much-reactivity"><i class="fa fa-check"></i><b>6.2.2</b> Too much reactivity</a></li>
+<li class="chapter" data-level="6.2.3" data-path="matters.html"><a href="matters.html#too-much-interactivity"><i class="fa fa-check"></i><b>6.2.3</b> Too much interactivity</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="matters.html"><a href="matters.html#web-accessibility"><i class="fa fa-check"></i><b>6.3</b> Web Accessibility</a><ul>
+<li class="chapter" data-level="6.3.1" data-path="matters.html"><a href="matters.html#about-accessibility"><i class="fa fa-check"></i><b>6.3.1</b> About Accessibility</a></li>
+<li class="chapter" data-level="6.3.2" data-path="matters.html"><a href="matters.html#making-your-app-accessible"><i class="fa fa-check"></i><b>6.3.2</b> Making your App Accessible</a></li>
+<li class="chapter" data-level="6.3.3" data-path="matters.html"><a href="matters.html#evaluating-your-app-accessibility-further-reading"><i class="fa fa-check"></i><b>6.3.3</b> Evaluating your App Accessibility &amp; Further reading</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="step-design.html"><a href="step-design.html"><i class="fa fa-check"></i><b>7</b> Don’t rush into coding</a><ul>
+<li class="chapter" data-level="7.1" data-path="step-design.html"><a href="step-design.html#designing-before-coding"><i class="fa fa-check"></i><b>7.1</b> Designing before coding</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="step-design.html"><a href="step-design.html#the-urge-to-code"><i class="fa fa-check"></i><b>7.1.1</b> The Urge to Code</a></li>
+<li class="chapter" data-level="7.1.2" data-path="step-design.html"><a href="step-design.html#knowing-where-to-search"><i class="fa fa-check"></i><b>7.1.2</b> Knowing where to search</a></li>
+<li class="chapter" data-level="7.1.3" data-path="step-design.html"><a href="step-design.html#about-concept-map"><i class="fa fa-check"></i><b>7.1.3</b> About Concept Map</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="step-design.html"><a href="step-design.html#ask-questions"><i class="fa fa-check"></i><b>7.2</b> Ask questions</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="step-design.html"><a href="step-design.html#about-the-end-users"><i class="fa fa-check"></i><b>7.2.1</b> About the end users</a></li>
+<li class="chapter" data-level="7.2.2" data-path="step-design.html"><a href="step-design.html#building-personas"><i class="fa fa-check"></i><b>7.2.2</b> Building personas</a></li>
+<li class="chapter" data-level="7.2.3" data-path="step-design.html"><a href="step-design.html#pre-existing-code-base"><i class="fa fa-check"></i><b>7.2.3</b> Pre-existing code-base</a></li>
+<li class="chapter" data-level="7.2.4" data-path="step-design.html"><a href="step-design.html#deployment"><i class="fa fa-check"></i><b>7.2.4</b> Deployment</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>III Step 2: Prototype</b></span></li>
+<li class="chapter" data-level="8" data-path="settingupsuccess.html"><a href="settingupsuccess.html"><i class="fa fa-check"></i><b>8</b> Setting up for success with <code>{golem}</code></a><ul>
+<li class="chapter" data-level="8.1" data-path="settingupsuccess.html"><a href="settingupsuccess.html#create-a-golem"><i class="fa fa-check"></i><b>8.1</b> Create a <code>{golem}</code></a></li>
+<li class="chapter" data-level="8.2" data-path="settingupsuccess.html"><a href="settingupsuccess.html#setting-things-up-with-dev01_start.r"><i class="fa fa-check"></i><b>8.2</b> Setting things up with <code>dev/01_start.R</code></a><ul>
+<li class="chapter" data-level="8.2.1" data-path="settingupsuccess.html"><a href="settingupsuccess.html#fill-the-description-and-set-options"><i class="fa fa-check"></i><b>8.2.1</b> Fill the DESCRIPTION and set options</a></li>
+<li class="chapter" data-level="8.2.2" data-path="settingupsuccess.html"><a href="settingupsuccess.html#set-common-files"><i class="fa fa-check"></i><b>8.2.2</b> Set common Files</a></li>
+<li class="chapter" data-level="8.2.3" data-path="settingupsuccess.html"><a href="settingupsuccess.html#use-recommended-elements"><i class="fa fa-check"></i><b>8.2.3</b> Use Recommended Elements</a></li>
+<li class="chapter" data-level="8.2.4" data-path="settingupsuccess.html"><a href="settingupsuccess.html#add-utilitary-functions"><i class="fa fa-check"></i><b>8.2.4</b> Add utilitary functions</a></li>
+<li class="chapter" data-level="8.2.5" data-path="settingupsuccess.html"><a href="settingupsuccess.html#changing-the-favicon"><i class="fa fa-check"></i><b>8.2.5</b> Changing the favicon</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="settingupsuccess.html"><a href="settingupsuccess.html#setting-infrastructure-for-prototyping"><i class="fa fa-check"></i><b>8.3</b> Setting infrastructure for prototyping</a><ul>
+<li class="chapter" data-level="8.3.1" data-path="settingupsuccess.html"><a href="settingupsuccess.html#add-modules-in-dev02_dev.r"><i class="fa fa-check"></i><b>8.3.1</b> Add modules in <code>dev/02_dev.R</code></a></li>
+<li class="chapter" data-level="8.3.2" data-path="settingupsuccess.html"><a href="settingupsuccess.html#add-css-js-files"><i class="fa fa-check"></i><b>8.3.2</b> Add CSS &amp; JS Files</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="stepprotopype.html"><a href="stepprotopype.html"><i class="fa fa-check"></i><b>9</b> Building an “ipsum-app”</a><ul>
+<li class="chapter" data-level="9.1" data-path="stepprotopype.html"><a href="stepprotopype.html#prototyping-is-crucial"><i class="fa fa-check"></i><b>9.1</b> Prototyping is crucial</a><ul>
+<li class="chapter" data-level="9.1.1" data-path="stepprotopype.html"><a href="stepprotopype.html#prototype-then-polish"><i class="fa fa-check"></i><b>9.1.1</b> Prototype, then polish</a></li>
+<li class="chapter" data-level="9.1.2" data-path="stepprotopype.html"><a href="stepprotopype.html#the-ui-first-approach"><i class="fa fa-check"></i><b>9.1.2</b> The “UI first” approach</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="stepprotopype.html"><a href="stepprotopype.html#prototyping-shiny"><i class="fa fa-check"></i><b>9.2</b> Prototyping <code>{shiny}</code></a><ul>
+<li class="chapter" data-level="9.2.1" data-path="stepprotopype.html"><a href="stepprotopype.html#fast-ui-prototyping-with-shinipsum"><i class="fa fa-check"></i><b>9.2.1</b> Fast UI Prototyping with <code>{shinipsum}</code></a></li>
+<li class="chapter" data-level="9.2.2" data-path="stepprotopype.html"><a href="stepprotopype.html#using-fakir-for-fake-data-generation"><i class="fa fa-check"></i><b>9.2.2</b> Using <code>{fakir}</code> for fake data generation</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="stepprotopype.html"><a href="stepprotopype.html#proto-rmdfirst"><i class="fa fa-check"></i><b>9.3</b> Building with RMarkdown</a><ul>
+<li class="chapter" data-level="9.3.1" data-path="stepprotopype.html"><a href="stepprotopype.html#define-the-content-of-the-application"><i class="fa fa-check"></i><b>9.3.1</b> Define the content of the application</a></li>
+<li class="chapter" data-level="9.3.2" data-path="stepprotopype.html"><a href="stepprotopype.html#using-the-rmd-files-as-a-laboratory-notebook"><i class="fa fa-check"></i><b>9.3.2</b> Using the Rmd files as a laboratory notebook</a></li>
+<li class="chapter" data-level="9.3.3" data-path="stepprotopype.html"><a href="stepprotopype.html#rmd-vignettes-and-documentation-first"><i class="fa fa-check"></i><b>9.3.3</b> Rmd, Vignettes, and documentation first</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>IV Step 3: Build</b></span></li>
+<li class="chapter" data-level="10" data-path="stepbuild.html"><a href="stepbuild.html"><i class="fa fa-check"></i><b>10</b> Building the app with <code>{golem}</code></a><ul>
+<li class="chapter" data-level="10.1" data-path="stepbuild.html"><a href="stepbuild.html#add-dependencies"><i class="fa fa-check"></i><b>10.1</b> Add dependencies</a><ul>
+<li class="chapter" data-level="10.1.1" data-path="stepbuild.html"><a href="stepbuild.html#package-dependencies"><i class="fa fa-check"></i><b>10.1.1</b> Package dependencies</a></li>
+<li class="chapter" data-level="10.1.2" data-path="stepbuild.html"><a href="stepbuild.html#importing-packages-and-functions"><i class="fa fa-check"></i><b>10.1.2</b> Importing packages and functions</a></li>
+</ul></li>
+<li class="chapter" data-level="10.2" data-path="stepbuild.html"><a href="stepbuild.html#submodules-and-utility-functions"><i class="fa fa-check"></i><b>10.2</b> Submodules and utility functions</a></li>
+<li class="chapter" data-level="10.3" data-path="stepbuild.html"><a href="stepbuild.html#add-tests"><i class="fa fa-check"></i><b>10.3</b> Add tests</a></li>
+<li class="chapter" data-level="10.4" data-path="stepbuild.html"><a href="stepbuild.html#documentation-and-code-coverage"><i class="fa fa-check"></i><b>10.4</b> Documentation and Code Coverage</a><ul>
+<li class="chapter" data-level="10.4.1" data-path="stepbuild.html"><a href="stepbuild.html#vignette"><i class="fa fa-check"></i><b>10.4.1</b> Vignette</a></li>
+<li class="chapter" data-level="10.4.2" data-path="stepbuild.html"><a href="stepbuild.html#code-coverage-continuous-integration"><i class="fa fa-check"></i><b>10.4.2</b> Code Coverage &amp; Continuous Integration</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="stepbuild.html"><a href="stepbuild.html#using-golem-dev-functions"><i class="fa fa-check"></i><b>10.5</b> Using <code>{golem}</code> dev functions</a></li>
+</ul></li>
+<li class="part"><span><b>V Step 4: Strengthen</b></span></li>
+<li class="chapter" data-level="11" data-path="step-secure.html"><a href="step-secure.html"><i class="fa fa-check"></i><b>11</b> Build yourself a safety net</a><ul>
+<li class="chapter" data-level="11.1" data-path="step-secure.html"><a href="step-secure.html#testing-your-app"><i class="fa fa-check"></i><b>11.1</b> Testing your app</a><ul>
+<li class="chapter" data-level="11.1.1" data-path="step-secure.html"><a href="step-secure.html#testing-the-business-logic"><i class="fa fa-check"></i><b>11.1.1</b> Testing the business logic</a></li>
+<li class="chapter" data-level="11.1.2" data-path="step-secure.html"><a href="step-secure.html#shinytestserver"><i class="fa fa-check"></i><b>11.1.2</b> <code>shiny::testServer()</code></a></li>
+<li class="chapter" data-level="11.1.3" data-path="step-secure.html"><a href="step-secure.html#testing-the-interactive-logic"><i class="fa fa-check"></i><b>11.1.3</b> Testing the interactive logic</a></li>
+<li class="chapter" data-level="11.1.4" data-path="step-secure.html"><a href="step-secure.html#testing-the-app-load"><i class="fa fa-check"></i><b>11.1.4</b> Testing the app load</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="step-secure.html"><a href="step-secure.html#a-reproducible-environment"><i class="fa fa-check"></i><b>11.2</b> A reproducible environment</a><ul>
+<li class="chapter" data-level="11.2.1" data-path="step-secure.html"><a href="step-secure.html#renv"><i class="fa fa-check"></i><b>11.2.1</b> <code>{renv}</code></a></li>
+<li class="chapter" data-level="11.2.2" data-path="step-secure.html"><a href="step-secure.html#docker"><i class="fa fa-check"></i><b>11.2.2</b> Docker</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="secure.html"><a href="secure.html"><i class="fa fa-check"></i><b>12</b> Version Control</a><ul>
+<li class="chapter" data-level="12.1" data-path="secure.html"><a href="secure.html#version-control"><i class="fa fa-check"></i><b>12.1</b> Using Version Control with <code>git</code></a><ul>
+<li class="chapter" data-level="12.1.1" data-path="secure.html"><a href="secure.html#why-version-control"><i class="fa fa-check"></i><b>12.1.1</b> Why Version Control?</a></li>
+<li class="chapter" data-level="12.1.2" data-path="secure.html"><a href="secure.html#git-basics-add---commit---push---pull"><i class="fa fa-check"></i><b>12.1.2</b> <code>Git</code> basics: <code>add</code> - <code>commit</code> - <code>push</code> - <code>pull</code></a></li>
+<li class="chapter" data-level="12.1.3" data-path="secure.html"><a href="secure.html#about-branches"><i class="fa fa-check"></i><b>12.1.3</b> About branches</a></li>
+<li class="chapter" data-level="12.1.4" data-path="secure.html"><a href="secure.html#issues"><i class="fa fa-check"></i><b>12.1.4</b> Issues</a></li>
+</ul></li>
+<li class="chapter" data-level="12.2" data-path="secure.html"><a href="secure.html#git-integration"><i class="fa fa-check"></i><b>12.2</b> Git integration</a><ul>
+<li class="chapter" data-level="12.2.1" data-path="secure.html"><a href="secure.html#with-rstudio"><i class="fa fa-check"></i><b>12.2.1</b> With RStudio</a></li>
+<li class="chapter" data-level="12.2.2" data-path="secure.html"><a href="secure.html#as-part-of-a-larger-world"><i class="fa fa-check"></i><b>12.2.2</b> As part of a larger world</a></li>
+<li class="chapter" data-level="12.2.3" data-path="secure.html"><a href="secure.html#about-git-flow"><i class="fa fa-check"></i><b>12.2.3</b> About <code>git-flow</code></a></li>
+<li class="chapter" data-level="12.2.4" data-path="secure.html"><a href="secure.html#further-readings-on-git"><i class="fa fa-check"></i><b>12.2.4</b> Further readings on <code>git</code></a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="secure.html"><a href="secure.html#automated-testing"><i class="fa fa-check"></i><b>12.3</b> Automated testing</a></li>
+</ul></li>
+<li class="part"><span><b>VI Step 5: Deploy</b></span></li>
+<li class="chapter" data-level="13" data-path="deploy.html"><a href="deploy.html"><i class="fa fa-check"></i><b>13</b> Deploy your application</a><ul>
+<li class="chapter" data-level="13.1" data-path="deploy.html"><a href="deploy.html#before-deployment-check-list"><i class="fa fa-check"></i><b>13.1</b> Before deployment Check-list</a></li>
+<li class="chapter" data-level="13.2" data-path="deploy.html"><a href="deploy.html#sharing-your-app-as-a-package"><i class="fa fa-check"></i><b>13.2</b> Sharing your app as a package</a><ul>
+<li class="chapter" data-level="13.2.1" data-path="deploy.html"><a href="deploy.html#install-on-your-machine"><i class="fa fa-check"></i><b>13.2.1</b> Install on your machine</a></li>
+<li class="chapter" data-level="13.2.2" data-path="deploy.html"><a href="deploy.html#share-as-built-package"><i class="fa fa-check"></i><b>13.2.2</b> Share as built package</a></li>
+</ul></li>
+<li class="chapter" data-level="13.3" data-path="deploy.html"><a href="deploy.html#deploying-apps-with-golem"><i class="fa fa-check"></i><b>13.3</b> Deploying Apps with <code>{golem}</code></a><ul>
+<li class="chapter" data-level="13.3.1" data-path="deploy.html"><a href="deploy.html#rstudio-environments"><i class="fa fa-check"></i><b>13.3.1</b> RStudio Environments</a></li>
+<li class="chapter" data-level="13.3.2" data-path="deploy.html"><a href="deploy.html#docker-1"><i class="fa fa-check"></i><b>13.3.2</b> Docker</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>VII Optimizing</b></span></li>
+<li class="chapter" data-level="14" data-path="when-optimize.html"><a href="when-optimize.html"><i class="fa fa-check"></i><b>14</b> The Need for Optimization</a><ul>
+<li class="chapter" data-level="14.1" data-path="when-optimize.html"><a href="when-optimize.html#build-first-then-optimize"><i class="fa fa-check"></i><b>14.1</b> Build first, then optimize</a><ul>
+<li class="chapter" data-level="14.1.1" data-path="when-optimize.html"><a href="when-optimize.html#identifying-bottlenecks"><i class="fa fa-check"></i><b>14.1.1</b> Identifying bottlenecks</a></li>
+<li class="chapter" data-level="14.1.2" data-path="when-optimize.html"><a href="when-optimize.html#do-you-need-faster-functions"><i class="fa fa-check"></i><b>14.1.2</b> Do you need faster functions?</a></li>
+<li class="chapter" data-level="14.1.3" data-path="when-optimize.html"><a href="when-optimize.html#dont-sacrifice-readability"><i class="fa fa-check"></i><b>14.1.3</b> Don’t sacrifice readability</a></li>
+</ul></li>
+<li class="chapter" data-level="14.2" data-path="when-optimize.html"><a href="when-optimize.html#tools-for-profiling"><i class="fa fa-check"></i><b>14.2</b> Tools for profiling</a><ul>
+<li class="chapter" data-level="14.2.1" data-path="when-optimize.html"><a href="when-optimize.html#profiling-r-code"><i class="fa fa-check"></i><b>14.2.1</b> Profiling R code</a></li>
+<li class="chapter" data-level="14.2.2" data-path="when-optimize.html"><a href="when-optimize.html#profiling-shiny"><i class="fa fa-check"></i><b>14.2.2</b> Profiling <code>{shiny}</code></a></li>
+<li class="chapter" data-level="14.2.3" data-path="when-optimize.html"><a href="when-optimize.html#more-resources-about-web-page-performance"><i class="fa fa-check"></i><b>14.2.3</b> More resources about web page performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="15" data-path="optim-caveat.html"><a href="optim-caveat.html"><i class="fa fa-check"></i><b>15</b> Common Application Caveats</a><ul>
+<li class="chapter" data-level="15.1" data-path="optim-caveat.html"><a href="optim-caveat.html#reactivity-anti-patterns"><i class="fa fa-check"></i><b>15.1</b> Reactivity anti-patterns</a><ul>
+<li class="chapter" data-level="15.1.1" data-path="optim-caveat.html"><a href="optim-caveat.html#reactivity-is-awesome-until-it-is-not"><i class="fa fa-check"></i><b>15.1.1</b> Reactivity is awesome… until it is not</a></li>
+<li class="chapter" data-level="15.1.2" data-path="optim-caveat.html"><a href="optim-caveat.html#observe-vs-observeevent"><i class="fa fa-check"></i><b>15.1.2</b> <code>observe</code> vs <code>observeEvent</code></a></li>
+<li class="chapter" data-level="15.1.3" data-path="optim-caveat.html"><a href="optim-caveat.html#building-triggers-and-watchers"><i class="fa fa-check"></i><b>15.1.3</b> Building triggers and watchers</a></li>
+<li class="chapter" data-level="15.1.4" data-path="optim-caveat.html"><a href="optim-caveat.html#using-r6-as-a-data-storage"><i class="fa fa-check"></i><b>15.1.4</b> Using R6 as a data storage</a></li>
+<li class="chapter" data-level="15.1.5" data-path="optim-caveat.html"><a href="optim-caveat.html#logging-reactivity-with-whereami"><i class="fa fa-check"></i><b>15.1.5</b> Logging reactivity with <code>{whereami}</code></a></li>
+</ul></li>
+<li class="chapter" data-level="15.2" data-path="optim-caveat.html"><a href="optim-caveat.html#r-does-too-much"><i class="fa fa-check"></i><b>15.2</b> R does too much</a><ul>
+<li class="chapter" data-level="15.2.1" data-path="optim-caveat.html"><a href="optim-caveat.html#rendering-ui-from-server-side"><i class="fa fa-check"></i><b>15.2.1</b> Rendering UI from server side</a></li>
+<li class="chapter" data-level="15.2.2" data-path="optim-caveat.html"><a href="optim-caveat.html#too-much-data-in-memory"><i class="fa fa-check"></i><b>15.2.2</b> Too Much Data in Memory</a></li>
+</ul></li>
+<li class="chapter" data-level="15.3" data-path="optim-caveat.html"><a href="optim-caveat.html#reading-data"><i class="fa fa-check"></i><b>15.3</b> Reading data</a><ul>
+<li class="chapter" data-level="15.3.1" data-path="optim-caveat.html"><a href="optim-caveat.html#including-data-in-your-application"><i class="fa fa-check"></i><b>15.3.1</b> Including Data in your Application</a></li>
+<li class="chapter" data-level="15.3.2" data-path="optim-caveat.html"><a href="optim-caveat.html#reading-external-datasets"><i class="fa fa-check"></i><b>15.3.2</b> Reading External Datasets</a></li>
+<li class="chapter" data-level="15.3.3" data-path="optim-caveat.html"><a href="optim-caveat.html#using-external-databases"><i class="fa fa-check"></i><b>15.3.3</b> Using External Databases</a></li>
+<li class="chapter" data-level="15.3.4" data-path="optim-caveat.html"><a href="optim-caveat.html#data-source-checklist"><i class="fa fa-check"></i><b>15.3.4</b> Data Source Checklist</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="16" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html"><i class="fa fa-check"></i><b>16</b> Optimizing <code>{shiny}</code> Code</a><ul>
+<li class="chapter" data-level="16.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#optimizing-r-code"><i class="fa fa-check"></i><b>16.1</b> Optimizing R code</a></li>
+<li class="chapter" data-level="16.2" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#caching-elements"><i class="fa fa-check"></i><b>16.2</b> Caching elements</a><ul>
+<li class="chapter" data-level="16.2.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#what-is-caching"><i class="fa fa-check"></i><b>16.2.1</b> What is caching?</a></li>
+<li class="chapter" data-level="16.2.2" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#native-caching-in-r"><i class="fa fa-check"></i><b>16.2.2</b> Native Caching in R</a></li>
+<li class="chapter" data-level="16.2.3" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#caching-in-shiny"><i class="fa fa-check"></i><b>16.2.3</b> Caching in <code>{shiny}</code></a></li>
+</ul></li>
+<li class="chapter" data-level="16.3" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#asynchronous-in-shiny"><i class="fa fa-check"></i><b>16.3</b> Asynchronous in <code>{shiny}</code></a><ul>
+<li class="chapter" data-level="16.3.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#how-to"><i class="fa fa-check"></i><b>16.3.1</b> How to</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="17" data-path="optimjs.html"><a href="optimjs.html"><i class="fa fa-check"></i><b>17</b> Using JavaScript</a><ul>
+<li class="chapter" data-level="17.1" data-path="optimjs.html"><a href="optimjs.html#introduction-1"><i class="fa fa-check"></i><b>17.1</b> Introduction</a></li>
+<li class="chapter" data-level="17.2" data-path="optimjs.html"><a href="optimjs.html#a-quick-introduction-to-javascript"><i class="fa fa-check"></i><b>17.2</b> A quick introduction to JavaScript</a><ul>
+<li class="chapter" data-level="17.2.1" data-path="optimjs.html"><a href="optimjs.html#about-javascript"><i class="fa fa-check"></i><b>17.2.1</b> About JavaScript</a></li>
+<li class="chapter" data-level="17.2.2" data-path="optimjs.html"><a href="optimjs.html#including-javascript-code-in-your-app"><i class="fa fa-check"></i><b>17.2.2</b> Including JavaScript code in your app</a></li>
+<li class="chapter" data-level="17.2.3" data-path="optimjs.html"><a href="optimjs.html#understanding-html-class-and-id"><i class="fa fa-check"></i><b>17.2.3</b> Understanding html, class, and id</a></li>
+<li class="chapter" data-level="17.2.4" data-path="optimjs.html"><a href="optimjs.html#querying-in-vanilla-javascript"><i class="fa fa-check"></i><b>17.2.4</b> Querying in Vanilla JavaScript</a></li>
+<li class="chapter" data-level="17.2.5" data-path="optimjs.html"><a href="optimjs.html#about-dom-events"><i class="fa fa-check"></i><b>17.2.5</b> About DOM events</a></li>
+<li class="chapter" data-level="17.2.6" data-path="optimjs.html"><a href="optimjs.html#about-jquery-jquery-selectors"><i class="fa fa-check"></i><b>17.2.6</b> About <code>jQuery</code> &amp; <code>jQuery</code> selectors</a></li>
+</ul></li>
+<li class="chapter" data-level="17.3" data-path="optimjs.html"><a href="optimjs.html#client-side-javascript"><i class="fa fa-check"></i><b>17.3</b> Client-side JavaScript</a><ul>
+<li class="chapter" data-level="17.3.1" data-path="optimjs.html"><a href="optimjs.html#common-patterns"><i class="fa fa-check"></i><b>17.3.1</b> Common patterns</a></li>
+<li class="chapter" data-level="17.3.2" data-path="optimjs.html"><a href="optimjs.html#where-to-put-them---back-to-javascript-events"><i class="fa fa-check"></i><b>17.3.2</b> Where to put them - Back to JavaScript Events</a></li>
+</ul></li>
+<li class="chapter" data-level="17.4" data-path="optimjs.html"><a href="optimjs.html#javascript---shiny-communication"><i class="fa fa-check"></i><b>17.4</b> JavaScript &lt;-&gt; <code>{shiny}</code> communication</a><ul>
+<li class="chapter" data-level="17.4.1" data-path="optimjs.html"><a href="optimjs.html#from-r-to-javascript"><i class="fa fa-check"></i><b>17.4.1</b> From R to JavaScript</a></li>
+<li class="chapter" data-level="17.4.2" data-path="optimjs.html"><a href="optimjs.html#from-javascript-to-r"><i class="fa fa-check"></i><b>17.4.2</b> From JavaScript to R</a></li>
+</ul></li>
+<li class="chapter" data-level="17.5" data-path="optimjs.html"><a href="optimjs.html#about-shinyjs-js-functions"><i class="fa fa-check"></i><b>17.5</b> About <code>{shinyjs}</code> js functions</a></li>
+<li class="chapter" data-level="17.6" data-path="optimjs.html"><a href="optimjs.html#one-last-thing-api-calls"><i class="fa fa-check"></i><b>17.6</b> One Last Thing: API calls</a></li>
+<li class="chapter" data-level="17.7" data-path="optimjs.html"><a href="optimjs.html#learn-more-about-javascript"><i class="fa fa-check"></i><b>17.7</b> Learn more about JavaScript</a><ul>
+<li class="chapter" data-level="17.7.1" data-path="optimjs.html"><a href="optimjs.html#shiny-javascript"><i class="fa fa-check"></i><b>17.7.1</b> <code>{shiny}</code> &amp; JavaScript</a></li>
+<li class="chapter" data-level="17.7.2" data-path="optimjs.html"><a href="optimjs.html#javascript-basics"><i class="fa fa-check"></i><b>17.7.2</b> JavaScript basics</a></li>
+<li class="chapter" data-level="17.7.3" data-path="optimjs.html"><a href="optimjs.html#jquery"><i class="fa fa-check"></i><b>17.7.3</b> jQuery</a></li>
+<li class="chapter" data-level="17.7.4" data-path="optimjs.html"><a href="optimjs.html#intermediate-advanced-javascript"><i class="fa fa-check"></i><b>17.7.4</b> Intermediate / advanced JavaScript</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="18" data-path="css.html"><a href="css.html"><i class="fa fa-check"></i><b>18</b> A Gentle Introduction to CSS</a><ul>
+<li class="chapter" data-level="18.1" data-path="css.html"><a href="css.html#what-is-css"><i class="fa fa-check"></i><b>18.1</b> What is CSS</a><ul>
+<li class="chapter" data-level="18.1.1" data-path="css.html"><a href="css.html#about-css"><i class="fa fa-check"></i><b>18.1.1</b> About CSS</a></li>
+<li class="chapter" data-level="18.1.2" data-path="css.html"><a href="css.html#shinys-default-fluidpage"><i class="fa fa-check"></i><b>18.1.2</b> <code>{shiny}</code>’s default: <code>fluidPage()</code></a></li>
+</ul></li>
+<li class="chapter" data-level="18.2" data-path="css.html"><a href="css.html#getting-started-with-css"><i class="fa fa-check"></i><b>18.2</b> Getting started with CSS</a><ul>
+<li class="chapter" data-level="18.2.1" data-path="css.html"><a href="css.html#about-css-syntax"><i class="fa fa-check"></i><b>18.2.1</b> About CSS syntax</a></li>
+<li class="chapter" data-level="18.2.2" data-path="css.html"><a href="css.html#css-selectors"><i class="fa fa-check"></i><b>18.2.2</b> CSS selectors</a></li>
+<li class="chapter" data-level="18.2.3" data-path="css.html"><a href="css.html#css-properties"><i class="fa fa-check"></i><b>18.2.3</b> CSS properties</a></li>
+</ul></li>
+<li class="chapter" data-level="18.3" data-path="css.html"><a href="css.html#integrate-css-files-to-your-shiny-app"><i class="fa fa-check"></i><b>18.3</b> Integrate CSS files to your <code>{shiny}</code> App</a><ul>
+<li class="chapter" data-level="18.3.1" data-path="css.html"><a href="css.html#inline-css"><i class="fa fa-check"></i><b>18.3.1</b> Inline CSS</a></li>
+<li class="chapter" data-level="18.3.2" data-path="css.html"><a href="css.html#writing-in-a-tagsstyle"><i class="fa fa-check"></i><b>18.3.2</b> Writing in a <code>tags$style()</code></a></li>
+<li class="chapter" data-level="18.3.3" data-path="css.html"><a href="css.html#including-external-files"><i class="fa fa-check"></i><b>18.3.3</b> Including External Files</a></li>
+<li class="chapter" data-level="18.3.4" data-path="css.html"><a href="css.html#using-r-packages"><i class="fa fa-check"></i><b>18.3.4</b> Using R packages</a></li>
+</ul></li>
+<li class="chapter" data-level="18.4" data-path="css.html"><a href="css.html#external-resources"><i class="fa fa-check"></i><b>18.4</b> External resources</a></li>
+</ul></li>
+<li class="part"><span><b>VIII Appendix</b></span></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html"><i class="fa fa-check"></i>Use case - Building an App, from Start to Finish</a><ul>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#about-the-application"><i class="fa fa-check"></i>About the application</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#step-1-design-1"><i class="fa fa-check"></i>Step 1: Design</a><ul>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#deciphering-the-specifications"><i class="fa fa-check"></i>Deciphering the Specifications</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#building-a-concept-map"><i class="fa fa-check"></i>Building a Concept Map</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#asking-questions"><i class="fa fa-check"></i>Asking Questions</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#building-personas-1"><i class="fa fa-check"></i>Building personas</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#step-2-prototyping"><i class="fa fa-check"></i>Step 2: Prototyping</a><ul>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#backend-in-rmd"><i class="fa fa-check"></i>Backend in Rmd</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#ui-prototyping"><i class="fa fa-check"></i>UI prototyping</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#step-3-build-1"><i class="fa fa-check"></i>Step 3: Build</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#step-4-strengthen-1"><i class="fa fa-check"></i>Step 4: Strengthen</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#step-5-deploy-1"><i class="fa fa-check"></i>Step 5: Deploy</a><ul>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#before-deploy-checklist"><i class="fa fa-check"></i>Before deploy checklist</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#deploy-as-a-tar.gz"><i class="fa fa-check"></i>Deploy as a tar.gz</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#deploy-on-rstudio-connect"><i class="fa fa-check"></i>Deploy on RStudio Connect</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#deploy-with-docker"><i class="fa fa-check"></i>Deploy with Docker</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="session-info.html"><a href="session-info.html"><i class="fa fa-check"></i>Session Info</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://rtask.thinkr.fr">A book by the ThinkR team</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Engineering Production-Grade Shiny Apps</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="deploy" class="section level1">
+<h1><span class="header-section-number">Chapter 13</span> Deploy your application</h1>
+<blockquote>
+<p>Your deploys should be as boring, straightforward, and stress-free as possible.<br />
+<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<style>.right{ text-align: right;}</style>
+<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<div class="right">
+<a href="https://zachholman.com/posts/deploying-software">How to Deploy Software - Zach Holman</a>
+</div></p>
+</blockquote>
+<p>Once your app is built, you are ready to deploy it!
+In other words, your software is now ready to be used by other users.
+There are two main ways to share your application and make it available to others: by creating a package and making it installable, or by sending it to a remote server.
+We will see in this part how you can do that using <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span>.</p>
+<div id="before-deployment-check-list" class="section level2">
+<h2><span class="header-section-number">13.1</span> Before deployment Check-list</h2>
+<p>Here is a quick checklist of things to think about once your application is ready, and before sending it to production</p>
+<ul>
+<li><p><input type="checkbox" disabled="" />
+<code>devtools::check()</code>, run from the command line, returns 0 errors, 0 warnings, 0 notes</p></li>
+<li><p><input type="checkbox" disabled="" />
+The current version number is valid, <em>i.e</em> if the current app is an update, the version number has been bumped</p></li>
+<li><p><input type="checkbox" disabled="" />
+Everything is fully documented</p></li>
+<li><p><input type="checkbox" disabled="" />
+Test coverage is good, i.e you cover a sufficient amount of the code base, and these tests cover the core/strategic algorithms</p></li>
+<li><p><input type="checkbox" disabled="" />
+It’s clear to everyone involved in the project who is the person to call if something goes wrong</p></li>
+<li><p><input type="checkbox" disabled="" />
+It’s clear to everyone involved in the project what is the debugging process, how to communicate bugs to the developer team, and how long it will take to get changes fixed</p></li>
+<li><p><input type="checkbox" disabled="" />
+(If relevant) The server it is deployed on has all the necessary software installed (Docker, Connect, <code>{shiny}</code> Server…) to make the application run</p></li>
+<li><p><input type="checkbox" disabled="" />
+The server has all the system requirements needed (<em>i.e</em> the system libraries), and if not, they are installed with the application (if it’s dockerized)</p></li>
+<li><p><input type="checkbox" disabled="" />
+The application, if deployed on a server, will be deployed on a port which will be accessible by the users</p></li>
+<li><p><input type="checkbox" disabled="" />
+(If relevant) The environment variables from the production server are managed inside the application</p></li>
+<li><p><input type="checkbox" disabled="" />
+(If relevant) The app is launched on the correct port, or at least this port can be configured via an environment variable</p></li>
+<li><p><input type="checkbox" disabled="" />
+(If relevant) The server where the app is deployed have access to the data sources (database, API…)</p></li>
+<li><p><input type="checkbox" disabled="" />
+If the app records data, there are backups for these data.</p></li>
+</ul>
+</div>
+<div id="sharing-your-app-as-a-package" class="section level2">
+<h2><span class="header-section-number">13.2</span> Sharing your app as a package</h2>
+<div id="install-on-your-machine" class="section level3">
+<h3><span class="header-section-number">13.2.1</span> Install on your machine</h3>
+<p>A <code>{shiny}</code> application built with <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> is <strong>by definition</strong> an R package.
+This <code>{shiny}</code> App as a Package is also helpful when it comes to deploying your application: packages are designed to be shareable pieces of R code.</p>
+<p>Before sending it to a remote server or sharing it to the world, <strong>the first step is testing if the package can be installed on your own computer</strong>.
+To do that, when you are in the project corresponding to the golem you built, you can call <code>remotes::install_local()</code> to install the application on your computer.
+Of course, if you are somewhere else on your machine, you can call <code>remotes::install_local("path/to/app")</code>.
+If you are using the RStudio IDE, you can also click on the <code>Build</code> tab, then click on the <code>Install and Restart</code> button.</p>
+<p>This should restart your R session, and call <code>library(yourpackagename)</code>.
+Then, try the <code>run_app()</code> function to check that the app can be launched.</p>
+</div>
+<div id="share-as-built-package" class="section level3">
+<h3><span class="header-section-number">13.2.2</span> Share as built package</h3>
+<div id="a.-local-build" class="section level4 unnumbered">
+<h4>A. Local build</h4>
+<p>Building an app as a package also means that this app can be bundled into an archive, and then shared, either as is or using a package repository like the CRAN.</p>
+<p>To do that, you first need an bundled version of your app, which can be created using the <code>build()</code> function from <code>{pkgbuild}</code> <span class="citation">(Wickham and Hester <a href="#ref-R-pkgbuild" role="doc-biblioref">2020</a>)</span> in the same working directory as your application.
+Calling this function will create a .tar.gz file that is called <code>mygolem_0.0.1.tar.gz</code> (of course with the name of your package).
+Once you have this <code>tar.gz</code>, you can send it to your favorite package repository.</p>
+<p>You can also share the file as is with others.
+If you do so, they will have to install the app with <code>remotes::install_local("path/to/tar.gz")</code>, that will take care of doing a full installation of the app, including installing the required dependencies.<br />
+Then, they can do <code>library(yourpackagename)</code> and <code>run_app()</code> on their machine.</p>
+</div>
+<div id="b.-send-to-a-package-repository" class="section level4 unnumbered">
+<h4>B. Send to a package repository</h4>
+<p>The upside of building the application <code>{golem}</code>, <em>i.e</em> as a package, is that you can share your application on a remote package manager, the more widely used for example on the CRAN like <code>{dccvalidator}</code> <span class="citation">(Woo, Kauer, and Montgomery <a href="#ref-R-dccvalidator" role="doc-biblioref">2020</a>)</span>, or on BioConductor like <code>{spatialLIBD}</code> <span class="citation">(Collado-Torres, Maynard, and Jaffe <a href="#ref-R-spatialLIBD" role="doc-biblioref">2020</a>)</span>.
+But any other package manager will work: for example if the company uses RStudio Package Manager, your application can be installed here as any other package.
+If your application is open-source, the package structure also allows to install from GitHub, by using the <code>remotes::install_github()</code> function.<a href="#fn53" class="footnote-ref" id="fnref53"><sup>53</sup></a>
+For example, this is what you can do with <code>{hexmake}</code>, or <code>{tidytuesday}</code>: as they are open-source packages, they can be installed from GitHub.
+Then, once your application is installed as a package on the users’ machines, they can do <code>library(yourpackagename)</code> and <code>run_app()</code>.</p>
+<p>The advantage of this solution being that R users are familiar with package installation, so it makes using your application easier for them.
+Also, and we will see it in the next section, but making your application available as a standard R package makes it easier to deploy it: for example if your RStudio Connect is coupled with your RStudio Package Manager, the deployment file just have to contain one line launching the application.</p>
+<p>Note that releasing to CRAN or BioConductor requires extra effort: you have to comply to a series of rules.
+But good news: as you have been following the best practices from this book, you should not have to put that much extra efforts!</p>
+<p>Know more about releasing on CRAN:</p>
+<ul>
+<li><a href="https://cran.r-project.org/web/packages/submission_checklist.html">Checklist for CRAN submissions</a></li>
+<li><a href="https://cran.r-project.org/web/packages/policies.html">CRAN Repository Policy</a></li>
+<li><a href="https://r-pkgs.org/release.html">R packages - Chapter 18 Releasing a package</a></li>
+<li><a href="https://kbroman.org/pkg_primer/pages/cran.html">Getting your R package on CRAN</a></li>
+<li><a href="https://github.com/ThinkR-open/prepare-for-cran">prepare-for-cran - A Collaborative list of things to know before submitting to CRAN</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="deploying-apps-with-golem" class="section level2">
+<h2><span class="header-section-number">13.3</span> Deploying Apps with <code>{golem}</code></h2>
+<p>The other way to make your application available to others is by sending it to a remote server that can serve <code>{shiny}</code> applications.
+In other words, instead of having to install the application on their machines, <strong>they can crack open a web browser and navigate to the URL where the application is deployed</strong>.
+Deploying to a server is the solution of choice when you want to make your application available to a wide public: on a server, visitors do not have to have R installed on their computer, they do not have to install a package or launch it, they can just browse the application like any other web application.
+This solution is also a common choice in companies that have strict security requirements: the IT team might not be willing to let everyone install software on their machine, and sharing an application on a server allows them more control over who can access the application.
+For example, deploying on a server allows to use proxy, and to filter by IP: then, only a subset of people can have access to the application.</p>
+<p>When using <code>{golem}</code>, you can open the <code>dev/03_deploy.R</code> and find the functions for server deployment.
+At the time of writing this book, there are two main ways to deploy a shiny app on a server:</p>
+<ul>
+<li>RStudio’s solutions</li>
+<li>A docker based solution</li>
+</ul>
+<div id="rstudio-environments" class="section level3">
+<h3><span class="header-section-number">13.3.1</span> RStudio Environments</h3>
+<p>RStudio proposes three services to deploy <code>{shiny}</code> application:</p>
+<ul>
+<li><p>shinyapps.io, an on-premise solution that can serve <code>{shiny}</code> application (freemium)</p></li>
+<li><p><code>{shiny}</code>-server, a software you have to install on your own server, and that can be used to deploy multiple applications (you can find either an open source or a professional edition)</p></li>
+<li><p>RStudio connect, a server-based solution that can deploy <code>{shiny}</code> applications and markdown documents (and other kind of content), and that serves them as ordinary websites</p></li>
+</ul>
+<p>Each of these platforms has its own function to create an <code>app.R</code> file that is to be used as a launch script of each platform.</p>
+<ul>
+<li><p><code>golem::add_rstudioconnect_file()</code></p></li>
+<li><p><code>golem::add_shinyappsio_file()</code></p></li>
+<li><p><code>golem::add_shinyserver_file()</code></p></li>
+</ul>
+<p>What these <code>app.R</code> files do is calling a <code>pkgload::load_all()</code> function, that will mimic the launch of your package, and then call the <code>run_app()</code> function from your packaged app.
+Note that if you need to configure the way your app is launched on these platforms (for example if you need to pass arguments to the <code>run_app()</code> function), you will have to edit this file.</p>
+<p>Note that when using these functions, you will be able to use the “One click deploy” for these platforms: on the top right of these <code>app.R</code>, use the Blue Button to deploy to server.</p>
+<p>Another way to deploy your <code>{golem}</code> based app to <code>{shiny}</code> server and to Connect is to link these two software to a local repository (for example an RStudio Package Manager), and then to only use <code>mypackage::run_app()</code> to the <code>app.R</code>.</p>
+</div>
+<div id="docker-1" class="section level3">
+<h3><span class="header-section-number">13.3.2</span> Docker</h3>
+<p>Docker is an open source software used to build and deploy applications in containers.
+Docker has become an core solution in the DevOps world and a lot of server solution are based on it.
+See the “Strengthen” chapter for a more complete introduction to Docker.</p>
+<p>You will find the function for creating a <code>Dockerfile</code> for your <code>{golem}</code> app inside the <code>03_deploy.R</code> file, which contains a series of 3 functions:</p>
+<ul>
+<li><code>golem::add_dockerfile()</code></li>
+<li><code>golem::add_dockerfile_shinyproxy()</code></li>
+<li><code>golem::add_dockerfile_heroku()</code></li>
+</ul>
+<p>The first function creates a “generic” <code>Dockerfile</code>, in the sense that it is not specific to any platform, and would work out of the box for your local machine.
+The second one is meant for <a href="https://www.shinyproxy.io/"><code>{shiny}</code>Proxy</a>, an open source solution for deploying containerized <code>{shiny}</code> applications, and the third for <a href="https://www.heroku.com/">Heroku</a>, an online service that can serve containerized applications (not specific to <code>{shiny}</code>).</p>
+<p>Other platforms can run Docker containers, notably AWS and Google Cloud Engine.
+At the time of writing these lines, <code>{golem}</code> does not provide support for these environment, but that is on the ToDo list!</p>
+<p>Note that the <code>Dockerfile</code> creation in <code>{golem}</code> tries to replicate your local environment as precisely as possible, notably by matching your R version, and the version of the packages you have installed on your machine.
+System requirements are also added when they are found on <a href="https://sysreqs.r-hub.io/">the sysreqs service from r-hub</a>.
+Otherwise you might have to add them manually.</p>
+
+</div>
+</div>
+</div>
+
+
+
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-R-spatialLIBD">
+<p>Collado-Torres, Leonardo, Kristen R. Maynard, and Andrew E. Jaffe. 2020. <em>LIBD Visium Spatial Transcriptomics Human Pilot Data Inspector</em>. <a href="https://doi.org/10.18129/B9.bioc.spatialLIBD">https://doi.org/10.18129/B9.bioc.spatialLIBD</a>.</p>
+</div>
+<div id="ref-R-golem">
+<p>Fay, Colin, Vincent Guyader, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
+</div>
+<div id="ref-R-pkgbuild">
+<p>Wickham, Hadley, and Jim Hester. 2020. <em>Pkgbuild: Find Tools Needed to Build R Packages</em>. <a href="https://github.com/r-lib/pkgbuild">https://github.com/r-lib/pkgbuild</a>.</p>
+</div>
+<div id="ref-R-dccvalidator">
+<p>Woo, Kara, Nicole Kauer, and Kelsey Montgomery. 2020. <em>Dccvalidator: Metadata Validation for Data Coordinating Centers</em>.</p>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="53">
+<li id="fn53"><p>This is also true for any other Version Control system<a href="deploy.html#fnref53" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+<hr/>
+<footer>
+<a href="rtask.thinkr.fr"><img src="img/logo400_129.png" alt="ThinkR Website"/></a>
+<!--https://yihui.org/en/2018/09/target-blank/-->
+<script>
+  (function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+</footer>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="secure.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="when-optimize.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook/js/app.min.js"></script>
+<script src="libs/gitbook/js/lunr.js"></script>
+<script src="libs/gitbook/js/clipboard.min.js"></script>
+<script src="libs/gitbook/js/plugin-search.js"></script>
+<script src="libs/gitbook/js/plugin-sharing.js"></script>
+<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook/js/jquery.highlight.js"></script>
+<script src="libs/gitbook/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/13-deploy.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
