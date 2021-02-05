@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps</title>
+  <title>Chapter 8 Setting up for success with {golem} | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:title" content="Chapter 8 Setting up for success with {golem} | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
   
   <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps" />
+  <meta name="twitter:title" content="Chapter 8 Setting up for success with {golem} | Engineering Production-Grade Shiny Apps" />
   
   <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="version-control.html"/>
-<link rel="next" href="need-for-optimization.html"/>
+<link rel="prev" href="dont-rush-into-coding.html"/>
+<link rel="next" href="building-ispum-app.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
@@ -484,177 +484,195 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="deploy" class="section level1">
-<h1><span class="header-section-number">Chapter 13</span> Deploy your application</h1>
-<blockquote>
-<p>Your deploys should be as boring, straightforward, and stress-free as possible.<br />
-<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
-<style>.right{ text-align: right;}</style>
-<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
-<div class="right">
-<a href="https://zachholman.com/posts/deploying-software">How to Deploy Software - Zach Holman</a>
-</div></p>
-</blockquote>
-<p>Once your app is built, you are ready to deploy it!
-In other words, your software is now ready to be used by other users.
-There are two main ways to share your application and make it available to others: by creating a package and making it installable, or by sending it to a remote server.
-We will see in this part how you can do that using <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span>.</p>
-<div id="before-deployment-check-list" class="section level2">
-<h2><span class="header-section-number">13.1</span> Before deployment Check-list</h2>
-<p>Here is a quick checklist of things to think about once your application is ready, and before sending it to production</p>
-<ul>
-<li><p><input type="checkbox" disabled="" />
-<code>devtools::check()</code>, run from the command line, returns 0 errors, 0 warnings, 0 notes</p></li>
-<li><p><input type="checkbox" disabled="" />
-The current version number is valid, <em>i.e</em> if the current app is an update, the version number has been bumped</p></li>
-<li><p><input type="checkbox" disabled="" />
-Everything is fully documented</p></li>
-<li><p><input type="checkbox" disabled="" />
-Test coverage is good, i.e you cover a sufficient amount of the code base, and these tests cover the core/strategic algorithms</p></li>
-<li><p><input type="checkbox" disabled="" />
-It’s clear to everyone involved in the project who is the person to call if something goes wrong</p></li>
-<li><p><input type="checkbox" disabled="" />
-It’s clear to everyone involved in the project what is the debugging process, how to communicate bugs to the developer team, and how long it will take to get changes fixed</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The server it is deployed on has all the necessary software installed (Docker, Connect, <code>{shiny}</code> Server…) to make the application run</p></li>
-<li><p><input type="checkbox" disabled="" />
-The server has all the system requirements needed (<em>i.e</em> the system libraries), and if not, they are installed with the application (if it’s dockerized)</p></li>
-<li><p><input type="checkbox" disabled="" />
-The application, if deployed on a server, will be deployed on a port which will be accessible by the users</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The environment variables from the production server are managed inside the application</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The app is launched on the correct port, or at least this port can be configured via an environment variable</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The server where the app is deployed have access to the data sources (database, API…)</p></li>
-<li><p><input type="checkbox" disabled="" />
-If the app records data, there are backups for these data.</p></li>
-</ul>
+<div id="setting-up-for-success" class="section level1">
+<h1><span class="header-section-number">Chapter 8</span> Setting up for success with <code>{golem}</code></h1>
+<p>Before starting to prototype and build anything, initialize a <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> project!
+This will help you start your application on solid ground, and once the project is ready to be filled, you can start prototyping right inside it.</p>
+<p>The general workflow for “prototype and build” is the following: the project manager sets up a <code>{golem}</code> project, where the first steps are filled, the general structure (potentially with <code>{shiny}</code> module) is set, and then the project is registered to the version control system.
+Once we have this structure, package and modules combined, we can start prototyping the UI inside the module, work on the CSS and JavaScript elements that might be needed, and prototyping the back-end functionalities inside Rmarkdown files.
+And then, once this two prototyping sides are finished, we work on the integration of everything inside the reactive context.</p>
+<p>In this chapter and in chapter 11, we will be presenting the <code>{golem}</code> package in more depth.
+<code>{golem}</code> is a framework that standardizes the process of building production-ready <code>{shiny}</code> Applications.</p>
+<div id="create-a-golem" class="section level2">
+<h2><span class="header-section-number">8.1</span> Create a <code>{golem}</code></h2>
+<p>Once <code>{golem}</code> is installed and available on your computer, you can got to File &gt; New Project… in RStudio, and choose “Package for <code>{shiny}</code> App Using golem” input.</p>
+<p>If you want to do it through command line, you can use:</p>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="setting-up-for-success.html#cb86-1"></a><span class="co"># Creating a golem project from the command line</span></span>
+<span id="cb86-2"><a href="setting-up-for-success.html#cb86-2"></a>golem<span class="op">::</span><span class="kw">create_golem</span>(<span class="dt">path =</span> <span class="st">&quot;path/to/package&quot;</span>)</span></code></pre></div>
+<p>Once you have got that, a new project will be launched.
+Here is the structure of this project:</p>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="setting-up-for-success.html#cb87-1"></a><span class="co"># This is what a default {golem} project looks like</span></span>
+<span id="cb87-2"><a href="setting-up-for-success.html#cb87-2"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;golex&quot;</span>)</span></code></pre></div>
+<pre><code>golex
+├── DESCRIPTION
+├── NAMESPACE
+├── R
+│   ├── app_config.R
+│   ├── app_server.R
+│   ├── app_ui.R
+│   ├── mod_my_first_module.R
+│   └── run_app.R
+├── dev
+│   ├── 01_start.R
+│   ├── 02_dev.R
+│   ├── 03_deploy.R
+│   └── run_dev.R
+├── inst
+│   ├── app
+│   │   └── www
+│   │       ├── custom.css
+│   │       ├── favicon.ico
+│   │       ├── first_handler.js
+│   │       └── script.js
+│   └── golem-config.yml
+└── man
+    └── run_app.Rd</code></pre>
+<p>If you already have some experience with R packages, most of these files will appear very familiar to you.
+That’s because a <code>{golem}</code> app IS a package, so it uses the standard R pakage structure (and yes, the good news is that everything you know about R packages will work in a <code>{golem}</code> based application).</p>
 </div>
-<div id="sharing-your-app-as-a-package" class="section level2">
-<h2><span class="header-section-number">13.2</span> Sharing your app as a package</h2>
-<div id="install-on-your-machine" class="section level3">
-<h3><span class="header-section-number">13.2.1</span> Install on your machine</h3>
-<p>A <code>{shiny}</code> application built with <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> is <strong>by definition</strong> an R package.
-This <code>{shiny}</code> App as a Package is also helpful when it comes to deploying your application: packages are designed to be shareable pieces of R code.</p>
-<p>Before sending it to a remote server or sharing it to the world, <strong>the first step is testing if the package can be installed on your own computer</strong>.
-To do that, when you are in the project corresponding to the golem you built, you can call <code>remotes::install_local()</code> to install the application on your computer.
-Of course, if you are somewhere else on your machine, you can call <code>remotes::install_local("path/to/app")</code>.
-If you are using the RStudio IDE, you can also click on the <code>Build</code> tab, then click on the <code>Install and Restart</code> button.</p>
-<p>This should restart your R session, and call <code>library(yourpackagename)</code>.
-Then, try the <code>run_app()</code> function to check that the app can be launched.</p>
+<div id="setting-things-up-with-dev01_start.r" class="section level2">
+<h2><span class="header-section-number">8.2</span> Setting things up with <code>dev/01_start.R</code></h2>
+<p>Once you have created your project, the first file that opens is <code>dev/01_start.R</code>.
+This file contains a series of commands to run once, at the start of the project.</p>
+<div id="fill-the-description-and-set-options" class="section level3">
+<h3><span class="header-section-number">8.2.1</span> Fill the DESCRIPTION and set options</h3>
+<p>First, fill the DESCRIPTION file by adding information about the package that will contain your app:</p>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="setting-up-for-success.html#cb89-1"></a>golem<span class="op">::</span><span class="kw">fill_desc</span>(</span>
+<span id="cb89-2"><a href="setting-up-for-success.html#cb89-2"></a>  <span class="co"># The Name of the package containing the App </span></span>
+<span id="cb89-3"><a href="setting-up-for-success.html#cb89-3"></a>  <span class="dt">pkg_name =</span> <span class="st">&quot;ipsumapp&quot;</span>, </span>
+<span id="cb89-4"><a href="setting-up-for-success.html#cb89-4"></a>  <span class="co"># The Title of the package containing the App </span></span>
+<span id="cb89-5"><a href="setting-up-for-success.html#cb89-5"></a>  <span class="dt">pkg_title =</span> <span class="st">&quot;PKG_TITLE&quot;</span>, </span>
+<span id="cb89-6"><a href="setting-up-for-success.html#cb89-6"></a>  <span class="co"># The Description of the package containing the App </span></span>
+<span id="cb89-7"><a href="setting-up-for-success.html#cb89-7"></a>  <span class="dt">pkg_description =</span> <span class="st">&quot;PKG_DESC.&quot;</span>, </span>
+<span id="cb89-8"><a href="setting-up-for-success.html#cb89-8"></a>  <span class="co"># Your First Name</span></span>
+<span id="cb89-9"><a href="setting-up-for-success.html#cb89-9"></a>  <span class="dt">author_first_name =</span> <span class="st">&quot;AUTHOR_FIRST&quot;</span>, </span>
+<span id="cb89-10"><a href="setting-up-for-success.html#cb89-10"></a>  <span class="co"># Your Last Name</span></span>
+<span id="cb89-11"><a href="setting-up-for-success.html#cb89-11"></a>  <span class="dt">author_last_name =</span> <span class="st">&quot;AUTHOR_LAST&quot;</span>, </span>
+<span id="cb89-12"><a href="setting-up-for-success.html#cb89-12"></a>  <span class="co"># Your Email</span></span>
+<span id="cb89-13"><a href="setting-up-for-success.html#cb89-13"></a>  <span class="dt">author_email =</span> <span class="st">&quot;AUTHOR@MAIL.COM&quot;</span>, </span>
+<span id="cb89-14"><a href="setting-up-for-success.html#cb89-14"></a>  <span class="co"># The URL of the GitHub Repo (optional) </span></span>
+<span id="cb89-15"><a href="setting-up-for-success.html#cb89-15"></a>  <span class="dt">repo_url =</span> <span class="ot">NULL</span> </span>
+<span id="cb89-16"><a href="setting-up-for-success.html#cb89-16"></a>)   </span></code></pre></div>
+<p>Then, call the <code>golem::set_golem_options()</code> function, which will add information to the <code>golem-config.yml</code> file, and set the <code>{here}</code> <span class="citation">(Müller <a href="#ref-R-here" role="doc-biblioref">2017</a>)</span> package root sentinel.
+<code>{here}</code> is an R package designed to handle directory management in R.
+When used in combination with <code>{golem}</code>, <code>{here}</code> helps ensuring that everything you do in your console is performed relatively to the root directory of your project: the one containing the <code>DESCRIPTION</code> of your application.
+That way, even if you change the working directory of your R session to a subfolder, you will still be able to create modules and CSS files in the correct folder.</p>
 </div>
-<div id="share-as-built-package" class="section level3">
-<h3><span class="header-section-number">13.2.2</span> Share as built package</h3>
-<div id="a.-local-build" class="section level4 unnumbered">
-<h4>A. Local build</h4>
-<p>Building an app as a package also means that this app can be bundled into an archive, and then shared, either as is or using a package repository like the CRAN.</p>
-<p>To do that, you first need an bundled version of your app, which can be created using the <code>build()</code> function from <code>{pkgbuild}</code> <span class="citation">(Wickham and Hester <a href="#ref-R-pkgbuild" role="doc-biblioref">2020</a>)</span> in the same working directory as your application.
-Calling this function will create a .tar.gz file that is called <code>mygolem_0.0.1.tar.gz</code> (of course with the name of your package).
-Once you have this <code>tar.gz</code>, you can send it to your favorite package repository.</p>
-<p>You can also share the file as is with others.
-If you do so, they will have to install the app with <code>remotes::install_local("path/to/tar.gz")</code>, that will take care of doing a full installation of the app, including installing the required dependencies.<br />
-Then, they can do <code>library(yourpackagename)</code> and <code>run_app()</code> on their machine.</p>
+<div id="set-common-files" class="section level3">
+<h3><span class="header-section-number">8.2.2</span> Set common Files</h3>
+<p>If you want to use the MIT license, add README, a code of conduct, a lifecycle badge, and NEWS.</p>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="setting-up-for-success.html#cb90-1"></a><span class="co"># You can set another license here</span></span>
+<span id="cb90-2"><a href="setting-up-for-success.html#cb90-2"></a>usethis<span class="op">::</span><span class="kw">use_mit_license</span>( <span class="dt">name =</span> <span class="st">&quot;Golem User&quot;</span> )  </span>
+<span id="cb90-3"><a href="setting-up-for-success.html#cb90-3"></a><span class="co"># Add a README, Code of Conduct, lifecycle badge and NEWS.md </span></span>
+<span id="cb90-4"><a href="setting-up-for-success.html#cb90-4"></a><span class="co"># file to your application</span></span>
+<span id="cb90-5"><a href="setting-up-for-success.html#cb90-5"></a>usethis<span class="op">::</span><span class="kw">use_readme_rmd</span>( <span class="dt">open =</span> <span class="ot">FALSE</span> )</span>
+<span id="cb90-6"><a href="setting-up-for-success.html#cb90-6"></a>usethis<span class="op">::</span><span class="kw">use_code_of_conduct</span>()</span>
+<span id="cb90-7"><a href="setting-up-for-success.html#cb90-7"></a>usethis<span class="op">::</span><span class="kw">use_lifecycle_badge</span>( <span class="st">&quot;Experimental&quot;</span> )</span>
+<span id="cb90-8"><a href="setting-up-for-success.html#cb90-8"></a>usethis<span class="op">::</span><span class="kw">use_news_md</span>( <span class="dt">open =</span> <span class="ot">FALSE</span> )</span></code></pre></div>
+<p>It’s also where you will be invited to use <code>git</code>:</p>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="setting-up-for-success.html#cb91-1"></a>usethis<span class="op">::</span><span class="kw">use_git</span>()</span></code></pre></div>
 </div>
-<div id="b.-send-to-a-package-repository" class="section level4 unnumbered">
-<h4>B. Send to a package repository</h4>
-<p>The upside of building the application <code>{golem}</code>, <em>i.e</em> as a package, is that you can share your application on a remote package manager, the more widely used for example on the CRAN like <code>{dccvalidator}</code> <span class="citation">(Woo, Kauer, and Montgomery <a href="#ref-R-dccvalidator" role="doc-biblioref">2020</a>)</span>, or on BioConductor like <code>{spatialLIBD}</code> <span class="citation">(Collado-Torres, Maynard, and Jaffe <a href="#ref-R-spatialLIBD" role="doc-biblioref">2020</a>)</span>.
-But any other package manager will work: for example if the company uses RStudio Package Manager, your application can be installed here as any other package.
-If your application is open-source, the package structure also allows to install from GitHub, by using the <code>remotes::install_github()</code> function.<a href="#fn53" class="footnote-ref" id="fnref53"><sup>53</sup></a>
-For example, this is what you can do with <code>{hexmake}</code>, or <code>{tidytuesday}</code>: as they are open-source packages, they can be installed from GitHub.
-Then, once your application is installed as a package on the users’ machines, they can do <code>library(yourpackagename)</code> and <code>run_app()</code>.</p>
-<p>The advantage of this solution being that R users are familiar with package installation, so it makes using your application easier for them.
-Also, and we will see it in the next section, but making your application available as a standard R package makes it easier to deploy it: for example if your RStudio Connect is coupled with your RStudio Package Manager, the deployment file just have to contain one line launching the application.</p>
-<p>Note that releasing to CRAN or BioConductor requires extra effort: you have to comply to a series of rules.
-But good news: as you have been following the best practices from this book, you should not have to put that much extra efforts!</p>
-<p>Know more about releasing on CRAN:</p>
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/submission_checklist.html">Checklist for CRAN submissions</a></li>
-<li><a href="https://cran.r-project.org/web/packages/policies.html">CRAN Repository Policy</a></li>
-<li><a href="https://r-pkgs.org/release.html">R packages - Chapter 18 Releasing a package</a></li>
-<li><a href="https://kbroman.org/pkg_primer/pages/cran.html">Getting your R package on CRAN</a></li>
-<li><a href="https://github.com/ThinkR-open/prepare-for-cran">prepare-for-cran - A Collaborative list of things to know before submitting to CRAN</a></li>
-</ul>
+<div id="use-recommended-elements" class="section level3">
+<h3><span class="header-section-number">8.2.3</span> Use Recommended Elements</h3>
+<p><code>golem::use_recommended_tests()</code> and <code>golem::use_recommended_deps()</code> sets a default testing infrastructure and adds dependencies to the application.</p>
+</div>
+<div id="add-utilitary-functions" class="section level3">
+<h3><span class="header-section-number">8.2.4</span> Add utilitary functions</h3>
+<p>These two functions add a file with various functions that can be used along the process of building your app.</p>
+<p>See each file in details for a description of the functions.</p>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="setting-up-for-success.html#cb92-1"></a><span class="co"># These files will create R/golem_utils_ui.R </span></span>
+<span id="cb92-2"><a href="setting-up-for-success.html#cb92-2"></a><span class="co"># and R/golem_utils_server.R</span></span>
+<span id="cb92-3"><a href="setting-up-for-success.html#cb92-3"></a>golem<span class="op">::</span><span class="kw">use_utils_ui</span>()</span>
+<span id="cb92-4"><a href="setting-up-for-success.html#cb92-4"></a>golem<span class="op">::</span><span class="kw">use_utils_server</span>()</span></code></pre></div>
+<p>In this file, you will for example find <code>list_to_li()</code>, which is a function to turn an R list into an HTML list or <code>with_red_star()</code>, a function to add a small red star after an UI input, useful for communicating that an input is mandatory.</p>
+</div>
+<div id="changing-the-favicon" class="section level3">
+<h3><span class="header-section-number">8.2.5</span> Changing the favicon</h3>
+<p>Favicons are the small icon located on the tab of your browser: in the default application, this favicon is the <code>{golem}</code> hex.</p>
+<p>If you want to change the default favicon:</p>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="setting-up-for-success.html#cb93-1"></a>golem<span class="op">::</span><span class="kw">use_favicon</span>( <span class="dt">path =</span> <span class="st">&quot;path/to/favicon&quot;</span>)</span></code></pre></div>
+<p>You’re now set!
+You’ve successfully initiated the project and can go to <code>dev/02_dev.R</code>.</p>
 </div>
 </div>
+<div id="setting-infrastructure-for-prototyping" class="section level2">
+<h2><span class="header-section-number">8.3</span> Setting infrastructure for prototyping</h2>
+<div id="add-modules-in-dev02_dev.r" class="section level3">
+<h3><span class="header-section-number">8.3.1</span> Add modules in <code>dev/02_dev.R</code></h3>
+<p>The <code>golem::add_module()</code> functions creates a module in the <code>R</code> folder.
+The file and the modules will be named after the <code>name</code> parameter, by adding <code>mod_</code> to the R file, and <code>mod_*_ui</code> and <code>mod_*_server</code> to the UI and server functions.</p>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="setting-up-for-success.html#cb94-1"></a><span class="co"># Creating a module skeleton</span></span>
+<span id="cb94-2"><a href="setting-up-for-success.html#cb94-2"></a>golem<span class="op">::</span><span class="kw">add_module</span>(<span class="dt">name =</span> <span class="st">&quot;my_first_module&quot;</span>) </span></code></pre></div>
+<pre><code>✔ File already exists.
+● Go to R/mod_my_first_module.R</code></pre>
+<p>The new file will contain:</p>
+<pre><code>#&#39; my_first_module UI Function
+#&#39;
+#&#39; @description A shiny Module.
+#&#39;
+#&#39; @param id,input,output,session Internal parameters for {shiny}.
+#&#39;
+#&#39; @noRd 
+#&#39;
+#&#39; @importFrom shiny NS tagList 
+mod_my_first_module_ui &lt;- function(id){
+  ns &lt;- NS(id)
+  tagList(
+ 
+  )
+}
+    
+#&#39; my_first_module Server Functions
+#&#39;
+#&#39; @noRd 
+mod_my_first_module_server &lt;- function(id){
+  moduleServer( id, function(input, output, session){
+    ns &lt;- session$ns
+ 
+  })
+}
+    
+## To be copied in the UI
+# mod_my_first_module_ui(&quot;my_first_module_ui_1&quot;)
+    
+## To be copied in the server
+# mod_my_first_module_server(&quot;my_first_module_ui_1&quot;)</code></pre>
+<p>Note that in order not to make errors when putting these into your app, the end of the file will contain code that has to be copied and pasted inside your UI and server functions.</p>
+<p>This is where you will be adding the core of your app.
+In a first time, these modules will contain prototyped UI for the application, and once the application is ready to be integrated, you will add the core logic here.</p>
 </div>
-<div id="deploying-apps-with-golem" class="section level2">
-<h2><span class="header-section-number">13.3</span> Deploying Apps with <code>{golem}</code></h2>
-<p>The other way to make your application available to others is by sending it to a remote server that can serve <code>{shiny}</code> applications.
-In other words, instead of having to install the application on their machines, <strong>they can crack open a web browser and navigate to the URL where the application is deployed</strong>.
-Deploying to a server is the solution of choice when you want to make your application available to a wide public: on a server, visitors do not have to have R installed on their computer, they do not have to install a package or launch it, they can just browse the application like any other web application.
-This solution is also a common choice in companies that have strict security requirements: the IT team might not be willing to let everyone install software on their machine, and sharing an application on a server allows them more control over who can access the application.
-For example, deploying on a server allows to use proxy, and to filter by IP: then, only a subset of people can have access to the application.</p>
-<p>When using <code>{golem}</code>, you can open the <code>dev/03_deploy.R</code> and find the functions for server deployment.
-At the time of writing this book, there are two main ways to deploy a shiny app on a server:</p>
-<ul>
-<li>RStudio’s solutions</li>
-<li>A docker based solution</li>
-</ul>
-<div id="rstudio-environments" class="section level3">
-<h3><span class="header-section-number">13.3.1</span> RStudio Environments</h3>
-<p>RStudio proposes three services to deploy <code>{shiny}</code> application:</p>
-<ul>
-<li><p>shinyapps.io, an on-premise solution that can serve <code>{shiny}</code> application (freemium)</p></li>
-<li><p><code>{shiny}</code>-server, a software you have to install on your own server, and that can be used to deploy multiple applications (you can find either an open source or a professional edition)</p></li>
-<li><p>RStudio connect, a server-based solution that can deploy <code>{shiny}</code> applications and markdown documents (and other kind of content), and that serves them as ordinary websites</p></li>
-</ul>
-<p>Each of these platforms has its own function to create an <code>app.R</code> file that is to be used as a launch script of each platform.</p>
-<ul>
-<li><p><code>golem::add_rstudioconnect_file()</code></p></li>
-<li><p><code>golem::add_shinyappsio_file()</code></p></li>
-<li><p><code>golem::add_shinyserver_file()</code></p></li>
-</ul>
-<p>What these <code>app.R</code> files do is calling a <code>pkgload::load_all()</code> function, that will mimic the launch of your package, and then call the <code>run_app()</code> function from your packaged app.
-Note that if you need to configure the way your app is launched on these platforms (for example if you need to pass arguments to the <code>run_app()</code> function), you will have to edit this file.</p>
-<p>Note that when using these functions, you will be able to use the “One click deploy” for these platforms: on the top right of these <code>app.R</code>, use the Blue Button to deploy to server.</p>
-<p>Another way to deploy your <code>{golem}</code> based app to <code>{shiny}</code> server and to Connect is to link these two software to a local repository (for example an RStudio Package Manager), and then to only use <code>mypackage::run_app()</code> to the <code>app.R</code>.</p>
-</div>
-<div id="docker-1" class="section level3">
-<h3><span class="header-section-number">13.3.2</span> Docker</h3>
-<p>Docker is an open source software used to build and deploy applications in containers.
-Docker has become an core solution in the DevOps world and a lot of server solution are based on it.
-See the “Strengthen” chapter for a more complete introduction to Docker.</p>
-<p>You will find the function for creating a <code>Dockerfile</code> for your <code>{golem}</code> app inside the <code>03_deploy.R</code> file, which contains a series of 3 functions:</p>
-<ul>
-<li><code>golem::add_dockerfile()</code></li>
-<li><code>golem::add_dockerfile_shinyproxy()</code></li>
-<li><code>golem::add_dockerfile_heroku()</code></li>
-</ul>
-<p>The first function creates a “generic” <code>Dockerfile</code>, in the sense that it is not specific to any platform, and would work out of the box for your local machine.
-The second one is meant for <a href="https://www.shinyproxy.io/"><code>{shiny}</code>Proxy</a>, an open source solution for deploying containerized <code>{shiny}</code> applications, and the third for <a href="https://www.heroku.com/">Heroku</a>, an online service that can serve containerized applications (not specific to <code>{shiny}</code>).</p>
-<p>Other platforms can run Docker containers, notably AWS and Google Cloud Engine.
-At the time of writing these lines, <code>{golem}</code> does not provide support for these environment, but that is on the ToDo list!</p>
-<p>Note that the <code>Dockerfile</code> creation in <code>{golem}</code> tries to replicate your local environment as precisely as possible, notably by matching your R version, and the version of the packages you have installed on your machine.
-System requirements are also added when they are found on <a href="https://sysreqs.r-hub.io/">the sysreqs service from r-hub</a>.
-Otherwise you might have to add them manually.</p>
+<div id="add-css-js-files" class="section level3">
+<h3><span class="header-section-number">8.3.2</span> Add CSS &amp; JS Files</h3>
+<p>Adding some infrastructure for JavaScript and CSS file from the very beginning can also formalize the set-up: you are giving the rest of your team a specific file where they can write the JavaScript and CSS code.</p>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="setting-up-for-success.html#cb97-1"></a>golem<span class="op">::</span><span class="kw">add_js_file</span>( <span class="st">&quot;script&quot;</span> )</span></code></pre></div>
+<p>will generate the following file:</p>
+<pre><code>$( document ).ready(function() {
+  
+});</code></pre>
+<p>Here, you will have an infrastructure for launching JavaScript code once the application is ready (this code is standard <code>jQuery</code> format: we will be back to JavaScript at the end of this book).</p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="setting-up-for-success.html#cb99-1"></a>golem<span class="op">::</span><span class="kw">add_js_handler</span>( <span class="st">&quot;handlers&quot;</span> )</span></code></pre></div>
+<p>Will generate the following file:</p>
+<pre><code>$( document ).ready(function() {
+  Shiny.addCustomMessageHandler(&#39;fun&#39;, function(arg) {
+  
+  })
+});</code></pre>
+<p>As you can see, there is already a skeleton for building <code>{shiny}</code> JavaScript handlers.</p>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="setting-up-for-success.html#cb101-1"></a>golem<span class="op">::</span><span class="kw">add_css_file</span>( <span class="st">&quot;custom&quot;</span> )</span></code></pre></div>
+<p>will create a blank CSS file inside the <code>inst/app/www</code> folder.</p>
+<p>Note that as you are building your application with <code>{golem}</code>, these files will be linked automatically to your application.</p>
 
 </div>
 </div>
 </div>
-
-
-
 <h3>References</h3>
 <div id="refs" class="references">
-<div id="ref-R-spatialLIBD">
-<p>Collado-Torres, Leonardo, Kristen R. Maynard, and Andrew E. Jaffe. 2020. <em>LIBD Visium Spatial Transcriptomics Human Pilot Data Inspector</em>. <a href="https://doi.org/10.18129/B9.bioc.spatialLIBD">https://doi.org/10.18129/B9.bioc.spatialLIBD</a>.</p>
-</div>
 <div id="ref-R-golem">
 <p>Fay, Colin, Vincent Guyader, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
 </div>
-<div id="ref-R-pkgbuild">
-<p>Wickham, Hadley, and Jim Hester. 2020. <em>Pkgbuild: Find Tools Needed to Build R Packages</em>. <a href="https://github.com/r-lib/pkgbuild">https://github.com/r-lib/pkgbuild</a>.</p>
+<div id="ref-R-here">
+<p>Müller, Kirill. 2017. <em>Here: A Simpler Way to Find Your Files</em>.</p>
 </div>
-<div id="ref-R-dccvalidator">
-<p>Woo, Kara, Nicole Kauer, and Kelsey Montgomery. 2020. <em>Dccvalidator: Metadata Validation for Data Coordinating Centers</em>.</p>
-</div>
-</div>
-<div class="footnotes">
-<hr />
-<ol start="53">
-<li id="fn53"><p>This is also true for any other Version Control system<a href="deploy.html#fnref53" class="footnote-back">↩︎</a></p></li>
-</ol>
 </div>
 <hr/>
 <footer>
@@ -676,8 +694,8 @@ Otherwise you might have to add them manually.</p>
           </div>
         </div>
       </div>
-<a href="version-control.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="need-for-optimization.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="dont-rush-into-coding.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="building-ispum-app.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -708,7 +726,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/13-deploy.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/08-step-by-step-prototype.Rmd",
 "text": "Edit"
 },
 "history": {

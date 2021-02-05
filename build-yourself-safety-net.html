@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 11 Build yourself a safety net | Engineering Production-Grade Shiny Apps</title>
+  <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
+  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 11 Build yourself a safety net | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
+  <meta property="og:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
+  <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 11 Build yourself a safety net | Engineering Production-Grade Shiny Apps" />
+  
+  <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
+
+<meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
+
+
+<meta name="date" content="2021-02-05" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+<link rel="prev" href="build-app-golem.html"/>
+<link rel="next" href="version-control.html"/>
+<script src="libs/jquery/jquery.min.js"></script>
+<link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<script src="libs/accessible-code-block/empty-anchor.js"></script>
+<link href="libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections/anchor-sections.js"></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-149994171-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-149994171-1');
+</script>
+
+
+<style type="text/css">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+<link rel="stylesheet" href="css/thinkr.css" type="text/css" />
+<link rel="stylesheet" href="css/style_gitbook.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Engineering Production-Grade Shiny Apps</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a><ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#motivation"><i class="fa fa-check"></i>Motivation</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#who-is-this-book-for"><i class="fa fa-check"></i>Who is this book for</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#what-is-production"><i class="fa fa-check"></i>What is “production”?</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#book-structure"><i class="fa fa-check"></i>Book structure</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#about-the-authors"><i class="fa fa-check"></i>About the authors</a><ul>
+<li><a href="index.html#colin-fay"><a href="https://colinfay.me/">Colin Fay</a></a></li>
+<li><a href="index.html#sébastien-rochette"><a href="https://statnmap.com/">Sébastien Rochette</a></a></li>
+<li><a href="index.html#vincent-guyader"><a href="https://twitter.com/VincentGuyader">Vincent Guyader</a></a></li>
+<li><a href="index.html#cervan-girard"><a href="https://twitter.com/CervanGirard">Cervan Girard</a></a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#want-to-help"><i class="fa fa-check"></i>Want to help?</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#other-resources"><i class="fa fa-check"></i>Other resources</a><ul>
+<li><a href="index.html#getting-started-with-shiny">Getting started with <code>{shiny}</code></a></li>
+<li><a href="index.html#shiny-into-production"><code>{shiny}</code> into production</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i>Disclaimer</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information-and-conventions"><i class="fa fa-check"></i>Software information and conventions</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a><ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#special-thank"><i class="fa fa-check"></i>Special thank</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#contributors-to-this-book"><i class="fa fa-check"></i>Contributors to this book</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="foreword.html"><a href="foreword.html"><i class="fa fa-check"></i>Foreword</a></li>
+<li class="chapter" data-level="" data-path="applications-presentation.html"><a href="applications-presentation.html"><i class="fa fa-check"></i>Applications presentation</a><ul>
+<li><a href="applications-presentation.html#hexmake"><code>{hexmake}</code></a></li>
+<li><a href="applications-presentation.html#tidytuesday201942"><code>{tidytuesday201942}</code></a></li>
+<li><a href="applications-presentation.html#minifying"><code>{minifying}</code></a></li>
+<li class="chapter" data-level="" data-path="applications-presentation.html"><a href="applications-presentation.html#other-applications"><i class="fa fa-check"></i>Other applications</a></li>
+</ul></li>
+<li class="part"><span><b>I Building Successful <code>{shiny}</code> Apps</b></span></li>
+<li class="chapter" data-level="1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html"><i class="fa fa-check"></i><b>1</b> About Successful <code>{shiny}</code> Apps</a><ul>
+<li class="chapter" data-level="1.1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#a-very-short-introduction-to-shiny"><i class="fa fa-check"></i><b>1.1</b> A (very) short introduction to <code>{shiny}</code></a></li>
+<li class="chapter" data-level="1.2" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#complex-shiny"><i class="fa fa-check"></i><b>1.2</b> What is a Complex <code>{shiny}</code> Application?</a><ul>
+<li class="chapter" data-level="1.2.1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#reaching-the-cliff-of-complexity"><i class="fa fa-check"></i><b>1.2.1</b> Reaching the cliff of complexity</a></li>
+<li class="chapter" data-level="1.2.2" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#balancing-complexities"><i class="fa fa-check"></i><b>1.2.2</b> Balancing complexities</a></li>
+<li class="chapter" data-level="1.2.3" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#assessing-code-complexity"><i class="fa fa-check"></i><b>1.2.3</b> Assessing Code Complexity</a></li>
+<li class="chapter" data-level="1.2.4" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#production-grade-software-engineering"><i class="fa fa-check"></i><b>1.2.4</b> Production Grade Software Engineering</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#what-is-a-successful-shiny-app"><i class="fa fa-check"></i><b>1.3</b> What is a successful <code>{shiny}</code> App?</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-exists"><i class="fa fa-check"></i><b>1.3.1</b> It exists</a></li>
+<li class="chapter" data-level="1.3.2" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-is-accurate"><i class="fa fa-check"></i><b>1.3.2</b> It is accurate</a></li>
+<li class="chapter" data-level="1.3.3" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-is-usable"><i class="fa fa-check"></i><b>1.3.3</b> It is usable</a></li>
+<li class="chapter" data-level="1.3.4" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-is-immortal"><i class="fa fa-check"></i><b>1.3.4</b> It is immortal</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="planning-ahead.html"><a href="planning-ahead.html"><i class="fa fa-check"></i><b>2</b> Planning Ahead</a><ul>
+<li class="chapter" data-level="2.1" data-path="planning-ahead.html"><a href="planning-ahead.html#working-with-a-long-term-mindset"><i class="fa fa-check"></i><b>2.1</b> Working with a “long-term” mindset</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="planning-ahead.html"><a href="planning-ahead.html#prepare-for-success"><i class="fa fa-check"></i><b>2.1.1</b> Prepare for success</a></li>
+<li class="chapter" data-level="2.1.2" data-path="planning-ahead.html"><a href="planning-ahead.html#develop-with-the-kiss-principle"><i class="fa fa-check"></i><b>2.1.2</b> Develop with the KISS principle</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="planning-ahead.html"><a href="planning-ahead.html#working-as-a-team-tools-structure"><i class="fa fa-check"></i><b>2.2</b> Working as a team: Tools &amp; Structure</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="planning-ahead.html"><a href="planning-ahead.html#from-the-tools-point-of-view"><i class="fa fa-check"></i><b>2.2.1</b> From the tools point of view</a></li>
+<li class="chapter" data-level="2.2.2" data-path="planning-ahead.html"><a href="planning-ahead.html#from-the-team-point-of-view"><i class="fa fa-check"></i><b>2.2.2</b> From the Team Point of View</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="structuring-project.html"><a href="structuring-project.html"><i class="fa fa-check"></i><b>3</b> Structuring your Project</a><ul>
+<li class="chapter" data-level="3.1" data-path="structuring-project.html"><a href="structuring-project.html#shiny-app-as-a-package"><i class="fa fa-check"></i><b>3.1</b> <code>{shiny}</code> App as a Package</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="structuring-project.html"><a href="structuring-project.html#what-is-in-a-production-grade-shiny-app"><i class="fa fa-check"></i><b>3.1.1</b> What is in a production-grade <code>{shiny}</code> App?</a></li>
+<li class="chapter" data-level="3.1.2" data-path="structuring-project.html"><a href="structuring-project.html#resources"><i class="fa fa-check"></i><b>3.1.2</b> Resources</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="structuring-project.html"><a href="structuring-project.html#using-shiny-modules"><i class="fa fa-check"></i><b>3.2</b> Using <code>{shiny}</code> Modules</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="structuring-project.html"><a href="structuring-project.html#why-using-shiny-modules"><i class="fa fa-check"></i><b>3.2.1</b> Why using <code>{shiny}</code> modules?</a></li>
+<li class="chapter" data-level="3.2.2" data-path="structuring-project.html"><a href="structuring-project.html#when-to-use-shiny-modules"><i class="fa fa-check"></i><b>3.2.2</b> When to use <code>{shiny}</code> modules</a></li>
+<li class="chapter" data-level="3.2.3" data-path="structuring-project.html"><a href="structuring-project.html#a-practical-walk-through"><i class="fa fa-check"></i><b>3.2.3</b> A practical walk through</a></li>
+<li class="chapter" data-level="3.2.4" data-path="structuring-project.html"><a href="structuring-project.html#communication-between-modules"><i class="fa fa-check"></i><b>3.2.4</b> Communication between modules</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="structuring-project.html"><a href="structuring-project.html#structuring-your-app"><i class="fa fa-check"></i><b>3.3</b> Structuring your app</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="structuring-project.html"><a href="structuring-project.html#business-logic-application-logic"><i class="fa fa-check"></i><b>3.3.1</b> Business logic &amp; application logic</a></li>
+<li class="chapter" data-level="3.3.2" data-path="structuring-project.html"><a href="structuring-project.html#small-is-beautiful-bis-repetita"><i class="fa fa-check"></i><b>3.3.2</b> Small is beautiful (bis repetita)</a></li>
+<li class="chapter" data-level="3.3.3" data-path="structuring-project.html"><a href="structuring-project.html#conventions-matter"><i class="fa fa-check"></i><b>3.3.3</b> Conventions matter</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="golem.html"><a href="golem.html"><i class="fa fa-check"></i><b>4</b> Introduction to <code>{golem}</code></a><ul>
+<li class="chapter" data-level="4.1" data-path="golem.html"><a href="golem.html#what-is-golem"><i class="fa fa-check"></i><b>4.1</b> What is <code>{golem}</code>?</a></li>
+<li class="chapter" data-level="4.2" data-path="golem.html"><a href="golem.html#understanding-golem-app-structure"><i class="fa fa-check"></i><b>4.2</b> Understanding <code>{golem}</code> app structure</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="golem.html"><a href="golem.html#description-namespace"><i class="fa fa-check"></i><b>4.2.1</b> <code>DESCRIPTION</code> &amp; <code>NAMESPACE</code></a></li>
+<li class="chapter" data-level="4.2.2" data-path="golem.html"><a href="golem.html#r"><i class="fa fa-check"></i><b>4.2.2</b> R/</a></li>
+<li class="chapter" data-level="4.2.3" data-path="golem.html"><a href="golem.html#golem-config"><i class="fa fa-check"></i><b>4.2.3</b> <code>golem-config</code></a></li>
+<li class="chapter" data-level="4.2.4" data-path="golem.html"><a href="golem.html#instappwww"><i class="fa fa-check"></i><b>4.2.4</b> <code>inst/app/www/</code></a></li>
+<li class="chapter" data-level="4.2.5" data-path="golem.html"><a href="golem.html#dev"><i class="fa fa-check"></i><b>4.2.5</b> <code>dev/</code></a></li>
+<li class="chapter" data-level="4.2.6" data-path="golem.html"><a href="golem.html#man"><i class="fa fa-check"></i><b>4.2.6</b> <code>man/</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="workflow.html"><a href="workflow.html"><i class="fa fa-check"></i><b>5</b> The workflow</a><ul>
+<li class="chapter" data-level="5.1" data-path="workflow.html"><a href="workflow.html#step-1-design"><i class="fa fa-check"></i><b>5.1</b> Step 1: Design</a></li>
+<li class="chapter" data-level="5.2" data-path="workflow.html"><a href="workflow.html#step-2-prototype"><i class="fa fa-check"></i><b>5.2</b> Step 2: Prototype</a></li>
+<li class="chapter" data-level="5.3" data-path="workflow.html"><a href="workflow.html#step-3-build"><i class="fa fa-check"></i><b>5.3</b> Step 3: Build</a></li>
+<li class="chapter" data-level="5.4" data-path="workflow.html"><a href="workflow.html#step-4-strengthen"><i class="fa fa-check"></i><b>5.4</b> Step 4: Strengthen</a></li>
+<li class="chapter" data-level="5.5" data-path="workflow.html"><a href="workflow.html#step-5-deploy"><i class="fa fa-check"></i><b>5.5</b> Step 5: Deploy</a></li>
+</ul></li>
+<li class="part"><span><b>II Step 1: Design</b></span></li>
+<li class="chapter" data-level="6" data-path="ux-matters.html"><a href="ux-matters.html"><i class="fa fa-check"></i><b>6</b> UX Matters</a><ul>
+<li class="chapter" data-level="6.1" data-path="ux-matters.html"><a href="ux-matters.html#simplicity-is-gold"><i class="fa fa-check"></i><b>6.1</b> Simplicity is Gold</a><ul>
+<li class="chapter" data-level="6.1.1" data-path="ux-matters.html"><a href="ux-matters.html#how-we-read-the-web-scanning-content"><i class="fa fa-check"></i><b>6.1.1</b> How we read the web: scanning content</a></li>
+<li class="chapter" data-level="6.1.2" data-path="ux-matters.html"><a href="ux-matters.html#building-a-self-evident-app-or-at-least-self-explanatory"><i class="fa fa-check"></i><b>6.1.2</b> Building a self-evident app (or at least self-explanatory)</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="ux-matters.html"><a href="ux-matters.html#the-danger-of-feature-creep"><i class="fa fa-check"></i><b>6.2</b> The danger of feature-creep</a><ul>
+<li class="chapter" data-level="6.2.1" data-path="ux-matters.html"><a href="ux-matters.html#what-is-feature-creep"><i class="fa fa-check"></i><b>6.2.1</b> What is feature-creep?</a></li>
+<li class="chapter" data-level="6.2.2" data-path="ux-matters.html"><a href="ux-matters.html#too-much-reactivity"><i class="fa fa-check"></i><b>6.2.2</b> Too much reactivity</a></li>
+<li class="chapter" data-level="6.2.3" data-path="ux-matters.html"><a href="ux-matters.html#too-much-interactivity"><i class="fa fa-check"></i><b>6.2.3</b> Too much interactivity</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="ux-matters.html"><a href="ux-matters.html#web-accessibility"><i class="fa fa-check"></i><b>6.3</b> Web Accessibility</a><ul>
+<li class="chapter" data-level="6.3.1" data-path="ux-matters.html"><a href="ux-matters.html#about-accessibility"><i class="fa fa-check"></i><b>6.3.1</b> About Accessibility</a></li>
+<li class="chapter" data-level="6.3.2" data-path="ux-matters.html"><a href="ux-matters.html#making-your-app-accessible"><i class="fa fa-check"></i><b>6.3.2</b> Making your App Accessible</a></li>
+<li class="chapter" data-level="6.3.3" data-path="ux-matters.html"><a href="ux-matters.html#evaluating-your-app-accessibility-further-reading"><i class="fa fa-check"></i><b>6.3.3</b> Evaluating your App Accessibility &amp; Further reading</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html"><i class="fa fa-check"></i><b>7</b> Don’t rush into coding</a><ul>
+<li class="chapter" data-level="7.1" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#designing-before-coding"><i class="fa fa-check"></i><b>7.1</b> Designing before coding</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#the-urge-to-code"><i class="fa fa-check"></i><b>7.1.1</b> The Urge to Code</a></li>
+<li class="chapter" data-level="7.1.2" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#knowing-where-to-search"><i class="fa fa-check"></i><b>7.1.2</b> Knowing where to search</a></li>
+<li class="chapter" data-level="7.1.3" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#about-concept-map"><i class="fa fa-check"></i><b>7.1.3</b> About Concept Map</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#ask-questions"><i class="fa fa-check"></i><b>7.2</b> Ask questions</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#about-the-end-users"><i class="fa fa-check"></i><b>7.2.1</b> About the end users</a></li>
+<li class="chapter" data-level="7.2.2" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#building-personas"><i class="fa fa-check"></i><b>7.2.2</b> Building personas</a></li>
+<li class="chapter" data-level="7.2.3" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#pre-existing-code-base"><i class="fa fa-check"></i><b>7.2.3</b> Pre-existing code-base</a></li>
+<li class="chapter" data-level="7.2.4" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#deployment"><i class="fa fa-check"></i><b>7.2.4</b> Deployment</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>III Step 2: Prototype</b></span></li>
+<li class="chapter" data-level="8" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html"><i class="fa fa-check"></i><b>8</b> Setting up for success with <code>{golem}</code></a><ul>
+<li class="chapter" data-level="8.1" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#create-a-golem"><i class="fa fa-check"></i><b>8.1</b> Create a <code>{golem}</code></a></li>
+<li class="chapter" data-level="8.2" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#setting-things-up-with-dev01_start.r"><i class="fa fa-check"></i><b>8.2</b> Setting things up with <code>dev/01_start.R</code></a><ul>
+<li class="chapter" data-level="8.2.1" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#fill-the-description-and-set-options"><i class="fa fa-check"></i><b>8.2.1</b> Fill the DESCRIPTION and set options</a></li>
+<li class="chapter" data-level="8.2.2" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#set-common-files"><i class="fa fa-check"></i><b>8.2.2</b> Set common Files</a></li>
+<li class="chapter" data-level="8.2.3" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#use-recommended-elements"><i class="fa fa-check"></i><b>8.2.3</b> Use Recommended Elements</a></li>
+<li class="chapter" data-level="8.2.4" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#add-utilitary-functions"><i class="fa fa-check"></i><b>8.2.4</b> Add utilitary functions</a></li>
+<li class="chapter" data-level="8.2.5" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#changing-the-favicon"><i class="fa fa-check"></i><b>8.2.5</b> Changing the favicon</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#setting-infrastructure-for-prototyping"><i class="fa fa-check"></i><b>8.3</b> Setting infrastructure for prototyping</a><ul>
+<li class="chapter" data-level="8.3.1" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#add-modules-in-dev02_dev.r"><i class="fa fa-check"></i><b>8.3.1</b> Add modules in <code>dev/02_dev.R</code></a></li>
+<li class="chapter" data-level="8.3.2" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#add-css-js-files"><i class="fa fa-check"></i><b>8.3.2</b> Add CSS &amp; JS Files</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="building-ispum-app.html"><a href="building-ispum-app.html"><i class="fa fa-check"></i><b>9</b> Building an “ipsum-app”</a><ul>
+<li class="chapter" data-level="9.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#prototyping-is-crucial"><i class="fa fa-check"></i><b>9.1</b> Prototyping is crucial</a><ul>
+<li class="chapter" data-level="9.1.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#prototype-then-polish"><i class="fa fa-check"></i><b>9.1.1</b> Prototype, then polish</a></li>
+<li class="chapter" data-level="9.1.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#the-ui-first-approach"><i class="fa fa-check"></i><b>9.1.2</b> The “UI first” approach</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#prototyping-shiny"><i class="fa fa-check"></i><b>9.2</b> Prototyping <code>{shiny}</code></a><ul>
+<li class="chapter" data-level="9.2.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#fast-ui-prototyping-with-shinipsum"><i class="fa fa-check"></i><b>9.2.1</b> Fast UI Prototyping with <code>{shinipsum}</code></a></li>
+<li class="chapter" data-level="9.2.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#using-fakir-for-fake-data-generation"><i class="fa fa-check"></i><b>9.2.2</b> Using <code>{fakir}</code> for fake data generation</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="building-ispum-app.html"><a href="building-ispum-app.html#proto-rmdfirst"><i class="fa fa-check"></i><b>9.3</b> Building with RMarkdown</a><ul>
+<li class="chapter" data-level="9.3.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#define-the-content-of-the-application"><i class="fa fa-check"></i><b>9.3.1</b> Define the content of the application</a></li>
+<li class="chapter" data-level="9.3.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#using-the-rmd-files-as-a-laboratory-notebook"><i class="fa fa-check"></i><b>9.3.2</b> Using the Rmd files as a laboratory notebook</a></li>
+<li class="chapter" data-level="9.3.3" data-path="building-ispum-app.html"><a href="building-ispum-app.html#rmd-vignettes-and-documentation-first"><i class="fa fa-check"></i><b>9.3.3</b> Rmd, Vignettes, and documentation first</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>IV Step 3: Build</b></span></li>
+<li class="chapter" data-level="10" data-path="build-app-golem.html"><a href="build-app-golem.html"><i class="fa fa-check"></i><b>10</b> Building the app with <code>{golem}</code></a><ul>
+<li class="chapter" data-level="10.1" data-path="build-app-golem.html"><a href="build-app-golem.html#add-dependencies"><i class="fa fa-check"></i><b>10.1</b> Add dependencies</a><ul>
+<li class="chapter" data-level="10.1.1" data-path="build-app-golem.html"><a href="build-app-golem.html#package-dependencies"><i class="fa fa-check"></i><b>10.1.1</b> Package dependencies</a></li>
+<li class="chapter" data-level="10.1.2" data-path="build-app-golem.html"><a href="build-app-golem.html#importing-packages-and-functions"><i class="fa fa-check"></i><b>10.1.2</b> Importing packages and functions</a></li>
+</ul></li>
+<li class="chapter" data-level="10.2" data-path="build-app-golem.html"><a href="build-app-golem.html#submodules-and-utility-functions"><i class="fa fa-check"></i><b>10.2</b> Submodules and utility functions</a></li>
+<li class="chapter" data-level="10.3" data-path="build-app-golem.html"><a href="build-app-golem.html#add-tests"><i class="fa fa-check"></i><b>10.3</b> Add tests</a></li>
+<li class="chapter" data-level="10.4" data-path="build-app-golem.html"><a href="build-app-golem.html#documentation-and-code-coverage"><i class="fa fa-check"></i><b>10.4</b> Documentation and Code Coverage</a><ul>
+<li class="chapter" data-level="10.4.1" data-path="build-app-golem.html"><a href="build-app-golem.html#vignette"><i class="fa fa-check"></i><b>10.4.1</b> Vignette</a></li>
+<li class="chapter" data-level="10.4.2" data-path="build-app-golem.html"><a href="build-app-golem.html#code-coverage-continuous-integration"><i class="fa fa-check"></i><b>10.4.2</b> Code Coverage &amp; Continuous Integration</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="build-app-golem.html"><a href="build-app-golem.html#using-golem-dev-functions"><i class="fa fa-check"></i><b>10.5</b> Using <code>{golem}</code> dev functions</a></li>
+</ul></li>
+<li class="part"><span><b>V Step 4: Strengthen</b></span></li>
+<li class="chapter" data-level="11" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html"><i class="fa fa-check"></i><b>11</b> Build yourself a safety net</a><ul>
+<li class="chapter" data-level="11.1" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-your-app"><i class="fa fa-check"></i><b>11.1</b> Testing your app</a><ul>
+<li class="chapter" data-level="11.1.1" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-the-business-logic"><i class="fa fa-check"></i><b>11.1.1</b> Testing the business logic</a></li>
+<li class="chapter" data-level="11.1.2" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#shinytestserver"><i class="fa fa-check"></i><b>11.1.2</b> <code>shiny::testServer()</code></a></li>
+<li class="chapter" data-level="11.1.3" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-the-interactive-logic"><i class="fa fa-check"></i><b>11.1.3</b> Testing the interactive logic</a></li>
+<li class="chapter" data-level="11.1.4" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-the-app-load"><i class="fa fa-check"></i><b>11.1.4</b> Testing the app load</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#a-reproducible-environment"><i class="fa fa-check"></i><b>11.2</b> A reproducible environment</a><ul>
+<li class="chapter" data-level="11.2.1" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#renv"><i class="fa fa-check"></i><b>11.2.1</b> <code>{renv}</code></a></li>
+<li class="chapter" data-level="11.2.2" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#docker"><i class="fa fa-check"></i><b>11.2.2</b> Docker</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="version-control.html"><a href="version-control.html"><i class="fa fa-check"></i><b>12</b> Version Control</a><ul>
+<li class="chapter" data-level="12.1" data-path="version-control.html"><a href="version-control.html#version-control"><i class="fa fa-check"></i><b>12.1</b> Using Version Control with <code>git</code></a><ul>
+<li class="chapter" data-level="12.1.1" data-path="version-control.html"><a href="version-control.html#why-version-control"><i class="fa fa-check"></i><b>12.1.1</b> Why Version Control?</a></li>
+<li class="chapter" data-level="12.1.2" data-path="version-control.html"><a href="version-control.html#git-basics-add---commit---push---pull"><i class="fa fa-check"></i><b>12.1.2</b> <code>Git</code> basics: <code>add</code> - <code>commit</code> - <code>push</code> - <code>pull</code></a></li>
+<li class="chapter" data-level="12.1.3" data-path="version-control.html"><a href="version-control.html#about-branches"><i class="fa fa-check"></i><b>12.1.3</b> About branches</a></li>
+<li class="chapter" data-level="12.1.4" data-path="version-control.html"><a href="version-control.html#issues"><i class="fa fa-check"></i><b>12.1.4</b> Issues</a></li>
+</ul></li>
+<li class="chapter" data-level="12.2" data-path="version-control.html"><a href="version-control.html#git-integration"><i class="fa fa-check"></i><b>12.2</b> Git integration</a><ul>
+<li class="chapter" data-level="12.2.1" data-path="version-control.html"><a href="version-control.html#with-rstudio"><i class="fa fa-check"></i><b>12.2.1</b> With RStudio</a></li>
+<li class="chapter" data-level="12.2.2" data-path="version-control.html"><a href="version-control.html#as-part-of-a-larger-world"><i class="fa fa-check"></i><b>12.2.2</b> As part of a larger world</a></li>
+<li class="chapter" data-level="12.2.3" data-path="version-control.html"><a href="version-control.html#about-git-flow"><i class="fa fa-check"></i><b>12.2.3</b> About <code>git-flow</code></a></li>
+<li class="chapter" data-level="12.2.4" data-path="version-control.html"><a href="version-control.html#further-readings-on-git"><i class="fa fa-check"></i><b>12.2.4</b> Further readings on <code>git</code></a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="version-control.html"><a href="version-control.html#automated-testing"><i class="fa fa-check"></i><b>12.3</b> Automated testing</a></li>
+</ul></li>
+<li class="part"><span><b>VI Step 5: Deploy</b></span></li>
+<li class="chapter" data-level="13" data-path="deploy.html"><a href="deploy.html"><i class="fa fa-check"></i><b>13</b> Deploy your application</a><ul>
+<li class="chapter" data-level="13.1" data-path="deploy.html"><a href="deploy.html#before-deployment-check-list"><i class="fa fa-check"></i><b>13.1</b> Before deployment Check-list</a></li>
+<li class="chapter" data-level="13.2" data-path="deploy.html"><a href="deploy.html#sharing-your-app-as-a-package"><i class="fa fa-check"></i><b>13.2</b> Sharing your app as a package</a><ul>
+<li class="chapter" data-level="13.2.1" data-path="deploy.html"><a href="deploy.html#install-on-your-machine"><i class="fa fa-check"></i><b>13.2.1</b> Install on your machine</a></li>
+<li class="chapter" data-level="13.2.2" data-path="deploy.html"><a href="deploy.html#share-as-built-package"><i class="fa fa-check"></i><b>13.2.2</b> Share as built package</a></li>
+</ul></li>
+<li class="chapter" data-level="13.3" data-path="deploy.html"><a href="deploy.html#deploying-apps-with-golem"><i class="fa fa-check"></i><b>13.3</b> Deploying Apps with <code>{golem}</code></a><ul>
+<li class="chapter" data-level="13.3.1" data-path="deploy.html"><a href="deploy.html#rstudio-environments"><i class="fa fa-check"></i><b>13.3.1</b> RStudio Environments</a></li>
+<li class="chapter" data-level="13.3.2" data-path="deploy.html"><a href="deploy.html#docker-1"><i class="fa fa-check"></i><b>13.3.2</b> Docker</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>VII Optimizing</b></span></li>
+<li class="chapter" data-level="14" data-path="need-for-optimization.html"><a href="need-for-optimization.html"><i class="fa fa-check"></i><b>14</b> The Need for Optimization</a><ul>
+<li class="chapter" data-level="14.1" data-path="need-for-optimization.html"><a href="need-for-optimization.html#build-first-then-optimize"><i class="fa fa-check"></i><b>14.1</b> Build first, then optimize</a><ul>
+<li class="chapter" data-level="14.1.1" data-path="need-for-optimization.html"><a href="need-for-optimization.html#identifying-bottlenecks"><i class="fa fa-check"></i><b>14.1.1</b> Identifying bottlenecks</a></li>
+<li class="chapter" data-level="14.1.2" data-path="need-for-optimization.html"><a href="need-for-optimization.html#do-you-need-faster-functions"><i class="fa fa-check"></i><b>14.1.2</b> Do you need faster functions?</a></li>
+<li class="chapter" data-level="14.1.3" data-path="need-for-optimization.html"><a href="need-for-optimization.html#dont-sacrifice-readability"><i class="fa fa-check"></i><b>14.1.3</b> Don’t sacrifice readability</a></li>
+</ul></li>
+<li class="chapter" data-level="14.2" data-path="need-for-optimization.html"><a href="need-for-optimization.html#tools-for-profiling"><i class="fa fa-check"></i><b>14.2</b> Tools for profiling</a><ul>
+<li class="chapter" data-level="14.2.1" data-path="need-for-optimization.html"><a href="need-for-optimization.html#profiling-r-code"><i class="fa fa-check"></i><b>14.2.1</b> Profiling R code</a></li>
+<li class="chapter" data-level="14.2.2" data-path="need-for-optimization.html"><a href="need-for-optimization.html#profiling-shiny"><i class="fa fa-check"></i><b>14.2.2</b> Profiling <code>{shiny}</code></a></li>
+<li class="chapter" data-level="14.2.3" data-path="need-for-optimization.html"><a href="need-for-optimization.html#more-resources-about-web-page-performance"><i class="fa fa-check"></i><b>14.2.3</b> More resources about web page performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="15" data-path="common-app-caveats.html"><a href="common-app-caveats.html"><i class="fa fa-check"></i><b>15</b> Common Application Caveats</a><ul>
+<li class="chapter" data-level="15.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reactivity-anti-patterns"><i class="fa fa-check"></i><b>15.1</b> Reactivity anti-patterns</a><ul>
+<li class="chapter" data-level="15.1.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reactivity-is-awesome-until-it-is-not"><i class="fa fa-check"></i><b>15.1.1</b> Reactivity is awesome… until it is not</a></li>
+<li class="chapter" data-level="15.1.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#observe-vs-observeevent"><i class="fa fa-check"></i><b>15.1.2</b> <code>observe</code> vs <code>observeEvent</code></a></li>
+<li class="chapter" data-level="15.1.3" data-path="common-app-caveats.html"><a href="common-app-caveats.html#building-triggers-and-watchers"><i class="fa fa-check"></i><b>15.1.3</b> Building triggers and watchers</a></li>
+<li class="chapter" data-level="15.1.4" data-path="common-app-caveats.html"><a href="common-app-caveats.html#using-r6-as-a-data-storage"><i class="fa fa-check"></i><b>15.1.4</b> Using R6 as a data storage</a></li>
+<li class="chapter" data-level="15.1.5" data-path="common-app-caveats.html"><a href="common-app-caveats.html#logging-reactivity-with-whereami"><i class="fa fa-check"></i><b>15.1.5</b> Logging reactivity with <code>{whereami}</code></a></li>
+</ul></li>
+<li class="chapter" data-level="15.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#r-does-too-much"><i class="fa fa-check"></i><b>15.2</b> R does too much</a><ul>
+<li class="chapter" data-level="15.2.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#rendering-ui-from-server-side"><i class="fa fa-check"></i><b>15.2.1</b> Rendering UI from server side</a></li>
+<li class="chapter" data-level="15.2.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#too-much-data-in-memory"><i class="fa fa-check"></i><b>15.2.2</b> Too Much Data in Memory</a></li>
+</ul></li>
+<li class="chapter" data-level="15.3" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reading-data"><i class="fa fa-check"></i><b>15.3</b> Reading data</a><ul>
+<li class="chapter" data-level="15.3.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#including-data-in-your-application"><i class="fa fa-check"></i><b>15.3.1</b> Including Data in your Application</a></li>
+<li class="chapter" data-level="15.3.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reading-external-datasets"><i class="fa fa-check"></i><b>15.3.2</b> Reading External Datasets</a></li>
+<li class="chapter" data-level="15.3.3" data-path="common-app-caveats.html"><a href="common-app-caveats.html#using-external-databases"><i class="fa fa-check"></i><b>15.3.3</b> Using External Databases</a></li>
+<li class="chapter" data-level="15.3.4" data-path="common-app-caveats.html"><a href="common-app-caveats.html#data-source-checklist"><i class="fa fa-check"></i><b>15.3.4</b> Data Source Checklist</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="16" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html"><i class="fa fa-check"></i><b>16</b> Optimizing <code>{shiny}</code> Code</a><ul>
+<li class="chapter" data-level="16.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#optimizing-r-code"><i class="fa fa-check"></i><b>16.1</b> Optimizing R code</a></li>
+<li class="chapter" data-level="16.2" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#caching-elements"><i class="fa fa-check"></i><b>16.2</b> Caching elements</a><ul>
+<li class="chapter" data-level="16.2.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#what-is-caching"><i class="fa fa-check"></i><b>16.2.1</b> What is caching?</a></li>
+<li class="chapter" data-level="16.2.2" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#native-caching-in-r"><i class="fa fa-check"></i><b>16.2.2</b> Native Caching in R</a></li>
+<li class="chapter" data-level="16.2.3" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#caching-in-shiny"><i class="fa fa-check"></i><b>16.2.3</b> Caching in <code>{shiny}</code></a></li>
+</ul></li>
+<li class="chapter" data-level="16.3" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#asynchronous-in-shiny"><i class="fa fa-check"></i><b>16.3</b> Asynchronous in <code>{shiny}</code></a><ul>
+<li class="chapter" data-level="16.3.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#how-to"><i class="fa fa-check"></i><b>16.3.1</b> How to</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="17" data-path="using-javascript.html"><a href="using-javascript.html"><i class="fa fa-check"></i><b>17</b> Using JavaScript</a><ul>
+<li class="chapter" data-level="17.1" data-path="using-javascript.html"><a href="using-javascript.html#introduction-1"><i class="fa fa-check"></i><b>17.1</b> Introduction</a></li>
+<li class="chapter" data-level="17.2" data-path="using-javascript.html"><a href="using-javascript.html#a-quick-introduction-to-javascript"><i class="fa fa-check"></i><b>17.2</b> A quick introduction to JavaScript</a><ul>
+<li class="chapter" data-level="17.2.1" data-path="using-javascript.html"><a href="using-javascript.html#about-javascript"><i class="fa fa-check"></i><b>17.2.1</b> About JavaScript</a></li>
+<li class="chapter" data-level="17.2.2" data-path="using-javascript.html"><a href="using-javascript.html#including-javascript-code-in-your-app"><i class="fa fa-check"></i><b>17.2.2</b> Including JavaScript code in your app</a></li>
+<li class="chapter" data-level="17.2.3" data-path="using-javascript.html"><a href="using-javascript.html#understanding-html-class-and-id"><i class="fa fa-check"></i><b>17.2.3</b> Understanding html, class, and id</a></li>
+<li class="chapter" data-level="17.2.4" data-path="using-javascript.html"><a href="using-javascript.html#querying-in-vanilla-javascript"><i class="fa fa-check"></i><b>17.2.4</b> Querying in Vanilla JavaScript</a></li>
+<li class="chapter" data-level="17.2.5" data-path="using-javascript.html"><a href="using-javascript.html#about-dom-events"><i class="fa fa-check"></i><b>17.2.5</b> About DOM events</a></li>
+<li class="chapter" data-level="17.2.6" data-path="using-javascript.html"><a href="using-javascript.html#about-jquery-jquery-selectors"><i class="fa fa-check"></i><b>17.2.6</b> About <code>jQuery</code> &amp; <code>jQuery</code> selectors</a></li>
+</ul></li>
+<li class="chapter" data-level="17.3" data-path="using-javascript.html"><a href="using-javascript.html#client-side-javascript"><i class="fa fa-check"></i><b>17.3</b> Client-side JavaScript</a><ul>
+<li class="chapter" data-level="17.3.1" data-path="using-javascript.html"><a href="using-javascript.html#common-patterns"><i class="fa fa-check"></i><b>17.3.1</b> Common patterns</a></li>
+<li class="chapter" data-level="17.3.2" data-path="using-javascript.html"><a href="using-javascript.html#where-to-put-them---back-to-javascript-events"><i class="fa fa-check"></i><b>17.3.2</b> Where to put them - Back to JavaScript Events</a></li>
+</ul></li>
+<li class="chapter" data-level="17.4" data-path="using-javascript.html"><a href="using-javascript.html#javascript---shiny-communication"><i class="fa fa-check"></i><b>17.4</b> JavaScript &lt;-&gt; <code>{shiny}</code> communication</a><ul>
+<li class="chapter" data-level="17.4.1" data-path="using-javascript.html"><a href="using-javascript.html#from-r-to-javascript"><i class="fa fa-check"></i><b>17.4.1</b> From R to JavaScript</a></li>
+<li class="chapter" data-level="17.4.2" data-path="using-javascript.html"><a href="using-javascript.html#from-javascript-to-r"><i class="fa fa-check"></i><b>17.4.2</b> From JavaScript to R</a></li>
+</ul></li>
+<li class="chapter" data-level="17.5" data-path="using-javascript.html"><a href="using-javascript.html#about-shinyjs-js-functions"><i class="fa fa-check"></i><b>17.5</b> About <code>{shinyjs}</code> js functions</a></li>
+<li class="chapter" data-level="17.6" data-path="using-javascript.html"><a href="using-javascript.html#one-last-thing-api-calls"><i class="fa fa-check"></i><b>17.6</b> One Last Thing: API calls</a></li>
+<li class="chapter" data-level="17.7" data-path="using-javascript.html"><a href="using-javascript.html#learn-more-about-javascript"><i class="fa fa-check"></i><b>17.7</b> Learn more about JavaScript</a><ul>
+<li class="chapter" data-level="17.7.1" data-path="using-javascript.html"><a href="using-javascript.html#shiny-javascript"><i class="fa fa-check"></i><b>17.7.1</b> <code>{shiny}</code> &amp; JavaScript</a></li>
+<li class="chapter" data-level="17.7.2" data-path="using-javascript.html"><a href="using-javascript.html#javascript-basics"><i class="fa fa-check"></i><b>17.7.2</b> JavaScript basics</a></li>
+<li class="chapter" data-level="17.7.3" data-path="using-javascript.html"><a href="using-javascript.html#jquery"><i class="fa fa-check"></i><b>17.7.3</b> jQuery</a></li>
+<li class="chapter" data-level="17.7.4" data-path="using-javascript.html"><a href="using-javascript.html#intermediate-advanced-javascript"><i class="fa fa-check"></i><b>17.7.4</b> Intermediate / advanced JavaScript</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="18" data-path="css.html"><a href="css.html"><i class="fa fa-check"></i><b>18</b> A Gentle Introduction to CSS</a><ul>
+<li class="chapter" data-level="18.1" data-path="css.html"><a href="css.html#what-is-css"><i class="fa fa-check"></i><b>18.1</b> What is CSS</a><ul>
+<li class="chapter" data-level="18.1.1" data-path="css.html"><a href="css.html#about-css"><i class="fa fa-check"></i><b>18.1.1</b> About CSS</a></li>
+<li class="chapter" data-level="18.1.2" data-path="css.html"><a href="css.html#shinys-default-fluidpage"><i class="fa fa-check"></i><b>18.1.2</b> <code>{shiny}</code>’s default: <code>fluidPage()</code></a></li>
+</ul></li>
+<li class="chapter" data-level="18.2" data-path="css.html"><a href="css.html#getting-started-with-css"><i class="fa fa-check"></i><b>18.2</b> Getting started with CSS</a><ul>
+<li class="chapter" data-level="18.2.1" data-path="css.html"><a href="css.html#about-css-syntax"><i class="fa fa-check"></i><b>18.2.1</b> About CSS syntax</a></li>
+<li class="chapter" data-level="18.2.2" data-path="css.html"><a href="css.html#css-selectors"><i class="fa fa-check"></i><b>18.2.2</b> CSS selectors</a></li>
+<li class="chapter" data-level="18.2.3" data-path="css.html"><a href="css.html#css-properties"><i class="fa fa-check"></i><b>18.2.3</b> CSS properties</a></li>
+</ul></li>
+<li class="chapter" data-level="18.3" data-path="css.html"><a href="css.html#integrate-css-files-to-your-shiny-app"><i class="fa fa-check"></i><b>18.3</b> Integrate CSS files to your <code>{shiny}</code> App</a><ul>
+<li class="chapter" data-level="18.3.1" data-path="css.html"><a href="css.html#inline-css"><i class="fa fa-check"></i><b>18.3.1</b> Inline CSS</a></li>
+<li class="chapter" data-level="18.3.2" data-path="css.html"><a href="css.html#writing-in-a-tagsstyle"><i class="fa fa-check"></i><b>18.3.2</b> Writing in a <code>tags$style()</code></a></li>
+<li class="chapter" data-level="18.3.3" data-path="css.html"><a href="css.html#including-external-files"><i class="fa fa-check"></i><b>18.3.3</b> Including External Files</a></li>
+<li class="chapter" data-level="18.3.4" data-path="css.html"><a href="css.html#using-r-packages"><i class="fa fa-check"></i><b>18.3.4</b> Using R packages</a></li>
+</ul></li>
+<li class="chapter" data-level="18.4" data-path="css.html"><a href="css.html#external-resources"><i class="fa fa-check"></i><b>18.4</b> External resources</a></li>
+</ul></li>
+<li class="part"><span><b>VIII Appendix</b></span></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html"><i class="fa fa-check"></i>Use case - Building an App, from Start to Finish</a><ul>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#about-the-application"><i class="fa fa-check"></i>About the application</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#step-1-design-1"><i class="fa fa-check"></i>Step 1: Design</a><ul>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#deciphering-the-specifications"><i class="fa fa-check"></i>Deciphering the Specifications</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#building-a-concept-map"><i class="fa fa-check"></i>Building a Concept Map</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#asking-questions"><i class="fa fa-check"></i>Asking Questions</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#building-personas-1"><i class="fa fa-check"></i>Building personas</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#step-2-prototyping"><i class="fa fa-check"></i>Step 2: Prototyping</a><ul>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#backend-in-rmd"><i class="fa fa-check"></i>Backend in Rmd</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#ui-prototyping"><i class="fa fa-check"></i>UI prototyping</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#step-3-build-1"><i class="fa fa-check"></i>Step 3: Build</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#step-4-strengthen-1"><i class="fa fa-check"></i>Step 4: Strengthen</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#step-5-deploy-1"><i class="fa fa-check"></i>Step 5: Deploy</a><ul>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#before-deploy-checklist"><i class="fa fa-check"></i>Before deploy checklist</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#deploy-as-a-tar.gz"><i class="fa fa-check"></i>Deploy as a tar.gz</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#deploy-on-rstudio-connect"><i class="fa fa-check"></i>Deploy on RStudio Connect</a></li>
+<li class="chapter" data-level="" data-path="use-case-building-an-app-from-start-to-finish.html"><a href="use-case-building-an-app-from-start-to-finish.html#deploy-with-docker"><i class="fa fa-check"></i>Deploy with Docker</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="session-info.html"><a href="session-info.html"><i class="fa fa-check"></i>Session Info</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://rtask.thinkr.fr">A book by the ThinkR team</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Engineering Production-Grade Shiny Apps</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="build-yourself-safety-net" class="section level1">
+<h1><span class="header-section-number">Chapter 11</span> Build yourself a safety net</h1>
+<blockquote>
+<p>“Don’t fuck over Future You”<br />
+<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<style>.right{ text-align: right;}</style>
+<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<div class="right">
+<a href="https://twitter.com/CMastication">JD</a>
+</div></p>
+</blockquote>
+<p>Strengthening your app means two things: testing, and locking the application environment.</p>
+<div id="testing-your-app" class="section level2">
+<h2><span class="header-section-number">11.1</span> Testing your app</h2>
+<p>The process of getting your application production-ready implies that the application is tested.
+With a robust testing suite, you will develop, maintain, and improve in a safe environment and ensure your project sustainability.
+What will you be testing?
+Both sides of the application: the business logic and the user interface.
+And also, the application load, <em>i.e</em> how much time and memory is required when your application starts being used by a significant amount of users, be it from the user perspective (how long does it take to complete a full scenario) and from the server perspective (how much memory is needed for my app to run).</p>
+<div id="testing-the-business-logic" class="section level3">
+<h3><span class="header-section-number">11.1.1</span> Testing the business logic</h3>
+<p>If you have been following the good practices we have listed in previous chapters, your current application has at least these two properties:</p>
+<ul>
+<li>The business-logic functions are separated from your interactive-logic functions.</li>
+<li>Your application is inside a package.</li>
+</ul>
+<p>On top of being a sane organization approach, <strong>using this separation inside a package structure allows to leverage all the tooling that has been built for testing “standard” packages</strong>.</p>
+<p>R developers have been developing packages for a long time, and at the time of writing these lines (April 2020), more than 15,000 packages are available on CRAN.
+To sustain these developments, a lot of tools have been created to secure the development process, and especially tools for creating unit tests for your package.</p>
+<p>Unit tests are a general concept in software engineering that describes the process of writing a form of assessment to check the validity of your code.
+A simplified explanation is that if you write a function called <code>meaning_of_life</code> that returns <code>42</code>, you will expect this function to always return <code>42</code>, and to be alerted if ever this value changes.
+Using unit tests is a way to secure your work in the future, be it for future you, for your collaborator, or for anybody wanting to collaborate to the project: if anyone comes and change the code behind the <code>meaning_of_life()</code> function, and the result is no longer <code>42</code>, the developer working on this piece of code will be able to catch it.
+The general idea is to detect bugs and breaking changes at the moment they are happening, not once it is too late.</p>
+<p>There are several packages in R that can be used to implement unit testing, and you can even implement your own tests.
+One of the most popular right now<a href="#fn47" class="footnote-ref" id="fnref47"><sup>47</sup></a> is <code>{testthat}</code> <span class="citation">(Wickham <a href="#ref-R-testthat" role="doc-biblioref">2020</a>)</span>.
+This testing framework lets you write a series of tests and expectations, which are then launched when calling <code>test()</code> from <code>{devtools}</code> <span class="citation">(Wickham, Hester, and Chang <a href="#ref-R-devtools" role="doc-biblioref">2020</a>)</span>, either locally or in you CI system.</p>
+<p>Here is an example of testing that the <code>meaning_of_life</code> will always be <code>42</code>.</p>
+<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb130-1"><a href="build-yourself-safety-net.html#cb130-1"></a><span class="co"># Creating a testing context, with one expectation</span></span>
+<span id="cb130-2"><a href="build-yourself-safety-net.html#cb130-2"></a><span class="kw">test_that</span>(<span class="st">&quot;The meaning of life is 42&quot;</span>, {</span>
+<span id="cb130-3"><a href="build-yourself-safety-net.html#cb130-3"></a>  <span class="kw">expect_equal</span>(</span>
+<span id="cb130-4"><a href="build-yourself-safety-net.html#cb130-4"></a>    <span class="kw">meaning_of_life</span>(), </span>
+<span id="cb130-5"><a href="build-yourself-safety-net.html#cb130-5"></a>    <span class="dv">42</span></span>
+<span id="cb130-6"><a href="build-yourself-safety-net.html#cb130-6"></a>  )</span>
+<span id="cb130-7"><a href="build-yourself-safety-net.html#cb130-7"></a>})</span></code></pre></div>
+<p>Once you have this test skeleton set, you will be able to detect any change to this function.</p>
+<p>If you want to learn more about how to use <code>{testthat}</code>, you can refer to the following resources:</p>
+<ul>
+<li><p><a href="https://testthat.r-lib.org/"><code>{testthat}</code> online documentation</a></p></li>
+<li><p><a href="https://r-pkgs.org/tests.html">Chapter 10 Testing - R Packages</a></p></li>
+<li><p><a href="https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107">Part 5: Test and Code Coverage - Building a package that lasts — eRum 2018 workshop</a></p></li>
+</ul>
+</div>
+<div id="shinytestserver" class="section level3">
+<h3><span class="header-section-number">11.1.2</span> <code>shiny::testServer()</code></h3>
+<p>At the time of writing these lines, the <code>{shiny}</code> team is actively working on a new way to test <code>{shiny}</code> server functions.
+These features are still a work-in-progress, and are not available in the stable version of <code>{shiny}</code> we have used in this book (1.5.0).
+Given that these features are still subject to change, we will not go into details about these new features, but here is a preview of what it will look like:</p>
+<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="build-yourself-safety-net.html#cb131-1"></a><span class="co"># Given the following module</span></span>
+<span id="cb131-2"><a href="build-yourself-safety-net.html#cb131-2"></a>computation_module_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb131-3"><a href="build-yourself-safety-net.html#cb131-3"></a>  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</span>
+<span id="cb131-4"><a href="build-yourself-safety-net.html#cb131-4"></a>  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>(</span>
+<span id="cb131-5"><a href="build-yourself-safety-net.html#cb131-5"></a>    <span class="dt">value =</span> <span class="ot">NULL</span></span>
+<span id="cb131-6"><a href="build-yourself-safety-net.html#cb131-6"></a>  )</span>
+<span id="cb131-7"><a href="build-yourself-safety-net.html#cb131-7"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>selector , {</span>
+<span id="cb131-8"><a href="build-yourself-safety-net.html#cb131-8"></a>    r<span class="op">$</span>value &lt;-<span class="st"> </span>input<span class="op">$</span>selector <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
+<span id="cb131-9"><a href="build-yourself-safety-net.html#cb131-9"></a>  })</span>
+<span id="cb131-10"><a href="build-yourself-safety-net.html#cb131-10"></a>  </span>
+<span id="cb131-11"><a href="build-yourself-safety-net.html#cb131-11"></a>}</span>
+<span id="cb131-12"><a href="build-yourself-safety-net.html#cb131-12"></a></span>
+<span id="cb131-13"><a href="build-yourself-safety-net.html#cb131-13"></a><span class="co"># We can test it that way</span></span>
+<span id="cb131-14"><a href="build-yourself-safety-net.html#cb131-14"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb131-15"><a href="build-yourself-safety-net.html#cb131-15"></a><span class="kw">library</span>(testthat)</span>
+<span id="cb131-16"><a href="build-yourself-safety-net.html#cb131-16"></a><span class="kw">testModule</span>(computation_module_server, {</span>
+<span id="cb131-17"><a href="build-yourself-safety-net.html#cb131-17"></a></span>
+<span id="cb131-18"><a href="build-yourself-safety-net.html#cb131-18"></a>  <span class="co"># Give input$selector a value</span></span>
+<span id="cb131-19"><a href="build-yourself-safety-net.html#cb131-19"></a>  session<span class="op">$</span><span class="kw">setInputs</span>(<span class="dt">selector =</span> <span class="dv">1</span>)</span>
+<span id="cb131-20"><a href="build-yourself-safety-net.html#cb131-20"></a>  <span class="co"># Call {testthat} functions</span></span>
+<span id="cb131-21"><a href="build-yourself-safety-net.html#cb131-21"></a>  <span class="kw">expect_equal</span>(r<span class="op">$</span>value, <span class="dv">10</span>)</span>
+<span id="cb131-22"><a href="build-yourself-safety-net.html#cb131-22"></a></span>
+<span id="cb131-23"><a href="build-yourself-safety-net.html#cb131-23"></a>  <span class="co"># Give input$selector a value</span></span>
+<span id="cb131-24"><a href="build-yourself-safety-net.html#cb131-24"></a>  session<span class="op">$</span><span class="kw">setInputs</span>(<span class="dt">selector =</span> <span class="dv">2</span>)</span>
+<span id="cb131-25"><a href="build-yourself-safety-net.html#cb131-25"></a>  <span class="co"># Call {testthat} functions</span></span>
+<span id="cb131-26"><a href="build-yourself-safety-net.html#cb131-26"></a>  <span class="kw">expect_equal</span>(r<span class="op">$</span>value, <span class="dv">20</span>)</span>
+<span id="cb131-27"><a href="build-yourself-safety-net.html#cb131-27"></a></span>
+<span id="cb131-28"><a href="build-yourself-safety-net.html#cb131-28"></a></span>
+<span id="cb131-29"><a href="build-yourself-safety-net.html#cb131-29"></a>})</span></code></pre></div>
+<p>This methodology is still under-development, so we won’t go deeper into this subject, but if you want to follow the update on this topic, please refer to the <a href="https://shiny.rstudio.com/articles/integration-testing.html">Server function testing with Shiny</a> article on the <code>{shiny}</code> website.</p>
+</div>
+<div id="testing-the-interactive-logic" class="section level3">
+<h3><span class="header-section-number">11.1.3</span> Testing the interactive logic</h3>
+<p>Once you have built a solid test suite for your business logic, another side of your app you might want to check is the interactive logic, i.e. the user interface.</p>
+<p>There are several tools from the web development world that can be used to do exactly that: mimicking an interactive session where instead of deliberately clicking on the application interface, you let a program do it for you.</p>
+<div id="a.-puppeteer" class="section level4 unnumbered">
+<h4>A. <code>puppeteer</code></h4>
+<p><code>puppeteer</code> is a NodeJS module that drives a Google Chrome headless session and mimic a session on the app.</p>
+<p>And good news, there is a Google Chrome extension, called <a href="https://chrome.google.com/webstore/detail/puppeteer-recorder/djeegiggegleadkkbgopoonhjimgehda">Puppeteer Recorder</a>, that allows you to create, while visiting a webpage, the <code>pupepeteer</code> script to reproduce your visit.
+Here is, for example, a very small javascript script for testing <code>{hexmake}</code> <span class="citation">(Fay <a href="#ref-R-hexmake" role="doc-biblioref">2020</a><a href="#ref-R-hexmake" role="doc-biblioref">g</a>)</span>, generated by this extension.</p>
+<div class="sourceCode" id="cb132"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb132-1"><a href="build-yourself-safety-net.html#cb132-1"></a><span class="co">// Require the node module</span></span>
+<span id="cb132-2"><a href="build-yourself-safety-net.html#cb132-2"></a><span class="kw">const</span> puppeteer <span class="op">=</span> <span class="at">require</span>(<span class="st">&#39;puppeteer&#39;</span>)<span class="op">;</span></span>
+<span id="cb132-3"><a href="build-yourself-safety-net.html#cb132-3"></a>(<span class="kw">async</span> () <span class="kw">=&gt;</span> <span class="op">{</span></span>
+<span id="cb132-4"><a href="build-yourself-safety-net.html#cb132-4"></a><span class="co">// launch puppeteer and connect to the page</span></span>
+<span id="cb132-5"><a href="build-yourself-safety-net.html#cb132-5"></a><span class="kw">const</span> browser <span class="op">=</span> <span class="cf">await</span> <span class="va">puppeteer</span>.<span class="at">launch</span>()</span>
+<span id="cb132-6"><a href="build-yourself-safety-net.html#cb132-6"></a><span class="kw">const</span> page <span class="op">=</span> <span class="cf">await</span> <span class="va">browser</span>.<span class="at">newPage</span>()</span>
+<span id="cb132-7"><a href="build-yourself-safety-net.html#cb132-7"></a><span class="cf">await</span> <span class="va">page</span>.<span class="at">goto</span>(<span class="st">&#39;http://localhost:2811/&#39;</span>)</span>
+<span id="cb132-8"><a href="build-yourself-safety-net.html#cb132-8"></a></span>
+<span id="cb132-9"><a href="build-yourself-safety-net.html#cb132-9"></a><span class="co">// We&#39;re waiting for a DOM element to be ready</span></span>
+<span id="cb132-10"><a href="build-yourself-safety-net.html#cb132-10"></a><span class="cf">await</span> <span class="va">page</span>.<span class="at">waitForSelector</span>(<span class="st">&#39;.row &gt; .col &gt; </span><span class="sc">\</span></span>
+<span id="cb132-11"><a href="build-yourself-safety-net.html#cb132-11"></a><span class="st">    .rounded &gt; details:nth-child(3) &gt; summary&#39;</span>)</span>
+<span id="cb132-12"><a href="build-yourself-safety-net.html#cb132-12"></a>    <span class="co">// Now it&#39;s ready, we can click on it</span></span>
+<span id="cb132-13"><a href="build-yourself-safety-net.html#cb132-13"></a>    <span class="cf">await</span> <span class="va">page</span>.<span class="at">click</span>(<span class="st">&#39;.row &gt; .col &gt; .rounded &gt; </span><span class="sc">\</span></span>
+<span id="cb132-14"><a href="build-yourself-safety-net.html#cb132-14"></a><span class="st">    details:nth-child(3) &gt; summary&#39;</span>)</span>
+<span id="cb132-15"><a href="build-yourself-safety-net.html#cb132-15"></a>    </span>
+<span id="cb132-16"><a href="build-yourself-safety-net.html#cb132-16"></a>    <span class="co">// Now our test is over, we can close the connection</span></span>
+<span id="cb132-17"><a href="build-yourself-safety-net.html#cb132-17"></a>    <span class="cf">await</span> <span class="va">browser</span>.<span class="at">close</span>()</span>
+<span id="cb132-18"><a href="build-yourself-safety-net.html#cb132-18"></a><span class="op">}</span>)()</span></code></pre></div>
+<p>Be aware though that this extension does not record everything, at least with the version used while writing this book (<code>0.7.1</code>).
+For example, typing inside a text input is not recorded: that is completely doable inside <code>puppeteer</code>, yet not recorded by this extension<a href="#fn48" class="footnote-ref" id="fnref48"><sup>48</sup></a> .</p>
+<p>Once you have this piece of code, put it into a NodeJS script, and replay the session as many time as you need.
+If ever one of the steps can not be replayed as recorded, the script will fail, notifying you of a regression.</p>
+<p>Several packages in R mimic what <code>puppeteer</code> does (Google Chrome headless orchestration), with notably <code>{crrri}</code> <span class="citation">(Lesur and Dervieux <a href="#ref-R-crrri" role="doc-biblioref">2020</a>)</span> and <code>{chromote}</code> <span class="citation">(Chang <a href="#ref-R-chromote" role="doc-biblioref">2020</a>)</span>.
+These packages can be used to launch and manipulate a Google Chrome headless session, meaning that you can programmatically navigate and interact with a webpage from R.
+And to do the tests in a <code>puppeteer</code> spirit, you can refer to the <code>{crrry}</code> package <span class="citation">(Fay <a href="#ref-R-crrry" role="doc-biblioref">2020</a><a href="#ref-R-crrry" role="doc-biblioref">c</a>)</span>, which contains a series of wrapper functions around <code>{crrri}</code>, specifically designed for <code>{shiny}</code>.</p>
+<p>Here is an example:</p>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="build-yourself-safety-net.html#cb133-1"></a><span class="co"># Creating a new test instance</span></span>
+<span id="cb133-2"><a href="build-yourself-safety-net.html#cb133-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
+<span id="cb133-3"><a href="build-yourself-safety-net.html#cb133-3"></a>  <span class="co"># Using the `find_chrome()` function to guess where the </span></span>
+<span id="cb133-4"><a href="build-yourself-safety-net.html#cb133-4"></a>  <span class="co"># Chrome bin is on our machine</span></span>
+<span id="cb133-5"><a href="build-yourself-safety-net.html#cb133-5"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
+<span id="cb133-6"><a href="build-yourself-safety-net.html#cb133-6"></a>  <span class="co"># Launching Chrome on a random available port on our machine</span></span>
+<span id="cb133-7"><a href="build-yourself-safety-net.html#cb133-7"></a>  <span class="co"># Note that you will need httpuv &gt;= 1.5.2 if you want to use </span></span>
+<span id="cb133-8"><a href="build-yourself-safety-net.html#cb133-8"></a>  <span class="co"># this function</span></span>
+<span id="cb133-9"><a href="build-yourself-safety-net.html#cb133-9"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(), </span>
+<span id="cb133-10"><a href="build-yourself-safety-net.html#cb133-10"></a>  <span class="co"># Specifying the page we want to connect to</span></span>
+<span id="cb133-11"><a href="build-yourself-safety-net.html#cb133-11"></a>  <span class="dt">url =</span> <span class="st">&quot;https://connect.thinkr.fr/hexmake/&quot;</span>,</span>
+<span id="cb133-12"><a href="build-yourself-safety-net.html#cb133-12"></a>  <span class="co"># Do everything on the terminal, with no window open</span></span>
+<span id="cb133-13"><a href="build-yourself-safety-net.html#cb133-13"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
+<span id="cb133-14"><a href="build-yourself-safety-net.html#cb133-14"></a>)</span></code></pre></div>
+<pre><code>Running \
+  &#39;/Applications/Google Chrome.app/Contents/MacOS/Google Chrome&#39; \
+  --no-first-run --headless \
+  &#39;--user-data-dir=/Users/colin/Library/Application Support/
+    r-crrri/chrome-data-dir-dhutmfux&#39; \
+  &#39;--remote-debugging-port=40698&#39;</code></pre>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="build-yourself-safety-net.html#cb135-1"></a><span class="co"># We&#39;ll wait for the application to be ready to accept inputs</span></span>
+<span id="cb135-2"><a href="build-yourself-safety-net.html#cb135-2"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span></code></pre></div>
+<pre><code>Shiny is computing
+✓ Shiny is still running</code></pre>
+<p>You can then call one of the <code>test</code> object methods:</p>
+<ul>
+<li><code>call_js()</code>, that allows you to run JavaScript code</li>
+<li><code>shiny_set_input()</code> changes the value of a <code>{shiny}</code> Input</li>
+<li><code>wait_for()</code> waits for a JavaScript condition to be TRUE</li>
+<li><code>click_on_id</code> clicks on a given id</li>
+</ul>
+<p>Of course, the interesting part is doing “bulk testing” of your application, for example by setting a series of values to an input:</p>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="build-yourself-safety-net.html#cb137-1"></a><span class="cf">for</span> (i <span class="cf">in</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]){</span>
+<span id="cb137-2"><a href="build-yourself-safety-net.html#cb137-2"></a>  <span class="co"># We&#39;ll be setting a series of letters, one by one</span></span>
+<span id="cb137-3"><a href="build-yourself-safety-net.html#cb137-3"></a>  <span class="co"># for the package name input</span></span>
+<span id="cb137-4"><a href="build-yourself-safety-net.html#cb137-4"></a>  test<span class="op">$</span><span class="kw">shiny_set_input</span>(</span>
+<span id="cb137-5"><a href="build-yourself-safety-net.html#cb137-5"></a>    <span class="st">&quot;main_ui_1-left_ui_1-pkg_name_ui_1-package&quot;</span>, </span>
+<span id="cb137-6"><a href="build-yourself-safety-net.html#cb137-6"></a>    i</span>
+<span id="cb137-7"><a href="build-yourself-safety-net.html#cb137-7"></a>  )</span>
+<span id="cb137-8"><a href="build-yourself-safety-net.html#cb137-8"></a>}</span></code></pre></div>
+<pre><code>-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package--
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
+Shiny is computing
+✓ Shiny is still running</code></pre>
+<p>And once your test is done, do not forget to close the connection!</p>
+<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb139-1"><a href="build-yourself-safety-net.html#cb139-1"></a><span class="co"># Closing the connection</span></span>
+<span id="cb139-2"><a href="build-yourself-safety-net.html#cb139-2"></a>test<span class="op">$</span><span class="kw">stop</span>()</span></code></pre></div>
+</div>
+<div id="b.-monkey-test" class="section level4 unnumbered">
+<h4>B. Monkey test</h4>
+<p>If you are working on a user-facing software (i.e a software used by external users), there is one rule to live by: every unexpected behavior that can happen, will happen.
+In other words, if you develop and think “a user will never do that”, just expect a user to eventually do “that”.</p>
+<p>But how can we get prepared for the unexpected?
+How can we test the “crazy behavior” that user will adopt?
+In web development, there exists a methodology called “Monkey testing”, which consists of <strong>launching a series of random event on a webpage: random text in input, scrolling, clicking, zooming… and see if the application crashes or not</strong>.
+This software testing method allows to test the robustness of the application, by seeing how much it can handle unexpected behaviors.</p>
+<p>Several JavaScript libraries exist when it comes to monkey testing, one of the most popular (and easy to use) library is called <a href="https://github.com/marmelab/gremlins.js"><code>gremlin.js</code></a>.
+This library is particularly interesting when it comes to <code>{shiny}</code> as it does not need external installation: you can add the library as a bookmark on your browser, navigate to the application, and launch the testing (click on the “Generate Bookmarklet” link on the <a href="(https://github.com/marmelab/gremlins.js)">top of the README</a>).
+Figure <a href="build-yourself-safety-net.html#fig:11-step-by-step-secure-7">11.1</a> show an example of running gremlins on the prenoms application.</p>
+
+<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-7"></span>
+<img src="img/gremlins.png" alt="Example of using gremlins.js on the “prenoms” {shiny} application." width="100%" />
+<p class="caption">
+FIGURE 11.1: Example of using <code>gremlins.js</code> on the “prenoms” <code>{shiny}</code> application.
+</p>
+</div>
+<p>And if you want to scale this, you can also combine it with <code>{shinyloadtest}</code> <span class="citation">(Dipert, Schloerke, and Borges <a href="#ref-R-shinyloadtest" role="doc-biblioref">2020</a>)</span>: launch a session recording, run <code>gremlins</code> one or several time inside the recording, then replay it with multiple sessions.</p>
+<p>With <code>{crrry}</code>, this <code>gremlins</code> test comes for free:</p>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="build-yourself-safety-net.html#cb140-1"></a><span class="co"># Creating a new test instance</span></span>
+<span id="cb140-2"><a href="build-yourself-safety-net.html#cb140-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
+<span id="cb140-3"><a href="build-yourself-safety-net.html#cb140-3"></a>  <span class="co"># Using the `find_chrome()` function to guess where the </span></span>
+<span id="cb140-4"><a href="build-yourself-safety-net.html#cb140-4"></a>  <span class="co"># Chrome bin is on our machine</span></span>
+<span id="cb140-5"><a href="build-yourself-safety-net.html#cb140-5"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
+<span id="cb140-6"><a href="build-yourself-safety-net.html#cb140-6"></a>  <span class="co"># Launching Chrome on a random available port on our machine</span></span>
+<span id="cb140-7"><a href="build-yourself-safety-net.html#cb140-7"></a>  <span class="co"># Note that you will need httpuv &gt;= 1.5.2 if you want to use </span></span>
+<span id="cb140-8"><a href="build-yourself-safety-net.html#cb140-8"></a>  <span class="co"># this function</span></span>
+<span id="cb140-9"><a href="build-yourself-safety-net.html#cb140-9"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(), </span>
+<span id="cb140-10"><a href="build-yourself-safety-net.html#cb140-10"></a>  <span class="co"># Specifying the page we want to connect to</span></span>
+<span id="cb140-11"><a href="build-yourself-safety-net.html#cb140-11"></a>  <span class="dt">url =</span> <span class="st">&quot;https://connect.thinkr.fr/hexmake/&quot;</span>,</span>
+<span id="cb140-12"><a href="build-yourself-safety-net.html#cb140-12"></a>  <span class="co"># Do everything on the terminal, with no window open</span></span>
+<span id="cb140-13"><a href="build-yourself-safety-net.html#cb140-13"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
+<span id="cb140-14"><a href="build-yourself-safety-net.html#cb140-14"></a>)</span>
+<span id="cb140-15"><a href="build-yourself-safety-net.html#cb140-15"></a><span class="co"># We&#39;ll wait for the application to be ready to accept inputs</span></span>
+<span id="cb140-16"><a href="build-yourself-safety-net.html#cb140-16"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span>
+<span id="cb140-17"><a href="build-yourself-safety-net.html#cb140-17"></a><span class="co"># We launch the horde of gremlins</span></span>
+<span id="cb140-18"><a href="build-yourself-safety-net.html#cb140-18"></a>test<span class="op">$</span><span class="kw">gremlins_horde</span>()</span>
+<span id="cb140-19"><a href="build-yourself-safety-net.html#cb140-19"></a><span class="co"># Sleep, let the gremlins do their job</span></span>
+<span id="cb140-20"><a href="build-yourself-safety-net.html#cb140-20"></a><span class="kw">Sys.sleep</span>(<span class="dv">10</span>)</span>
+<span id="cb140-21"><a href="build-yourself-safety-net.html#cb140-21"></a><span class="co"># Check that the app is still working</span></span>
+<span id="cb140-22"><a href="build-yourself-safety-net.html#cb140-22"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span>
+<span id="cb140-23"><a href="build-yourself-safety-net.html#cb140-23"></a><span class="co"># Stop the connection</span></span>
+<span id="cb140-24"><a href="build-yourself-safety-net.html#cb140-24"></a>test<span class="op">$</span><span class="kw">stop</span>()</span></code></pre></div>
+</div>
+<div id="c.-shinytest" class="section level4 unnumbered">
+<h4>C. <code>{shinytest}</code></h4>
+<p>Finally, if you prefer a <code>{shiny}</code> specific package, you can go for <code>{shinytest}</code> <span class="citation">(Chang and Csárdi <a href="#ref-R-shinytest" role="doc-biblioref">2019</a>)</span>.
+This package, created and maintained by RStudio, <strong>allows you to do a series of screenshots of your application, and then replays your app and compare the previously taken screenshots to the current state of your application</strong>, allowing you to detect any changes in the interface.</p>
+<p>If you are building your application with <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span>, you will need to add an <code>app.R</code> file at the root of your package, then run <code>shinytest::recordTest()</code>:</p>
+<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="build-yourself-safety-net.html#cb141-1"></a><span class="co"># Create an app.R file at the root of the package</span></span>
+<span id="cb141-2"><a href="build-yourself-safety-net.html#cb141-2"></a>golem<span class="op">::</span><span class="kw">add_rstudioconnect_file</span>()</span>
+<span id="cb141-3"><a href="build-yourself-safety-net.html#cb141-3"></a><span class="co"># Launch a test, and record a series of </span></span>
+<span id="cb141-4"><a href="build-yourself-safety-net.html#cb141-4"></a><span class="co"># snapshots of your application</span></span>
+<span id="cb141-5"><a href="build-yourself-safety-net.html#cb141-5"></a>shinytest<span class="op">::</span><span class="kw">recordTest</span>()</span></code></pre></div>
+<p>Once this function is run, a new window opens: it contains your app, and a “Screenshot” button on the right.
+Using this button, you can take various recording of your shiny application at different states, as shown in figure <a href="build-yourself-safety-net.html#fig:11-step-by-step-secure-10">11.2</a>.</p>
+
+<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-10"></span>
+<img src="img/shinytest.png" alt="General view of a {shinytest} window." width="100%" />
+<p class="caption">
+FIGURE 11.2: General view of a <code>{shinytest}</code> window.
+</p>
+</div>
+<p>Then, you can do some changes in your app, and run:</p>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="build-yourself-safety-net.html#cb142-1"></a>shinytest<span class="op">::</span><span class="kw">testApp</span>()</span></code></pre></div>
+<p>If the <code>{shinytest}</code> package detects a visual change in the application, you will be immediately alerted, with a report of the difference from the snapshots you took and the current state of the application.</p>
+</div>
+</div>
+<div id="testing-the-app-load" class="section level3">
+<h3><span class="header-section-number">11.1.4</span> Testing the app load</h3>
+<div id="a.-shinyloadtest" class="section level4 unnumbered">
+<h4>A. <code>{shinyloadtest}</code></h4>
+<p><code>{shinyloadtest}</code> <span class="citation">(Dipert, Schloerke, and Borges <a href="#ref-R-shinyloadtest" role="doc-biblioref">2020</a>)</span> <strong>tests how an application behaves when one, two, three, twenty, one hundred users connect to the app and use it</strong>, and gives you a visual report about the connection and response time of each session.
+The idea with <code>{shinyloadtest}</code> is to first record a session where you mimic a user behavior, then <code>shinycannon</code>, a command line tool coming with <code>{shinyloadtest}</code>, replays the recording several times.
+Once the session has been replayed several times mimicking the session you have recorded, you have access to a report of the behavior of your app.</p>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="build-yourself-safety-net.html#cb143-1"></a><span class="kw">library</span>(shinyloadtest)</span></code></pre></div>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="build-yourself-safety-net.html#cb144-1"></a><span class="co"># Starting your app in another process</span></span>
+<span id="cb144-2"><a href="build-yourself-safety-net.html#cb144-2"></a>p &lt;-<span class="st"> </span>processx<span class="op">::</span>process<span class="op">$</span><span class="kw">new</span>(</span>
+<span id="cb144-3"><a href="build-yourself-safety-net.html#cb144-3"></a>  <span class="st">&quot;Rscript&quot;</span>, </span>
+<span id="cb144-4"><a href="build-yourself-safety-net.html#cb144-4"></a>  <span class="kw">c</span>( <span class="st">&quot;-e&quot;</span>,  <span class="st">&quot;options(&#39;shiny.port&#39;= 2811);hexmake::run_app()&quot;</span> )</span>
+<span id="cb144-5"><a href="build-yourself-safety-net.html#cb144-5"></a>)</span>
+<span id="cb144-6"><a href="build-yourself-safety-net.html#cb144-6"></a><span class="co"># We wait for the app to be ready</span></span>
+<span id="cb144-7"><a href="build-yourself-safety-net.html#cb144-7"></a><span class="kw">Sys.sleep</span>(<span class="dv">5</span>) </span>
+<span id="cb144-8"><a href="build-yourself-safety-net.html#cb144-8"></a><span class="co"># Check that the process is alive</span></span>
+<span id="cb144-9"><a href="build-yourself-safety-net.html#cb144-9"></a>p<span class="op">$</span><span class="kw">is_alive</span>()</span>
+<span id="cb144-10"><a href="build-yourself-safety-net.html#cb144-10"></a><span class="co"># Open the app in our browser just to be sure</span></span>
+<span id="cb144-11"><a href="build-yourself-safety-net.html#cb144-11"></a><span class="kw">browseURL</span>(<span class="st">&quot;http:://localhost:2811&quot;</span>)</span></code></pre></div>
+<p>Record the tests, potentially in a new dir:</p>
+<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb145-1"><a href="build-yourself-safety-net.html#cb145-1"></a><span class="co"># Creating a directory to receive the logs</span></span>
+<span id="cb145-2"><a href="build-yourself-safety-net.html#cb145-2"></a>fs<span class="op">::</span><span class="kw">dir_create</span>(<span class="st">&quot;shinylogs&quot;</span>)</span>
+<span id="cb145-3"><a href="build-yourself-safety-net.html#cb145-3"></a><span class="co"># Performing the session recording inside this new folder</span></span>
+<span id="cb145-4"><a href="build-yourself-safety-net.html#cb145-4"></a>withr<span class="op">::</span><span class="kw">with_dir</span>(</span>
+<span id="cb145-5"><a href="build-yourself-safety-net.html#cb145-5"></a>  <span class="st">&quot;shinylogs&quot;</span>, {</span>
+<span id="cb145-6"><a href="build-yourself-safety-net.html#cb145-6"></a>    <span class="co"># Launch the recording of an app session, using port 1234</span></span>
+<span id="cb145-7"><a href="build-yourself-safety-net.html#cb145-7"></a>    shinyloadtest<span class="op">::</span><span class="kw">record_session</span>(</span>
+<span id="cb145-8"><a href="build-yourself-safety-net.html#cb145-8"></a>      <span class="st">&quot;http://localhost:2811&quot;</span>, </span>
+<span id="cb145-9"><a href="build-yourself-safety-net.html#cb145-9"></a>      <span class="dt">port =</span> <span class="dv">1234</span></span>
+<span id="cb145-10"><a href="build-yourself-safety-net.html#cb145-10"></a>    ) </span>
+<span id="cb145-11"><a href="build-yourself-safety-net.html#cb145-11"></a>  }</span>
+<span id="cb145-12"><a href="build-yourself-safety-net.html#cb145-12"></a>)</span></code></pre></div>
+<p>We now have a series of one or more recording/s inside the <code>shinylogs/</code> folder:</p>
+<p>Then, let’s switch to our command line, and rerun the session with <code>shinycannon</code>.
+The <code>shinycannon</code> command line tools take several arguments: the path the <code>.log</code> file, the URL of the app, <code>--workers</code> specify the number of concurrent connections to run, and the <code>--output-dir</code> argument specifies where the report should be written.</p>
+<p>Then, go to your terminal and run:</p>
+<div class="sourceCode" id="cb146"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb146-1"><a href="build-yourself-safety-net.html#cb146-1"></a><span class="ex">shinycannon</span> shinylogs/recording.log \</span>
+<span id="cb146-2"><a href="build-yourself-safety-net.html#cb146-2"></a>  http://localhost:2811 --workers 10 \</span>
+<span id="cb146-3"><a href="build-yourself-safety-net.html#cb146-3"></a>  --output-dir shinylogs/run1</span></code></pre></div>
+<p>And now, we have new files inside the folder, corresponding to the session recordings.</p>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="build-yourself-safety-net.html#cb147-1"></a><span class="co"># printing the structure of shinylogs</span></span>
+<span id="cb147-2"><a href="build-yourself-safety-net.html#cb147-2"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;shinylogs&quot;</span>, <span class="dt">recurse =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<pre><code>shinylogs
+├── recording.log
+├── run1
+├── run2
+└── run3</code></pre>
+<p>Good news: we do not have to manually analyze these files—<code>{shinyloadtest}</code> offers a series of wrapper functions to do that.</p>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="build-yourself-safety-net.html#cb149-1"></a><span class="co"># Bringing the runs in the R session</span></span>
+<span id="cb149-2"><a href="build-yourself-safety-net.html#cb149-2"></a>shinyload_runs &lt;-<span class="st"> </span><span class="kw">load_runs</span>(</span>
+<span id="cb149-3"><a href="build-yourself-safety-net.html#cb149-3"></a>  <span class="st">&quot;5 workers&quot;</span> =<span class="st"> &quot;shinylogs/run1&quot;</span></span>
+<span id="cb149-4"><a href="build-yourself-safety-net.html#cb149-4"></a>)</span></code></pre></div>
+<p>We now have a data.frame that looks like this:</p>
+<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="build-yourself-safety-net.html#cb150-1"></a>dplyr<span class="op">::</span><span class="kw">glimpse</span>(<span class="kw">head</span>(shinyload_runs))</span></code></pre></div>
+<pre><code>Rows: 6
+Columns: 13
+$ run               &lt;ord&gt; 5 workers, 5 workers, 5 wo…
+$ session_id        &lt;int&gt; 0, 0, 0, 0, 0, 0
+$ user_id           &lt;int&gt; 0, 0, 0, 0, 0, 0
+$ iteration         &lt;int&gt; 0, 0, 0, 0, 0, 0
+$ input_line_number &lt;int&gt; 4, 5, 6, 8, 9, 11
+$ event             &lt;chr&gt; &quot;REQ_HOME&quot;, &quot;WS_OPEN&quot;, &quot;WS…
+$ start             &lt;dbl&gt; 0.000, 0.462, 0.539, 1.025…
+$ end               &lt;dbl&gt; 0.461, 0.539, 0.542, 1.219…
+$ time              &lt;dbl&gt; 0.461, 0.077, 0.003, 0.194…
+$ concurrency       &lt;dbl&gt; 0.0, 1.0, 1.0, 1.0, 1.0, 1…
+$ maintenance       &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, TR…
+$ label             &lt;ord&gt; &quot;Event 1) Get: Homepage&quot;, …
+$ json              &lt;list&gt; [[&quot;REQ_HOME&quot;, 2020-04-10 …</code></pre>
+<p>Then, <code>{shinyloadtest}</code> comes with a series of plotting functions that can be used to analyze your recording.
+For example:</p>
+<ul>
+<li><code>slt_session_duration()</code> plots the session duration, with the various types of event that takes computation time: JS and CSS load, R computation…</li>
+</ul>
+
+<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="build-yourself-safety-net.html#cb152-1"></a><span class="kw">slt_session_duration</span>(shinyload_runs)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-21"></span>
+<img src="engineering-production-grade-shiny-apps_files/figure-html/11-step-by-step-secure-21-1.png" alt="Session duration" width="100%" />
+<p class="caption">
+FIGURE 11.3: Session duration
+</p>
+</div>
+<!-- + `slt_waterfall()` plots the waterfall graph of session durations, ordered by events.  -->
+<!-- (ref:waterfall) Waterfall graph of session durations -->
+<!-- ```{r 12-step-by-step-secure-20, fig.cap="(ref:waterfall)", out.width="100%", out.height="100%"} -->
+<!-- slt_waterfall(shinyload_runs) -->
+<!-- ``` -->
+<p>And if you need to bundle everything into an HTML reports, <code>shinyloadtest_report()</code> is what you are looking for.</p>
+<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="build-yourself-safety-net.html#cb153-1"></a><span class="co"># Generating the report</span></span>
+<span id="cb153-2"><a href="build-yourself-safety-net.html#cb153-2"></a><span class="kw">shinyloadtest_report</span>(shinyload_runs)</span></code></pre></div>
+<p>This function will generate an HTML report of all the things computed by <code>{shinyloadtest}</code>, as show in figure <a href="build-yourself-safety-net.html#fig:11-step-by-step-secure-23">11.4</a>.</p>
+
+<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-23"></span>
+<img src="img/shinyloadtestreport.png" alt="Webpage generated by shinyloadtest_report()" width="100%" />
+<p class="caption">
+FIGURE 11.4: Webpage generated by <code>shinyloadtest_report()</code>
+</p>
+</div>
+<p>To sum up with a step by step guide:</p>
+<ul>
+<li><p>If the shiny app is only available on your machine, launch a process with <code>{processx}</code> <span class="citation">(Csárdi and Chang <a href="#ref-R-processx" role="doc-biblioref">2020</a>)</span>, or in another R session, that launches the application.
+You can either set the port with <code>options('shiny.port'= 2811)</code>, or let shiny decide for you.
+Be sure that the process is running.
+If the app is online, use the online url (and make sure you have access to the app).</p></li>
+<li><p>Run <code>shinyloadtest::record_session(url)</code>.
+You should probably set a different port for <code>{shinyloadtest}</code>, so that it does not try to connect on port 80.</p></li>
+<li><p>Play around with your app, record a scenario of usage</p></li>
+<li><p>Close the tab where the app is running.</p></li>
+<li><p>Return to your terminal, and run the <code>shinycannon</code> command line tool</p></li>
+<li><p>Wait for the process to be finished</p></li>
+<li><p>Go back to R, and then you can analyse the data from the recordings, either manually or by generating the html report</p></li>
+</ul>
+</div>
+<div id="b.-shinyloadtest-crrry-and-dockerstats" class="section level4 unnumbered">
+<h4>B. <code>{shinyloadtest}</code>, <code>{crrry}</code>, and <code>{dockerstats}</code></h4>
+<p>Another thing you might want to monitor is the memory/CPU usage of your application, which <code>{shinyloadtest}</code> does not natively provide: the package records the load from the browser point of view, not from the server one.
+That’s where <code>{dockerstats}</code> <span class="citation">(Fay <a href="#ref-R-dockerstats" role="doc-biblioref">2020</a><a href="#ref-R-dockerstats" role="doc-biblioref">d</a>)</span> can come into play: this package is a wrapper around the command line <code>docker stats</code>, and returns an R data.frame with the stats.</p>
+<p>You can get the <code>{dockerstats}</code> package from GitHub with:</p>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="build-yourself-safety-net.html#cb154-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;ColinFay/dockerstats&quot;</span>)</span></code></pre></div>
+<p>Or from npm via:</p>
+<div class="sourceCode" id="cb155"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb155-1"><a href="build-yourself-safety-net.html#cb155-1"></a><span class="ex">npm</span> install -g r-dockerstats</span></code></pre></div>
+<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="build-yourself-safety-net.html#cb156-1"></a><span class="kw">library</span>(dockerstats)</span></code></pre></div>
+<p>With these stats, we can monitor the load on the app when it is run in a docker container.</p>
+<p>We will start by launching the container using a <code>system()</code> call: here, we are running the <code>{hexmake}</code> application, bundled in the <code>colinfay/hexmake</code> docker image, on port 2811.
+We also make sure we give it a name with <code>--name</code>, so that we can call it in our <code>dockerstats()</code> call later on.</p>
+<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="build-yourself-safety-net.html#cb157-1"></a><span class="co"># We are launching the docker container </span></span>
+<span id="cb157-2"><a href="build-yourself-safety-net.html#cb157-2"></a><span class="co"># using R system() command. Here, we are </span></span>
+<span id="cb157-3"><a href="build-yourself-safety-net.html#cb157-3"></a><span class="co"># running the container image called </span></span>
+<span id="cb157-4"><a href="build-yourself-safety-net.html#cb157-4"></a><span class="co"># colinfay/hexmake. We are naming the </span></span>
+<span id="cb157-5"><a href="build-yourself-safety-net.html#cb157-5"></a><span class="co"># container hexmake using the --name flag, </span></span>
+<span id="cb157-6"><a href="build-yourself-safety-net.html#cb157-6"></a><span class="co"># --rm means the container will be removed </span></span>
+<span id="cb157-7"><a href="build-yourself-safety-net.html#cb157-7"></a><span class="co"># when stopped, and finally the -p flag defines </span></span>
+<span id="cb157-8"><a href="build-yourself-safety-net.html#cb157-8"></a><span class="co"># how to bind the ports of the container</span></span>
+<span id="cb157-9"><a href="build-yourself-safety-net.html#cb157-9"></a><span class="co"># with the ports of the host (left is the host,</span></span>
+<span id="cb157-10"><a href="build-yourself-safety-net.html#cb157-10"></a><span class="co">#  right is the container): in other word, here, </span></span>
+<span id="cb157-11"><a href="build-yourself-safety-net.html#cb157-11"></a><span class="co">#  we bind port 80 of our container to the port 2811</span></span>
+<span id="cb157-12"><a href="build-yourself-safety-net.html#cb157-12"></a><span class="co"># of our machine.</span></span>
+<span id="cb157-13"><a href="build-yourself-safety-net.html#cb157-13"></a><span class="kw">system</span>(</span>
+<span id="cb157-14"><a href="build-yourself-safety-net.html#cb157-14"></a>  <span class="st">&quot;docker run --name hexmake --rm -p 2811:80 colinfay/hexmake&quot;</span>, </span>
+<span id="cb157-15"><a href="build-yourself-safety-net.html#cb157-15"></a>  <span class="dt">wait =</span> <span class="ot">FALSE</span></span>
+<span id="cb157-16"><a href="build-yourself-safety-net.html#cb157-16"></a>)</span></code></pre></div>
+<p>Let’s say now we want the stats for the hexmake container:</p>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="build-yourself-safety-net.html#cb158-1"></a><span class="co"># Waiting for the container to be ready </span></span>
+<span id="cb158-2"><a href="build-yourself-safety-net.html#cb158-2"></a><span class="kw">Sys.sleep</span>(<span class="dv">30</span>)</span>
+<span id="cb158-3"><a href="build-yourself-safety-net.html#cb158-3"></a><span class="co"># Showing the docker stats for hexmake</span></span>
+<span id="cb158-4"><a href="build-yourself-safety-net.html#cb158-4"></a><span class="kw">dockerstats</span>(<span class="st">&quot;hexmake&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb158-5"><a href="build-yourself-safety-net.html#cb158-5"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()</span></code></pre></div>
+<pre><code># A tibble: 1 x 14
+  Container Name  ID    CPUPerc MemUsage MemLimit
+  &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;   
+1 hexmake   hexm… 95c2…    0.07 115.7MiB 6.791GiB
+# … with 8 more variables: MemPerc &lt;dbl&gt;, NetI &lt;chr&gt;,
+#   NetO &lt;chr&gt;, BlockI &lt;chr&gt;, BlockO &lt;chr&gt;,
+#   PIDs &lt;int&gt;, record_time &lt;chr&gt;, extra &lt;chr&gt;</code></pre>
+<p>Of course, right now nobody is using the app, so the usage can be pretty small.
+But let’s push it a little bit by mimicking a lot of connections.</p>
+<p>To do that, we can replay our <code>shinycannon</code> call, with at the same time using the <code>dockerstats_recurse()</code> function, that will recursively call <code>dockerstats()</code> on a regular interval.</p>
+<div class="sourceCode" id="cb160"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb160-1"><a href="build-yourself-safety-net.html#cb160-1"></a><span class="co"># Replaying the recording</span></span>
+<span id="cb160-2"><a href="build-yourself-safety-net.html#cb160-2"></a><span class="ex">shinycannon</span> shinylogs/recording.log <span class="dt">\ </span></span>
+<span id="cb160-3"><a href="build-yourself-safety-net.html#cb160-3"></a><span class="co"># Specificying the host url and the number of &quot;visitors&quot;</span></span>
+<span id="cb160-4"><a href="build-yourself-safety-net.html#cb160-4"></a>  <span class="ex">http</span>://localhost:2811 --workers 10 \</span>
+<span id="cb160-5"><a href="build-yourself-safety-net.html#cb160-5"></a># Define where the recording will be outputed</span>
+<span id="cb160-6"><a href="build-yourself-safety-net.html#cb160-6"></a>  <span class="ex">--output-dir</span> shinylogs/run3</span></code></pre></div>
+<p>Let’s launch at the same time a <code>dockerstats_recurse()</code> For example, here, we will print, on each loop, the <code>MemUsage</code> of the container, then saving the data inside a <code>dockerstats.csv</code> file.</p>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="build-yourself-safety-net.html#cb161-1"></a><span class="co"># Calling recursive the dockerstats function. </span></span>
+<span id="cb161-2"><a href="build-yourself-safety-net.html#cb161-2"></a><span class="co"># The callback function takes a function, and define</span></span>
+<span id="cb161-3"><a href="build-yourself-safety-net.html#cb161-3"></a><span class="co"># what to do with the data.frame each time the </span></span>
+<span id="cb161-4"><a href="build-yourself-safety-net.html#cb161-4"></a><span class="co"># dockerstats results are computed.</span></span>
+<span id="cb161-5"><a href="build-yourself-safety-net.html#cb161-5"></a><span class="kw">dockerstats_recurse</span>(</span>
+<span id="cb161-6"><a href="build-yourself-safety-net.html#cb161-6"></a>  <span class="st">&quot;hexmake&quot;</span>,</span>
+<span id="cb161-7"><a href="build-yourself-safety-net.html#cb161-7"></a>  <span class="co"># append_csv is a {dockerstats} function that will </span></span>
+<span id="cb161-8"><a href="build-yourself-safety-net.html#cb161-8"></a>  <span class="co"># apped the output to a given csv</span></span>
+<span id="cb161-9"><a href="build-yourself-safety-net.html#cb161-9"></a>  <span class="dt">callback =</span> <span class="kw">append_csv</span>(</span>
+<span id="cb161-10"><a href="build-yourself-safety-net.html#cb161-10"></a>    <span class="dt">file =</span> <span class="st">&quot;shinylogs/dockerstats.csv&quot;</span>, </span>
+<span id="cb161-11"><a href="build-yourself-safety-net.html#cb161-11"></a>    <span class="dt">print =</span> <span class="ot">TRUE</span></span>
+<span id="cb161-12"><a href="build-yourself-safety-net.html#cb161-12"></a>  )</span>
+<span id="cb161-13"><a href="build-yourself-safety-net.html#cb161-13"></a>)</span></code></pre></div>
+<p>Figure <a href="build-yourself-safety-net.html#fig:11-step-by-step-secure-31">11.5</a> is what both these processes look side to side.</p>
+
+<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-31"></span>
+<img src="img/hexmake-dockerstats.png" alt="{dockerstats} and shinycannon running side-by-side at the same time." width="100%" />
+<p class="caption">
+FIGURE 11.5: <code>{dockerstats}</code> and <code>shinycannon</code> running side-by-side at the same time.
+</p>
+</div>
+<p>As you can see, as the number of connections grow, the memory usage grows.
+And we now have a csv with the evolution of the <code>docker stats</code> records over time!</p>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="build-yourself-safety-net.html#cb162-1"></a><span class="co"># read_appended_csv() allows to read a csv that has been </span></span>
+<span id="cb162-2"><a href="build-yourself-safety-net.html#cb162-2"></a><span class="co"># constructed with the append_csv() function</span></span>
+<span id="cb162-3"><a href="build-yourself-safety-net.html#cb162-3"></a>docker_stats &lt;-<span class="st"> </span><span class="kw">read_appended_csv</span>(</span>
+<span id="cb162-4"><a href="build-yourself-safety-net.html#cb162-4"></a>  <span class="st">&quot;shinylogs/dockerstats.csv&quot;</span></span>
+<span id="cb162-5"><a href="build-yourself-safety-net.html#cb162-5"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="build-yourself-safety-net.html#cb163-1"></a>dplyr<span class="op">::</span><span class="kw">glimpse</span>(<span class="kw">head</span>(docker_stats))</span></code></pre></div>
+<pre><code>Rows: 6
+Columns: 14
+$ Container   &lt;chr&gt; &quot;hexmake&quot;, &quot;hexmake&quot;, &quot;hexmake&quot;,…
+$ Name        &lt;chr&gt; &quot;hexmake&quot;, &quot;hexmake&quot;, &quot;hexmake&quot;,…
+$ ID          &lt;chr&gt; &quot;b5d337941e310cbf4708b95a9cc7556…
+$ CPUPerc     &lt;dbl&gt; 0.09, 15.07, 38.58, 54.94, 20.28…
+$ MemUsage    &lt;chr&gt; &quot;110.9MiB&quot;, &quot;117.2MiB&quot;, &quot;168.3Mi…
+$ MemLimit    &lt;chr&gt; &quot;1.943GiB&quot;, &quot;1.943GiB&quot;, &quot;1.943Gi…
+$ MemPerc     &lt;dbl&gt; 5.57, 5.89, 8.46, 8.73, 8.74, 8.…
+$ NetI        &lt;chr&gt; &quot;586B&quot;, &quot;8.37kB&quot;, &quot;31.6kB&quot;, &quot;62.…
+$ NetO        &lt;chr&gt; &quot;0B&quot;, &quot;433kB&quot;, &quot;1.18MB&quot;, &quot;2.48MB…
+$ BlockI      &lt;chr&gt; &quot;0B&quot;, &quot;0B&quot;, &quot;0B&quot;, &quot;0B&quot;, &quot;0B&quot;, &quot;0…
+$ BlockO      &lt;chr&gt; &quot;0B&quot;, &quot;0B&quot;, &quot;0B&quot;, &quot;0B&quot;, &quot;0B&quot;, &quot;0…
+$ PIDs        &lt;int&gt; 3, 4, 4, 4, 4, 4
+$ record_time &lt;dttm&gt; 2020-04-10 10:39:20, 2020-04-10…
+$ extra       &lt;lgl&gt; NA, NA, NA, NA, NA, NA</code></pre>
+<p>If you need a deeper look into the connection between application actions and the docker stats, you can also combine <code>{dockerstats}</code> with <code>{crrry}</code>, the idea being that you can record the CPU usage at the exact moment the application performs a specific computation.</p>
+<p>Let’s record the computation of the <code>hexmake</code> container containing the same app as before.</p>
+<p>First, launch the container:</p>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="build-yourself-safety-net.html#cb165-1"></a><span class="co"># Launching the container a second time, </span></span>
+<span id="cb165-2"><a href="build-yourself-safety-net.html#cb165-2"></a><span class="co"># but name it xmk2 and serve it on port 2708</span></span>
+<span id="cb165-3"><a href="build-yourself-safety-net.html#cb165-3"></a><span class="kw">system</span>(</span>
+<span id="cb165-4"><a href="build-yourself-safety-net.html#cb165-4"></a>  <span class="st">&quot;docker run -p 2708:80 --rm --name xmk2 -d colinfay/hexmake&quot;</span>, </span>
+<span id="cb165-5"><a href="build-yourself-safety-net.html#cb165-5"></a>  <span class="dt">wait =</span> <span class="ot">FALSE</span></span>
+<span id="cb165-6"><a href="build-yourself-safety-net.html#cb165-6"></a>)</span>
+<span id="cb165-7"><a href="build-yourself-safety-net.html#cb165-7"></a><span class="kw">Sys.sleep</span>(<span class="dv">60</span>) <span class="co"># Let the container launch</span></span></code></pre></div>
+<p>Then, a <code>{crrry}</code> job:</p>
+<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="build-yourself-safety-net.html#cb166-1"></a><span class="co"># See previous version of this code for a commented explanation </span></span>
+<span id="cb166-2"><a href="build-yourself-safety-net.html#cb166-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
+<span id="cb166-3"><a href="build-yourself-safety-net.html#cb166-3"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
+<span id="cb166-4"><a href="build-yourself-safety-net.html#cb166-4"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(),</span>
+<span id="cb166-5"><a href="build-yourself-safety-net.html#cb166-5"></a>  <span class="dt">url =</span><span class="st">&quot;http://localhost:2708&quot;</span>,</span>
+<span id="cb166-6"><a href="build-yourself-safety-net.html#cb166-6"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
+<span id="cb166-7"><a href="build-yourself-safety-net.html#cb166-7"></a>)</span></code></pre></div>
+<pre><code>Running &#39;/Applications/Google 
+  Chrome.app/Contents/MacOS/Google Chrome&#39; 
+  --no-first-run --headless \
+  &#39;--user-data-dir=/Users/colin/Library/Application     
+  Support/r-crrri/chrome-data-dir-thyhpptv&#39; \
+  &#39;--remote-debugging-port=48938&#39;</code></pre>
+<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="build-yourself-safety-net.html#cb168-1"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span></code></pre></div>
+<pre><code>Shiny is computing
+✓ Shiny is still running</code></pre>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="build-yourself-safety-net.html#cb170-1"></a><span class="co"># We are creating a first data.frame that records the launch </span></span>
+<span id="cb170-2"><a href="build-yourself-safety-net.html#cb170-2"></a><span class="co"># of the container.</span></span>
+<span id="cb170-3"><a href="build-yourself-safety-net.html#cb170-3"></a>results &lt;-<span class="st"> </span>dockerstats<span class="op">::</span><span class="kw">dockerstats</span>(<span class="st">&quot;xmk2&quot;</span>, <span class="dt">extra =</span> <span class="st">&quot;launch&quot;</span>)</span>
+<span id="cb170-4"><a href="build-yourself-safety-net.html#cb170-4"></a></span>
+<span id="cb170-5"><a href="build-yourself-safety-net.html#cb170-5"></a><span class="cf">for</span> (i <span class="cf">in</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>]){</span>
+<span id="cb170-6"><a href="build-yourself-safety-net.html#cb170-6"></a>  <span class="co"># We will be setting a letter for the package name input</span></span>
+<span id="cb170-7"><a href="build-yourself-safety-net.html#cb170-7"></a>  test<span class="op">$</span><span class="kw">shiny_set_input</span>(</span>
+<span id="cb170-8"><a href="build-yourself-safety-net.html#cb170-8"></a>    <span class="st">&quot;main_ui_1-left_ui_1-pkg_name_ui_1-package&quot;</span>, </span>
+<span id="cb170-9"><a href="build-yourself-safety-net.html#cb170-9"></a>    i</span>
+<span id="cb170-10"><a href="build-yourself-safety-net.html#cb170-10"></a>  )</span>
+<span id="cb170-11"><a href="build-yourself-safety-net.html#cb170-11"></a>  <span class="co"># Once the input is set, we call dockerstats() </span></span>
+<span id="cb170-12"><a href="build-yourself-safety-net.html#cb170-12"></a>  <span class="co"># for this container and bind the results to </span></span>
+<span id="cb170-13"><a href="build-yourself-safety-net.html#cb170-13"></a>  <span class="co"># the previously created data.frame</span></span>
+<span id="cb170-14"><a href="build-yourself-safety-net.html#cb170-14"></a>  results &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
+<span id="cb170-15"><a href="build-yourself-safety-net.html#cb170-15"></a>    results, </span>
+<span id="cb170-16"><a href="build-yourself-safety-net.html#cb170-16"></a>    dockerstats<span class="op">::</span><span class="kw">dockerstats</span>(<span class="st">&quot;xmk2&quot;</span>, <span class="dt">extra =</span> i)</span>
+<span id="cb170-17"><a href="build-yourself-safety-net.html#cb170-17"></a>  )</span>
+<span id="cb170-18"><a href="build-yourself-safety-net.html#cb170-18"></a>}</span></code></pre></div>
+<pre><code>-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
+Shiny is computing
+✓ Shiny is still running
+-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
+Shiny is computing
+✓ Shiny is still running</code></pre>
+<p>And draw a small graph of this evolution:</p>
+
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="build-yourself-safety-net.html#cb172-1"></a><span class="kw">library</span>(dplyr, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb172-2"><a href="build-yourself-safety-net.html#cb172-2"></a><span class="co"># We are converting the MemUsage and record_time columns </span></span>
+<span id="cb172-3"><a href="build-yourself-safety-net.html#cb172-3"></a><span class="co"># to a format that can be used in {ggplot2}</span></span>
+<span id="cb172-4"><a href="build-yourself-safety-net.html#cb172-4"></a>results &lt;-<span class="st"> </span>results <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb172-5"><a href="build-yourself-safety-net.html#cb172-5"></a><span class="st">  </span><span class="kw">mutate</span>(</span>
+<span id="cb172-6"><a href="build-yourself-safety-net.html#cb172-6"></a>    <span class="dt">MemUsage =</span> <span class="kw">to_mib</span>(MemUsage), </span>
+<span id="cb172-7"><a href="build-yourself-safety-net.html#cb172-7"></a>    <span class="dt">record_time =</span> <span class="kw">as.POSIXct</span>(record_time)</span>
+<span id="cb172-8"><a href="build-yourself-safety-net.html#cb172-8"></a>  )</span>
+<span id="cb172-9"><a href="build-yourself-safety-net.html#cb172-9"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb172-10"><a href="build-yourself-safety-net.html#cb172-10"></a><span class="co"># Using the record time as an x axis, </span></span>
+<span id="cb172-11"><a href="build-yourself-safety-net.html#cb172-11"></a><span class="co"># then adding the MemUsage as a line (to watch the </span></span>
+<span id="cb172-12"><a href="build-yourself-safety-net.html#cb172-12"></a><span class="co"># evolution over time), then we add the &#39;extra&#39; column, </span></span>
+<span id="cb172-13"><a href="build-yourself-safety-net.html#cb172-13"></a><span class="co"># that contains the letters, as vertical lines + as </span></span>
+<span id="cb172-14"><a href="build-yourself-safety-net.html#cb172-14"></a><span class="co"># label</span></span>
+<span id="cb172-15"><a href="build-yourself-safety-net.html#cb172-15"></a><span class="kw">ggplot</span>(</span>
+<span id="cb172-16"><a href="build-yourself-safety-net.html#cb172-16"></a>  <span class="dt">data =</span> results, </span>
+<span id="cb172-17"><a href="build-yourself-safety-net.html#cb172-17"></a>  <span class="kw">aes</span>(<span class="dt">x =</span> record_time)</span>
+<span id="cb172-18"><a href="build-yourself-safety-net.html#cb172-18"></a>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb172-19"><a href="build-yourself-safety-net.html#cb172-19"></a><span class="st">  </span><span class="kw">geom_line</span>(</span>
+<span id="cb172-20"><a href="build-yourself-safety-net.html#cb172-20"></a>    <span class="kw">aes</span>(<span class="dt">y =</span> MemUsage)</span>
+<span id="cb172-21"><a href="build-yourself-safety-net.html#cb172-21"></a>  ) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb172-22"><a href="build-yourself-safety-net.html#cb172-22"></a><span class="st">  </span><span class="kw">geom_vline</span>(</span>
+<span id="cb172-23"><a href="build-yourself-safety-net.html#cb172-23"></a>    <span class="kw">aes</span>(<span class="dt">xintercept =</span> record_time)</span>
+<span id="cb172-24"><a href="build-yourself-safety-net.html#cb172-24"></a>  ) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb172-25"><a href="build-yourself-safety-net.html#cb172-25"></a><span class="st">  </span><span class="kw">geom_label</span>(</span>
+<span id="cb172-26"><a href="build-yourself-safety-net.html#cb172-26"></a>    <span class="kw">aes</span>(</span>
+<span id="cb172-27"><a href="build-yourself-safety-net.html#cb172-27"></a>      <span class="dt">y =</span> <span class="kw">max</span>(MemUsage), </span>
+<span id="cb172-28"><a href="build-yourself-safety-net.html#cb172-28"></a>      <span class="dt">label =</span> extra</span>
+<span id="cb172-29"><a href="build-yourself-safety-net.html#cb172-29"></a>    )</span>
+<span id="cb172-30"><a href="build-yourself-safety-net.html#cb172-30"></a>  ) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb172-31"><a href="build-yourself-safety-net.html#cb172-31"></a><span class="st">  </span><span class="kw">labs</span>(</span>
+<span id="cb172-32"><a href="build-yourself-safety-net.html#cb172-32"></a>    <span class="dt">title =</span> <span class="st">&quot;MemUsage of 10 inputs for package name&quot;</span></span>
+<span id="cb172-33"><a href="build-yourself-safety-net.html#cb172-33"></a>  )</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-43"></span>
+<img src="engineering-production-grade-shiny-apps_files/figure-html/11-step-by-step-secure-43-1.png" alt="Plot of the {dockerstats} evolution" width="672" />
+<p class="caption">
+FIGURE 11.6: Plot of the <code>{dockerstats}</code> evolution
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="a-reproducible-environment" class="section level2">
+<h2><span class="header-section-number">11.2</span> A reproducible environment</h2>
+<p>One of the challenges of building an app that needs to be sent to production is that you will need to work in a reproducible environment.
+What does this mean?
+<strong>When building a production application, you are building a piece of software that will be launched on another computer, be it a server in the cloud or someone else’s computer</strong>.
+Once your app is built, there are few chances that you will launch it on your own computer and that external users will connect to your computer.
+What will happen is that you will either give your users a package (which will be the simplest way to share it: bundle the packaged app to a <code>tar.gz</code>, then let people install it either manually or from a package repository), or a URL where they can connect and use your app.</p>
+<p>If you follow the <code>{golem}</code> workflow and all the good practices for a solid package, the application you have built should be deployable on another computer that has R.
+In that second case, <strong>you will have to think about how you can create your app in a reproducible environment</strong>: in other words, be sure that the app is deployed under the same configuration as your local application—R version, package versions, system requirements, environment variables…</p>
+<p>To help you achieve that, we will introduce two tools in the next section: <code>{renv}</code> <span class="citation">(Ushey <a href="#ref-R-renv" role="doc-biblioref">2020</a>)</span>, and <a href="https://www.docker.com/">Docker</a>.</p>
+<div id="renv" class="section level3">
+<h3><span class="header-section-number">11.2.1</span> <code>{renv}</code></h3>
+<div id="a.-about-renv" class="section level4 unnumbered">
+<h4>A. About <code>{renv}</code></h4>
+<p>How do we make sure the package versions we have installed on our machine stays the same in the production environment?
+And also, how can we be sure that, working as a team, we will be able to work together using the same package versions?</p>
+<p>From one package version to another, functions and behaviors change.
+Most of the time, new version means new functions, and new features.
+But from time to time, a new version means breaking change<strong>s. Monitoring these changes and how they potentially break our code is an hard task: be it because checking versions of packages on various machines can take time</strong>, or because debugging these bugs in your application logs is not straightforward.
+And of course, the moment when we discover the error might not be the perfect time for us, as we might not have enough free time on our calendar to debug the application which has stopped running…</p>
+<p>Let’s take for example this traceback from the logs of an application we sent one day on a Shiny Server:</p>
+<div class="sourceCode" id="cb173"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb173-1"><a href="build-yourself-safety-net.html#cb173-1"></a><span class="ex">root@westeros-vm</span>:/var/log/shiny-server# cat thewall(...)<span class="ex">.log</span></span>
+<span id="cb173-2"><a href="build-yourself-safety-net.html#cb173-2"></a><span class="ex">***</span> caught segfault ***</span>
+<span id="cb173-3"><a href="build-yourself-safety-net.html#cb173-3"></a>[<span class="ex">...</span>]</span>
+<span id="cb173-4"><a href="build-yourself-safety-net.html#cb173-4"></a><span class="ex">address</span> 0x5100004d, cause <span class="st">&#39;memory not mapped&#39;</span></span>
+<span id="cb173-5"><a href="build-yourself-safety-net.html#cb173-5"></a></span>
+<span id="cb173-6"><a href="build-yourself-safety-net.html#cb173-6"></a><span class="ex">Traceback</span>:</span>
+<span id="cb173-7"><a href="build-yourself-safety-net.html#cb173-7"></a><span class="ex">1</span>: rcpp_sf_to_geojson(sf, digits, factors_as_string)</span>
+<span id="cb173-8"><a href="build-yourself-safety-net.html#cb173-8"></a><span class="ex">2</span>: sf_geojson.sf(data)</span>
+<span id="cb173-9"><a href="build-yourself-safety-net.html#cb173-9"></a><span class="ex">3</span>: geojsonsf::sf_geojson(data)</span>
+<span id="cb173-10"><a href="build-yourself-safety-net.html#cb173-10"></a><span class="ex">4</span>: addGlifyPolygons(., data = pol_V1, color = les_couleurs, </span>
+<span id="cb173-11"><a href="build-yourself-safety-net.html#cb173-11"></a><span class="ex">popup</span> = <span class="st">&quot;val&quot;</span>, opacity = 1)</span>
+<span id="cb173-12"><a href="build-yourself-safety-net.html#cb173-12"></a><span class="ex">5</span>: function_list[[i]](value)</span>
+<span id="cb173-13"><a href="build-yourself-safety-net.html#cb173-13"></a><span class="ex">6</span>: freduce(value, <span class="kw">`</span><span class="ex">_function_list</span><span class="kw">`</span>)</span>
+<span id="cb173-14"><a href="build-yourself-safety-net.html#cb173-14"></a><span class="ex">7</span>: <span class="kw">`</span><span class="ex">_fseq</span><span class="kw">`</span>(<span class="kw">`</span><span class="ex">_lhs</span><span class="kw">`</span>)</span>
+<span id="cb173-15"><a href="build-yourself-safety-net.html#cb173-15"></a><span class="ex">8</span>: eval(quote(<span class="kw">`</span><span class="ex">_fseq</span><span class="kw">`</span>(<span class="kw">`</span><span class="ex">_lhs</span><span class="kw">`</span>)), <span class="fu">env</span>, env)</span>
+<span id="cb173-16"><a href="build-yourself-safety-net.html#cb173-16"></a>[<span class="ex">...</span>]</span>
+<span id="cb173-17"><a href="build-yourself-safety-net.html#cb173-17"></a><span class="ex">105</span>: captureStackTraces({</span>
+<span id="cb173-18"><a href="build-yourself-safety-net.html#cb173-18"></a><span class="kw">while</span> <span class="kw">(</span>!<span class="ex">.globals</span><span class="va">$stopped</span><span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb173-19"><a href="build-yourself-safety-net.html#cb173-19"></a><span class="ex">..stacktracefloor..</span>(serviceApp())</span>
+<span id="cb173-20"><a href="build-yourself-safety-net.html#cb173-20"></a><span class="ex">Sys.sleep</span>(0.001)    <span class="kw">}</span>})</span>
+<span id="cb173-21"><a href="build-yourself-safety-net.html#cb173-21"></a><span class="ex">106</span>: ..stacktraceoff..(captureStackTraces({</span>
+<span id="cb173-22"><a href="build-yourself-safety-net.html#cb173-22"></a><span class="kw">while</span> <span class="kw">(</span>!<span class="ex">.globals</span><span class="va">$stopped</span><span class="kw">)</span> <span class="kw">{</span>                </span>
+<span id="cb173-23"><a href="build-yourself-safety-net.html#cb173-23"></a><span class="ex">..stacktracefloor..</span>(serviceApp())</span>
+<span id="cb173-24"><a href="build-yourself-safety-net.html#cb173-24"></a><span class="ex">Sys.sleep</span>(0.001)    <span class="kw">}</span>}))</span>
+<span id="cb173-25"><a href="build-yourself-safety-net.html#cb173-25"></a><span class="ex">107</span>: runApp(Sys.getenv(<span class="st">&quot;SHINY_APP&quot;</span>), </span>
+<span id="cb173-26"><a href="build-yourself-safety-net.html#cb173-26"></a><span class="ex">port</span> = port, </span>
+<span id="cb173-27"><a href="build-yourself-safety-net.html#cb173-27"></a><span class="ex">launch.browser</span> = FALSE)</span>
+<span id="cb173-28"><a href="build-yourself-safety-net.html#cb173-28"></a><span class="ex">An</span> irrecoverable exception occurred. R is aborting now ...</span></code></pre></div>
+<p>Pretty hard to debug, isn’t it?
+What has actually happened?
+On that specific case, it turned out that the package version from <code>{geojsonsf}</code> <span class="citation">(Cooley <a href="#ref-R-geojsonsf" role="doc-biblioref">2020</a>)</span> was <code>1.2.1</code> on our development machine, and the one on the <code>{shiny}</code> server was updated to <code>1.3.0</code>, and there was a breaking change in the package, as shown in figure <a href="build-yourself-safety-net.html#fig:11-step-by-step-secure-44">11.7</a>.
+These kind of bugs are even harder to detect as <code>{geojsonsf}</code> was not a direct dependency of our app, but a dependency of one of our dependency, making it slightly more complex to identify.</p>
+
+<div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-44"></span>
+<img src="img/geojson.png" alt="Breaking changes in {geojsonsf}, a dependency of a dependency of our {shiny} application." width="100%" />
+<p class="caption">
+FIGURE 11.7: Breaking changes in <code>{geojsonsf}</code>, a dependency of a dependency of our <code>{shiny}</code> application.
+</p>
+</div>
+<p>The same thing could have happen if working as a team: one of the computer has an old version, when another one has updated to a more recent one.
+How do we prevent that?
+This is where the <code>{renv}</code> package comes into play: this package allows to have a project-based library, instead of a global one.
+In other words, instead of having a library that is global to your machine, <code>{renv}</code> allows to specify packages with fixed versions for a project.
+That means that you can have <code>{geojsonsf}</code> version <code>1.2.1</code> in one of your project, and the <code>1.3.0</code> in another, with the two not conflicting with each other.</p>
+</div>
+<div id="b.-using-renv" class="section level4 unnumbered">
+<h4>B. Using <code>{renv}</code></h4>
+<blockquote>
+<p>Underlying the philosophy of renv is that any of your existing workflows should just work as they did befo.<br />
+<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<style>.right{ text-align: right;}</style>
+<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
+<div class="right">
+<a href="https://rstudio.github.io/renv/articles/renv.html">Introduction to renv</a>
+</div></p>
+</blockquote>
+<p>The first thing to do with <code>{renv}</code> is initiating it with the <code>init()</code> function.</p>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="build-yourself-safety-net.html#cb174-1"></a><span class="co"># Loading and initiaing {renv}</span></span>
+<span id="cb174-2"><a href="build-yourself-safety-net.html#cb174-2"></a><span class="kw">library</span>(renv)</span>
+<span id="cb174-3"><a href="build-yourself-safety-net.html#cb174-3"></a><span class="kw">init</span>()</span></code></pre></div>
+<p>This function does several things:</p>
+<ul>
+<li>Create/modify the <code>.Rprofile</code> file at the root of your project. Here is an example of what this files may look like inside an empty project:</li>
+</ul>
+<pre><code>source(&quot;renv/activate.R&quot;)</code></pre>
+<p>In this example, there is just one call to a script, one located at <code>renv/activate.R</code>.</p>
+<ul>
+<li>It creates a <code>renv.lock</code> file, which will list all the package dependencies</li>
+</ul>
+<p>As we have initiated an empty project, we do not have any dependencies here.
+If you run this command in a project that already has scripts and dependencies, <code>{renv}</code> will try to locate them all, and add them to this file.
+Note that these packages may come from CRAN, Bioconductor, GitHub, GitLab, Bitbucket, and even local repositories.</p>
+<p>The <code>renv/</code> folder contains a series of files that store your settings and the necessary packages, using a structure that mimics a local repository.</p>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="build-yourself-safety-net.html#cb176-1"></a><span class="co"># Displaying the structure of the folder</span></span>
+<span id="cb176-2"><a href="build-yourself-safety-net.html#cb176-2"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;data-raw/renvinit/&quot;</span>, <span class="dt">recurse =</span> <span class="dv">5</span>)</span></code></pre></div>
+<pre><code>data-raw/renvinit/
+├── renv
+│   ├── activate.R
+│   └── settings.dcf
+├── renv.lock
+└── renvinit.Rproj</code></pre>
+<p>We will not go into details on this folder, as it is a rather complex structure and chances are that you will never have to update it by hand.</p>
+<p>With <code>{renv}</code>, you can choose to link this “local repository” to a local cache, <em>i.e</em> a folder which is common to all your projects and stores packages and the different versions you already installed (this is the default behavior) or to store the complete packages inside the project, making it portable.</p>
+<p>When you need a new package, you will have to install it in your local library.
+The fastest way to install new packages in your <code>{renv}</code> powered project is by using the <code>install.packages</code> function, which is shimmed by <code>{renv}</code>.
+This shim will search into the local cache to see if the package has already been cached, and if it is not, it will install and link it.</p>
+<p>Now, we need to install a new package, for example <code>{attempt}</code> <span class="citation">(Fay <a href="#ref-R-attempt" role="doc-biblioref">2020</a><a href="#ref-R-attempt" role="doc-biblioref">a</a>)</span>:</p>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="build-yourself-safety-net.html#cb178-1"></a><span class="co"># Installing attempt</span></span>
+<span id="cb178-2"><a href="build-yourself-safety-net.html#cb178-2"></a><span class="kw">install.packages</span>(<span class="st">&quot;attempt&quot;</span>)</span></code></pre></div>
+<p>We will now add a little call to this library now:</p>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="build-yourself-safety-net.html#cb179-1"></a><span class="co"># Create a fake script that launches {attempt}</span></span>
+<span id="cb179-2"><a href="build-yourself-safety-net.html#cb179-2"></a><span class="kw">write</span>(<span class="st">&quot;library(attempt)&quot;</span>, <span class="st">&quot;script.R&quot;</span>)</span></code></pre></div>
+<p>Once you want to update your <code>{renv}</code> <code>Lockfile</code>, call <code>snapshot()</code></p>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="build-yourself-safety-net.html#cb180-1"></a><span class="co"># Snapshoting the current status of the environment</span></span>
+<span id="cb180-2"><a href="build-yourself-safety-net.html#cb180-2"></a>renv<span class="op">::</span><span class="kw">snapshot</span>(<span class="dt">confirm =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<p>Note that if you are building an application as a package, use <code>renv::snapshot(type = "explicit")</code> (need version &gt; <code>0.9.3-99</code>): this will only capture the dependencies listed in the <code>DESCRIPTION</code> file.
+If you don’t specify this <code>type = "explicit"</code>, <code>{renv}</code> will go and look for all the package it can find in your file, and notably in your <code>.Rhistory</code>, meaning that if you one day used a function from <code>{dplyr}</code> but that your current package doesn’t use it anymore, <code>{renv}</code> will include it.</p>
+<pre><code>{
+  &quot;R&quot;: {
+    &quot;Version&quot;: &quot;3.6.1&quot;,
+    &quot;Repositories&quot;: [
+      {
+        &quot;Name&quot;: &quot;CRAN&quot;,
+        &quot;URL&quot;: &quot;https://cran.rstudio.com&quot;
+      }
+    ]
+  },
+  &quot;Packages&quot;: {
+    &quot;attempt&quot;: {
+      &quot;Package&quot;: &quot;attempt&quot;,
+      &quot;Version&quot;: &quot;0.3.0&quot;,
+      &quot;Source&quot;: &quot;Repository&quot;,
+      &quot;Repository&quot;: &quot;CRAN&quot;,
+      &quot;Hash&quot;: &quot;9aaae25e273927dba4e279caac478baa&quot;
+    },
+    &quot;renv&quot;: {
+      &quot;Package&quot;: &quot;renv&quot;,
+      &quot;Version&quot;: &quot;0.9.3&quot;,
+      &quot;Source&quot;: &quot;Repository&quot;,
+      &quot;Repository&quot;: &quot;CRAN&quot;,
+      &quot;Hash&quot;: &quot;c1a367437d8a8a44bec4b9d4974cb20c&quot;
+    },
+    &quot;rlang&quot;: {
+      &quot;Package&quot;: &quot;rlang&quot;,
+      &quot;Version&quot;: &quot;0.4.5&quot;,
+      &quot;Source&quot;: &quot;Repository&quot;,
+      &quot;Repository&quot;: &quot;CRAN&quot;,
+      &quot;Hash&quot;: &quot;1cc1b38e4db40ea6eb19ab8080bbed3b&quot;
+    }
+  }
+}</code></pre>
+<p>And now that you have a reproducible <code>{renv}</code> library, what is next?
+Of course, if you are either working as a team or deploying to a server, you will have to restore the state of your project, which is now living somewhere else, inside your current project / deployment.
+And to do that, the function to call is <code>renv::restore()</code>, which will update your local project with the dependencies listed inside your <code>Lockfile</code>.</p>
+<p>To sum up, here are the step to follow:</p>
+<ul>
+<li>Initiate the project with <code>renv::init()</code></li>
+<li>Install / remove packages</li>
+<li>Take a <code>snapshot()</code> of the state of your project</li>
+<li><code>renv::restore()</code> the state of your project using <code>renv.lock</code></li>
+<li>Share <code>.Rprofile</code>, <code>renv.lock</code>, <code>renv/activate.R</code> and <code>renv/settings.dcf</code> files for reproducibility</li>
+</ul>
+<p>Of course, <code>renv::restore()</code> comes with another superpower: time traveling!
+If you decide to update a package in your project, and realize that this package makes the application crash (<em>e.g.</em> an update to <code>{geojsonsf}</code>), you can go back in time to a previous version of your library by calling the <code>restore()</code> function.</p>
+<p>There are more things you can do with <code>{renv}</code>.
+If you want to know more, we invite you to refer to the <a href="https://rstudio.github.io/renv">official documentation</a>.</p>
+</div>
+</div>
+<div id="docker" class="section level3">
+<h3><span class="header-section-number">11.2.2</span> Docker</h3>
+<div id="a.-r-docker-shiny" class="section level4 unnumbered">
+<h4>A. R, Docker, <code>{shiny}</code></h4>
+<p>Docker is a program that allows to download, install, create, launch and stop multiple operating systems, called containers, on a machine, which will be called the host.
+This host can be your local computer, or the server where you deploy your application/s.</p>
+<p>Docker was designed for <strong>enclosing software environments inside an image that can later be launched</strong>.
+The general idea is that with Docker, you are defining in a <code>Dockerfile</code> all the “rules” that are used to create a given environment, and then you can use this file (and the linked files, for example the R package containing your app) to <strong>deploy your application on any given server that can run Docker</strong>.
+That way, if the <code>Dockerfile</code> can compile on your machine and if you can run it, it should work everywhere (of course, it is a little bit more complex than that, but you get the idea).</p>
+<p>Why Docker in the context of <code>{shiny}</code> apps?
+Because Docker allows you to abstract away the complexity of managing multiple versions of R and multiple version of the same package, or even different versions of the same system requirement.
+For example, let’s take our example with the breaking change in <code>{geojsonsf}</code> we used in the previous section.
+With Docker, we can safely specify a <code>1.2.1</code> version in our image, and changing versions on the server would not have broken our code.</p>
+<p>By using Docker for your deployment, you can build and deploy an application with the very same version of packages and R as the one on your computer.
+And of course, you can change them without breaking the rest of the machine: everything that happens in a container stays in a container.
+That way, if your are building your application with an older version of <code>{shiny}</code>, <strong>you are sure that sending it to production will not break everything: the version inside the Docker is the same as the one from your machine</strong>.
+And later, if you update <code>{shiny}</code> and start a new project, you can deploy your app with another version of the package.
+Same goes for your version of R.</p>
+</div>
+<div id="b.-building-a-dockerfile-for-your-app" class="section level4 unnumbered">
+<h4>B. Building a Dockerfile for your app</h4>
+<p>Good news!
+If you are building your app with <code>{golem}</code>, the creation of the <code>Dockerfile</code> is just one function away!
+If you have a look at the <code>03_deploy.R</code> file in the <code>dev</code> folder, you will find a series of functions that can create the <code>Dockerfile</code> for your project: either as a generic docker image, or for <code>{shiny}</code>Proxy or Heroku.</p>
+<p>For example, to create a <code>Dockerfile</code> for a <code>{golem}</code> project, you can run, from the root of your package:</p>
+<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="build-yourself-safety-net.html#cb182-1"></a>golem<span class="op">::</span><span class="kw">add_dockerfile</span>()</span></code></pre></div>
+<p>Let’s take some time to understand this file, or and details how we could be building it from scratch.</p>
+<ol style="list-style-type: decimal">
+<li><code>FROM</code></li>
+</ol>
+<pre><code>FROM rocker/r-ver:4.0.3</code></pre>
+<p>This line defines what version of R to use for deploying your application.
+This <code>FROM</code> line is the one that sets an image to start from: you rarely (if ever) build a Docker image from nothing, but instead you use an existing image on top of which you build your own image.
+Here, we choose one of the <a href="https://hub.docker.com/r/rocker/r-ver/">r-ver</a> docker images, based on the output of:</p>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="build-yourself-safety-net.html#cb184-1"></a><span class="kw">R.Version</span>()<span class="op">$</span>version.string</span></code></pre></div>
+<pre><code>[1] &quot;R version 4.0.3 (2020-10-10)&quot;</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li><code>RUN</code></li>
+</ol>
+<p>The <code>RUN</code> calls in the file refers to bash calls that are used to build the image.
+For example, the second line of the <code>Dockerfile</code> installs all the system requirements needed by our application.</p>
+<pre><code>RUN apt-get update &amp;&amp; \
+apt-get install -y  git-core \
+libcurl4-openssl-dev libssh2-1-dev \
+libssl-dev libxml2-dev make \
+zlib1g-dev &amp;&amp; rm -rf /var/lib/apt/lists/*</code></pre>
+<p>In the subsequent <code>RUN</code> calls, <code>{golem}</code> chooses to call <code>remotes::install_version()</code> to be sure we install the version of the package that matches the one from your computer.</p>
+<pre><code>RUN Rscript -e \
+&#39;remotes::install_version(&quot;xfun&quot;,upgrade=&quot;never&quot;,version=&quot;0.19&quot;)&#39;</code></pre>
+<p>As you can see, it matches the local version:</p>
+<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="build-yourself-safety-net.html#cb188-1"></a><span class="kw">packageVersion</span>(<span class="st">&quot;xfun&quot;</span>)</span></code></pre></div>
+<pre><code>[1] ‘0.19’</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li><code>ADD</code></li>
+</ol>
+<p>This Docker entry takes a folder or a file, and copies it inside the image.
+With <code>{golem}</code>, we are adding the current project, containing the app, to a folder called <code>/build_zone</code>.</p>
+<pre><code>ADD . /build_zone</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li><code>EXPOSE</code></li>
+</ol>
+<p>This command defines which port of the container will be available from the outside of the container.</p>
+<pre><code>EXPOSE 80</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li><code>CMD</code></li>
+</ol>
+<p>This final command is the one that is launched when you run a container.
+With a <code>{shiny}</code> app, this command is the one that launches the application.</p>
+<pre><code>CMD R -e \
+ &quot;options(&#39;shiny.port&#39;=80,shiny.host=&#39;0.0.0.0&#39;);golex::run_app()&quot;</code></pre>
+</div>
+<div id="c.-dockerfiler" class="section level4 unnumbered">
+<h4>C. <code>{dockerfiler}</code></h4>
+<p>If you want to do everything from the R command line, the <code>{dockerfiler}</code> <span class="citation">(Fay <a href="#ref-R-dockerfiler" role="doc-biblioref">2019</a>)</span> package is here for you!
+This package allows you to generate a <code>Dockerfile</code> straight from R:</p>
+<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="build-yourself-safety-net.html#cb193-1"></a><span class="kw">library</span>(dockerfiler)</span>
+<span id="cb193-2"><a href="build-yourself-safety-net.html#cb193-2"></a><span class="co"># Creating a new Dockerfile object</span></span>
+<span id="cb193-3"><a href="build-yourself-safety-net.html#cb193-3"></a>my_dock &lt;-<span class="st"> </span>Dockerfile<span class="op">$</span><span class="kw">new</span>()</span>
+<span id="cb193-4"><a href="build-yourself-safety-net.html#cb193-4"></a><span class="co"># Adding RUN, ADD, WORKDIR and EXPOSE commands</span></span>
+<span id="cb193-5"><a href="build-yourself-safety-net.html#cb193-5"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="st">&quot;apt-get update &amp;&amp; apt-get install -y git-core&quot;</span>)</span>
+<span id="cb193-6"><a href="build-yourself-safety-net.html#cb193-6"></a>my_dock<span class="op">$</span><span class="kw">ADD</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;/&quot;</span>)</span>
+<span id="cb193-7"><a href="build-yourself-safety-net.html#cb193-7"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="st">&quot;mkdir /build_zone&quot;</span>)</span>
+<span id="cb193-8"><a href="build-yourself-safety-net.html#cb193-8"></a>my_dock<span class="op">$</span><span class="kw">ADD</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;/build_zone&quot;</span>)</span>
+<span id="cb193-9"><a href="build-yourself-safety-net.html#cb193-9"></a>my_dock<span class="op">$</span><span class="kw">WORKDIR</span>(<span class="st">&quot;/build_zone&quot;</span>)</span>
+<span id="cb193-10"><a href="build-yourself-safety-net.html#cb193-10"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="kw">r</span>(remotes<span class="op">::</span><span class="kw">install_local</span>(<span class="dt">upgrade=</span><span class="st">&quot;never&quot;</span>)))</span>
+<span id="cb193-11"><a href="build-yourself-safety-net.html#cb193-11"></a>my_dock<span class="op">$</span><span class="kw">EXPOSE</span>(<span class="dv">80</span>)</span>
+<span id="cb193-12"><a href="build-yourself-safety-net.html#cb193-12"></a><span class="co"># Viewing the Dockerfile</span></span>
+<span id="cb193-13"><a href="build-yourself-safety-net.html#cb193-13"></a>my_dock</span></code></pre></div>
+<pre><code>FROM rocker/r-base
+RUN apt-get update &amp;&amp; apt-get install -y git-core
+ADD . /
+RUN mkdir /build_zone
+ADD . /build_zone
+WORKDIR /build_zone
+RUN R -e &#39;remotes::install_local(upgrade = &quot;never&quot;)&#39;
+EXPOSE 80</code></pre>
+</div>
+<div id="d.-docker-renv" class="section level4 unnumbered">
+<h4>D. Docker &amp; <code>{renv}</code></h4>
+<p>If you use <code>{renv}</code> to build your <code>{shiny}</code> application, it can also be used inside your Docker container.
+To make those two tools work together, you will have to copy the files produced by <code>{renv}</code> inside the container: <code>.Rprofile</code>, <code>renv.lock</code>, <code>renv/activate.R</code> and <code>renv/settings.dcf</code> files.</p>
+<p>Then run <code>renv::restore()</code> inside your application, instead of using the calls to <code>remotes::install_version()</code> as they are currently implemented when doing it with <code>{golem}</code>.</p>
+<p>At the time of writing these lines, there is no native support of <code>{renv}</code> (with or without Docker) in <code>{golem}</code>, but that is something we can expect to happen in future versions of <code>{golem}</code>.</p>
+</div>
+<div id="e.-develop-inside-a-docker-container" class="section level4 unnumbered">
+<h4>E. Develop inside a Docker container</h4>
+<p>Developers have their own R versions and operating systems, which generally differs from the one used on the production server, leading to issues when it comes to deploying the application.</p>
+<p>If you plan on using Docker as a deployment mechanism, you can also use Docker as a local developer environment.
+Thanks to the containers maintained by the <a href="https://www.rocker-project.org/">The Rocker Project</a>, it’s possible to have a local environment that comes close to what you will find on the production server.
+What’s even more interesting is that this project offers images that can contain RStudio server: that means that the application that you will deploy in production can have the very same configuration as the one developers are using on their local machine: thanks to these containers, developers can work on a version of R that matches the one from the production server, using packages that will exactly match the one used in production.</p>
+<p>Even more interesting is using RStudio inside Docker in combination with <code>{renv}</code>: the developers work on their machines, inside an IDE they know, and with system requirements (R versions, packages…) that can be reproduced on the production server!</p>
+</div>
+<div id="f.-read-more-about-docker" class="section level4 unnumbered">
+<h4>F. Read more about Docker</h4>
+<ul>
+<li><p><a href="https://colinfay.me/docker-r-reproducibility/">An Introduction to Docker for R Users</a></p></li>
+<li><p>An Introduction to Rocker: Docker Containers for R <span class="citation">(Boettiger and Eddelbuettel <a href="#ref-RJ-2017-065" role="doc-biblioref">2017</a>)</span></p></li>
+<li><p>The Rockerverse: Packages and Applications for Containerization with R <span class="citation">(Nüst et al. <a href="#ref-rockerverse" role="doc-biblioref">2020</a>)</span></p></li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-RJ-2017-065">
+<p>Boettiger, Carl, and Dirk Eddelbuettel. 2017. “An Introduction to Rocker: Docker Containers for R.” <em>The R Journal</em> 9 (2): 527–36. <a href="https://doi.org/10.32614/RJ-2017-065">https://doi.org/10.32614/RJ-2017-065</a>.</p>
+</div>
+<div id="ref-R-chromote">
+<p>Chang, Winston. 2020. <em>Chromote: Headless Chrome Web Browser Interface</em>.</p>
+</div>
+<div id="ref-R-shinytest">
+<p>Chang, Winston, and Gábor Csárdi. 2019. <em>Shinytest: Test Shiny Apps</em>. <a href="https://github.com/rstudio/shinytest">https://github.com/rstudio/shinytest</a>.</p>
+</div>
+<div id="ref-R-geojsonsf">
+<p>Cooley, David. 2020. <em>Geojsonsf: GeoJSON to Simple Feature Converter</em>. <a href="https://github.com/SymbolixAU/geojsonsf">https://github.com/SymbolixAU/geojsonsf</a>.</p>
+</div>
+<div id="ref-R-processx">
+<p>Csárdi, Gábor, and Winston Chang. 2020. <em>Processx: Execute and Control System Processes</em>.</p>
+</div>
+<div id="ref-R-shinyloadtest">
+<p>Dipert, Alan, Barret Schloerke, and Barbara Borges. 2020. <em>Shinyloadtest: Load Test Shiny Applications</em>.</p>
+</div>
+<div id="ref-R-dockerfiler">
+<p>Fay, Colin. 2019. <em>Dockerfiler: Easy Dockerfile Creation from R</em>. <a href="https://github.com/ColinFay/dockerfiler">https://github.com/ColinFay/dockerfiler</a>.</p>
+</div>
+<div id="ref-R-attempt">
+<p>Fay, Colin. 2020a. <em>Attempt: Tools for Defensive Programming</em>. <a href="https://github.com/ColinFay/attempt">https://github.com/ColinFay/attempt</a>.</p>
+</div>
+<div id="ref-R-crrry">
+<p>Fay, Colin. 2020c. <em>Crrry: Crrri Recipes for Shiny</em>. <a href="https://github.com/ColinFay/crrry">https://github.com/ColinFay/crrry</a>.</p>
+</div>
+<div id="ref-R-dockerstats">
+<p>Fay, Colin. 2020d. <em>Dockerstats: A Wrapper Around Docker Stats</em>. <a href="https://github.com/ColinFay/dockerstats">https://github.com/ColinFay/dockerstats</a>.</p>
+</div>
+<div id="ref-R-hexmake">
+<p>Fay, Colin. 2020g. <em>Hexmake: Hex Stickers Maker</em>. <a href="https://github.com/colinfay/hexmake">https://github.com/colinfay/hexmake</a>.</p>
+</div>
+<div id="ref-R-golem">
+<p>Fay, Colin, Vincent Guyader, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
+</div>
+<div id="ref-R-crrri">
+<p>Lesur, Romain, and Christophe Dervieux. 2020. <em>Crrri: An Interface with Headless Chromium/Chrome</em>.</p>
+</div>
+<div id="ref-rockerverse">
+<p>Nüst, Daniel, Dirk Eddelbuettel, Dom Bennett, Robrecht Cannoodt, Dav Clark, Gergely Daroczi, Mark Edmondson, et al. 2020. “The Rockerverse: Packages and Applications for Containerization with R.”</p>
+</div>
+<div id="ref-R-renv">
+<p>Ushey, Kevin. 2020. <em>Renv: Project Environments</em>. <a href="https://rstudio.github.io/renv/">https://rstudio.github.io/renv/</a>.</p>
+</div>
+<div id="ref-R-testthat">
+<p>Wickham, Hadley. 2020. <em>Testthat: Unit Testing for R</em>.</p>
+</div>
+<div id="ref-R-devtools">
+<p>Wickham, Hadley, Jim Hester, and Winston Chang. 2020. <em>Devtools: Tools to Make Developing R Packages Easier</em>.</p>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="47">
+<li id="fn47"><p>Based on the number of Reverse dependencies &amp; suggests at <a href="https://cran.r-project.org/web/packages/testthat/index.html" class="uri">https://cran.r-project.org/web/packages/testthat/index.html</a><a href="build-yourself-safety-net.html#fnref47" class="footnote-back">↩︎</a></p></li>
+<li id="fn48"><p>See <a href="https://github.com/puppeteer/puppeteer/issues/441">puppeteer/issues/441</a> for the code to set the text input values.<a href="build-yourself-safety-net.html#fnref48" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+<hr/>
+<footer>
+<a href="rtask.thinkr.fr"><img src="img/logo400_129.png" alt="ThinkR Website"/></a>
+<!--https://yihui.org/en/2018/09/target-blank/-->
+<script>
+  (function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+</footer>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="build-app-golem.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="version-control.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook/js/app.min.js"></script>
+<script src="libs/gitbook/js/lunr.js"></script>
+<script src="libs/gitbook/js/clipboard.min.js"></script>
+<script src="libs/gitbook/js/plugin-search.js"></script>
+<script src="libs/gitbook/js/plugin-sharing.js"></script>
+<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook/js/jquery.highlight.js"></script>
+<script src="libs/gitbook/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/11-step-by-step-secure.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

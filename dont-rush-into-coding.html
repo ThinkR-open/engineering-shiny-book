@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps</title>
+  <title>Chapter 7 Don’t rush into coding | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:title" content="Chapter 7 Don’t rush into coding | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
   
   <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps" />
+  <meta name="twitter:title" content="Chapter 7 Don’t rush into coding | Engineering Production-Grade Shiny Apps" />
   
   <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="version-control.html"/>
-<link rel="next" href="need-for-optimization.html"/>
+<link rel="prev" href="ux-matters.html"/>
+<link rel="next" href="setting-up-for-success.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
@@ -484,150 +484,185 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="deploy" class="section level1">
-<h1><span class="header-section-number">Chapter 13</span> Deploy your application</h1>
+<div id="dont-rush-into-coding" class="section level1">
+<h1><span class="header-section-number">Chapter 7</span> Don’t rush into coding</h1>
+<div id="designing-before-coding" class="section level2">
+<h2><span class="header-section-number">7.1</span> Designing before coding</h2>
 <blockquote>
-<p>Your deploys should be as boring, straightforward, and stress-free as possible.<br />
+<p>You have to believe that software design is a craft worth all the intelligence, creativity, and passion you can muster.
+Otherwise you will not look past the easy, stereotyped ways of approaching design and implementation; <strong>you will rush into coding when you should be thinking</strong>.
+You’ll carelessly complicate when you should be relentlessly simplifying — and you will wonder why your code bloats and debugging is so hard.<br />
 <!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
 <style>.right{ text-align: right;}</style>
 <!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
 <div class="right">
-<a href="https://zachholman.com/posts/deploying-software">How to Deploy Software - Zach Holman</a>
+<a href="http://www.catb.org/~esr/writings/taoup/html/ch01s09.html">The Art of Unix Programming - Attitude Matters Too</a>
 </div></p>
 </blockquote>
-<p>Once your app is built, you are ready to deploy it!
-In other words, your software is now ready to be used by other users.
-There are two main ways to share your application and make it available to others: by creating a package and making it installable, or by sending it to a remote server.
-We will see in this part how you can do that using <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span>.</p>
-<div id="before-deployment-check-list" class="section level2">
-<h2><span class="header-section-number">13.1</span> Before deployment Check-list</h2>
-<p>Here is a quick checklist of things to think about once your application is ready, and before sending it to production</p>
+<div id="the-urge-to-code" class="section level3">
+<h3><span class="header-section-number">7.1.1</span> The Urge to Code</h3>
+<p>At the moment you receive the specifications for your app, it is tempting to rush into coding.
+And that is perfectly normal: we’re R developers because we love building software, so as soon as a problem emerges, our brain starts thinking about technical implementation, packages, pieces of code, and all these things that we love to do when we are building an application.</p>
+<p>But <strong>rushing into coding from the very beginning is not the safest way to go</strong>.
+Focusing on technical details from the very beginning can make you miss the big picture, be it for the whole app if you are in charge of the project, or for the piece of the whole app you have been assigned to.
+Have you ever faced a situation in a coding project where you tell yourself “Oh, I wish I had realized this sooner, because now I need to refactor a lot of my code for this specific thing”?
+Yes, we all have been in this situation: realizing too late that the thing we have implemented does not work with another feature we discover along the road.
+And what about “Oh I wish I had realized sooner that this package existed before trying to implement my own functions to do that!”<a href="#fn35" class="footnote-ref" id="fnref35"><sup>35</sup></a>.
+Same thing: we’re jumping straight into solving programming problem when someone else has open-sourced a solution to this very same problem.</p>
+<p>Of course, implementing your own solution might be a good thing in specific cases: avoiding heavy dependencies, incompatible licensing, the joy of the intellectual challenge… But <strong>when building production software, it is safer to go for an existing solution if it exists and fits in the project: existing packages/software that are widely used by the community and by the industry benefit from wider testing, wider documentation, and a larger audience if you need to ask questions</strong>.
+And of course, it saves time, be it immediately or in the long run: re-using an existing solution allows you to save time re-implementing it, so you save time today, but it also prevent you from having to detect and correct bugs, saving you time tomorrow<a href="#fn36" class="footnote-ref" id="fnref36"><sup>36</sup></a> .</p>
+<p>Note also that assessing that a dependency/technology is a good choice for an application is not an easy task: there is a difference between <em>thinking</em> something will be the good choice and <em>knowing</em> that this choice is the correct one.
+Most of the time, when faced with a new technology, it makes sense to take some time to write a small prototype that tests the features we want to use.
+This process of prototyping small applications to test features is made easier notably by using the <code>{shinipsum}</code> package, that we will see in Chapter <a href="building-ispum-app.html#building-ispum-app">9</a>.</p>
+<p>Before rushing into coding, take some time to conceptualize your application / modules on a piece of paper.
+That will help you get the big picture of the piece of code you will be writing: what are the inputs, what are the outputs, what packages / services you can use inside your application, how it will fit in the rest of the project, and so on and so forth.</p>
+</div>
+<div id="knowing-where-to-search" class="section level3">
+<h3><span class="header-section-number">7.1.2</span> Knowing where to search</h3>
+<p>Being a good developer is knowing where to search, and what to search for.
+Here are a non-exhaustive list of places you can look for if you are stuck/looking for existing packages.</p>
+<div id="r-shiny" class="section level4 unnumbered">
+<h4>R &amp; <code>{shiny}</code></h4>
 <ul>
-<li><p><input type="checkbox" disabled="" />
-<code>devtools::check()</code>, run from the command line, returns 0 errors, 0 warnings, 0 notes</p></li>
-<li><p><input type="checkbox" disabled="" />
-The current version number is valid, <em>i.e</em> if the current app is an update, the version number has been bumped</p></li>
-<li><p><input type="checkbox" disabled="" />
-Everything is fully documented</p></li>
-<li><p><input type="checkbox" disabled="" />
-Test coverage is good, i.e you cover a sufficient amount of the code base, and these tests cover the core/strategic algorithms</p></li>
-<li><p><input type="checkbox" disabled="" />
-It’s clear to everyone involved in the project who is the person to call if something goes wrong</p></li>
-<li><p><input type="checkbox" disabled="" />
-It’s clear to everyone involved in the project what is the debugging process, how to communicate bugs to the developer team, and how long it will take to get changes fixed</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The server it is deployed on has all the necessary software installed (Docker, Connect, <code>{shiny}</code> Server…) to make the application run</p></li>
-<li><p><input type="checkbox" disabled="" />
-The server has all the system requirements needed (<em>i.e</em> the system libraries), and if not, they are installed with the application (if it’s dockerized)</p></li>
-<li><p><input type="checkbox" disabled="" />
-The application, if deployed on a server, will be deployed on a port which will be accessible by the users</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The environment variables from the production server are managed inside the application</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The app is launched on the correct port, or at least this port can be configured via an environment variable</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The server where the app is deployed have access to the data sources (database, API…)</p></li>
-<li><p><input type="checkbox" disabled="" />
-If the app records data, there are backups for these data.</p></li>
+<li><a href="https://cran.r-project.org/web/views/WebTechnologies.html">CRAN Task View: Web Technologies and Services</a> and <a href="https://cran.r-project.org/web/views/Databases.html">CRAN Task View: Databases with R</a>, which will be useful for interacting with web technologies and databases.</li>
+<li><a href="https://cloudyr.github.io/">The cloudyr project</a>, which focuses on cloud services and R.</li>
+<li><a href="https://r-pkg.org/">The METACRAN</a>, which is a search engine for R packages.</li>
+<li><a href="https://github.com/search?q=language%3AR">GitHub search using <code>language:R</code></a>: when doing a search on GitHub, do not forget to add the language specific tag.</li>
+<li><a href="https://community.rstudio.com/c/shiny/8">RStudio Community</a> has a series of post about <code>{shiny}</code>: question, announcement, best practices…</li>
 </ul>
 </div>
-<div id="sharing-your-app-as-a-package" class="section level2">
-<h2><span class="header-section-number">13.2</span> Sharing your app as a package</h2>
-<div id="install-on-your-machine" class="section level3">
-<h3><span class="header-section-number">13.2.1</span> Install on your machine</h3>
-<p>A <code>{shiny}</code> application built with <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> is <strong>by definition</strong> an R package.
-This <code>{shiny}</code> App as a Package is also helpful when it comes to deploying your application: packages are designed to be shareable pieces of R code.</p>
-<p>Before sending it to a remote server or sharing it to the world, <strong>the first step is testing if the package can be installed on your own computer</strong>.
-To do that, when you are in the project corresponding to the golem you built, you can call <code>remotes::install_local()</code> to install the application on your computer.
-Of course, if you are somewhere else on your machine, you can call <code>remotes::install_local("path/to/app")</code>.
-If you are using the RStudio IDE, you can also click on the <code>Build</code> tab, then click on the <code>Install and Restart</code> button.</p>
-<p>This should restart your R session, and call <code>library(yourpackagename)</code>.
-Then, try the <code>run_app()</code> function to check that the app can be launched.</p>
-</div>
-<div id="share-as-built-package" class="section level3">
-<h3><span class="header-section-number">13.2.2</span> Share as built package</h3>
-<div id="a.-local-build" class="section level4 unnumbered">
-<h4>A. Local build</h4>
-<p>Building an app as a package also means that this app can be bundled into an archive, and then shared, either as is or using a package repository like the CRAN.</p>
-<p>To do that, you first need an bundled version of your app, which can be created using the <code>build()</code> function from <code>{pkgbuild}</code> <span class="citation">(Wickham and Hester <a href="#ref-R-pkgbuild" role="doc-biblioref">2020</a>)</span> in the same working directory as your application.
-Calling this function will create a .tar.gz file that is called <code>mygolem_0.0.1.tar.gz</code> (of course with the name of your package).
-Once you have this <code>tar.gz</code>, you can send it to your favorite package repository.</p>
-<p>You can also share the file as is with others.
-If you do so, they will have to install the app with <code>remotes::install_local("path/to/tar.gz")</code>, that will take care of doing a full installation of the app, including installing the required dependencies.<br />
-Then, they can do <code>library(yourpackagename)</code> and <code>run_app()</code> on their machine.</p>
-</div>
-<div id="b.-send-to-a-package-repository" class="section level4 unnumbered">
-<h4>B. Send to a package repository</h4>
-<p>The upside of building the application <code>{golem}</code>, <em>i.e</em> as a package, is that you can share your application on a remote package manager, the more widely used for example on the CRAN like <code>{dccvalidator}</code> <span class="citation">(Woo, Kauer, and Montgomery <a href="#ref-R-dccvalidator" role="doc-biblioref">2020</a>)</span>, or on BioConductor like <code>{spatialLIBD}</code> <span class="citation">(Collado-Torres, Maynard, and Jaffe <a href="#ref-R-spatialLIBD" role="doc-biblioref">2020</a>)</span>.
-But any other package manager will work: for example if the company uses RStudio Package Manager, your application can be installed here as any other package.
-If your application is open-source, the package structure also allows to install from GitHub, by using the <code>remotes::install_github()</code> function.<a href="#fn53" class="footnote-ref" id="fnref53"><sup>53</sup></a>
-For example, this is what you can do with <code>{hexmake}</code>, or <code>{tidytuesday}</code>: as they are open-source packages, they can be installed from GitHub.
-Then, once your application is installed as a package on the users’ machines, they can do <code>library(yourpackagename)</code> and <code>run_app()</code>.</p>
-<p>The advantage of this solution being that R users are familiar with package installation, so it makes using your application easier for them.
-Also, and we will see it in the next section, but making your application available as a standard R package makes it easier to deploy it: for example if your RStudio Connect is coupled with your RStudio Package Manager, the deployment file just have to contain one line launching the application.</p>
-<p>Note that releasing to CRAN or BioConductor requires extra effort: you have to comply to a series of rules.
-But good news: as you have been following the best practices from this book, you should not have to put that much extra efforts!</p>
-<p>Know more about releasing on CRAN:</p>
+<div id="web" class="section level4 unnumbered">
+<h4>Web</h4>
 <ul>
-<li><a href="https://cran.r-project.org/web/packages/submission_checklist.html">Checklist for CRAN submissions</a></li>
-<li><a href="https://cran.r-project.org/web/packages/policies.html">CRAN Repository Policy</a></li>
-<li><a href="https://r-pkgs.org/release.html">R packages - Chapter 18 Releasing a package</a></li>
-<li><a href="https://kbroman.org/pkg_primer/pages/cran.html">Getting your R package on CRAN</a></li>
-<li><a href="https://github.com/ThinkR-open/prepare-for-cran">prepare-for-cran - A Collaborative list of things to know before submitting to CRAN</a></li>
+<li><a href="https://developer.mozilla.org/">Mozilla developer center</a> is one of the most comprehensive resource platform when it comes to web technologies (HTML, CSS, and JavaScript)</li>
+<li><a href="https://developers.google.com/">Google Developer Center</a> also has a series of resources that can be helpful when it comes to web technologies.</li>
+<li><a href="https://www.freecodecamp.org/">FreeCodeCamp</a> contains more that 2000 hours of free courses about web technologies, plus a blog and forum.</li>
 </ul>
 </div>
 </div>
+<div id="about-concept-map" class="section level3">
+<h3><span class="header-section-number">7.1.3</span> About Concept Map</h3>
+<p>Using a concept map to think about your app can be a valuable method to help you grasp the big picture of your application.</p>
+<p>Concept maps are a widely used tool, be it in the software engineering world and in many other fields.
+The idea with concept maps is to take a piece of paper (or a digital tool), where you <strong>draw all the concepts that come to mind for a specific topic, and all the relationships that link these concepts together</strong>.
+Drawing a concept map is a way to organize the knowledge of a specific topic.</p>
+<p>When doing this for a piece software, we are not trying to add technical details about the way things are implemented: we are listing down the various “actors” (the concepts) around our app, with the relationships they have.
+For example, here is a very simple concept map of the <code>{hexmake}</code> <span class="citation">(Fay <a href="#ref-R-hexmake" role="doc-biblioref">2020</a><a href="#ref-R-hexmake" role="doc-biblioref">g</a>)</span> app.</p>
+
+<div class="figure" style="text-align: center"><span id="fig:07-step-by-step-design-1"></span>
+<img src="img/hexmakemap.png" alt="{hexmake} concept map, built with XMind (https://www.xmind.net)" width="100%" />
+<p class="caption">
+FIGURE 7.1: <code>{hexmake}</code> concept map, built with XMind (<a href="https://www.xmind.net" class="uri">https://www.xmind.net</a>)
+</p>
 </div>
-<div id="deploying-apps-with-golem" class="section level2">
-<h2><span class="header-section-number">13.3</span> Deploying Apps with <code>{golem}</code></h2>
-<p>The other way to make your application available to others is by sending it to a remote server that can serve <code>{shiny}</code> applications.
-In other words, instead of having to install the application on their machines, <strong>they can crack open a web browser and navigate to the URL where the application is deployed</strong>.
-Deploying to a server is the solution of choice when you want to make your application available to a wide public: on a server, visitors do not have to have R installed on their computer, they do not have to install a package or launch it, they can just browse the application like any other web application.
-This solution is also a common choice in companies that have strict security requirements: the IT team might not be willing to let everyone install software on their machine, and sharing an application on a server allows them more control over who can access the application.
-For example, deploying on a server allows to use proxy, and to filter by IP: then, only a subset of people can have access to the application.</p>
-<p>When using <code>{golem}</code>, you can open the <code>dev/03_deploy.R</code> and find the functions for server deployment.
-At the time of writing this book, there are two main ways to deploy a shiny app on a server:</p>
+<p>As you can see, we are not detailing the technical implementations: we are not writing the external database specification, the connection process, how the different modules interact with each other… The goal of a concept map is to think about the big picture, to see the “who and what” of the application.
+Here, creating this concept map helps us list the flow of the app: there is a user, that wants to configure an hex, built with default image or with an uploaded one, and once this hex is finished, the user can either download it or register it in a database.
+This database can be browsed, and restore hex.
+The user can also export a <code>.hex</code> file, that can restore an app configuration.</p>
+<p>Once this general flow is written down, you can get back to it several times during the process of building the app, but it is also a perfect tool at the end to see if everything is in place: once the application is finished, we can question it:</p>
 <ul>
-<li>RStudio’s solutions</li>
-<li>A docker based solution</li>
+<li>Can we point to any concept and confirm it’s there?</li>
+<li>Can we look at every relationship and see they all work as expected?</li>
 </ul>
-<div id="rstudio-environments" class="section level3">
-<h3><span class="header-section-number">13.3.1</span> RStudio Environments</h3>
-<p>RStudio proposes three services to deploy <code>{shiny}</code> application:</p>
-<ul>
-<li><p>shinyapps.io, an on-premise solution that can serve <code>{shiny}</code> application (freemium)</p></li>
-<li><p><code>{shiny}</code>-server, a software you have to install on your own server, and that can be used to deploy multiple applications (you can find either an open source or a professional edition)</p></li>
-<li><p>RStudio connect, a server-based solution that can deploy <code>{shiny}</code> applications and markdown documents (and other kind of content), and that serves them as ordinary websites</p></li>
-</ul>
-<p>Each of these platforms has its own function to create an <code>app.R</code> file that is to be used as a launch script of each platform.</p>
-<ul>
-<li><p><code>golem::add_rstudioconnect_file()</code></p></li>
-<li><p><code>golem::add_shinyappsio_file()</code></p></li>
-<li><p><code>golem::add_shinyserver_file()</code></p></li>
-</ul>
-<p>What these <code>app.R</code> files do is calling a <code>pkgload::load_all()</code> function, that will mimic the launch of your package, and then call the <code>run_app()</code> function from your packaged app.
-Note that if you need to configure the way your app is launched on these platforms (for example if you need to pass arguments to the <code>run_app()</code> function), you will have to edit this file.</p>
-<p>Note that when using these functions, you will be able to use the “One click deploy” for these platforms: on the top right of these <code>app.R</code>, use the Blue Button to deploy to server.</p>
-<p>Another way to deploy your <code>{golem}</code> based app to <code>{shiny}</code> server and to Connect is to link these two software to a local repository (for example an RStudio Package Manager), and then to only use <code>mypackage::run_app()</code> to the <code>app.R</code>.</p>
+<p>Deciding which level of details you want to put in your concept map depends: “simple” applications probably do not need complex maps.
+And that also depends on how precise the specifications are, and how many people are working on the project: the concept map is a valuable tool when it comes to communication, as it allows people involved in the project to have visual clues of the conceptual architecture of the application.
+But beware: very complex maps are also unreadable!
+In that case, it might make sense to divide into several concept maps: one with the “big picture”, and smaller ones that focus on specific components of your application.</p>
 </div>
-<div id="docker-1" class="section level3">
-<h3><span class="header-section-number">13.3.2</span> Docker</h3>
-<p>Docker is an open source software used to build and deploy applications in containers.
-Docker has become an core solution in the DevOps world and a lot of server solution are based on it.
-See the “Strengthen” chapter for a more complete introduction to Docker.</p>
-<p>You will find the function for creating a <code>Dockerfile</code> for your <code>{golem}</code> app inside the <code>03_deploy.R</code> file, which contains a series of 3 functions:</p>
+</div>
+<div id="ask-questions" class="section level2">
+<h2><span class="header-section-number">7.2</span> Ask questions</h2>
+<p>Before starting to code, the safe call will be to ask your team/client (depending on the project) a series of question just to get a good grasp of the whole project.</p>
+<p>Here is a (non-exhaustive) list of information you might need along the way.</p>
+<p>Side note: of course, these questions do not cover the core features of the application: we’re pretty sure you have thought about covering this already.
+These are more contextual questions which are not directly linked to the application itself, yet that can be useful down the line.</p>
+<div id="about-the-end-users" class="section level3">
+<h3><span class="header-section-number">7.2.1</span> About the end users</h3>
+<p>Some questions you might ask:</p>
 <ul>
-<li><code>golem::add_dockerfile()</code></li>
-<li><code>golem::add_dockerfile_shinyproxy()</code></li>
-<li><code>golem::add_dockerfile_heroku()</code></li>
+<li>Who are the end users of your app?</li>
+<li>Are they tech-literate?</li>
+<li>In which context will they be using your app?</li>
+<li>On what machines (computer, tablet, smartphone, or any other device)?</li>
+<li>Are there any restriction when it comes to the browser they are using? (For example, are they still using an old version of Internet Explorer?)</li>
+<li>Will they be using the app in their office, on their phone while driving a tractor, in a plant, while wearing lab coats?</li>
 </ul>
-<p>The first function creates a “generic” <code>Dockerfile</code>, in the sense that it is not specific to any platform, and would work out of the box for your local machine.
-The second one is meant for <a href="https://www.shinyproxy.io/"><code>{shiny}</code>Proxy</a>, an open source solution for deploying containerized <code>{shiny}</code> applications, and the third for <a href="https://www.heroku.com/">Heroku</a>, an online service that can serve containerized applications (not specific to <code>{shiny}</code>).</p>
-<p>Other platforms can run Docker containers, notably AWS and Google Cloud Engine.
-At the time of writing these lines, <code>{golem}</code> does not provide support for these environment, but that is on the ToDo list!</p>
-<p>Note that the <code>Dockerfile</code> creation in <code>{golem}</code> tries to replicate your local environment as precisely as possible, notably by matching your R version, and the version of the packages you have installed on your machine.
-System requirements are also added when they are found on <a href="https://sysreqs.r-hub.io/">the sysreqs service from r-hub</a>.
-Otherwise you might have to add them manually.</p>
+<p>Those might seem like weird questions if you are just focusing on the very technical side of the app implementation, but think about where the app will be used: the application used while driving agricultural machines might need less interactive things, bigger fonts, simpler interface, less details and more direct information.
+If you are building a <code>{shiny}</code> app for a team of sellers who are always on the road, chances are they will need an app that they can browse from their mobile.
+And developing for mobiles requires a different kind of mindset<a href="#fn37" class="footnote-ref" id="fnref37"><sup>37</sup></a> .</p>
+<p>Another good reason why talking to the users is an important step, is that most of the time, <strong>people writing specifications are not the end users and will ask either too much features or not enough</strong>.
+Do the users really need that much interactive plots?
+Do they actually need that much granularity in the information?
+Will they really see a <code>datatable</code> of 15k lines?
+Do they really care about being able to zoom in the <code>dygraph</code> so that they can see the point at a minute scale?
+To what extent does the app has to be fast?</p>
+<p>Asking these questions is important, because building interactive widgets makes the app a little bit slower, and shoving a series of unnecessary widgets will make the user experience worse, adding more cognitive load than necessary.
+The speed of execution of your app is also an important parameter for your application: getting a sense about the need for speed in your application will allow you to judge whether or not you will have to focus on optimizing code execution.</p>
+<p>On top of that, remember all these things we have seen in the last chapter about accessibility: some of your end users might have specific accessibility requirements.</p>
+</div>
+<div id="building-personas" class="section level3">
+<h3><span class="header-section-number">7.2.2</span> Building personas</h3>
+<p>Personas is a concept borrowed from design and marketing that refers to fictional characters that will serve as a user type.
+In other words<strong>, a persona is a character that represents the “typical” behavior and traits for a group of users that will interact with your product</strong>.</p>
+<blockquote>
+<p>A persona consists of a description of a fictional person who represents an important customer or user group for the product, and typically presents information about demographics, behavior, product usage, and product-related goals, tasks, attitudes, etc.<br />
+<span class="citation">(Chapman et al. <a href="#ref-Chapman2008" role="doc-biblioref">2008</a>)</span></p>
+</blockquote>
+<p>Using personas during the design process helps you center your focus on the end user, so that you know who you are creating the application for.
+Then, while building your application, you can think about how each persona will interact with a given feature: will they use it?
+Will they understand it?
+Do we need to add extra information?
+Will they find this useful?
+etc.
+Asking these kind of questions helps taking a step back from feature implementation and re-focus on what matters: we are building application for someone else, who will eventually use it.</p>
+<blockquote>
+<p>“The benefits of personas are that they enable designers to envision the end-user’s needs and wants, remind designers that their own needs are not necessarily the end-users’ needs, and provide an effective communication tool, which facilitates better design decisions.”<br />
+<span class="citation">(Billestrup et al. <a href="#ref-Billestrup2014" role="doc-biblioref">2014</a>)</span></p>
+</blockquote>
+<p>The building of these personas is made easier once you have interacted with the end users, as we suggested in the previous section.
+Given the answers to these questions, you will be able to draw some common characteristics about the future users of your application.
+And don’t hesitate to detail these fictional characters, as “<em>[p]ersonas are considered to be most useful if they are developed as whole characters, described with enough detail for designers and developers to get a feeling of its personality</em>”.
+<span class="citation">(Billestrup et al. <a href="#ref-Billestrup2014" role="doc-biblioref">2014</a>)</span></p>
+</div>
+<div id="pre-existing-code-base" class="section level3">
+<h3><span class="header-section-number">7.2.3</span> Pre-existing code-base</h3>
+<p>From time to time, you are building a <code>{shiny}</code> app on top of an existing code-base: either scripts with business logic, a package if you are lucky, or a PoC for a <code>{shiny}</code> app.</p>
+<p>These kind of projects are often referred to as “brownfield projects”, in opposition to “greenfield projects”, borrowing the terminology from urban planning: <strong>a greenfield project being one where you are building on “evergreen” lands, while a brownfield project is building on lands that were, for example, industrial lands, and which will need to be sanitized, as they potentially contain waste or pollution, constructions need to be destroyed, roads needs to be deviated, and all these things that can make the urban planning process more complex</strong>.
+Then, you can extend this to software engineering, where a greenfield project is the one that start from scratch, and a brownfield project is a one where you need to build on top of an existing code-base, implying that you will need to do some extra work before actually working on the project:</p>
+<blockquote>
+<p>“When transforming brownfield projects, we may face significant impediments and problems, especially when no automated testing exists, or when there is a tightly-coupled architecture that prevents small teams from developing, testing, and deploying code independently.”<br />
+<span class="citation">(Kim <a href="#ref-genekim2016" role="doc-biblioref">2016</a>)</span></p>
+</blockquote>
+<p>Depending on how you chose to handle it, starting from a code base that is already written can either be very much helping, or you can be shooting yourself in the foot.
+Most of the time, <code>{shiny}</code> projects are not built as reproducible infrastructures: you will find a series of <code>library()</code> calls, no functions structure <em>per se</em>, no documentation, and no tests.
+In that case, we would advise to do it “the hard way”, or at least what seems to be the hard way: throw the app out away and start from scratch…</p>
+<p>Well, not really from scratch: <strong>extract the core business logic of the app and make it a package</strong>.
+Take some time with the developer/s that has built the current app, so that you can make them extract the core business logic, i.e. all the pieces of code that do not need a reactive context to run.
+Write documentation for this package, work on test, and once you are done, call it a day: you now have a solid ground for building the back-end, and it is built outside of any reactivity, is not linked to any application, and most of the time it can be used outside of the app.
+And it might actually be more useful than you think: it can serve analysts and data scientists that will benefit from these functions outside of the application, as they can use the business logic functions that are now packaged, and so reusable.</p>
+<p>Existing <code>{shiny}</code> projects, in most cases, have not been built by software engineers nor web developers—they have been built by data analyst/scientists who wanted to create an interactive PoC for their work The good news then is that you can expect the core algorithms to be pretty solid and innovative.
+But web development is not their strength: and that is perfectly normal, as it is not their core job.
+What that implies is that most <code>{shiny}</code> PoCs take shortcuts and rely on hacks, especially when it comes to managing reactivity, which is a beautiful concept for small project but can be very complex to scale if you are not a software engineer by training.
+Even more given that R is by nature sequential.</p>
+<p>That’s why it is better to split the business and app logic from the very beginning (as we have explained in chapter 3): it simplifies the process of refactoring a <code>{shiny}</code> PoC into a production-grade <code>{shiny}</code> application.</p>
+</div>
+<div id="deployment" class="section level3">
+<h3><span class="header-section-number">7.2.4</span> Deployment</h3>
+<p>There are so many considerations about deployment that it will be very hard to list them all, but keep in mind that <strong>if you do not ask questions about where your application will be deployed from the very beginning, sending it to production might become a painful experience</strong>.
+Of course, it is more or less solved if you are deploying with Docker: if it works in a container on your machine, it should work in production, but that is not as simple as that: for example, building a <code>{shiny}</code> application that will be used by 10 people is not the same as building an application that needs to scale to 50.000 users.
+Learning at the end of the project that “now we need to scale to a very large user base” might prevent the deployment from being successful, as this kind of scale implies specific consideration while building.</p>
+<p>But that is just the tip of the iceberg of things that can happen.
+Let’s stop for a little story: once upon a time, a team of developers was missioned to build an app, and one feature of the app was to do some API requests.<br />
+So far so good, nothing too complicated… until they discovered that the server where the app was going to be deployed does not have access to the internet, making it impossible to issue API requests from the server.
+Here, the containers worked on the dev machines, as they had access to the internet.
+Once deployed, the app stopped working, and the team lost a couple of days of exchanges with the client, trying to debug our API calls, until they realized that the issue was not with the app, but with the production server itself: and nobody in the team, be it the developers nor the client, though about asking the question of internet access for the server.</p>
+<p>It’s even more important to think about the IT side of your application, as the people writing specs and interacting with you might come from the Data Science team, and they might or might not have discussed with the IT team about deploying the app.
+There is a chance that they do not have in mind all what is needed to deploy a <code>{shiny}</code> App on their company server.</p>
+<p>For example, maybe your application has a database back-end.
+For that, you will need to have access to this database, the correct port should be set, and the permission given to the process that executes the <code>{shiny}</code> app to read, and maybe write, to the database.
+But, <strong>and for good reason</strong>, database managers do not issue read and write permissions to a DB without having examined what the app wants to read, and how and where it will write.
+To sum up, if you do not want to have weeks of delay for your app deployment, start the discussion from the very beginning of the project.
+That way, even if the process of getting permission to write on the company database takes time, you might have it by the end of the coding marathon.</p>
 
 </div>
 </div>
@@ -637,23 +672,24 @@ Otherwise you might have to add them manually.</p>
 
 <h3>References</h3>
 <div id="refs" class="references">
-<div id="ref-R-spatialLIBD">
-<p>Collado-Torres, Leonardo, Kristen R. Maynard, and Andrew E. Jaffe. 2020. <em>LIBD Visium Spatial Transcriptomics Human Pilot Data Inspector</em>. <a href="https://doi.org/10.18129/B9.bioc.spatialLIBD">https://doi.org/10.18129/B9.bioc.spatialLIBD</a>.</p>
+<div id="ref-Billestrup2014">
+<p>Billestrup, Jane, Jan Stage, Anders Bruun, Lene Nielsen, and Kira S. Nielsen. 2014. “Creating and Using Personas in Software Development: Experiences from Practice.” In <em>Human-Centered Software Engineering</em>, 251–58. Springer Berlin Heidelberg. <a href="https://doi.org/10.1007/978-3-662-44811-3_16">https://doi.org/10.1007/978-3-662-44811-3_16</a>.</p>
 </div>
-<div id="ref-R-golem">
-<p>Fay, Colin, Vincent Guyader, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
+<div id="ref-Chapman2008">
+<p>Chapman, Christopher N., Edwin Love, Russell P. Milham, Paul ElRif, and James L. Alford. 2008. “Quantitative Evaluation of Personas as Information.” <em>Proceedings of the Human Factors and Ergonomics Society Annual Meeting</em> 52 (16): 1107–11. <a href="https://doi.org/10.1177/154193120805201602">https://doi.org/10.1177/154193120805201602</a>.</p>
 </div>
-<div id="ref-R-pkgbuild">
-<p>Wickham, Hadley, and Jim Hester. 2020. <em>Pkgbuild: Find Tools Needed to Build R Packages</em>. <a href="https://github.com/r-lib/pkgbuild">https://github.com/r-lib/pkgbuild</a>.</p>
+<div id="ref-R-hexmake">
+<p>Fay, Colin. 2020g. <em>Hexmake: Hex Stickers Maker</em>. <a href="https://github.com/colinfay/hexmake">https://github.com/colinfay/hexmake</a>.</p>
 </div>
-<div id="ref-R-dccvalidator">
-<p>Woo, Kara, Nicole Kauer, and Kelsey Montgomery. 2020. <em>Dccvalidator: Metadata Validation for Data Coordinating Centers</em>.</p>
+<div id="ref-genekim2016">
+<p>Kim, Gene. 2016. <em>The Devops Handbook: How to Create World-Class Agility, Reliability, and Security in Technology Organizations</em>. IT Revolution Press. <a href="https://www.xarg.org/ref/a/1942788002/">https://www.xarg.org/ref/a/1942788002/</a>.</p>
 </div>
 </div>
 <div class="footnotes">
 <hr />
-<ol start="53">
-<li id="fn53"><p>This is also true for any other Version Control system<a href="deploy.html#fnref53" class="footnote-back">↩︎</a></p></li>
+<ol start="36">
+<li id="fn36"><p>Of course, it is not an absolute rule: you might also inherit from the bug created by the open source solution.<a href="dont-rush-into-coding.html#fnref36" class="footnote-back">↩︎</a></p></li>
+<li id="fn37"><p>For developing an app that is mobile first, you can have a look at the great <code>{shinyMobile}</code> <span class="citation">(Granjon, Perrier, and Rudolf <a href="#ref-R-shinyMobile" role="doc-biblioref">2019</a>)</span> package, made by the amazing Rinterface (<a href="https://rinterface.com/" class="uri">https://rinterface.com/</a>) team.<a href="dont-rush-into-coding.html#fnref37" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 <hr/>
@@ -676,8 +712,8 @@ Otherwise you might have to add them manually.</p>
           </div>
         </div>
       </div>
-<a href="version-control.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="need-for-optimization.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="ux-matters.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="setting-up-for-success.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -708,7 +744,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/13-deploy.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/07-step-by-step-design.Rmd",
 "text": "Edit"
 },
 "history": {

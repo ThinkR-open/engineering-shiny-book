@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps</title>
+  <title>Chapter 12 Version Control | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:title" content="Chapter 12 Version Control | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
   
   <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps" />
+  <meta name="twitter:title" content="Chapter 12 Version Control | Engineering Production-Grade Shiny Apps" />
   
   <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="version-control.html"/>
-<link rel="next" href="need-for-optimization.html"/>
+<link rel="prev" href="build-yourself-safety-net.html"/>
+<link rel="next" href="deploy.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
@@ -484,152 +484,234 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="deploy" class="section level1">
-<h1><span class="header-section-number">Chapter 13</span> Deploy your application</h1>
-<blockquote>
-<p>Your deploys should be as boring, straightforward, and stress-free as possible.<br />
-<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
-<style>.right{ text-align: right;}</style>
-<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
-<div class="right">
-<a href="https://zachholman.com/posts/deploying-software">How to Deploy Software - Zach Holman</a>
-</div></p>
-</blockquote>
-<p>Once your app is built, you are ready to deploy it!
-In other words, your software is now ready to be used by other users.
-There are two main ways to share your application and make it available to others: by creating a package and making it installable, or by sending it to a remote server.
-We will see in this part how you can do that using <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span>.</p>
-<div id="before-deployment-check-list" class="section level2">
-<h2><span class="header-section-number">13.1</span> Before deployment Check-list</h2>
-<p>Here is a quick checklist of things to think about once your application is ready, and before sending it to production</p>
+<div id="version-control" class="section level1">
+<h1><span class="header-section-number">Chapter 12</span> Version Control</h1>
+<div id="version-control" class="section level2">
+<h2><span class="header-section-number">12.1</span> Using Version Control with <code>git</code></h2>
+<p>“Friends do not let friends work on a coding project without version control.” You might have heard this before, without really considering what this means.
+Or maybe you are convinced about this saying, but have not had the opportunity to use git, GitHub or GitLab for versioning your applications.
+If so, now is the time to update your workflow!</p>
+<div id="why-version-control" class="section level3">
+<h3><span class="header-section-number">12.1.1</span> Why Version Control?</h3>
+<p>Have you ever experienced a piece of code disappearing?
+Or the unsolvable problem of integrating changes when several people have been working on the same piece of code?
+Or the inability to find back something you have written a while back?</p>
+<p>If so, you might have been missing Version Control (also shortened as VC).
+In this chapter, we’ll be focusing on <code>git</code>, but you should be aware that other VC system exist.
+As they are less popular than <code>git</code>, we will not cover them here.
+<code>Git</code> was designed to handle collaboration on code projects<a href="#fn49" class="footnote-ref" id="fnref49"><sup>49</sup></a> where potentially a lot of people have to interact and make changes to the codebase.
+<code>Git</code> might feel a little bit daunting at first, and even seasoned developers still misuse it, or do not understand it completely, but getting at ease with the basics will significantly improve the way you build software, so do not give up: the benefits from learning it really outweigh the (apparent) complexity.</p>
+<p>There are many advantages to VC, including:</p>
 <ul>
-<li><p><input type="checkbox" disabled="" />
-<code>devtools::check()</code>, run from the command line, returns 0 errors, 0 warnings, 0 notes</p></li>
-<li><p><input type="checkbox" disabled="" />
-The current version number is valid, <em>i.e</em> if the current app is an update, the version number has been bumped</p></li>
-<li><p><input type="checkbox" disabled="" />
-Everything is fully documented</p></li>
-<li><p><input type="checkbox" disabled="" />
-Test coverage is good, i.e you cover a sufficient amount of the code base, and these tests cover the core/strategic algorithms</p></li>
-<li><p><input type="checkbox" disabled="" />
-It’s clear to everyone involved in the project who is the person to call if something goes wrong</p></li>
-<li><p><input type="checkbox" disabled="" />
-It’s clear to everyone involved in the project what is the debugging process, how to communicate bugs to the developer team, and how long it will take to get changes fixed</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The server it is deployed on has all the necessary software installed (Docker, Connect, <code>{shiny}</code> Server…) to make the application run</p></li>
-<li><p><input type="checkbox" disabled="" />
-The server has all the system requirements needed (<em>i.e</em> the system libraries), and if not, they are installed with the application (if it’s dockerized)</p></li>
-<li><p><input type="checkbox" disabled="" />
-The application, if deployed on a server, will be deployed on a port which will be accessible by the users</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The environment variables from the production server are managed inside the application</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The app is launched on the correct port, or at least this port can be configured via an environment variable</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The server where the app is deployed have access to the data sources (database, API…)</p></li>
-<li><p><input type="checkbox" disabled="" />
-If the app records data, there are backups for these data.</p></li>
+<li><p><strong>You can go back in time</strong>.
+With a VC system like <code>git</code>, every change is recorded (well, every <strong>committed</strong> change), meaning that you can potentially go back in time to a previous version of a project, and see the complete history of a file.
+This feature is very important: if you accidentally made changes that break your application, or if you deleted a feature you thought you would never need, you can go back to where you were a few hours, a few days, a few months back.</p></li>
+<li><p><strong>Several people can work on the same file</strong>.
+<code>Git</code> relies on a system of branches.
+Within this branch pattern, there is one main branch, called “main”, which contains the stable, main version of the code-base.
+By “forking” this branch (or any other branch), developers will have a copy of the base branch, where they can safely work on changing (and breaking) things, without impacting the origin branch.
+This allows to try things in a safe environment, without touching what works.
+Note that simultaneously working on the same file at the same time might not be the perfect practice, it’s better, if possible, to split the code into smaller files.</p></li>
+<li><p><strong>You can safely track changes</strong>.
+Every time a developer records something to <code>git</code>, changes are listed.
+In other words, you can see what changes are made to a specific file in your codebase.</p></li>
+<li><p><strong>It centralizes the codebase</strong>.
+You can use <code>git</code> locally, but its strength also relies on the ability to synchronize your local project with a distant server.
+This also means that <em>several</em> people can synchronize with this server and collaborate on a project.
+That way, changes on a branch on a server can be downloaded (it is called <code>pull</code> in <code>git</code> terminology) by all the members of the team, and synchronized locally, <em>i.e</em> if someone makes changes to a branch and sends them to the main server, all the other developers can retrieve these change on their machine.</p></li>
 </ul>
 </div>
-<div id="sharing-your-app-as-a-package" class="section level2">
-<h2><span class="header-section-number">13.2</span> Sharing your app as a package</h2>
-<div id="install-on-your-machine" class="section level3">
-<h3><span class="header-section-number">13.2.1</span> Install on your machine</h3>
-<p>A <code>{shiny}</code> application built with <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> is <strong>by definition</strong> an R package.
-This <code>{shiny}</code> App as a Package is also helpful when it comes to deploying your application: packages are designed to be shareable pieces of R code.</p>
-<p>Before sending it to a remote server or sharing it to the world, <strong>the first step is testing if the package can be installed on your own computer</strong>.
-To do that, when you are in the project corresponding to the golem you built, you can call <code>remotes::install_local()</code> to install the application on your computer.
-Of course, if you are somewhere else on your machine, you can call <code>remotes::install_local("path/to/app")</code>.
-If you are using the RStudio IDE, you can also click on the <code>Build</code> tab, then click on the <code>Install and Restart</code> button.</p>
-<p>This should restart your R session, and call <code>library(yourpackagename)</code>.
-Then, try the <code>run_app()</code> function to check that the app can be launched.</p>
+<div id="git-basics-add---commit---push---pull" class="section level3">
+<h3><span class="header-section-number">12.1.2</span> <code>Git</code> basics: <code>add</code> - <code>commit</code> - <code>push</code> - <code>pull</code></h3>
+<p>These are the four main actions you will be performing in <code>git</code>: if you just need to learn the minimum to get started, they are the four essential ones.</p>
+<div id="add" class="section level4 unnumbered">
+<h4><code>add</code></h4>
+<p>When using <code>add</code>, you are choosing which elements of your project you want to track, be it new files or modifications of an already versioned file.
+This action does not save the file in the git repository, but flags the changes to be added to the next commit.</p>
 </div>
-<div id="share-as-built-package" class="section level3">
-<h3><span class="header-section-number">13.2.2</span> Share as built package</h3>
-<div id="a.-local-build" class="section level4 unnumbered">
-<h4>A. Local build</h4>
-<p>Building an app as a package also means that this app can be bundled into an archive, and then shared, either as is or using a package repository like the CRAN.</p>
-<p>To do that, you first need an bundled version of your app, which can be created using the <code>build()</code> function from <code>{pkgbuild}</code> <span class="citation">(Wickham and Hester <a href="#ref-R-pkgbuild" role="doc-biblioref">2020</a>)</span> in the same working directory as your application.
-Calling this function will create a .tar.gz file that is called <code>mygolem_0.0.1.tar.gz</code> (of course with the name of your package).
-Once you have this <code>tar.gz</code>, you can send it to your favorite package repository.</p>
-<p>You can also share the file as is with others.
-If you do so, they will have to install the app with <code>remotes::install_local("path/to/tar.gz")</code>, that will take care of doing a full installation of the app, including installing the required dependencies.<br />
-Then, they can do <code>library(yourpackagename)</code> and <code>run_app()</code> on their machine.</p>
+<div id="commit" class="section level4 unnumbered">
+<h4><code>commit</code></h4>
+<p>A <code>commit</code> is a snapshot of a codebase at a given moment in time.
+Each commit is associated with two things: a <code>sha1</code>, which is a unique reference in the history of the project, allowing you to identify this precise state when you need to get back in time, and a <code>message</code>, which is a piece of text that describes the commit<a href="#fn50" class="footnote-ref" id="fnref50"><sup>50</sup></a> .
+Note that messages are mandatory, you can not commit without them, and that the <code>sha1</code> are automatically generated by <code>git</code>. Do not overlook these messages: they might seem like a constraint at first but they are a life saver when you need to understand the history of a project.</p>
+<p>There is no strict rule about what and when to commit.
+Keep in mind that commits are what allow you to go back in time, so a commit is a complete state of your codebase to which it would make sense to go back to.
+A good practice is to state in the commit message which choices you made and why (but not how you implemented these changes), so that other developers (and you in the future) will be able to understand changes.
+Commits messages are also where you might specify the breaking changes, so that other developers can immediately see these when they are merging your code.</p>
 </div>
-<div id="b.-send-to-a-package-repository" class="section level4 unnumbered">
-<h4>B. Send to a package repository</h4>
-<p>The upside of building the application <code>{golem}</code>, <em>i.e</em> as a package, is that you can share your application on a remote package manager, the more widely used for example on the CRAN like <code>{dccvalidator}</code> <span class="citation">(Woo, Kauer, and Montgomery <a href="#ref-R-dccvalidator" role="doc-biblioref">2020</a>)</span>, or on BioConductor like <code>{spatialLIBD}</code> <span class="citation">(Collado-Torres, Maynard, and Jaffe <a href="#ref-R-spatialLIBD" role="doc-biblioref">2020</a>)</span>.
-But any other package manager will work: for example if the company uses RStudio Package Manager, your application can be installed here as any other package.
-If your application is open-source, the package structure also allows to install from GitHub, by using the <code>remotes::install_github()</code> function.<a href="#fn53" class="footnote-ref" id="fnref53"><sup>53</sup></a>
-For example, this is what you can do with <code>{hexmake}</code>, or <code>{tidytuesday}</code>: as they are open-source packages, they can be installed from GitHub.
-Then, once your application is installed as a package on the users’ machines, they can do <code>library(yourpackagename)</code> and <code>run_app()</code>.</p>
-<p>The advantage of this solution being that R users are familiar with package installation, so it makes using your application easier for them.
-Also, and we will see it in the next section, but making your application available as a standard R package makes it easier to deploy it: for example if your RStudio Connect is coupled with your RStudio Package Manager, the deployment file just have to contain one line launching the application.</p>
-<p>Note that releasing to CRAN or BioConductor requires extra effort: you have to comply to a series of rules.
-But good news: as you have been following the best practices from this book, you should not have to put that much extra efforts!</p>
-<p>Know more about releasing on CRAN:</p>
+<div id="push" class="section level4 unnumbered">
+<h4><code>push</code></h4>
+<p>Once you have a set of commits ready, you are ready to <code>push</code> it to the server.
+In other words, you will permanently record these commits (hence the series of changes) to the server.</p>
+<p>Making a push implies three things:</p>
 <ul>
-<li><a href="https://cran.r-project.org/web/packages/submission_checklist.html">Checklist for CRAN submissions</a></li>
-<li><a href="https://cran.r-project.org/web/packages/policies.html">CRAN Repository Policy</a></li>
-<li><a href="https://r-pkgs.org/release.html">R packages - Chapter 18 Releasing a package</a></li>
-<li><a href="https://kbroman.org/pkg_primer/pages/cran.html">Getting your R package on CRAN</a></li>
-<li><a href="https://github.com/ThinkR-open/prepare-for-cran">prepare-for-cran - A Collaborative list of things to know before submitting to CRAN</a></li>
+<li><p>Other people in the team will be able to retrieve the changes you have made</p></li>
+<li><p>These changes will be recorded permanently in the project history</p></li>
+<li><p>You can not modify commits once they were sent to the server<a href="#fn51" class="footnote-ref" id="fnref51"><sup>51</sup></a></p></li>
 </ul>
 </div>
+<div id="pull" class="section level4 unnumbered">
+<h4><code>pull</code></h4>
+<p>Once changes have been recorded in the main server, everybody synchronized with the project can <code>pull</code> the commits to their local project.</p>
 </div>
 </div>
-<div id="deploying-apps-with-golem" class="section level2">
-<h2><span class="header-section-number">13.3</span> Deploying Apps with <code>{golem}</code></h2>
-<p>The other way to make your application available to others is by sending it to a remote server that can serve <code>{shiny}</code> applications.
-In other words, instead of having to install the application on their machines, <strong>they can crack open a web browser and navigate to the URL where the application is deployed</strong>.
-Deploying to a server is the solution of choice when you want to make your application available to a wide public: on a server, visitors do not have to have R installed on their computer, they do not have to install a package or launch it, they can just browse the application like any other web application.
-This solution is also a common choice in companies that have strict security requirements: the IT team might not be willing to let everyone install software on their machine, and sharing an application on a server allows them more control over who can access the application.
-For example, deploying on a server allows to use proxy, and to filter by IP: then, only a subset of people can have access to the application.</p>
-<p>When using <code>{golem}</code>, you can open the <code>dev/03_deploy.R</code> and find the functions for server deployment.
-At the time of writing this book, there are two main ways to deploy a shiny app on a server:</p>
-<ul>
-<li>RStudio’s solutions</li>
-<li>A docker based solution</li>
-</ul>
-<div id="rstudio-environments" class="section level3">
-<h3><span class="header-section-number">13.3.1</span> RStudio Environments</h3>
-<p>RStudio proposes three services to deploy <code>{shiny}</code> application:</p>
-<ul>
-<li><p>shinyapps.io, an on-premise solution that can serve <code>{shiny}</code> application (freemium)</p></li>
-<li><p><code>{shiny}</code>-server, a software you have to install on your own server, and that can be used to deploy multiple applications (you can find either an open source or a professional edition)</p></li>
-<li><p>RStudio connect, a server-based solution that can deploy <code>{shiny}</code> applications and markdown documents (and other kind of content), and that serves them as ordinary websites</p></li>
-</ul>
-<p>Each of these platforms has its own function to create an <code>app.R</code> file that is to be used as a launch script of each platform.</p>
-<ul>
-<li><p><code>golem::add_rstudioconnect_file()</code></p></li>
-<li><p><code>golem::add_shinyappsio_file()</code></p></li>
-<li><p><code>golem::add_shinyserver_file()</code></p></li>
-</ul>
-<p>What these <code>app.R</code> files do is calling a <code>pkgload::load_all()</code> function, that will mimic the launch of your package, and then call the <code>run_app()</code> function from your packaged app.
-Note that if you need to configure the way your app is launched on these platforms (for example if you need to pass arguments to the <code>run_app()</code> function), you will have to edit this file.</p>
-<p>Note that when using these functions, you will be able to use the “One click deploy” for these platforms: on the top right of these <code>app.R</code>, use the Blue Button to deploy to server.</p>
-<p>Another way to deploy your <code>{golem}</code> based app to <code>{shiny}</code> server and to Connect is to link these two software to a local repository (for example an RStudio Package Manager), and then to only use <code>mypackage::run_app()</code> to the <code>app.R</code>.</p>
-</div>
-<div id="docker-1" class="section level3">
-<h3><span class="header-section-number">13.3.2</span> Docker</h3>
-<p>Docker is an open source software used to build and deploy applications in containers.
-Docker has become an core solution in the DevOps world and a lot of server solution are based on it.
-See the “Strengthen” chapter for a more complete introduction to Docker.</p>
-<p>You will find the function for creating a <code>Dockerfile</code> for your <code>{golem}</code> app inside the <code>03_deploy.R</code> file, which contains a series of 3 functions:</p>
-<ul>
-<li><code>golem::add_dockerfile()</code></li>
-<li><code>golem::add_dockerfile_shinyproxy()</code></li>
-<li><code>golem::add_dockerfile_heroku()</code></li>
-</ul>
-<p>The first function creates a “generic” <code>Dockerfile</code>, in the sense that it is not specific to any platform, and would work out of the box for your local machine.
-The second one is meant for <a href="https://www.shinyproxy.io/"><code>{shiny}</code>Proxy</a>, an open source solution for deploying containerized <code>{shiny}</code> applications, and the third for <a href="https://www.heroku.com/">Heroku</a>, an online service that can serve containerized applications (not specific to <code>{shiny}</code>).</p>
-<p>Other platforms can run Docker containers, notably AWS and Google Cloud Engine.
-At the time of writing these lines, <code>{golem}</code> does not provide support for these environment, but that is on the ToDo list!</p>
-<p>Note that the <code>Dockerfile</code> creation in <code>{golem}</code> tries to replicate your local environment as precisely as possible, notably by matching your R version, and the version of the packages you have installed on your machine.
-System requirements are also added when they are found on <a href="https://sysreqs.r-hub.io/">the sysreqs service from r-hub</a>.
-Otherwise you might have to add them manually.</p>
+<div id="about-branches" class="section level3">
+<h3><span class="header-section-number">12.1.3</span> About branches</h3>
+<p>Branches are <code>git</code> way to organize work and ideas, notably when several people are collaborating on the same project (which might be the case when building large web applications with R).</p>
+<p>How does it work?
+When your start a project, you are in the main branch, which is called the “main”.
+In a perfect world, you never work directly on this branch: it should always contain a working, deployable version of the application.</p>
+<p>Other branches are to be thought as work areas, where developers fix bugs or add features.
+The modifications made in these development branches will then be transferred (directly or indirectly) to the main branch.</p>
 
+<div class="figure" style="text-align: center"><span id="fig:12-secure-1"></span>
+<img src="img/Git_branches_fork.png" alt="Branches in git." width="100%" />
+<p class="caption">
+FIGURE 12.1: Branches in git.
+</p>
 </div>
+<p>In practice, you might want to use a workflow where each branch is designed to fix a small issue or implement a feature, so that it is easier to separate each small part of the work.
+Even when working alone.</p>
+</div>
+<div id="issues" class="section level3">
+<h3><span class="header-section-number">12.1.4</span> Issues</h3>
+<p>If you are working with a remote tool with a graphical interface like GitLab, GitHub or Bitbucket, there is a good chance you will be using issues.
+Issues are “notes” or “tickets” that can be used to track a bug or to suggest a feature.
+This tool is crucial when it comes to project management: they are the perfect spot for organizing and discussing ideas, but also to have an overview of what has been done, what is currently done and what is left to be done.
+Issue may also be used as a discussion medium with beta testers, clients or sponsors.</p>
+<p>One other valuable feature of issues is that they can be referenced inside commits using a hashtag and its number: <code>#123</code>.
+. In other words, when you send code to the centralized server, you can link this code to one or more issues and corresponding commits appear in the issue discussions.</p>
+</div>
+</div>
+<div id="git-integration" class="section level2">
+<h2><span class="header-section-number">12.2</span> Git integration</h2>
+<div id="with-rstudio" class="section level3">
+<h3><span class="header-section-number">12.2.1</span> With RStudio</h3>
+<p>Git is very well integrated to the RStudio IDE, and using <code>git</code> can be as simple as clicking on a button from time to time.
+If you are using RStudio, you will find a pull/push button, a stage &amp; commit interface, a tool for visualizing differences in files.
+Everything you need to get started is there.</p>
+<p>Note that of course, it will be better on the long run to get a more complete understanding of how git works, so that when things get more complexe, you will be able to handle them.</p>
+</div>
+<div id="as-part-of-a-larger-world" class="section level3">
+<h3><span class="header-section-number">12.2.2</span> As part of a larger world</h3>
+<p><code>Git</code> is not reserved for team work: even if you are working alone on a project, using <code>git</code> is definitely worth the effort.
+Using git, and particularly issues, helps you organize your train of thoughts, especially upfront when you need to plan what you will be doing.</p>
+<p>And of course, remember that <code>git</code> is not reserved to <code>{shiny}</code> Applications: it can be used for any other R related projects, and at the end of the day for any code related projects, making it a valuable skill to have in your toolbox, whatever language you will be working with in 10 years!</p>
+</div>
+<div id="about-git-flow" class="section level3">
+<h3><span class="header-section-number">12.2.3</span> About <code>git-flow</code></h3>
+<p>There are a lot of different ways and methodologies to organize your Git workflow.
+One of the most popular ones is called <code>git flow</code>, and we will give you here a quick introduction on how you can manage your work using this approach.
+Please note that this is a quick introduction, not a complete guide: we will link to some further reading just at the end of this section.</p>
+<p>So, here are the key concept of <code>git flow</code>:</p>
+<ul>
+<li><p>The <code>main</code> branch only contains stable code: most of the time is matches a tagged, fixed version (v0.0.1, 0.1.0, v1.0.0, etc).
+A very small subset of developers involved in the project have writing access to the <code>main</code> branch, and no developer should ever push code straight to this branch: new code to <code>main</code> only comes either from the <code>dev</code> branch, or from a <code>hotfix</code> branch.
+For an app in production, the last commit of this branch should be the version that is currently in production.</p></li>
+<li><p>The <code>dev</code> branch, on the other hand, is the “Work in progress” branch: the one that contains the latest changes before they are merged into main.
+This is the common working branch for every developers.
+Most of the time, developers do not push code into these branch either: they make merge/pull request (MR/PR) to <code>dev</code> from one of their <code>feature branch</code>.</p></li>
+<li><p>A <code>feature branch</code> is one branch, forked from <code>dev</code>, that implements one of the feature of the application.
+To keep a clean track of what each branch is doing, a good practice is to use <code>issue-XXX</code>, where <code>XXX</code> is the corresponding issue you plan to solve in this branch.</p></li>
+<li><p>A <code>hot fix</code> branch is a branch to correct a critical issue in <code>main</code>.
+If is forked from main, and is merged straight into <code>main</code> using a MR.</p></li>
+</ul>
+<p>Here is a summary of this process:</p>
+
+<div class="figure" style="text-align: center"><span id="fig:12-secure-2"></span>
+<img src="img/GitFlowHotfixBranch.png" alt="Presentation of a git flow (Vincent Driessen, http://nvie.com)." width="100%" />
+<p class="caption">
+FIGURE 12.2: Presentation of a git flow (Vincent Driessen, <a href="http://nvie.com" class="uri">http://nvie.com</a>).
+</p>
+</div>
+<p>From a software engineer point of view, here is how daily work goes:</p>
+<ul>
+<li><p>Identify an issue to work on</p></li>
+<li><p>Fork dev into <code>issue-XXX</code></p></li>
+<li><p>Develop feature inside the branch</p></li>
+<li><p>Regularly, run <code>git stash</code>, <code>git rebase dev</code>, and <code>git stash apply</code> to include the latest changes from <code>dev</code> to stay synchronized with <code>dev</code><a href="#fn52" class="footnote-ref" id="fnref52"><sup>52</sup></a></p></li>
+<li><p>Make a pull request to <code>dev</code> so that the feature is included</p></li>
+<li><p>Once the PR is accepted by the project manager, notify the rest of the team that there have been changes to <code>dev</code>, so they can rebase it to the branch they are working on</p></li>
+<li><p>Start working on a new feature</p></li>
+</ul>
+<p>Of course, there are way more subtleties to this flow of work, but this gives you a good starting point.
+Generally speaking, a good communication between developers is essential for a successful collaborative development project.</p>
+</div>
+<div id="further-readings-on-git" class="section level3">
+<h3><span class="header-section-number">12.2.4</span> Further readings on <code>git</code></h3>
+<p>If you want to learn more about git, here are some resources that have helped us in the past:</p>
+<ul>
+<li><a href="https://happygitwithr.com/" class="uri">https://happygitwithr.com/</a></li>
+<li><a href="https://git-scm.com/book" class="uri">https://git-scm.com/book</a></li>
+<li><a href="https://www.git-tower.com/blog/git-cheat-sheet/" class="uri">https://www.git-tower.com/blog/git-cheat-sheet/</a></li>
+</ul>
+</div>
+</div>
+<div id="automated-testing" class="section level2">
+<h2><span class="header-section-number">12.3</span> Automated testing</h2>
+<p>We have seen in chapter <a href="build-yourself-safety-net.html#build-yourself-safety-net">11</a> how to build a testing infrastructure for your app, notably using the <code>{testthat}</code> <span class="citation">(Wickham <a href="#ref-R-testthat" role="doc-biblioref">2020</a>)</span> package.
+What we have described is a way to build it locally, before running your test on your own machine.
+But there is a big flaw to this approach: you have to remember to run the tests, be it regularly or before making a pull request/pushing to the server.
+To do this kind of job, you will be looking for <strong>a tool to do automated testing at the repository level: in other words, a software that can test your application whenever a piece of code is pushed/moved on the repository</strong>.</p>
+<p>To do this, various tools are available, each with there own features.
+Here is a non exhaustive list of the one you can choose:</p>
+<p><a href="https://travis-ci.org/">travis-ci</a> is a software that can be synced with your <code>git</code> repositories (GitHub or Bitbucket), and whenever something happens on the repo, the events described in the travis configuration file (<code>.travis.yml</code>) are executed.
+If they exit with a code 0, the test passes.
+If they do not, the integrated tests have failed.
+Travis CI integration may be used internally and externally: internally, in the sense that before merging any pull request, the project manager have access to a series of tests that are automatically launched.
+Externally, as a “health check” before installing a software: if you visit a GitHub repository that has Travis badges included, you can check if the current state of the package/software is stable, <em>i.e.</em> if it passes the automated tests.</p>
+<p>Travis CI can do a lot more than just testing your app: it can be used to build documentation, deploy to production, or to run any other scripts you want to be run before/after the tests have passed.
+And the nice thing is that you can test for various versions of R, so that you are sure that you are supporting current, future and previous versions of R.</p>
+<p>All of this is defined in the <code>.travis.yml</code> file, which is to be put at the root of your source directory, a file that is automatically generated when calling <code>usethis::use_travis()</code>.</p>
+<p>Note that Travis CI can run tests on GNU/Linux or MacOS operating systems.</p>
+<p><a href="https://www.appveyor.com/">Appveyor</a> has the same functionalities as Travis CI. This service can integrate with GitHub, GitHub Enterprise, Bitbucket, GitLab, Azure Repos, Kiln, Gitea.
+It supports Windows, Linux and macOS.</p>
+<p><a href="https://github.com/features/actions">GitHub actions</a> serve a related purpose: defining actions to be performed as responses to events on the GitHub repository.
+Testing, building documentation, push to another repository, deploy on the server… all these actions can be automatically performed.
+As with Travis CI, these actions are defined in a <code>yaml</code> file.
+Examples for these configuration can be find at <a href="https://github.com/r-lib/actions">r-lib/actions</a>, and some can be automatically linked to your project using functions from <code>{usethis}</code>: <code>use_github_action_check_release()</code>, <code>use_github_action_check_standard()</code>, <code>use_github_action_check_full()</code> and <code>use_github_action_pr_commands()</code>.
+The three first perform a standard <code>R CMD check</code>, under various conditions:</p>
+<ul>
+<li>the <code>release</code> tests on MacOS, with the latest version of R, and runs the check via the <code>{rcmdcheck}</code> <span class="citation">(Csárdi <a href="#ref-R-rcmdcheck" role="doc-biblioref">2019</a>)</span> package</li>
+<li><code>standard</code> does the check for 3 OS (Windows, Mac and Linux), and for R and R-devel</li>
+<li><code>full</code> does <code>standard</code> but for the last 5 minors version of R</li>
+</ul>
+<p>Finally, <code>use_github_action_pr_commands()</code>, sets checks to be performed when a Pull Request is made to the repository.</p>
+<p>If you are working with GitLab, you can use the integrated <code>GitLab CI</code> service: it serves the same purpose, with the little difference that it is completely docker-based: you define a <code>yaml</code> with a series of stages that are performed (concurrently or sequentially), and they are all launched inside a docker container.
+To help you with this, the <a href="https://hub.docker.com/r/colinfay/r-ci-tidyverse"><code>colinfay/r-ci-tidyverse</code></a> docker image comes with pre-installed packages for testing: <code>{remotes}</code> <span class="citation">(Hester et al. <a href="#ref-R-remotes" role="doc-biblioref">2020</a>)</span>, <code>{testthat}</code> <span class="citation">(Wickham <a href="#ref-R-testthat" role="doc-biblioref">2020</a>)</span>, <code>{config}</code> <span class="citation">(Allaire <a href="#ref-R-config" role="doc-biblioref">2018</a>)</span>… and is available for several R versions.
+This docker image can be used as the source image for your <code>GitLab CI</code> yaml file.</p>
+<p>Here is an example of one of these files</p>
+<div class="sourceCode" id="cb195"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb195-1"><a href="version-control.html#cb195-1"></a><span class="fu">image</span><span class="kw">:</span><span class="at"> colinfay/r-ci-tidyverse:3.6.0</span></span>
+<span id="cb195-2"><a href="version-control.html#cb195-2"></a></span>
+<span id="cb195-3"><a href="version-control.html#cb195-3"></a><span class="fu">cache</span><span class="kw">:</span></span>
+<span id="cb195-4"><a href="version-control.html#cb195-4"></a><span class="at">  </span><span class="fu">paths</span><span class="kw">:</span></span>
+<span id="cb195-5"><a href="version-control.html#cb195-5"></a><span class="at">    </span><span class="kw">-</span><span class="at"> ci/</span></span>
+<span id="cb195-6"><a href="version-control.html#cb195-6"></a></span>
+<span id="cb195-7"><a href="version-control.html#cb195-7"></a><span class="fu">stages</span><span class="kw">:</span></span>
+<span id="cb195-8"><a href="version-control.html#cb195-8"></a><span class="at">  </span><span class="kw">-</span><span class="at"> test</span></span>
+<span id="cb195-9"><a href="version-control.html#cb195-9"></a><span class="at">  </span><span class="kw">-</span><span class="at"> document</span></span>
+<span id="cb195-10"><a href="version-control.html#cb195-10"></a></span>
+<span id="cb195-11"><a href="version-control.html#cb195-11"></a><span class="fu">building</span><span class="kw">:</span></span>
+<span id="cb195-12"><a href="version-control.html#cb195-12"></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> test</span></span>
+<span id="cb195-13"><a href="version-control.html#cb195-13"></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span></span>
+<span id="cb195-14"><a href="version-control.html#cb195-14"></a><span class="at">    </span><span class="kw">-</span><span class="at"> R -e &quot;remotes::install_deps(dependencies = TRUE)&quot;</span></span>
+<span id="cb195-15"><a href="version-control.html#cb195-15"></a><span class="at">    </span><span class="kw">-</span><span class="at"> R -e &#39;devtools::check()&#39;</span></span>
+<span id="cb195-16"><a href="version-control.html#cb195-16"></a></span>
+<span id="cb195-17"><a href="version-control.html#cb195-17"></a><span class="fu">documenting</span><span class="kw">:</span></span>
+<span id="cb195-18"><a href="version-control.html#cb195-18"></a><span class="at">    </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> document</span></span>
+<span id="cb195-19"><a href="version-control.html#cb195-19"></a><span class="at">    </span><span class="fu">allow_failure</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb195-20"><a href="version-control.html#cb195-20"></a><span class="at">    </span><span class="fu">when</span><span class="kw">:</span><span class="at"> on_success</span></span>
+<span id="cb195-21"><a href="version-control.html#cb195-21"></a><span class="at">    </span><span class="fu">only</span><span class="kw">:</span></span>
+<span id="cb195-22"><a href="version-control.html#cb195-22"></a><span class="at">        </span><span class="kw">-</span><span class="at"> main</span></span>
+<span id="cb195-23"><a href="version-control.html#cb195-23"></a><span class="at">    </span><span class="fu">script</span><span class="kw">:</span></span>
+<span id="cb195-24"><a href="version-control.html#cb195-24"></a><span class="at">        </span><span class="kw">-</span><span class="at"> Rscript -e &#39;install.packages(&quot;DT&quot;)&#39;</span></span>
+<span id="cb195-25"><a href="version-control.html#cb195-25"></a><span class="at">        </span><span class="kw">-</span><span class="at"> Rscript -e &#39;covr::gitlab(quiet = FALSE)&#39;</span></span>
+<span id="cb195-26"><a href="version-control.html#cb195-26"></a><span class="at">    </span><span class="fu">artifacts</span><span class="kw">:</span></span>
+<span id="cb195-27"><a href="version-control.html#cb195-27"></a><span class="at">        </span><span class="fu">paths</span><span class="kw">:</span></span>
+<span id="cb195-28"><a href="version-control.html#cb195-28"></a><span class="at">            </span><span class="kw">-</span><span class="at"> public</span></span></code></pre></div>
+<p>Automated testing, continuous integration and continuous deployment is a vast topic that can not be covered in a few pages inside this book, but spending some time learning about this methodologies is definitely worth the time spent: the more you can automate these processes, and the more you test, the more your application will be resilient, easy to maintain and easy to enhance: the more you check, the quicker you will discover bugs.</p>
+<p>And the quicker you detect bugs, the easier it is to correct them!</p>
+
 </div>
 </div>
 
@@ -637,23 +719,25 @@ Otherwise you might have to add them manually.</p>
 
 <h3>References</h3>
 <div id="refs" class="references">
-<div id="ref-R-spatialLIBD">
-<p>Collado-Torres, Leonardo, Kristen R. Maynard, and Andrew E. Jaffe. 2020. <em>LIBD Visium Spatial Transcriptomics Human Pilot Data Inspector</em>. <a href="https://doi.org/10.18129/B9.bioc.spatialLIBD">https://doi.org/10.18129/B9.bioc.spatialLIBD</a>.</p>
+<div id="ref-R-config">
+<p>Allaire, JJ. 2018. <em>Config: Manage Environment Specific Configuration Values</em>. <a href="https://github.com/rstudio/config">https://github.com/rstudio/config</a>.</p>
 </div>
-<div id="ref-R-golem">
-<p>Fay, Colin, Vincent Guyader, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
+<div id="ref-R-rcmdcheck">
+<p>Csárdi, Gábor. 2019. <em>Rcmdcheck: Run R Cmd Check from R and Capture Results</em>. <a href="https://github.com/r-Lib/rcmdcheck#readme">https://github.com/r-Lib/rcmdcheck#readme</a>.</p>
 </div>
-<div id="ref-R-pkgbuild">
-<p>Wickham, Hadley, and Jim Hester. 2020. <em>Pkgbuild: Find Tools Needed to Build R Packages</em>. <a href="https://github.com/r-lib/pkgbuild">https://github.com/r-lib/pkgbuild</a>.</p>
+<div id="ref-R-remotes">
+<p>Hester, Jim, Gábor Csárdi, Hadley Wickham, Winston Chang, Martin Morgan, and Dan Tenenbaum. 2020. <em>Remotes: R Package Installation from Remote Repositories, Including Github</em>.</p>
 </div>
-<div id="ref-R-dccvalidator">
-<p>Woo, Kara, Nicole Kauer, and Kelsey Montgomery. 2020. <em>Dccvalidator: Metadata Validation for Data Coordinating Centers</em>.</p>
+<div id="ref-R-testthat">
+<p>Wickham, Hadley. 2020. <em>Testthat: Unit Testing for R</em>.</p>
 </div>
 </div>
 <div class="footnotes">
 <hr />
-<ol start="53">
-<li id="fn53"><p>This is also true for any other Version Control system<a href="deploy.html#fnref53" class="footnote-back">↩︎</a></p></li>
+<ol start="49">
+<li id="fn49"><p>It was first developed by Linus Torvalds, the very same man behind Linux.<a href="version-control.html#fnref49" class="footnote-back">↩︎</a></p></li>
+<li id="fn50"><p>For example: “Added a graph in the analysis tab”, or “Fixed the docx export bug”<a href="version-control.html#fnref50" class="footnote-back">↩︎</a></p></li>
+<li id="fn51"><p>If you want to modify some code or have to go back in time, the best way to do it is to create a new commit with these changes or use adequate git commands.<a href="version-control.html#fnref51" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 <hr/>
@@ -676,8 +760,8 @@ Otherwise you might have to add them manually.</p>
           </div>
         </div>
       </div>
-<a href="version-control.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="need-for-optimization.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="build-yourself-safety-net.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="deploy.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -708,7 +792,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/13-deploy.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/12-secure.Rmd",
 "text": "Edit"
 },
 "history": {

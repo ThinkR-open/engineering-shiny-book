@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps</title>
+  <title>Chapter 10 Building the app with {golem} | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:title" content="Chapter 10 Building the app with {golem} | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
   
   <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 13 Deploy your application | Engineering Production-Grade Shiny Apps" />
+  <meta name="twitter:title" content="Chapter 10 Building the app with {golem} | Engineering Production-Grade Shiny Apps" />
   
   <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="version-control.html"/>
-<link rel="next" href="need-for-optimization.html"/>
+<link rel="prev" href="building-ispum-app.html"/>
+<link rel="next" href="build-yourself-safety-net.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
@@ -484,152 +484,225 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="deploy" class="section level1">
-<h1><span class="header-section-number">Chapter 13</span> Deploy your application</h1>
+<div id="build-app-golem" class="section level1">
+<h1><span class="header-section-number">Chapter 10</span> Building the app with <code>{golem}</code></h1>
+<p>Now that the application is prototyped inside a <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> skeleton, you can work on its integration.
+In this step of the workflow, you will be linking the back-end and front-end together, and working on the global engineering of the application, <em>i.e</em>:</p>
+<ul>
+<li>add and organize dependencies</li>
+<li>creating and including sub-modules if necessary</li>
+<li>organize utility functions and link them to the module they are used in</li>
+<li>adding testing infrastructure</li>
+<li>linking to CI / CD services</li>
+</ul>
+<p>Note that some concepts introduced here will be more extensively explored in the following chapters: the present chapter is a walkthrough of what you will find inside the <code>02_dev</code> scripts.</p>
+<div id="add-dependencies" class="section level2">
+<h2><span class="header-section-number">10.1</span> Add dependencies</h2>
+<div id="package-dependencies" class="section level3">
+<h3><span class="header-section-number">10.1.1</span> Package dependencies</h3>
+<p>When you are building a <code>{shiny}</code> <span class="citation">(Chang et al. <a href="#ref-R-shiny" role="doc-biblioref">2020</a>)</span> application, you will have to deal with dependencies.
+Well, at least with one dependency, <code>{shiny}</code>.
+But chances are that you will not only be using <code>{shiny}</code> inside your application: you will probably call functions from other packages, for example from <code>{ggplot2}</code> <span class="citation">(Wickham, Chang, et al. <a href="#ref-R-ggplot2" role="doc-biblioref">2020</a>)</span> for plotting, or any other package that is necessary for your application to work.</p>
+<p>If you are building your application using <code>{golem}</code>, you will have 3 default dependencies: <code>{golem}</code> itself, <code>{shiny}</code>, and <code>{config}</code>.
+If you call <code>golem::use_recommended_deps()</code> in the first workflow script, you will also have <code>{shiny}</code>, <code>{DT}</code>, <code>{attempt}</code>, <code>{glue}</code>, <code>{htmltools}</code>, and <code>{golem}</code> as dependencies to your package<a href="#fn40" class="footnote-ref" id="fnref40"><sup>40</sup></a> .
+But what about other dependencies like <code>{ggplot2}</code>? These ones need to be added by hand.</p>
+<p>Here is how to process for a new dependency:</p>
+<ul>
+<li>Open the <code>dev/02_dev.R</code> script,</li>
+<li>Call the <code>use_package()</code> function from <code>{usethis}</code>: <code>usethis::use_package("pkg.you.waa git repository for the {hexmake} application nt.to.add")</code></li>
+<li>Detail import mechanism in the related R files</li>
+</ul>
+</div>
+<div id="importing-packages-and-functions" class="section level3">
+<h3><span class="header-section-number">10.1.2</span> Importing packages and functions</h3>
+<p>There are two places where the dependencies of your application need to be managed<a href="#fn41" class="footnote-ref" id="fnref41"><sup>41</sup></a> : the <code>DESCRIPTION</code> file and the <code>NAMESPACE</code></p>
+<ul>
+<li><p>The <code>DESCRIPTION</code> file dictates which packages have to be installed <strong>when your application is installed</strong>.
+For example, when you install <code>{golem}</code> on your machine, you will also need other packages that are internally used by <code>{golem}</code>.
+And your application will also have dependencies: at the very least <code>{shiny}</code>, <code>{golem}</code>, and <code>{config}</code>.
+When building your application, you have to list somewhere these requirements, and the standard way to do that is by using the <code>DESCRIPTION</code> file<a href="#fn42" class="footnote-ref" id="fnref42"><sup>42</sup></a>.</p></li>
+<li><p>The <code>NAMESPACE</code> file describes how your app interacts with the R session at run time, <em>i.e</em> <strong>when your application is launched</strong>.
+With this <code>NAMESPACE</code> file, you can specify only a subset of functions to import from other packages: for example you can choose to import only <code>renderDT()</code> and <code>DTOutput()</code> from <code>{DT}</code>, instead of importing all the functions.
+This selective import mechanism allows to avoid namespace conflicts: for example between <code>jsonlite::flatten()</code> and <code>purrr::flatten()</code>.<a href="#fn43" class="footnote-ref" id="fnref43"><sup>43</sup></a>
+To do so, we will need to go to every script that defines one or several function/s, and add a <code>{roxygen2}</code> <span class="citation">(Wickham, Danenberg, et al. <a href="#ref-R-roxygen2" role="doc-biblioref">2020</a>)</span> tag, in the following form : <code>#' @importFrom jsonlite fromJSON</code> and <code>#' @importFrom purrr flatten</code>: that way, you are only importing <code>fromJSON()</code> from <code>{jsonlite}</code>.</p></li>
+</ul>
+<p>Note that you can also use explicit namespacing, <em>i.e</em> the <code>pkg::function()</code> notation inside your code.
+And that if you need a little help to identify dependencies, all the explicitly namespaced calls (<code>pkg::function()</code>) can be scraped using the <code>{attachment}</code> <span class="citation">(Guyader and Rochette <a href="#ref-R-attachment" role="doc-biblioref">2020</a>)</span> package:</p>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="build-app-golem.html#cb115-1"></a><span class="co"># This function will read all the scripts in the R/ folder and </span></span>
+<span id="cb115-2"><a href="build-app-golem.html#cb115-2"></a><span class="co"># try to guess required dependencies</span></span>
+<span id="cb115-3"><a href="build-app-golem.html#cb115-3"></a>attachment<span class="op">::</span><span class="kw">att_from_rscripts</span>()</span></code></pre></div>
+<p>If you are using a development package (for example one installed from GitHub), you can add it to the <code>DESCRIPTION</code> using the <code>use_dev_package()</code> function from <code>{usethis}</code>.
+This will add another field to the <code>DESCRIPTION</code> file, <code>Remotes</code>, with the location where the package is available.</p>
+<p>All of this can seem a little bit daunting at first, but that is for the best:</p>
 <blockquote>
-<p>Your deploys should be as boring, straightforward, and stress-free as possible.<br />
-<!--SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
-<style>.right{ text-align: right;}</style>
-<!--/SHINY.SINGLETON[1efbbb1390b1f2da3adcc5776ac72d01ac3af14a]-->
-<div class="right">
-<a href="https://zachholman.com/posts/deploying-software">How to Deploy Software - Zach Holman</a>
-</div></p>
+<p>Having a high quality namespace helps encapsulate your package and makes it self-contained.
+This ensures that other packages won’t interfere with your code, that your code won’t interfere with other packages, and that your package works regardless of the environment in which it’s run.<br />
+<span class="citation">(Wickham and Bryan <a href="#ref-rpkg" role="doc-biblioref">2020</a><a href="#ref-rpkg" role="doc-biblioref">a</a>)</span></p>
 </blockquote>
-<p>Once your app is built, you are ready to deploy it!
-In other words, your software is now ready to be used by other users.
-There are two main ways to share your application and make it available to others: by creating a package and making it installable, or by sending it to a remote server.
-We will see in this part how you can do that using <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span>.</p>
-<div id="before-deployment-check-list" class="section level2">
-<h2><span class="header-section-number">13.1</span> Before deployment Check-list</h2>
-<p>Here is a quick checklist of things to think about once your application is ready, and before sending it to production</p>
+<p>To learn more about the details of dependencies, <code>DESCRIPTION</code> and <code>NAMESPACE</code>, here are some resources:</p>
 <ul>
-<li><p><input type="checkbox" disabled="" />
-<code>devtools::check()</code>, run from the command line, returns 0 errors, 0 warnings, 0 notes</p></li>
-<li><p><input type="checkbox" disabled="" />
-The current version number is valid, <em>i.e</em> if the current app is an update, the version number has been bumped</p></li>
-<li><p><input type="checkbox" disabled="" />
-Everything is fully documented</p></li>
-<li><p><input type="checkbox" disabled="" />
-Test coverage is good, i.e you cover a sufficient amount of the code base, and these tests cover the core/strategic algorithms</p></li>
-<li><p><input type="checkbox" disabled="" />
-It’s clear to everyone involved in the project who is the person to call if something goes wrong</p></li>
-<li><p><input type="checkbox" disabled="" />
-It’s clear to everyone involved in the project what is the debugging process, how to communicate bugs to the developer team, and how long it will take to get changes fixed</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The server it is deployed on has all the necessary software installed (Docker, Connect, <code>{shiny}</code> Server…) to make the application run</p></li>
-<li><p><input type="checkbox" disabled="" />
-The server has all the system requirements needed (<em>i.e</em> the system libraries), and if not, they are installed with the application (if it’s dockerized)</p></li>
-<li><p><input type="checkbox" disabled="" />
-The application, if deployed on a server, will be deployed on a port which will be accessible by the users</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The environment variables from the production server are managed inside the application</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The app is launched on the correct port, or at least this port can be configured via an environment variable</p></li>
-<li><p><input type="checkbox" disabled="" />
-(If relevant) The server where the app is deployed have access to the data sources (database, API…)</p></li>
-<li><p><input type="checkbox" disabled="" />
-If the app records data, there are backups for these data.</p></li>
-</ul>
-</div>
-<div id="sharing-your-app-as-a-package" class="section level2">
-<h2><span class="header-section-number">13.2</span> Sharing your app as a package</h2>
-<div id="install-on-your-machine" class="section level3">
-<h3><span class="header-section-number">13.2.1</span> Install on your machine</h3>
-<p>A <code>{shiny}</code> application built with <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span> is <strong>by definition</strong> an R package.
-This <code>{shiny}</code> App as a Package is also helpful when it comes to deploying your application: packages are designed to be shareable pieces of R code.</p>
-<p>Before sending it to a remote server or sharing it to the world, <strong>the first step is testing if the package can be installed on your own computer</strong>.
-To do that, when you are in the project corresponding to the golem you built, you can call <code>remotes::install_local()</code> to install the application on your computer.
-Of course, if you are somewhere else on your machine, you can call <code>remotes::install_local("path/to/app")</code>.
-If you are using the RStudio IDE, you can also click on the <code>Build</code> tab, then click on the <code>Install and Restart</code> button.</p>
-<p>This should restart your R session, and call <code>library(yourpackagename)</code>.
-Then, try the <code>run_app()</code> function to check that the app can be launched.</p>
-</div>
-<div id="share-as-built-package" class="section level3">
-<h3><span class="header-section-number">13.2.2</span> Share as built package</h3>
-<div id="a.-local-build" class="section level4 unnumbered">
-<h4>A. Local build</h4>
-<p>Building an app as a package also means that this app can be bundled into an archive, and then shared, either as is or using a package repository like the CRAN.</p>
-<p>To do that, you first need an bundled version of your app, which can be created using the <code>build()</code> function from <code>{pkgbuild}</code> <span class="citation">(Wickham and Hester <a href="#ref-R-pkgbuild" role="doc-biblioref">2020</a>)</span> in the same working directory as your application.
-Calling this function will create a .tar.gz file that is called <code>mygolem_0.0.1.tar.gz</code> (of course with the name of your package).
-Once you have this <code>tar.gz</code>, you can send it to your favorite package repository.</p>
-<p>You can also share the file as is with others.
-If you do so, they will have to install the app with <code>remotes::install_local("path/to/tar.gz")</code>, that will take care of doing a full installation of the app, including installing the required dependencies.<br />
-Then, they can do <code>library(yourpackagename)</code> and <code>run_app()</code> on their machine.</p>
-</div>
-<div id="b.-send-to-a-package-repository" class="section level4 unnumbered">
-<h4>B. Send to a package repository</h4>
-<p>The upside of building the application <code>{golem}</code>, <em>i.e</em> as a package, is that you can share your application on a remote package manager, the more widely used for example on the CRAN like <code>{dccvalidator}</code> <span class="citation">(Woo, Kauer, and Montgomery <a href="#ref-R-dccvalidator" role="doc-biblioref">2020</a>)</span>, or on BioConductor like <code>{spatialLIBD}</code> <span class="citation">(Collado-Torres, Maynard, and Jaffe <a href="#ref-R-spatialLIBD" role="doc-biblioref">2020</a>)</span>.
-But any other package manager will work: for example if the company uses RStudio Package Manager, your application can be installed here as any other package.
-If your application is open-source, the package structure also allows to install from GitHub, by using the <code>remotes::install_github()</code> function.<a href="#fn53" class="footnote-ref" id="fnref53"><sup>53</sup></a>
-For example, this is what you can do with <code>{hexmake}</code>, or <code>{tidytuesday}</code>: as they are open-source packages, they can be installed from GitHub.
-Then, once your application is installed as a package on the users’ machines, they can do <code>library(yourpackagename)</code> and <code>run_app()</code>.</p>
-<p>The advantage of this solution being that R users are familiar with package installation, so it makes using your application easier for them.
-Also, and we will see it in the next section, but making your application available as a standard R package makes it easier to deploy it: for example if your RStudio Connect is coupled with your RStudio Package Manager, the deployment file just have to contain one line launching the application.</p>
-<p>Note that releasing to CRAN or BioConductor requires extra effort: you have to comply to a series of rules.
-But good news: as you have been following the best practices from this book, you should not have to put that much extra efforts!</p>
-<p>Know more about releasing on CRAN:</p>
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/submission_checklist.html">Checklist for CRAN submissions</a></li>
-<li><a href="https://cran.r-project.org/web/packages/policies.html">CRAN Repository Policy</a></li>
-<li><a href="https://r-pkgs.org/release.html">R packages - Chapter 18 Releasing a package</a></li>
-<li><a href="https://kbroman.org/pkg_primer/pages/cran.html">Getting your R package on CRAN</a></li>
-<li><a href="https://github.com/ThinkR-open/prepare-for-cran">prepare-for-cran - A Collaborative list of things to know before submitting to CRAN</a></li>
+<li><a href="https://cran.r-project.org/manuals.html">Writing R Extensions</a>, the official manual from the R-Core team</li>
+<li><a href="https://r-pkgs.org/">R Packages</a>, especially the <em>Package metadata</em> and <em>Namespace</em> chapters</li>
 </ul>
 </div>
 </div>
+<div id="submodules-and-utility-functions" class="section level2">
+<h2><span class="header-section-number">10.2</span> Submodules and utility functions</h2>
+<p>When building a large application, you <strong>will be splitting your code base into smaller pieces</strong>.
+We have developed in the <em>Structuring your Project</em> chapter that these utilitarian functions should be defined in files that are prefixed with a specific term.
+In the <code>{golem}</code> world, these are <code>utils_*</code> and <code>fct_*</code> files:</p>
+<ul>
+<li><code>utils_*</code> files contain small functions that might be used several times in the application</li>
+<li><code>fct_*</code> files contain larger functions that are more central to the application</li>
+</ul>
+<p>Two functions can be called to create these files:</p>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="build-app-golem.html#cb116-1"></a><span class="co"># Adding fct_ and utils_ files to the project</span></span>
+<span id="cb116-2"><a href="build-app-golem.html#cb116-2"></a>golem<span class="op">::</span><span class="kw">add_fct</span>( <span class="st">&quot;helpers&quot;</span> ) </span>
+<span id="cb116-3"><a href="build-app-golem.html#cb116-3"></a>golem<span class="op">::</span><span class="kw">add_utils</span>( <span class="st">&quot;helpers&quot;</span> )</span></code></pre></div>
+<ul>
+<li>The first will create a <code>R/fct_helpers.R</code> file</li>
+<li>The second will create a <code>R/utils_helpers.R</code> file</li>
+</ul>
+<p>The idea, as explained before, is that as soon as you open a <code>{golem}</code> based project, you are able to identify what the files contain, without having to open them<a href="#fn44" class="footnote-ref" id="fnref44"><sup>44</sup></a> .</p>
+<p>For example, the <code>{hexmake}</code> app has two of these files <a href="https://github.com/ColinFay/hexmake/blob/master/R/utils_ui.R"><code>R/utils_ui.R</code></a> and <a href="https://github.com/ColinFay/hexmake/blob/master/R/utils_server.R"><code>R/utils_server.R</code></a>, in which you will find small functions that are reused throughout the app.</p>
+<p>The <code>fct_*</code> files are to be used with larger functions, which are more central to the application, but that might not fit into a specific module.
+For example, in <code>{hexmake}</code>, you will find <a href="https://github.com/ColinFay/hexmake/blob/master/R/fct_mongo.R"><code>R/fct_mongo.R</code></a>, that is used to handle all the things related to connecting and interacting with the Mongodb database.</p>
+<p>As you can see, the difference is that <code>fct_*</code> file are more “topic centered”, in the sense that they gather functions that relate to a specific feature of the application (here, the database), while <code>utils_*</code> files are more used as a place where to put miscellaneous functions.</p>
+<p>Note that when building a module with <code>golem::add_module()</code>, you can add a module specific <code>fct_*</code> or <code>utils_*</code> file:</p>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="build-app-golem.html#cb117-1"></a><span class="co"># Creating the fct_ and utils_ file along the module creation</span></span>
+<span id="cb117-2"><a href="build-app-golem.html#cb117-2"></a>golem<span class="op">::</span><span class="kw">add_module</span>(<span class="st">&quot;rendering&quot;</span>, <span class="dt">fct =</span> <span class="st">&quot;connect&quot;</span>, <span class="dt">utils =</span> <span class="st">&quot;wrapper&quot;</span>)</span></code></pre></div>
+<p>Will create:</p>
+<ul>
+<li><code>R/mod_rendering.R</code></li>
+<li><code>R/mod_rendering_fct_connect.R</code></li>
+<li><code>R/mod_rendering_utils_wrapper.R</code></li>
+</ul>
+<p>And this can also be done the other way around, by specifying the module you want to link your file to:</p>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="build-app-golem.html#cb118-1"></a><span class="co"># Linking the utils_wrapper file to the rendering module</span></span>
+<span id="cb118-2"><a href="build-app-golem.html#cb118-2"></a>golem<span class="op">::</span><span class="kw">add_utils</span>(<span class="st">&quot;wrapper&quot;</span>, <span class="dt">module =</span> <span class="st">&quot;rendering&quot;</span>)</span></code></pre></div>
 </div>
-<div id="deploying-apps-with-golem" class="section level2">
-<h2><span class="header-section-number">13.3</span> Deploying Apps with <code>{golem}</code></h2>
-<p>The other way to make your application available to others is by sending it to a remote server that can serve <code>{shiny}</code> applications.
-In other words, instead of having to install the application on their machines, <strong>they can crack open a web browser and navigate to the URL where the application is deployed</strong>.
-Deploying to a server is the solution of choice when you want to make your application available to a wide public: on a server, visitors do not have to have R installed on their computer, they do not have to install a package or launch it, they can just browse the application like any other web application.
-This solution is also a common choice in companies that have strict security requirements: the IT team might not be willing to let everyone install software on their machine, and sharing an application on a server allows them more control over who can access the application.
-For example, deploying on a server allows to use proxy, and to filter by IP: then, only a subset of people can have access to the application.</p>
-<p>When using <code>{golem}</code>, you can open the <code>dev/03_deploy.R</code> and find the functions for server deployment.
-At the time of writing this book, there are two main ways to deploy a shiny app on a server:</p>
-<ul>
-<li>RStudio’s solutions</li>
-<li>A docker based solution</li>
-</ul>
-<div id="rstudio-environments" class="section level3">
-<h3><span class="header-section-number">13.3.1</span> RStudio Environments</h3>
-<p>RStudio proposes three services to deploy <code>{shiny}</code> application:</p>
-<ul>
-<li><p>shinyapps.io, an on-premise solution that can serve <code>{shiny}</code> application (freemium)</p></li>
-<li><p><code>{shiny}</code>-server, a software you have to install on your own server, and that can be used to deploy multiple applications (you can find either an open source or a professional edition)</p></li>
-<li><p>RStudio connect, a server-based solution that can deploy <code>{shiny}</code> applications and markdown documents (and other kind of content), and that serves them as ordinary websites</p></li>
-</ul>
-<p>Each of these platforms has its own function to create an <code>app.R</code> file that is to be used as a launch script of each platform.</p>
-<ul>
-<li><p><code>golem::add_rstudioconnect_file()</code></p></li>
-<li><p><code>golem::add_shinyappsio_file()</code></p></li>
-<li><p><code>golem::add_shinyserver_file()</code></p></li>
-</ul>
-<p>What these <code>app.R</code> files do is calling a <code>pkgload::load_all()</code> function, that will mimic the launch of your package, and then call the <code>run_app()</code> function from your packaged app.
-Note that if you need to configure the way your app is launched on these platforms (for example if you need to pass arguments to the <code>run_app()</code> function), you will have to edit this file.</p>
-<p>Note that when using these functions, you will be able to use the “One click deploy” for these platforms: on the top right of these <code>app.R</code>, use the Blue Button to deploy to server.</p>
-<p>Another way to deploy your <code>{golem}</code> based app to <code>{shiny}</code> server and to Connect is to link these two software to a local repository (for example an RStudio Package Manager), and then to only use <code>mypackage::run_app()</code> to the <code>app.R</code>.</p>
+<div id="add-tests" class="section level2">
+<h2><span class="header-section-number">10.3</span> Add tests</h2>
+<p>No piece of software should go into production if it has not been sufficiently tested.
+In this part of the building process, you will be setting tests for the application you are building.
+We will get back to the how, why and what of testing in an upcoming chapter, but as we are currently going through the <code>02_dev.R</code> script, we mention here the line that allows you to add a test skeleton to your app.</p>
+<p>If you have followed every steps from the <code>01_start.R</code> file, you already have a full testing infrastructure ready, with a set of recommended tests inserted by <code>{golem}</code>.
+But as it is hard to find tests that are relevant to all applications (as every application is unique), you will have to add and fill manually the tests that will check your app.
+And right now, to add a new testing file, you can call:</p>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="build-app-golem.html#cb119-1"></a><span class="co"># Generate the testing infrastructure</span></span>
+<span id="cb119-2"><a href="build-app-golem.html#cb119-2"></a>usethis<span class="op">::</span><span class="kw">use_test</span>(<span class="st">&quot;app&quot;</span>)</span></code></pre></div>
+<p>More on testing in chapter <a href="build-yourself-safety-net.html#build-yourself-safety-net">11</a>.</p>
 </div>
-<div id="docker-1" class="section level3">
-<h3><span class="header-section-number">13.3.2</span> Docker</h3>
-<p>Docker is an open source software used to build and deploy applications in containers.
-Docker has become an core solution in the DevOps world and a lot of server solution are based on it.
-See the “Strengthen” chapter for a more complete introduction to Docker.</p>
-<p>You will find the function for creating a <code>Dockerfile</code> for your <code>{golem}</code> app inside the <code>03_deploy.R</code> file, which contains a series of 3 functions:</p>
+<div id="documentation-and-code-coverage" class="section level2">
+<h2><span class="header-section-number">10.4</span> Documentation and Code Coverage</h2>
+<div id="vignette" class="section level3">
+<h3><span class="header-section-number">10.4.1</span> Vignette</h3>
+<p>Vignettes are long format documentation for your application, they are the one users see when they are running <code>browseVignettes()</code>, when they look at the documentation in the <code>Help</code> pane from RStudio, when they are browsing a webpage on CRAN, and it is also the files that are used when the <code>{pkgdown}</code> websites are built.
+The good news is that if you have been using our “Rmd first” method, you already have most of the Vignettes built: they are the Markdown files describing how the back-end of your application works.
+Depending on how you applied this principle, these Rmd files might live inside the <code>inst/</code> folder, or already as package Vignettes.
+If you need to add a new Vignette, be it for adding an Rmd describing the back-end or a global documentation about the application, you can call the <code>use_vignette()</code> function from <code>{usethis}</code>.</p>
+<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="build-app-golem.html#cb120-1"></a><span class="co"># Adding a new Vignette named &quot;shinyexample&quot;</span></span>
+<span id="cb120-2"><a href="build-app-golem.html#cb120-2"></a>usethis<span class="op">::</span><span class="kw">use_vignette</span>(<span class="st">&quot;shinyexample&quot;</span>)</span></code></pre></div>
+<p>Then, you can build all the Vignettes with:</p>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="build-app-golem.html#cb121-1"></a><span class="co"># Compiling the Vignettes</span></span>
+<span id="cb121-2"><a href="build-app-golem.html#cb121-2"></a>devtools<span class="op">::</span><span class="kw">build_vignettes</span>()</span></code></pre></div>
+</div>
+<div id="code-coverage-continuous-integration" class="section level3">
+<h3><span class="header-section-number">10.4.2</span> Code Coverage &amp; Continuous Integration</h3>
+<div id="a.-code-coverage" class="section level4 unnumbered">
+<h4>A. Code Coverage</h4>
+<p>Code coverage is a way to detect the volume of code that is covered by unit testing.
+You can do this locally, or you can use online services like Appveyor, an online platform that computes and tracks the code coverage of your repository.</p>
+<p>To add it to your application, call the <code>use_coverage()</code> function from the <code>{usethis}</code> package:</p>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="build-app-golem.html#cb122-1"></a><span class="co"># Adding the correct code coverage </span></span>
+<span id="cb122-2"><a href="build-app-golem.html#cb122-2"></a><span class="co"># infrastructure in your application</span></span>
+<span id="cb122-3"><a href="build-app-golem.html#cb122-3"></a>usethis<span class="op">::</span><span class="kw">use_coverage</span>()</span></code></pre></div>
+<p>At the time of writing these lines, this function supports two services: <a href="https://codecov.io/">CodeCov</a> and <a href="https://coveralls.io/">coveralls</a>.</p>
+<p>Note that you can also perform code coverage locally, using the <code>{covr}</code> <span class="citation">(Hester <a href="#ref-R-covr" role="doc-biblioref">2020</a><a href="#ref-R-covr" role="doc-biblioref">b</a>)</span> package, and the <code>package_coverage()</code> function.</p>
+<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="build-app-golem.html#cb123-1"></a><span class="co"># Compute the code coverage of your application</span></span>
+<span id="cb123-2"><a href="build-app-golem.html#cb123-2"></a>code_coverage &lt;-<span class="st"> </span>covr<span class="op">::</span><span class="kw">package_coverage</span>()</span></code></pre></div>
+<p>For example, figure <a href="build-app-golem.html#fig:10-step-by-step-build-11">10.1</a> is the output of running the <code>package_coverage()</code> function on the <code>{golem}</code> package on the 2020-04-29 on the <code>dev</code> branch:</p>
+<div class="figure" style="text-align: center"><span id="fig:10-step-by-step-build-11"></span>
+<img src="img/golemcov.png" alt="{golem} code coverage results" width="100%" />
+<p class="caption">
+FIGURE 10.1: {golem} code coverage results
+</p>
+</div>
+<p>As you can see, we reach a code coverage of almost 70%.
+<strong>Deciding what the perfect percentage of coverage should be is not an easy task, and setting for an arbitrary coverage is not a smart move either, as it very much depends on the type of project you are working on</strong>.
+For example, in <code>{golem}</code>, the <code>addins.R</code> file is not tested (0% code coverage), and that is for a good reason: these addins are linked to RStudio and are not meant to be tested/used in a non-interactive environment, and (at least at the time of writing these lines) there are no automated way to test for RStudio addins.
+Another thing to keep in mind while computing code coverage is that it counts the number of lines that are run when the tests are run, which means that if you write your whole function on one single line, you will have a 100% code coverage.
+Another example is writing your <code>if/else</code> statement on one line <code>if (this) that else that</code>: your code coverage will count this line as covered, even if your test suite only runs the <code>if(this)</code> and not the <code>else</code> ; in other words, even if your code coverage is good here, you are still not testing this algorithm extensively.</p>
+<p>Note that you can also identify files with zero code coverage using the <code>covr::zero_coverage(covr::package_coverage())</code> function, which, instead of printing back a metric of coverage for each file, will point to all the lines that are not covered by tests inside your package, as show in figure <a href="build-app-golem.html#fig:10-step-by-step-build-12">10.2</a>:</p>
+<div class="figure" style="text-align: center"><span id="fig:10-step-by-step-build-12"></span>
+<img src="img/zerocov.png" alt="`{golem}` files with zero code coverage" width="100%" />
+<p class="caption">
+FIGURE 10.2: <code>{golem}</code> files with zero code coverage
+</p>
+</div>
+<p>To sum up: do not set an arbitrary code coverage percentage goal, but rather use it as a general metric all along your project.
+With CodeCov, you can get a timeline of the evolution of code coverage: a good tool for judging when you need to write more tests.
+For example, figure <a href="build-app-golem.html#fig:10-step-by-step-build-13">10.3</a> is the general tendency for the code coverage of the <code>{tibble}</code> package over the last 6 months (November 2019 - April 2020):</p>
+<div class="figure" style="text-align: center"><span id="fig:10-step-by-step-build-13"></span>
+<img src="img/codecov-tibble.png" alt="CodeCov.io results for the {tibble} package" width="100%" />
+<p class="caption">
+FIGURE 10.3: CodeCov.io results for the {tibble} package
+</p>
+</div>
+<p>Perfect for getting a general feeling about the code coverage during the life of the project!</p>
+<p>Note also that if you want to add the code coverage of your application inside a Vignette, you can use the <code>{covrpage}</code> <span class="citation">(Sidi <a href="#ref-R-covrpage" role="doc-biblioref">2020</a>)</span> package, that bundles the results of <code>{covr}</code> coverage report into an interactive, human readable Vignette, that you can later on use as package documentation, or as an article inside your package website.
+<code>{covrpage}</code> can be installed from GitHub with <code>remotes::install_github('metrumresearchgroup/covrpage')</code>.</p>
+</div>
+<div id="b.-continuous-integration" class="section level4 unnumbered">
+<h4>B. Continuous Integration</h4>
+<p>Continuous Integration, on the other hand, is ensuring the software is still working whenever a change is made by one of the developers.
+The idea is to add to the centralized version control system (for example Git)<a href="#fn45" class="footnote-ref" id="fnref45"><sup>45</sup></a> a service like Travis CI, GitHub Action (if you are on GitHub) or GitLab CI (for GitLab) that runs a series of commands whenever something is integrated to the repository, <em>i.e</em> every time a change to the codebase is made.
+In other words, every time a new piece of code is sent to the central repository, a service runs regression tests that check that the software is still in a valid, working state.</p>
+<p>You can set up various continuous integration services automatically by using functions from the <code>{usethis}</code> package:</p>
 <ul>
-<li><code>golem::add_dockerfile()</code></li>
-<li><code>golem::add_dockerfile_shinyproxy()</code></li>
-<li><code>golem::add_dockerfile_heroku()</code></li>
+<li>Travis CI is set up with <code>usethis::use_travis()</code></li>
+<li>AppVeyor with <code>usethis::use_appveyor()</code></li>
+<li>GitLab CI with <code>use_gitlab_ci()</code></li>
+<li>Circle CI with <code>use_circleci()</code></li>
+<li>GitHub Actions with <code>use_github_actions()</code></li>
+<li>Jenkins with <code>use_jenkins()</code></li>
 </ul>
-<p>The first function creates a “generic” <code>Dockerfile</code>, in the sense that it is not specific to any platform, and would work out of the box for your local machine.
-The second one is meant for <a href="https://www.shinyproxy.io/"><code>{shiny}</code>Proxy</a>, an open source solution for deploying containerized <code>{shiny}</code> applications, and the third for <a href="https://www.heroku.com/">Heroku</a>, an online service that can serve containerized applications (not specific to <code>{shiny}</code>).</p>
-<p>Other platforms can run Docker containers, notably AWS and Google Cloud Engine.
-At the time of writing these lines, <code>{golem}</code> does not provide support for these environment, but that is on the ToDo list!</p>
-<p>Note that the <code>Dockerfile</code> creation in <code>{golem}</code> tries to replicate your local environment as precisely as possible, notably by matching your R version, and the version of the packages you have installed on your machine.
-System requirements are also added when they are found on <a href="https://sysreqs.r-hub.io/">the sysreqs service from r-hub</a>.
-Otherwise you might have to add them manually.</p>
+<p>If ever you want to add badges to your <code>README</code> files for these services, <code>{usethis}</code> also comes with a series of functions to do just that: <code>use_travis_badge()</code>, <code>use_appveyor_badge()</code>, <code>use_circleci_badge()</code> and <code>use_github_actions_badge()</code>.</p>
+<p>CI services can do a lot more, like for example deploying the application, build a container and send it to a container registry, compile RMarkdown files<a href="#fn46" class="footnote-ref" id="fnref46"><sup>46</sup></a> , etc.
+The possibilities are almost limitless!</p>
+</div>
+</div>
+</div>
+<div id="using-golem-dev-functions" class="section level2">
+<h2><span class="header-section-number">10.5</span> Using <code>{golem}</code> dev functions</h2>
+<p>When building an application, you will want it to behave differently depending on where it is run, and notably, if it is run in development or in production.
+We have seen in previous chapters that you can use the <code>golem-config.yml</code> file, or pass arguments to <code>run_app()</code>.
+A third option is to use the <code>dev</code> functions from <code>{golem}</code>.</p>
+<p>There is a series of tools to make your app behave differently whether it is in “dev” or “prod” mode.
+Notably, the <code>app_prod()</code> and <code>app_dev()</code> function look for the value of <code>options( "golem.app.prod" )</code>, or return <code>TRUE</code> if this option does not exist.
+In other words, by setting <code>options( "golem.app.prod" )</code> to <code>TRUE</code>, you will make the functions that depend on this option behave in a specific way.</p>
+<p>Some functions pre-exist in <code>{golem}</code>, for example if you need to print a message to the console only during dev, you can do it with <code>cat_dev()</code>.</p>
+<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="build-app-golem.html#cb124-1"></a><span class="co"># Setting the option to FALSE</span></span>
+<span id="cb124-2"><a href="build-app-golem.html#cb124-2"></a><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">FALSE</span>)</span>
+<span id="cb124-3"><a href="build-app-golem.html#cb124-3"></a><span class="co"># Function runs as expected</span></span>
+<span id="cb124-4"><a href="build-app-golem.html#cb124-4"></a>golem<span class="op">::</span><span class="kw">cat_dev</span>(<span class="st">&quot;In dev</span><span class="ch">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>In dev</code></pre>
+<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="build-app-golem.html#cb126-1"></a><span class="co"># Switching the option to TRUE</span></span>
+<span id="cb126-2"><a href="build-app-golem.html#cb126-2"></a><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">TRUE</span>)</span>
+<span id="cb126-3"><a href="build-app-golem.html#cb126-3"></a><span class="co"># Nothing is printing</span></span>
+<span id="cb126-4"><a href="build-app-golem.html#cb126-4"></a>golem<span class="op">::</span><span class="kw">cat_dev</span>(<span class="st">&quot;In dev</span><span class="ch">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<p>Of course, chances are you do not only need to print things, you might want to use other functions.
+Good news!
+You can make any function being “dev-dependent” with the <code>make_dev()</code> function:</p>
+<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="build-app-golem.html#cb127-1"></a><span class="co"># Same mechanism as cat_dev, but with other functions </span></span>
+<span id="cb127-2"><a href="build-app-golem.html#cb127-2"></a>log_dev &lt;-<span class="st"> </span>golem<span class="op">::</span><span class="kw">make_dev</span>(log)</span>
+<span id="cb127-3"><a href="build-app-golem.html#cb127-3"></a><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">FALSE</span>)</span>
+<span id="cb127-4"><a href="build-app-golem.html#cb127-4"></a><span class="kw">log_dev</span>(<span class="dv">10</span>)</span></code></pre></div>
+<pre><code>[1] 2.303</code></pre>
+<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb129-1"><a href="build-app-golem.html#cb129-1"></a><span class="kw">options</span>( <span class="st">&quot;golem.app.prod&quot;</span> =<span class="st"> </span><span class="ot">TRUE</span>)</span>
+<span id="cb129-2"><a href="build-app-golem.html#cb129-2"></a><span class="kw">log_dev</span>(<span class="dv">10</span>)</span></code></pre></div>
+<p>That way, you can use functions in your back-end for development purpose, that will be ignored in production.</p>
 
-</div>
 </div>
 </div>
 
@@ -637,23 +710,41 @@ Otherwise you might have to add them manually.</p>
 
 <h3>References</h3>
 <div id="refs" class="references">
-<div id="ref-R-spatialLIBD">
-<p>Collado-Torres, Leonardo, Kristen R. Maynard, and Andrew E. Jaffe. 2020. <em>LIBD Visium Spatial Transcriptomics Human Pilot Data Inspector</em>. <a href="https://doi.org/10.18129/B9.bioc.spatialLIBD">https://doi.org/10.18129/B9.bioc.spatialLIBD</a>.</p>
+<div id="ref-R-shiny">
+<p>Chang, Winston, Joe Cheng, JJ Allaire, Yihui Xie, and Jonathan McPherson. 2020. <em>Shiny: Web Application Framework for R</em>. <a href="http://shiny.rstudio.com">http://shiny.rstudio.com</a>.</p>
 </div>
 <div id="ref-R-golem">
 <p>Fay, Colin, Vincent Guyader, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
 </div>
-<div id="ref-R-pkgbuild">
-<p>Wickham, Hadley, and Jim Hester. 2020. <em>Pkgbuild: Find Tools Needed to Build R Packages</em>. <a href="https://github.com/r-lib/pkgbuild">https://github.com/r-lib/pkgbuild</a>.</p>
+<div id="ref-R-attachment">
+<p>Guyader, Vincent, and Sébastien Rochette. 2020. <em>Attachment: Deal with Dependencies</em>. <a href="https://github.com/Thinkr-open/attachment">https://github.com/Thinkr-open/attachment</a>.</p>
 </div>
-<div id="ref-R-dccvalidator">
-<p>Woo, Kara, Nicole Kauer, and Kelsey Montgomery. 2020. <em>Dccvalidator: Metadata Validation for Data Coordinating Centers</em>.</p>
+<div id="ref-R-covr">
+<p>Hester, Jim. 2020b. <em>Covr: Test Coverage for Packages</em>.</p>
+</div>
+<div id="ref-R-covrpage">
+<p>Sidi, Jonathan. 2020. <em>Covrpage: Create a Readme Summary Page for Github Testthat and Covr Outputs</em>. <a href="https://github.com/metrumresearchgroup/covrpage">https://github.com/metrumresearchgroup/covrpage</a>.</p>
+</div>
+<div id="ref-rpkg">
+<p>Wickham, Hadley, and Jennifer Bryan. 2020a. <em>R Packages</em>. <a href="https://r-pkgs.org/">https://r-pkgs.org/</a>.</p>
+</div>
+<div id="ref-R-ggplot2">
+<p>Wickham, Hadley, Winston Chang, Lionel Henry, Thomas Lin Pedersen, Kohske Takahashi, Claus Wilke, Kara Woo, Hiroaki Yutani, and Dewey Dunnington. 2020. <em>Ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics</em>.</p>
+</div>
+<div id="ref-R-roxygen2">
+<p>Wickham, Hadley, Peter Danenberg, Gábor Csárdi, and Manuel Eugster. 2020. <em>Roxygen2: In-Line Documentation for R</em>.</p>
 </div>
 </div>
 <div class="footnotes">
 <hr />
-<ol start="53">
-<li id="fn53"><p>This is also true for any other Version Control system<a href="deploy.html#fnref53" class="footnote-back">↩︎</a></p></li>
+<ol start="40">
+<li id="fn40"><p>The idea with this function is to provide a shortcut for adding commonly used dependencies, so that you don’t have to do it by hand<a href="build-app-golem.html#fnref40" class="footnote-back">↩︎</a></p></li>
+<li id="fn41"><p>This is not <code>{shiny}</code> nor <code>{golem}</code> specific, but a requirement for any package<a href="build-app-golem.html#fnref41" class="footnote-back">↩︎</a></p></li>
+<li id="fn42"><p>Note that most of the time, you will not be filling this by hand, but by using <code>usethis::use_package()</code><a href="build-app-golem.html#fnref42" class="footnote-back">↩︎</a></p></li>
+<li id="fn43"><p>which can be pretty common as <code>{jsonlite}</code> might import <code>JSON</code> files as list, and <code>{purrr}</code> has pretty powerful tools for manipulating lists<a href="build-app-golem.html#fnref43" class="footnote-back">↩︎</a></p></li>
+<li id="fn44"><p>The <code>utils_*</code> convention is a pretty common one: a lot of R packages contain a file call <code>utils.R</code> that bundles a series of small functions that are used throughout the package.<a href="build-app-golem.html#fnref44" class="footnote-back">↩︎</a></p></li>
+<li id="fn45"><p>We will get back to Version Control in the <em>Version Control</em> chapter<a href="build-app-golem.html#fnref45" class="footnote-back">↩︎</a></p></li>
+<li id="fn46"><p>For example, the online version of this book is compiled to HTML every time something is merged into the <code>master</code> branch on GitHub<a href="build-app-golem.html#fnref46" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 <hr/>
@@ -676,8 +767,8 @@ Otherwise you might have to add them manually.</p>
           </div>
         </div>
       </div>
-<a href="version-control.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="need-for-optimization.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="building-ispum-app.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="build-yourself-safety-net.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -708,7 +799,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/13-deploy.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/10-step-by-step-build.Rmd",
 "text": "Edit"
 },
 "history": {
