@@ -6,26 +6,26 @@
 
 ## A (very) short introduction to `{shiny}`
 
-If you are reading this page, chances are you already know what a `{shiny}` application (sometimes shorten "`{shiny}` app") is---**a web application that communicates with R, built in R, and working with R**.
+If you are reading this page, chances are you already know what a `{shiny}` application (sometimes shortened as "`{shiny}` app") is---**a web application that communicates with R, built in R, and working with R**.
 The beauty of `{shiny}` [@R-shiny] is that it makes it easy for someone already familiar with R to create a small app in a matter of hours.
 With small and minimal `{shiny}` apps, no knowledge of HTML, CSS or JavaScript is required, and you do not have to think about technical elements that usually come with web applications---for example, you do not have to think about the port the application is served on: `{shiny}` picks one for you [^big-shiny-1] .
 Same goes for serving external dependencies: the application comes with its set of CSS and JavaScript dependencies that a common `{shiny}` developer does not need to worry about.
-And that is probably one of the main reason why this package has become so successful over the years---**with very little training, you can rapidly create a proof-of-concept (PoC) for a data-product, showcase an algorithm, or present your results in an elegant and accessible user interfaces**.
+And that is probably one of the main reasons why this package has become so successful over the years---**with very little training, you can rapidly create a proof-of-concept (PoC) for a data product, showcase an algorithm, or present your results in an elegant and accessible user interfaces**.
 
-[^big-shiny-1]: Of course you can specify one if you need to, but by default the package picks one;
+[^big-shiny-1]: Of course you can specify one if you need to, but by default the package picks one.
 
 The first version of `{shiny}` was published in 2012.
-Since then, it has been one of the top project of the RStudio team.
+Since then, it has been one of the top projects of the RStudio team.
 At the time of writing these lines (April 2020), there are more than 4700 commits in the master branch of the GitHub repository, made by 46 contributors.
 It is now downloaded around 400K times a month, according to [cranlogs](https://cranlogs.r-pkg.org/badges/shiny), and has `r length(devtools::revdep("shiny"))` reverse dependencies (i.e packages that depend on it), according to `revdep("shiny")` from `{devtools}` [@R-devtools].
 
 If you are very new to `{shiny}`, this book might feel a little bit overwhelming: we will be discussing some advanced `{shiny}` and software engineering methods, best practices and structural ideas for sending `{shiny}` applications to production.
-This books relies on the assumption that you already know how to build basic `{shiny}` applications, and that you want to push your `{shiny}` skills to the next level: in other words, you are ready to move from the Proof of Concept to the production-grade application.
-If you are very new to `{shiny}`, we suggest you start with the [Mastering Shiny book](https://mastering-shiny.org/) before reading the present book.
+This book relies on the assumption that you already know how to build basic `{shiny}` applications, and that you want to push your `{shiny}` skills to the next level: in other words, you are ready to move from the Proof of Concept to the production-grade application.
+If you are very new to `{shiny}`, we suggest you start with the [_Mastering Shiny_ book](https://mastering-shiny.org/) before reading the present book.
 
 Ready to start engineering production-grade `{shiny}` apps?
 
-## What is a Complex `{shiny}` Application? {#complex-shiny}
+## What is a complex `{shiny}` application? {#complex-shiny}
 
 > One of the unfortunate things about reality is that it often poses complex problems that demand complex solutions.\
 > `r right_link("The Art of Unix Programming", "http://www.catb.org/~esr/writings/taoup/html/ch13s01.html")`
@@ -33,24 +33,23 @@ Ready to start engineering production-grade `{shiny}` apps?
 ### Reaching the cliff of complexity
 
 Building a `{shiny}` application seems quite straightforward when it comes to small prototypes or proof of concepts: after a few hours of practice and documentation reading, most R developers can have a small working application.\
-But things change when your application reaches "the cliff of complexity" [^big-shiny-2] , *i.e* that moment when the application reaches a state when it can be qualified as "complex"
-.
+But things change when your application reaches "the cliff of complexity" [^big-shiny-2] , *i.e* that moment when the application reaches a state when it can be qualified as "complex".
 
-[^big-shiny-2]: We borrow this term from Charity Major, as heard in *Test in Production with Charity Majors*, [CoRecursive](https://corecursive.com/019-test-in-production-with-charity-majors/){target="_blank"}
+[^big-shiny-2]: We borrow this term from Charity Major, as heard in *Test in Production with Charity Majors* CoRecursive #019, _Aug 31, 2018_.
 
 But what do we mean by complexity?
 Getting a clear definition is not an easy task [^big-shiny-3] as it very much depends on who is concerned and who you are talking to.
-But a good definition can be found in *The DevOps Handbook* [@genekim2016]: *"One of the defining characteristics of a complex system is that it **defies any single person's ability to see the system as a whole and understand how all the pieces fit together**. Complex systems typically have a high degree of interconnectedness of tightly coupled components, and system-level behavior cannot be explained merely in terms of the behavior of the system components."* (we underlined).
+But a good definition can be found in *The DevOps Handbook* [@genekim2016]: "One of the defining characteristics of a complex system is that it **defies any single person's ability to see the system as a whole and understand how all the pieces fit together**. Complex systems typically have a high degree of interconnectedness of tightly coupled components, and system-level behavior cannot be explained merely in terms of the behavior of the system components." (Our bold.)
 
 [^big-shiny-3]: Ironic, right?
 
-Or as noted in "Refactoring at Scale" [@lemaire2020], "*It becomes nearly impossible to reason about the effect a change might have when applied uniformly across a sprawling, complex system. Many tools exist to identify code smells or automatically detect improvements within subsections of code, but we are largely unable to automate human reasoning about how to restructure large applications,in codebases that are growing at an increasingly rapid pace.*"
+Or as noted in _Refactoring at Scale_ [@lemaire2020], "It becomes nearly impossible to reason about the effect a change might have when applied uniformly across a sprawling, complex system. Many tools exist to identify code smells or automatically detect improvements within subsections of code, but we are largely unable to automate human reasoning about how to restructure large applications, in codebases that are growing at an increasingly rapid pace."
 
 Building on top of these quotes, let's try to come up with a definition that will serve us in the context of engineering `{shiny}` applications.
 
-When building software, we can think of complexity from two points of view: the complexity as it is seen by the developer, and the complexity as it is seen by the customer/end-user [^big-shiny-4] .
+When building software, we can think of complexity from two points of view: the complexity as it is seen by the developer, and the complexity as it is seen by the customer/end user [^big-shiny-4] .
 
-[^big-shiny-4]: From *The Art of Unix Programming*, "Chapter 13: Speaking of Complexity", [@ericraymond2003]
+[^big-shiny-4]: From *The Art of Unix Programming*, "Chapter 13: Speaking of Complexity" [@ericraymond2003].
 
 -   For the code, **bugs are harder to anticipate**: it is hard to think about all the different paths the software can follow and difficult to identify bugs because they are deeply nested in the numerous routines the app is doing.
     It is also hard to think about what the state of your app is at a given moment because of the numerous inputs and outputs your app contains.
@@ -58,58 +57,58 @@ When building software, we can think of complexity from two points of view: the 
 -   **From the user perspective, the more complex an app is, the steeper the learning curve**.
     Indeed, the user will have to invest more time learning how the app works, and will be even more disappointed if ever they realize this time has been a waste.
 
-Let's dive a little bit more in these **two type of complexity**.
+Let's dive a little bit more into these **two types of complexity**.
 
-#### A. Developers complexity {.unnumbered}
+#### A. Developer complexity {.unnumbered}
 
-An app is to be considered complex when it is so large in terms of size and functionality that it makes it impossible to reason about it at once, and **developers must rely on tools and methods to understand and handle this complexity**: for example, when it comes to `{shiny}`, you will rely on tools like the `{golem}` [@R-golem] framework, introduced all along this book, to handle some implementation, development and deployment complexity.
-This book will introduce a clear methodology that comes with a series of conventions, which are crucial when it comes to building and maintaining complex systems: by imposing a formalized structure for a software, it enhances its readability, lower the learning curve for new-comers, and reduces the risk of errors inherent to repetitive tasks.
+An app is to be considered complex when it is so large in terms of size and functionality that it makes it impossible to reason about it at once, and **developers must rely on tools and methods to understand and handle this complexity**: for example, when it comes to `{shiny}`, you will rely on tools like the `{golem}` [@R-golem] framework, introduced throughout this book, to handle some implementation, development and deployment complexity.
+This book will introduce a clear methodology that comes with a series of conventions, which are crucial when it comes to building and maintaining complex systems: by imposing a formalized structure for software, it enhances its readability, lowers the learning curve for newcomers, and reduces the risk of errors inherent in repetitive tasks.
 
 This type of complexity is called *implementation complexity*.
-One of the goal of this book is to present a methodology and toolkit that will help you reduce this form of complexity.
+One of the goals of this book is to present a methodology and toolkit that will help you reduce this form of complexity.
 
-#### B. Customers and users complexity {.unnumbered}
+#### B. Customer and user complexity {.unnumbered}
 
 Customers and end users see complexity as *interface complexity*.
 
-Interface complexity can be driven by a lot of elements, for example the probability of making an error while using the app, the difficulty to understand the logical progression in the app, the presence of unfamiliar behavior or terms, visual distractions, etc.
-This book will also bring you strategy to help you cope with the need for simplification when it comes to designing interface.
+Interface complexity can be driven by a lot of elements, for example, the probability of making an error while using the app, the difficulty in understanding the logical progression in the app, the presence of unfamiliar behavior or terms, visual distractions, etc.
+This book will also bring you strategy to help you cope with the need for simplification when it comes to designing an interface.
 
 ### Balancing complexities
 
 There is an inherent tension between these two sources of complexity, as designing an app means finding a good balance between implementation and interface complexity.
 **Lowering one source of complexity usually means increasing the other, and managing an application project means knowing where to draw the line**.
-This usually requires restraining yourself from implementing too much features, and still create an application that is easy to use, and that fits the requirements you have received.
+This usually requires restraining yourself from implementing too many features, and still creating an application that is easy to use, and that fits the requirements you have received.
 
 For example, there is something common in `{shiny}` applications: what we can call the "too much reactivity pattern".
-In some cases, developers try to make everything reactive: *e.g.*, three sliders and a dropdown input, all updating a single plot.
+In some cases, developers try to make everything reactive: *e.g.*, three sliders and a drop-down input, all updating a single plot.
 This behavior lowers the interface complexity: users do not have to really think about what they are doing, they move sliders, change the inputs, and boom!
 the plot updates.
-But this kind of pattern can make the application perform too much computation, for example because users rarely go to the value they need on their first try: they usually miss what value they actually want to select.
+But this kind of pattern can make the application perform too much computation, for example, because users rarely go to the value they need on their first try: they usually miss the value they actually want to select.
 
 One solution can be to delay reactivity or to cache things so that R computes fewer things.
 But that comes with a cost: handling delayed reactivity and caching elements increase implementation complexity.
 Another solution is to add an "update plot" button, which updates the plot only when the user clicks on it.
-This pattern makes it easier to control reactivity from an implementation side.
+This pattern makes it easier to control reactivity from the implementation side.
 But this can make the interface a little bit more complex for the users, who have to perform another action, on top of changing their inputs.
 We will argue in this book that not enough reactivity is better than too much reactivity, as the latter increases computation time, and relies on the assumption that the user makes the right action on the first try.
 
 Another good example is `{shiny}`'s `dateRangeInput()` function.
 This function requires the user to choose a start date and an end date.
-However, the function allows to choose a start date which is posterior to the end (that is the behavior of the JavaScript plugin used in `{shiny}` to create this input).
+However, the function allows the user to choose a start date which is before the end (that is the behavior of the JavaScript plugin used in `{shiny}` to create this input).
 But allowing this behavior leads to bugs, notably in a context of full reactivity.
 Handling this special case is completely doable: with a little bit of craft, you can watch what the user inputs and throw an error if the start is after the end [^big-shiny-5] .
-On one hand that solution increases implementation complexity, while on the other hand letting this naive behavior requires the user to think carefully about what they are selecting, thus increasing the interface complexity.
+On one hand, that solution increases implementation complexity, while on the other hand, allowing this naive behavior requires the user to think carefully about what they are selecting, thus increasing the interface complexity.
 
-[^big-shiny-5]: See [shiny/issues/2043\#issuecomment-525640738](https://github.com/rstudio/shiny/issues/2043#issuecomment-525640738){target="_blank"} for an example
+[^big-shiny-5]: See [shiny/issues/2043\#issuecomment-525640738](https://github.com/rstudio/shiny/issues/2043#issuecomment-525640738){target="_blank"} for an example.
 
 What should we do?
-It's up to you: deciding where to draw the line between interface & implementation complexity very much depends of the project, but that is something that you should keep in mind all along the project's life.
+It's up to you: deciding where to draw the line between interface and implementation complexity very much depends on the project, but that is something that you should keep in mind throughout the project's life.
 
-### Assessing Code Complexity
+### Assessing code complexity
 
 On the developer side, you will want to **reduce code complexity so that everybody involved in the coding process is able to create a mental model of how the application works**.
-On the user side, you will want to **reduce interface complexity so that everybody comes out of using your application with a good user-experience**.
+On the user side, you will want to **reduce interface complexity so that everybody comes out of using your application with a good user experience**.
 
 Reducing complexity first comes with being able to identify its potential sources, be it in your application code base or in the specifications describing how the application should work.
 Finding these sources of complexity is not an easy task, as it requires some programming knowledge to identify bottlenecks, basic UX (User Experience) skills to implement a good interface, and of course a project management methodology to structure the whole life of your application.
@@ -119,14 +118,13 @@ But before that, let's dive into code complexity.
 
 #### A. Codebase size {.unnumbered}
 
-The total number of lines of code, and the number of files, can be good clue of potential complexity, but only if used as order of magnitude (for example a 10,000-line codebase is potentially more complex than a 100-line codebase), but should not be relied on if used strictly, even more if you try to reduce this number of lines by sacrificing code readability.
+The total number of lines of code, and the number of files, can be good clue of potential complexity, but only if used as an order of magnitude (for example, a 10,000-line codebase is potentially more complex than a 100-line codebase), but should not be relied on if used strictly, even more if you try to reduce the number of lines by sacrificing code readability.
 
-R is very permissive when it comes to indentation and line breaks, and, unlike JavaScript or CSS, it is generally not minified [^big-shiny-6] .\
-In R, the number of lines of code depends on your coding style and the packages you are using
-. For example, the `{tidyverse}` [@tidyverse2019] style guide encourages the use of `%>%` (called "pipe"), with one function by line, producing more lines in the end code: "*`%>%` should always have a space before it, and should usually be followed by a new line*" [tidyverse style guide](https://style.tidyverse.org/pipes.html){target="_blank"}. So you can expect a "tidyverse-centric" package to contain more lines of code, yet the pipe itself has been thought as a tool to lower code complexity by enhancing its readability
-[^big-shiny-7].
+R is very permissive when it comes to indentation and line breaks, and, unlike JavaScript or CSS, it is generally not minified [^big-shiny-6].
+In R, the number of lines of code depends on your coding style and the packages you are using. For example, the `{tidyverse}` [@tidyverse2019] style guide encourages the use of `%>%` (called "pipe"), with one function by line, producing more lines in the end code: "`%>%` should always have a space before it, and should usually be followed by a new line" ([tidyverse style guide](https://style.tidyverse.org/pipes.html){target="_blank"}).
+So you can expect a "tidyverse-centric" package to contain more lines of code, yet the pipe itself has been thought of as a tool to lower code complexity by enhancing its readability [^big-shiny-7].
 
-[^big-shiny-6]: The minification process is the process of removing all blank characters and put everything on one line so that the file in the output is much smaller.
+[^big-shiny-6]: The minification process is the process of removing all blank characters and putting everything on one line so that the file in the output is much smaller.
 
 [^big-shiny-7]: Note though that some users find using the pipe more complex.
 
@@ -165,19 +163,19 @@ iris[1:5, "Species"]
 In other words, using this kind of writing style can make the code base larger in term of lines, without really adding complexity to the general program.
 
 Another drawback of this metric is that it focuses on numbers instead of readability, and in the long run, yes, readability matters.
-As noted in *The Art of Unix Programming*, "Chapter 13: Speaking of Complexity", "*Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess*" [@ericraymond2003].
+As noted in *The Art of Unix Programming*, "Pressure to keep the codebase size down by using extremely dense and complicated implementation techniques can cause a cascade of implementation complexity in the system, leading to an un-debuggable mess" [@ericraymond2003].
 
 Still, this metric can be useful to reinforce what you have learned from other metrics.
-It is rather unlikely that you will find this "extreme" coding style we showed above, and even if it might not make sense to compare two codebases that just differ by 1 or 2 % of lines of code, it is very likely that a codebase which is ten, one hundred, one thousand times larger is a more complex software.
+It is rather unlikely that you will find this "extreme" coding style we showed above, and even if it might not make sense to compare two codebases that just differ by 1% or 2 % of lines of code, it is very likely that a codebase which is ten, one hundred, one thousand times larger is a more complex software.
 
 Another good metric related to code complexity is the number of files in the project: R developers tend to split their functions into several files, so the more files you will find in a project, the larger the codebase is.
-And numerous files can also be a sign of maintenance complexity, as it may be harder to reason about an app logic split into several files than about something that fits into one linear code inside one file [^big-shiny-8].
-On the other hand, one big 10,000-lines file which is standing alone in the project is not a good sign either.
+And numerous files can also be a sign of maintenance complexity, as it may be harder to reason about an app logic that is split into several files than about something that fits into one linear code inside one file [^big-shiny-8].
+On the other hand, one big 10,000-line file which is standing alone in the project is not a good sign either.
 
 [^big-shiny-8]:  To handle the complexity of splitting into files, you can set filenames to follow the structure of the project.
-    This pattern is developed in another part of this book, where we explicit the conventions used in `{golem}`.
+This pattern is developed in another part of this book, where we explain the conventions used in `{golem}`.
 
-If you want to use the number of lines metric, you can do it from R with the `{cloc}` [@R-cloc] package, available at <https://github.com/hrbrmstr/cloc>.
+If you want to use the number-of-lines metric, you can do it from R with the `{cloc}` [@R-cloc] package, available at <https://github.com/hrbrmstr/cloc>.
 
 ```{r 01-big-shiny-4, include = FALSE}
 if (!requireNamespace("cloc")){
@@ -269,11 +267,11 @@ For example, here we can see that `{hemake}` has `r dplyr::filter(hexmake_cloc, 
 
 #### B. Cyclomatic complexity {.unnumbered}
 
-Cyclomatic complexity is a software engineering measure which **allows to define the number of different linear paths a piece of code can take**.
+Cyclomatic complexity is a software engineering measure which **allows us to define the number of different linear paths a piece of code can take**.
 The higher the number of paths, the harder it can be to have a clear mental model of this function.
 
 Cyclomatic complexity is computed based on a control-flow graph [^big-shiny-9] representation of an algorithm.
-For example, here is a simple control flow for an `ifelse` statement:
+For example, here is a simple control flow for an `ifelse` statement *(The following paragraph details the algorithm implementation, feel free to skip it if you are not interested in the implementation details)*.
 
 [^big-shiny-9]: A control flow graph is a graph representing all the possible paths a piece of code can take while it is executed.
 
@@ -283,7 +281,6 @@ For example, here is a simple control flow for an `ifelse` statement:
 knitr::include_graphics("img/controlflow.png")
 ```
 
-*(The following paragraph details the algorithm implementation, feel free to skip it if you are not interested in the implementation details)*\
 The complexity number is then computed by taking the number of nodes, subtracting the number of edges, and adding twice the number of connected components of this graph.
 The algorithm is then $M = E − N + 2P$, where $M$ is the measure, $E$ the number of edges, $N$ the number of nodes and $2P$ is twice the number of connected components.
 We will not go deep into this topic, as there are a lot things going on in this computation and you can find much documentation about this online.
@@ -305,7 +302,7 @@ install.packages("cyclocomp")
 The `{cyclocomp}` package comes with three main functions: `cyclocomp()`, `cyclocomp_package()`, and `cyclocomp_package_dir()`.
 While developing your application, the one you will be interested in is `cyclocomp_package_dir()`: building successful shiny apps with the `{golem}` framework means you will be building your app as a package (we will get back on that later).
 
-Here is for example the cyclomatic complexity of the default golem template (assuming it is located in a `golex/` subdirectory):
+Here is, for example, the cyclomatic complexity of the default golem template (assuming it is located in a `golex/` subdirectory):
 
 ```{r 01-big-shiny-13, include = FALSE}
 #remotes::install_local("golex", upgrade = "never")
@@ -371,21 +368,21 @@ head(cyclo_shiny)
 
 And, bonus, this `cyclocomp_package()` function can also be used to retrieve the number of functions inside the package.
 
-As The Clash said, "what are we gonna do now?".
-You might have heard this saying: "*if you copy and paste a piece of code twice, you should write a function*", so you might be tempted to do that.
+As The Clash said, "What are we gonna do now?"
+You might have heard this saying: "if you copy and paste a piece of code twice, you should write a function", so you might be tempted to do that.
 Indeed, splitting code into smaller pieces lowers the local cyclomatic complexity, as smaller functions have lower cyclomatic complexity.
 But that is just at a local level, and it can be a suboptimal option: having a very large number of functions calling each other can make it harder to navigate through the codebase.
 
-In the end of the day splitting into smaller functions is not a magic solution because:
+In the end of the day, splitting into smaller functions is not a magic solution because:
 
--   The global complexity of the app is not lowered by splitting things into pieces (just local complexity)
--   The deeper the call stack, the harder it can be to debug
+-  the global complexity of the app is not lowered by splitting things into pieces (just local complexity) and
+-  tThe deeper the call stack, the harder it can be to debug.
 
 #### C. Other measures for code complexity {.unnumbered}
 
 Complexity can come from other sources: **insufficient code coverage, dependencies that break the implementation, relying on old packages**, or a lot of other things.
 
-We can use the `{packageMetrics2}` [@R-packageMetrics2] package to get some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc., ... and the number of lines of code and the cyclomatic complexity.
+We can use the `{packageMetrics2}` [@R-packageMetrics2] package to get some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc., and the number of lines of code and the cyclomatic complexity.
 
 ```{r 01-big-shiny-23, include = FALSE}
 if (!requireNamespace("packageMetrics2")) {
@@ -401,7 +398,7 @@ remotes::install_github("MangoTheCat/packageMetrics2")
 ```
 
 This package can now be used to assess the dependencies we use in our application.
-To do that, let's create a small function that computes this metric and return a tibble:
+To do that, let's create a small function that computes this metric and returns a tibble:
 
 ```{r 01-big-shiny-25 }
 library(packageMetrics2)
@@ -456,7 +453,7 @@ frame_metric("shiny")
 readRDS("data-raw/f_shiny.RDS")
 ```
 
-If you are building your `{shiny}` application with `{golem}`, you can use the `DESCRIPTION` file, which contains the list of dependencies, as a starting point to explore these metrics for your dependencies, for example using `{desc}` [@R-desc] or `{attachment}` [@R-attachment]:
+If you are building your `{shiny}` application with `{golem}`, you can use the `DESCRIPTION` file, which contains the list of dependencies, as a starting point to explore these metrics for your dependencies, for example, using `{desc}` [@R-desc] or `{attachment}` [@R-attachment]:
 
 ```{r 01-big-shiny-31 }
 # Get the dependencies from the DESCRIPTION file.
@@ -468,29 +465,29 @@ desc::desc_get_deps("golex/DESCRIPTION")
 attachment::att_from_description("golex/DESCRIPTION")
 ```
 
-Some important metrics to watch there are:
+Some important metrics to watch there are as follow:
 
 -   Test coverage: the more the better, as a large code coverage should imply that bugs are more easily caught.
--   The number of downloads: a largely downloaded package will likely be less prone to bug, as it will be used by a large user-base.
--   Number of dependencies: the more a package has dependencies, the more likely it is that at some point it time something in the dependency graph will break.
--   Dates of first publish on CRAN, last publish, and updates: a package actively maintained are a good sign[^big-shiny-10].
+-   The number of downloads: a largely downloaded package will likely be less prone to bug, as it will be used by a large user base.
+-   Number of dependencies: the more a package has dependencies, the more likely it is that at some point it time, something in the dependency graph will break.
+-   Dates of first publish on CRAN, last publish, and updates: a package actively maintained is a good sign[^big-shiny-10].
 
-[^big-shiny-10]:  Even if this is not an absolute rule: some packages haven't been updated for a long time but are still completely reliable.
+[^big-shiny-10]:  Even if this is not an absolute rule, some packages haven't been updated for a long time but are still completely reliable.
 
-#### D. Complexity Assessment Checklist {.unnumbered}
+#### D. Complexity assessment checklist {.unnumbered}
 
 To sum up, here is a quick checklist of things to check to assess the complexity of your application:
 
--   [ ] Running the metrics from `{cloc}`, to get an idea of the number of files, their diversity in term of extensions (for example `{hexmake}` also has JSON, JavaScript, and YAML files), and the ratio of comments for the code.
-    Remember that having only one big R file is a red flag, so is having zero code comments.
+-   [ ] Running the metrics from `{cloc}`, to get an idea of the number of files, their diversity in terms of extensions (for example `{hexmake}` also has JSON, JavaScript, and YAML files), and the ratio of comments for the code.
+    Remember that having only one big R file is a red flag, and so is having zero code comments.
 
 -   [ ] Assess the cyclomatic complexity of the package containing your application.
-    Remember that the more a function scores at this metric, the more complex it will be to debug it.
+    Remember that the more a function scores on this metric, the more complex it will be to debug it.
 
 -   [ ] Check the package common metrics using `{packageMetrics2}`, notably for the dependencies you are including in your package.
     Metrics to look for are test coverage, number of downloads, number of dependencies, and date of first release and last release.
 
-### Production Grade Software Engineering
+### Production-grade software engineering
 
 Complexity is still frowned upon by a lot of developers, notably because it has been seen as something to avoid according to the Unix philosophy.
 But there are dozens of reasons why an app can become complex: for example, the question your app is answering is quite complex and involves a lot of computation and routines.
@@ -502,7 +499,7 @@ To make your project a success, you need to use tools that reduce the complexity
 
 [^big-shiny-11]: By production-grade, we mean a software that can be used in a context where people use it for doing their job, and where failures or bugs have real-life consequences.
 
-In other words, production-grade `{shiny}` apps require working with a software engineering mindset, which is not always an easy task in the R world: many R developers have learned this language as a tool for doing data analysis, building model, making statistics, not really as a tool for building software.
+In other words, production-grade `{shiny}` apps require working with a software engineering mindset, which is not always an easy task in the R world: many R developers have learned this language as a tool for doing data analysis, building model, and making statistics; not really as a tool for building software.
 
 The use of R has evolved since its initial version released in 1995, and using this programming language as a tool to build software for production is still a challenge, even `r lubridate::year(Sys.Date()) - 1995` years after its first release.
 And still today, for a lot of R users, the software is still used as an "experimentation tool", where production quality is one of the least concerns.
@@ -518,9 +515,9 @@ And **without any structured methodology, we are almost certain to reach the cli
 
 The good news is that building a complex app with R (or with any other language) is not an impossible task.
 But this requires planning, rigor, and correct engineering.
-This is what this book is about: how to organize your `{shiny}` App in a way that is time and code efficient, and how to use correct engineering to make your app a success.
+This is what this book is about: how to organize your `{shiny}` app in a way that is time and code efficient, and how to use correct engineering to make your app a success.
 
-## What is a successful `{shiny}` App?
+## What is a successful `{shiny}` app?
 
 Defining what "successful" means is not an easy task, but we can extract some common patterns when it comes to applications that would be considered successful.
 
@@ -538,7 +535,7 @@ Anybody that has already worked on a code base as a team knows it is not an easy
 The project is a success if the application was delivered, and if **it answers the question it is supposed to answer, or serves the purpose it is supposed to serve**.
 Delivering is not the only thing to keep in mind: you can deliver a working app but it might not work the way it is supposed to work.
 
-Just as before, accuracy means that between the moment the idea appears in someone's mind and the moment the app is actually ready to be used, everybody was able to work together toward a common goal, and that now this goal is reached, we are also certain that the answers we get from the application are accurate, and that users can rely on the application to make decision.
+Just as before, accuracy means that between the moment the idea appears in someone's mind and the moment the app is actually ready to be used, everybody was able to work together toward a common goal, and now that this goal is reached, we are also certain that the answers we get from the application are accurate, and that users can rely on the application to make decisions.
 
 ### It is usable
 
@@ -549,10 +546,10 @@ And **if these people cannot use the application because it is too hard to use, 
 
 ### It is immortal
 
-Of course "immortal" is a little bit far fetched, but when designing the application, you should aim for robustness along the years, by engineering a (theoretically) immortal application.
+Of course, "immortal" is a little bit far-fetched, but when designing the application, you should aim for robustness through the years, by engineering a (theoretically) immortal application.
 
-Planning for the future is a very important component of a successful `{shiny}` App project.
-Once the app is out, it is successful if it can **exist in the long run, with all the hazards that this implies**: new package versions that could potentially break the code base, sudden call for the implementation of new features in the global interface, changing key features of the UI or the back-end, and not to mention passing the code base along to someone who has not worked on the first version, and who is now in charge of developing the next version [^big-shiny-12] .
+Planning for the future is a very important component of a successful `{shiny}` app project.
+Once the app is out, it is successful if it can **exist in the long run, with all the hazards that this implies**: new package versions that could potentially break the code base, sudden calls for the implementation of new features in the global interface, changing key features of the UI or the back-end, not to mention passing the code base along to someone who has not worked on the first version, and who is now in charge of developing the next version [^big-shiny-12] .
 And this, again, is hard to do without effective planning and efficient engineering.
 
 [^big-shiny-12]: In fact, this new person might simply be you, a month from now.
