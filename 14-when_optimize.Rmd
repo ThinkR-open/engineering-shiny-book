@@ -3,24 +3,24 @@
 # The Need for Optimization {#need-for-optimization}
 
 > Only once we have a solid characterization of the surface area we want to improve can we begin to identify the best way to improve it.\
-> `r right_link("Refactoring at Scale", "https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/")`
+> _Refactoring at Scale_ [@lemaire2020]
 
 ## Build first, then optimize
 
 ### Identifying bottlenecks
 
 Refactoring existing code for speed sounds like an appealing activity for a lot of us: it is always satisfying to watch our functions get faster, or finding a more elegant way to solve a problem that also results in making your code a little bit faster.
-Or as Maude Lemaire writes in "Refactoring at Scale" [@lemaire2020], "*Refactoring can be a little bit like eating brownies: the first few bites are delicious, making it easy to get carried away and accidentally eat an entire dozen. When you've taken your last bite, a bit of regret and perhaps a twinge of nausea kick in.*"
+Or as Maude Lemaire writes in _Refactoring at Scale_ [@lemaire2020], "Refactoring can be a little bit like eating brownies: the first few bites are delicious, making it easy to get carried away and accidentally eat an entire dozen. When you've taken your last bite, a bit of regret and perhaps a twinge of nausea kick in."
 
 But beware!
-As Donald Knuth puts it *"Premature optimization is the root of all evil"*.
-What does that means?
+As Donald Knuth puts it "Premature optimization is the root of all evil".
+What does that mean?
 That **focusing on optimizing small portions of your app before making it work fully is the best way to lose time along the way, even more in the context of a production application, where there are deadlines and a limited amount of time to build the application**.
 
 Why?
-Here is the general idea: let's say the schema below represents your software, and its goals is to make things travel from `X1` to `X2`, but you have a bottleneck at `μ`.
-Thing is you are building elements pieces by pieces: first, the portion `X1.1` of the "road", then `X1.2`, etc.
-Only when you have your application ready can you really appreciate where you bottleneck is, and you can focus on making things go fast from `X1.1` to `X.1.2`, these performance gains won't make you application go faster: you will only make the elements move faster to the bottleneck.
+Here is the general idea: let's say the schema in Figure \@ref(fig:14-when-optimize-1) represents your software, and its goal is to make things travel from *X1* to *X2*, but you have a bottleneck at μ.
+You are building elements piece by piece: first, the portion `X1.1` of the "road", then `X1.2`, etc.
+Only when you have your application ready can you really appreciate where your bottleneck is, and you can focus on making things go fast from `X1.1` to `X.1.2`, these performance gains won't make your application go faster: you will only make the elements move faster to the bottleneck.
 
 When?
 Once the application is ready: here in our example, we can only detect the bottleneck once the full road is actually built, not while we are building the circle.
@@ -32,56 +32,57 @@ knitr::include_graphics("img/bottleneck.png")
 ```
 
 This bottleneck is the very thing you should be optimizing: **having faster code anywhere else except this bottleneck will not make your app faster**: you will just make your app reach the bottleneck faster, but there will still be this part of your app that slows everything down.
-But this is something you might only realize when the app is fully built: pieces might be fast apart, but slow when put together.
+But this is something you might only realize when the app is fully built: pieces might be fast individually, but slow when put together.
 It is also possible that the test dataset you have been using from the start works just fine, but when you try your app with a bigger, more realistic dataset, the application is actually way slower than it should be.
-And, maybe you have been using an example dataset so that you do not have to query the database every time you implement a new feature, but actually the SQL query to the database is very slow.
-This is something you will discover only when the application is fully functional, not when building the parts: and realizing that when you only have 5% of the allocated time for this project left on your calendar is not a good surprise.
+And, maybe you have been using an example dataset so that you do not have to query the database every time you implement a new feature, but the SQL query to the database is actually very slow.
+This is something you will discover only when the application is fully functional, not when building the parts, and realizing that when you only have 5% of the allocated time for this project left on your calendar is not a good surprise.
 
 Or to sum up:
 
 > Get your design right with an un-optimized, slow, memory-intensive implementation before you try to tune.
 > Then, tune systematically, looking for the places where you can buy big performance wins with the smallest possible increases in local complexity.\
-> `r right_link("The Art of Unix Programming", "http://www.catb.org/~esr/writings/taoup/html/")`
+> The Art of Unix Programming, [@ericraymond2003]
 
 ### Do you need faster functions?
 
 Optimizing an app is a matter of trade-offs: of course, in a perfect world, every piece of the app would be tailored to be fast, easy to maintain, and elegant.
-But in the real world, you have deadlines, limited times and resources, and we are all but humans.
-That means that at the end of the day, your app will not be completely perfect: a software can **always** be made better.
+But in the real world, you have deadlines, limited time and resources, and we are all but humans.
+That means that at the end of the day, your app will not be completely perfect: software can **always** be made better.
 No piece of code has ever reached complete perfection.
 
 Given that, **do you want to spend 5 days out of the 30 you have planned optimizing a function so that it runs in a quarter of a second instead of half a second**, then realize the critical bottleneck of your app is actually the SQL query and not the data manipulation?
-Of course a function running twice faster is a good thing, but think about it in context: for example, how many times is this function called ?
-We can safely bet that if your function is only called once, working on making it twice faster might not be the one function you would want to focus on (well, unless you have unlimited time to work on your project, and in that case lucky you, you can spend a massive amount of time building the perfect software).
-On the other hand, the function which is called thousands of time in your application might benefit from being optimized.
+Of course a function running twice as fast is a good thing, but think about it in context: for example, how many times is this function called?
+We can safely bet that if your function is only called once, working on making it twice as fast might not be the one function you would want to focus on (well, unless you have unlimited time to work on your project, and in that case lucky you; you can spend a massive amount of time building the perfect software).
+On the other hand, the function which is called thousands of times in your application might benefit from being optimized.
 
 And all of this is basic maths.
 Let's assume the following:
 
--   A current scenario takes 300 seconds to be accomplished on your application
--   One function `A()` takes 30 seconds, and it's called once
--   One function `B()` takes 1 second, and it's called 50 times
+-   A current scenario takes 300 seconds to be accomplished on your application.
+-   One function `A()` takes 30 seconds, and it's called once.
+-   One function `B()` takes 1 second, and it's called 50 times.
 
 If you divide the execution time of `A()` by two, you would be performing a local optimization of 15 seconds, and a global optimization of 15 seconds.
 On the other hand, if you divide the execution time of `B()` by two, you would be performing a local optimization of 0.5 seconds, but a global optimization of 25 seconds.
 
 Again, this kind of optimization is hard to detect until the app is functional.
-An optimization of 15 seconds is way greater that an optimization of 0.5 seconds.
+An optimization of 15 seconds is way greater than an optimization of 0.5 seconds.
 Yet you will only realize that once the application is up and running!
 
 ### Don't sacrifice readability
 
-As said in the last section, every piece of code can be rewritten to be faster, either from R to R or using a lower level language: for example C or C++.
-You can also rebuild data manipulation code switching from a package to another, use complex data structures to optimizing memory usage, etc, etc.
-But that comes with a price: **not keeping thing simple for the sake of local optimization makes maintenance harder, even more if you are using a lesser known language/package**.
-Refactoring a piece of code is better done when you keep in mind that "*the primary goal should be to produce human-friendly code, even at the cost of your original design. If the laser focus is on the solution rather than the process, there's a greater chance your application will end up more more contrived and complicated than it was in the first place*" [@lemaire2020].
+As said in the last section, every piece of code can be rewritten to be faster, either from R to R or using a lower-level language: for example C or C++.
+You can also rebuild data manipulation code switching from one package to another, or use a complex data structures to optimize memory usage, etc.
+But that comes with a price: **not keeping things simple for the sake of local optimization makes maintenance harder, even more if you are using a lesser-known language/package**.
+Refactoring a piece of code is better done when you keep in mind that "the primary goal should be to produce human-friendly code, even at the cost of your original design. If the laser focus is on the solution rather than the process, there's a greater chance your application will end up more contrived and complicated than it was in the first place" [@lemaire2020].
 
-For example, switching some portions of your code to C++ implies that you might be the only person being able to maintain that specific portion of code, or that your colleague taking over the project will have to spend hours learning the tools you have been building, or the language you have chosen to write your functions with.
+For example, switching some portions of your code to C++ implies that you might be the only person who can maintain that specific portion of code, or that your colleague taking over the project will have to spend hours learning the tools you have been building, or the language you have chosen to write your functions with.
 
 Again, **optimization is always a matter of trade-off**: is the half-second local optimization worth the extra hours you will have to spend correcting bugs when the app will crash and when you will be the only one able to correct it?
 Also, are the extra hours/days spent rewriting a working code-base worth the speed gain of 0.5 seconds on one function?
 
-For example, let's compare both these implementations of the same function, one in R, and one in C++ via `{Rcpp}` [@R-Rcpp] Of course, the C++ function is faster than the R one---this is the very reason of using C++ with R.
+For example, let's compare both these implementations of the same function, one in R, and one in C++ via `{Rcpp}` [@R-Rcpp].
+Of course, the C++ function is faster than the R one---this is the very reason for using C++ with R.
 
 ```{r 14-when-optimize-2 }
 library("Rcpp")
@@ -107,14 +108,14 @@ benched <- bench::mark(
 benched
 ```
 
-(Note: we will come back to `bench::mark` later)
+(Note: we will come back to `bench::mark()` later.)
 
-Though, how much time gain is worth being sure you will get someone in your team to take over the maintenance if needed?
-In other words, given that (in our example), we are gaining around `r benched$median[1] - benched$median[2]` on the execution time of our function, is it worth switching to C++?
+However, how much is a time gain worth if you are not sure you can get someone on your team to take over the maintenance if needed?
+In other words, given that (in our example) we are gaining around `r benched$median[1] - benched$median[2]` on the execution time of our function, is it worth switching to C++?
 Using external languages or complex data structures implies that from the start, you will need to think about who and how your code base will be maintained over the years.
-Chances are that if you plan on using a `{shiny}` application during a span of several years, various R developers will be working on the project, and including C++ code inside your application means that these future developer will either be required to know C++, or they will not be able to maintain this piece of code.
+Chances are that if you plan on using a `{shiny}` application during a span of several years, various R developers will be working on the project, and including C++ code inside your application means that these future developers will either be required to know C++, or they will not be able to maintain this piece of code.
 
-So, to sum up, there are three ways to optimize your application & R code, and the bad news is that you can not optimize for all of them:
+So, to sum up, there are three ways to optimize your application and R code, and the bad news is that you can not optimize for all of them:
 
 -   Optimizing for speed
 -   Optimizing for memory
@@ -128,18 +129,18 @@ Leading a successful project means that you should, as much as possible, find th
 
 #### A. Identifying bottlenecks {.unnumbered}
 
-The best way to profile R code is by using the `{profvis}` [@R-profvis] package [^when_optimize-1] , a package designed to evaluate how much time each part of a function call take.
-With `{profvis}`, you can spot the bottleneck of your function.
+The best way to profile R code is by using the `{profvis}` [@R-profvis] package [^when_optimize-1] , a package designed to evaluate how much time each part of a function call takes.
+With `{profvis}`, you can spot the bottleneck in your function.
 Without an automated tool to do the profiling, the developers would have to profile by guessing, which will, most of the time, come with bad results:
 
 [^when_optimize-1]: `{utils}` also comes with a function call `Rprof()`, but we will not be examining this one here, as `{profvis}` provides a more user-friendly and enhanced interface to this profiling function.
 
 > One of the lessons that the original Unix programmers learned early is that intuition is a poor guide to where the bottlenecks are, even for one who knows the code in question intimately.\
-> `r right_link("The Art of Unix Programming", "http://www.catb.org/~esr/writings/taoup/html/ch12s02.html")`
+> The Art of Unix Programming, [@ericraymond2003]
 
-Instead of guessing, it is safe bet to go for a tool like `{profvis}`, which allows to have a detailed view of what takes a long time to run in your R code.
+Instead of guessing, it is a safe bet to go for a tool like `{profvis}`, which allows you to have a detailed view of what takes a long time to run in your R code.
 
-Using this package is quite straightforward: put the code you want to benchmark inside the `profvis()` function [^when_optimize-2] , wait for the code to run, and... that is it, you now have an analysis of your code running time.
+Using this package is quite straightforward: put the code you want to benchmark inside the `profvis()` function [^when_optimize-2] , wait for the code to run, and that is it; you now have an analysis of your code running time.
 
 [^when_optimize-2]: Do not forget to add `{}` inside `profvis({})` if you want to write several lines of code.
 
@@ -182,20 +183,20 @@ profvis({
 })
 ```
 
-What you see now is what is called a `flame graph`: it is a detailed timing of how your function has run, with a clear decomposition of the call stack.
-What you see on top window is the expression evaluated, and on the bottom a detail of the call stack, with what looks like a little bit like a Gantt diagram.
-This result reads as such: the wider the function call, the more time it has taken R to compute this piece of code.
-On the very bottom, the "top" function (i.e. the function which is directly called in the console), and the more you go up, the more you enter the nested function calls.
+What you see now is called a `flame graph`: it is a detailed timing of how your function has run, with a clear decomposition of the call stack.
+What you see in the top window is the expression evaluated, and on the bottom the details of the call stack, with what looks a little bit like a Gantt diagram.
+This result reads as follow: the wider the function call, the more time it has taken R to compute this piece of code.
+On the very bottom, the "top" function (i.e. the function which is directly called in the console), and the higher you go, the more you enter the nested function calls.
 
 Here is how to read this graph:
 
--   On the x axis, the time spent computing the whole function.
+-   On the x axis is the time spent computing the whole function.
     Our `top()` function being the only one executed, it takes the whole record time.
 
 -   Then, the second line shows the functions which are called inside `top()`.
-    First, R pauses, then does a series of call to `FUN` (which is the internal anonymous function from `lapply()`), then calls the `middle()` function
+    First, R pauses, then does a series of calls to `FUN` (which is the internal anonymous function from `lapply()`), and then calls the `middle()` function.
 
--   Then, the third lines details the calls made by of `middle()`, which pauses, then calls `bottom_a()` and `bottom_b()`, which each `pause()` for a given amount of time.
+-   Then, the third line details the calls made by `middle()`, which pauses, then calls `bottom_a()` and `bottom_b()`, which each `pause()` for a given amount of time.
 
 (ref:profvizflame) `{profvis}` flame graph
 
@@ -238,23 +239,23 @@ print(p2)
 
 (Example extracted from `{profmem}` help page).
 
-Here it is, now you have a tool to identify bottlenecks!
+Here it is; now you have a tool to identify bottlenecks!
 
-#### B. Benchmarking R Code {.unnumbered}
+#### B. Benchmarking R code {.unnumbered}
 
 Identifying bottlenecks is a start, but what to do now?
-In the next chapter about optimization, we will dive deeper into common strategies for optimizing R & `{shiny}` code.
+In the next chapter about optimization, we will dive deeper into common strategies for optimizing R and `{shiny}` code.
 But before that, remember this rule: **never start optimizing if you can not benchmark this optimization**.
 Why?
 Because developers are not perfect at identifying bottlenecks and estimating if something is faster or not, and some optimization methods might lead to slower code.
 Of course, most of the time they will not, but in some cases adopting optimization methods leads to writing slower code, because we have missed a bottleneck in our new code.
 And of course, without a clear documentation of what we are doing, we will be missing it, relying only on our intuition as a rough guess of speed gain.
 
-In other words, if you want to be sure that you are actually optimizing, be sure that you have a basis to compare with.
+In other words, if you want to be sure that you are actually optimizing, be sure that you have a basis for comparison.
 
 How to do that?
 One thing that can be done is to keep an RMarkdown file with your starting point: use this notebook to keep track of what you are doing, by noting where you are starting from (i.e, what's the original function you want to optimize), and compare it with the new one.
-By using an Rmd, you can document the strategies you have been using to optimize the code, e.g: "switched from for loop to vectorize function", "changed from x to y", etc.
+By using an Rmd, you can document the strategies you have been using to optimize the code, e.ga: "switched from for loop to vectorize function", "changed from x to y", etc.
 This will also be helpful for the future: either for you in other projects (you can get back to this document), or for other developers, as it will explain why specific decisions have been made.
 
 To do the timing computation, you can use the `{bench}` [@R-bench] package, which compares the execution time (and other metrics) of two functions.
@@ -285,9 +286,9 @@ res <- bench::mark(
 res
 ```
 
-Here, we have an empiric evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest.
+Here, we have an empirical evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest.
 
-If you want a graphical analysis, `{bench}` comes with an `autoplot` method for `{ggplot2}` [@R-ggplot2]:
+If you want a graphical analysis, `{bench}` comes with an `autoplot` method for `{ggplot2}` [@R-ggplot2], as shown in Figure \@ref(fig:14-when-optimize-10):
 
 (ref:benchautoplot) `{bench}` autoplot
 
@@ -295,65 +296,66 @@ If you want a graphical analysis, `{bench}` comes with an `autoplot` method for 
 ggplot2::autoplot(res)
 ```
 
-And, bonus point, `{bench}` takes time to check that the two outputs are the same, so that you are sure you are comparing the very same thing, which is another crucial aspect of benchmarking: be sure you are not comparing apple with oranges!
+And, bonus point, `{bench}` takes time to check that the two outputs are the same, so that you are sure you are comparing the very same thing, which is another crucial aspect of benchmarking: be sure you are not comparing apples with oranges!
 
 ### Profiling `{shiny}`
 
 #### A. `{shiny}` back-end {.unnumbered}
 
 You can profile `{shiny}` applications using the `{profvis}` package, just as any other piece of R code.
-The only thing to note if you want to use this function with an app built with `{golem}` [@R-golem], you will have to wrap the `run_app()` function in a `print()` function.
-Long story short, what make the app run is not the function itself, but the printing of the function, so the object returned by `run_app()` itself can not be profiled.
-See the discussion on this [issue on `{golem}`](https://github.com/ThinkR-open/golem/issues/146) to learn more about this.
+The only thing to note is that if you want to use this function with an app built with `{golem}` [@R-golem], you will have to wrap the `run_app()` function in a `print()` function.
+Long story short, what makes the app run is not the function itself, but the printing of the function, so the object returned by `run_app()` itself can not be profiled.
+See the discussion of this [issue on the `{golem}` repository](https://github.com/ThinkR-open/golem/issues/146) to learn more about this.
 
 #### B. `{shiny}` front-end {.unnumbered}
 
-##### Google LightHouse {.unnumbered}
+##### Google Lighthouse {.unnumbered}
 
 One other thing that can be optimized when it comes to the user interface is the webpage rendering performance.
 To do that, we can use standard web development tools: as said several times, a `{shiny}` application IS a web application, so tools that are language agnostic will work with `{shiny}`.
 There are thousands of tools available to do exactly that, and going through all of them would probably not make a lot of sense.
 
-Let's focus on getting started with a basic but powerful tool, that comes for free inside your browser: [Google Lighthouse](https://developers.google.com/web/tools/lighthouse), one of the famous tool for profiling web pages, and which is bundled into recent versions of Google Chrome.
-The nice thing is that this tool not only covers what you see (i.e. not only what you are actually rendering on your personal computer), but can also audit your app with various configurations, notably on mobile, with low bandwidth and/or mimicking 3G connection.
-**Being able to perform audit of our application as seen on a mobile device is a real strength: we are developing application on our computer, and might not be regularly checking how our application is performing on a mobile. Yet a large portion of the web navigation is performed on a mobile or tablet**.
+Let's focus on getting started with a basic but powerful tool, that comes for free inside your browser: [Google Lighthouse](https://developers.google.com/web/tools/lighthouse), one of the famous tools for profiling web pages, is bundled into recent versions of Google Chrome.
+The nice thing is that this tool not only covers what you see (i.e. not only what you are actually rendering on your personal computer), but can also audit your app with various configurations, notably on mobile, with low bandwidth and/or mimicking a 3G connection.
+**Being able to perform an audit of our application as seen on a mobile device is a real strength: we are developing an application on our computer, and might not be regularly checking how our application is performing on a mobile. Yet a large portion of web navigation is performed on a mobile or tablet**.
 
 Already in 2016, Google [wrote](https://www.thinkwithgoogle.com/data/web-traffic-from-smartphones-and-tablets/) that "*More than half of all web traffic now comes from smartphones and tablets*".
-Knowing the exact number of visitors that browse through mobile is hard: the web is vast, and not all website record the traffic they receive.
-Yet many, if not all, studies around how the web is browsed are reporting the same results: more traffic is performed via mobile than via computer [^when_optimize-3] .
+Knowing the exact number of visitors that browse through mobile is hard: the web is vast, and not all websites record the traffic they receive.
+Yet many, if not all, studies of how the web is browsed report the same results: more traffic is created via mobile than via computer [^when_optimize-3] .
 
-[^when_optimize-3]: [broadbandsearch](https://www.broadbandsearch.net/blog/mobile-desktop-internet-usage-statistics) for example, reports a 53.3% share for mobile browsing.
+[^when_optimize-3]: broadbandsearch <https://www.broadbandsearch.net/blog/mobile-desktop-internet-usage-statistics> for example, reports a 53.3% share for mobile browsing.
 
-And, the pro of running it in your browser is that it can perform the analysis on locally deployed applications: in other word, you can launch your `{shiny}` application in your R console, open the app in Google Chrome, and run the audit.
-A lot of online services needs an URL to do the audit!
+And, the advantages of running it in your browser is that it can perform the analysis on locally deployed applications: in other words, you can launch your `{shiny}` application in your R console, open the app in Google Chrome, and run the audit.
+A lot of online services need a URL to do the audit!
 
-Each result from the audit comes with a series of advises and changes you can make on your application to make it better, with links to know more about the specific issue.
+Each result from the audit comes with advice and changes you can make to your application to make it better, with links to know more about the specific issue.
 
-And of course, last but not least, you also got the results of the metrics you have "passed", and it is always a good mood booster to see our app passing some audited points!
+And of course, last but not least, you also get the results of the metrics you have "passed". 
+It is always a good mood booster to see our app passing some audited points!
 
 Here is a quick introduction to this tool:
 
--   Open Chrome in incognito mode (File \> New Icognito Window[^when_optimize-4]), so that the page performance is not influenced by any of the installed extensions in your Google Chrome
--   Open your developer console, either by going to View \> Developer \> Developer tools, by doing right click \> Inspect, or with the keyboard shortcut ctrl/cmd + alt + I, as show in figure \@ref(fig:14-when-optimize-11)
--   Go to the "Audit" tab
--   Configure your report (or leave the default)
--   Click on "Generate Report"
+-   Open Chrome in incognito mode (File \> New Icognito Window[^when_optimize-4]), so that the page performance is not influenced by any of the installed extensions in your Google Chrome.
+-   Open your developer console, either by going to View \> Developer \> Developer tools, by right-clicking \> Inspect, or with the keyboard shortcut ctrl/cmd + alt + I, as shown in Figure \@ref(fig:14-when-optimize-11).
+-   Go to the "Audit" tab.
+-   Configure your report (or leave the default).
+-   Click on "Generate Report".
 
 [^when_optimize-4]: This mode opens an "anonymous" session, in the sense that you don't have access to your account and extensions, and that the visits will not be recorded in your history.
 
-Note that you can also install a command line tool with `npm install -g lighthouse` [^when_optimize-5] , then run `lighthouse http://urlto.audit`: it will produce either a JSON (if asked) or an HTML report (the default).
+Note that you can also install a command-line tool with `npm install -g lighthouse` [^when_optimize-5] , then run `lighthouse http://urlto.audit`: it will produce either a JSON (if asked) or an HTML report (the default).
 
 [^when_optimize-5]: Being a NodeJS application, you will need to have NodeJS installed on your machine.
 
-(ref:lighthouseaudit) Launching LightHouse audit from the Google Chrome
+(ref:lighthouseaudit) Launching LightHouse audit from Google Chrome.
 
 ```{r 14-when-optimize-11, echo=FALSE, fig.cap="(ref:lighthouseaudit)", out.width="100%"}
 knitr::include_graphics("img/lighthouse-audit.png")
 ```
 
-See figure \@ref(fig:14-when-optimize-12) for a screenshot of the results computed by Google Lighthouse.
+See Figure \@ref(fig:14-when-optimize-12) for a screenshot of the results computed by Google Lighthouse.
 
-(ref:lighthouseres) LightHouse audit results
+(ref:lighthouseres) Lighthouse audit results
 
 ```{r 14-when-optimize-12, echo=FALSE, fig.cap="(ref:lighthouseres)", out.width="100%"}
 knitr::include_graphics("img/lighthouse-audit-results.png")
@@ -362,26 +364,26 @@ knitr::include_graphics("img/lighthouse-audit-results.png")
 Once the audit is finished, you have some basic but useful indications about your application:
 
 -   Performance.
-    This metric mostly analyzes the rendering time of the page: for example how many time does it take to load the app in full, that is to say how many time it takes from the first byte received to the app being fully ready to be used, the time between the very first call to the server and the very first response, etc.
+    This metric mostly analyzes the rendering time of the page: for example, how much time does it take to load the app in full, that is to say how much time it takes from the first byte received to the app being fully ready to be used, the time between the very first call to the server and the very first response, etc.
     With `{shiny}` [@R-shiny], you should get low performance here, notably due to the fact that it is serving external dependencies that you might not be able to control.
     For example, the report from `{hexmake}` [@R-hexmake] suggests to "Eliminate render-blocking resources", and most of them are not controlled by the shiny developer: they come bundled with `shiny::fluidPage()` itself.
 
 -   Accessibility.
-    Google Lighthouse performs a series of tests about accessibility (see our chapter about accessibility for more information).
+    Google Lighthouse performs a series of accessibility tests (see our chapter about accessibility for more information).
 
 -   Best practices bundles a list of "misc" best practices around web applications.
 
--   SEO: search engine optimization, or how will your app perform when it comes to search engine indexation[^when_optimize-6].
+-   SEO, search engine optimization, or how your app will perform when it comes to search engine indexation[^when_optimize-6].
 
--   Progressive Web App (PWA): a PWA is an app that can run on any device, *"reaching anyone, anywhere, on any device with a single codebase"*.
+-   Progressive Web App (PWA): A PWA is an app that can run on any device, *"reaching anyone, anywhere, on any device with a single codebase"*.
     Google audit your application to see if your application fits with this idea.
 
-[^when_optimize-6]: Search engine indexation refers to how Google is ranking your website in the search results for a given query.
+[^when_optimize-6]: Search engine indexation refers to how Google ranks your website in the search results for a given query.
 
 Profiling web page is a wide topic and a lot of things can be done to enhance the global page performance.
 That being said, if you have a limited time to invest in optimizing the front-end performance of the application, Google Lighthouse is a perfect tool, and can be your go-to audit tool for your application.
 
-And if you want to do if from R, the npm lighthouse module allows to output the audit in JSON, which can then be brought back to R!
+And if you want to do it from R, the npm lighthouse module allows you to output the audit in JSON, which can then be brought back to R!
 
 ``` {.bash}
 lighthouse --output json \
@@ -400,7 +402,7 @@ lighthouse_report$audits$`speed-index`$displayValue
 
 The results are contained in the `audits` sections of this object, and each of these sub-elements contains a `description` field, detailing what the metric means.
 
-Here are for example some of the results, focused on performance, with there respective description:
+Here are, for example, some of the results, focused on performance, with their respective descriptions:
 
 ##### "First Meaningful Paint" {.unnumbered}
 
@@ -499,9 +501,9 @@ To know more, feel free to read the [documentation](https://github.com/GoogleChr
 ##### Side note on minification {.unnumbered}
 
 Chances are that right now you are not using *minification* in your `{shiny}` application.
-Minification is the process of removing unnecessary characters from files, without changing the way the code works, in order to make the file size lighter.
-The general idea being that line breaks, spaces and a specific set of characters are used inside scripts for human readability, and are not useful when it comes to the way a computer reads a piece of code.
-Why not removing them when they are served in a larger software?
+Minification is the process of removing unnecessary characters from files, without changing the way the code works, to make the file size smaller.
+The general idea being that line breaks, spaces, and a specific set of characters are used inside scripts for human readability, and are not useful when it comes to the way a computer reads a piece of code.
+Why not remove them when they are served in a larger software?
 This is what *minification* does.
 
 Here is an example of how minification works, taken from *Empirical Study on Effects of Script Minification and HTTP Compression for Traffic Reduction* [@Sakamoto2015]:
@@ -520,22 +522,22 @@ is minified into:
 var sum=0;for(var i=0;i<=10;i++){sum+=i};alert(sum);
 ```
 
-Both these code blocks behave the same way, but the second one will be lighter when saved to a file: this is the very core principle of minification of files.
-It is something pretty common to do when building web applications: on the web, every byte counts, so the lighter your external resources the better.
-Minifiction is something important as the heavier your resources, the longer your application will take to launch, and:
+Both these code blocks behave the same way, but the second one will be smaller when saved to a file: this is the very core principle of minification of files.
+It is something pretty common to do when building web applications: on the web, every byte counts, so the smaller your external resources the better.
+Minification is important as the larger your resources, the longer your application will take to launch, and:
 
--   Page launch time is crucial when it comes to ranking the pages on the web
+-   Page launch time is crucial when it comes to ranking the pages on the web.
 
--   The heavier the resources, the longer it will be to launch the application on a mobile, notably if users are visiting your application from a 3G/4G network
+-   The larger the resources, the longer it will take to launch the application on a mobile, notably if users are visiting your application from a 3G/4G network.
 
-And do not forget,
+And do not forget the following:
 
 > Extremely high-speed network infrastructures are becoming more and more popular in developed countries.
 > However, we still face crowded and low-speed Wi-Fi environments on airport, cafe, international conference, etc.
 > Especially, a network environment of mobile devices requires efficient usage of network bandwidth.\
 > [@Sakamoto2015]
 
-To minify JavaScript, HTML and CSS files from R, you can use the `{minifyr}` [@R-minifyr] package, that wraps the `node-minify` NodeJS library.
+To minify JavaScript, HTML and CSS files from R, you can use the `{minifyr}` [@R-minifyr] package, which wraps the `node-minify` NodeJS library.
 For example, compare the size of this file from `{shiny}`:
 
 ```{r 14-when-optimize-24, eval = FALSE}
@@ -555,7 +557,7 @@ To its minified version:
 # Using the {minifyr} package to minify the CSS file
 minified <- minifyr::minifyr_css_cleancss(
   system.file("www/shared/shiny.css", package = "shiny"), 
-  "shinyminifed.css"
+  "shinyminified.css"
 ) 
 ```
 
@@ -568,23 +570,21 @@ fs::file_size(minified)
 cat("5.91K")
 ```
 
-That might not seem like much (a couple of KB) at a small scale, but as it can be done automatically, why not leverage these small performances gain when building larger applications?
-Of course, minification will not suddenly make your application blazing fast, but that's something you should consider when deploying an application to production, notably if you use a lot of packages with interactive widget: they might contain CSS and JavaScript files that are not minified.
+That might not seem like much (a couple of KB) on a small scale, but as it can be done automatically, why not leverage these small performance gains when building larger applications?
+Of course, minification will not suddenly make your application blazing fast, but that's something you should consider when deploying an application to production, notably if you use a lot of packages with interactive widgets: they might contain CSS and JavaScript files that are not minified.
 
-Minification can be important notably if you expect your audience to be connecting to your app with a low bandwidth: whenever your application starts, the browser has to download the source files from the server, meaning that the heavier these files, the longer it will take to render.
+Minification can be important notably if you expect your audience to be connecting to your app with a low bandwidth: whenever your application starts, the browser has to download the source files from the server, meaning that the larger these files, the longer it will take to render.
 
-Note that `{shiny}` files are minifed by default, so you will not have to re-minify them.
-But most package that extend `{shiny}` are not, so minifying the CSS and JavaScript from these packages might help you win some points on Google LightHouse report!
+Note that `{shiny}` files are minified by default, so you will not have to re-minify them.
+But most packages that extend `{shiny}` are not, so minifying the CSS and JavaScript files from these packages might help you win some points on you Google Lighthouse report!
 
 To do this automatically, you can add the `{minifyr}` commands to your deployment, be it on your CD/CI platform, or as a Dockerfile step.
 `{minifyr}` comes with a series of functions to do that:
 
--   `minify_folder_css()`, `minify_folder_js()`, `minify_folder_html()` and `minify_folder_json()` do a bulk minification of the files found in a folder that match the extension
--   `minify_package_js()`, `minify_package_css()`, `minify_package_html()` and `minify_package_json()` will minify the CSS and JavaScript files contained inside a package installed on the machine
+-   `minify_folder_css()`, `minify_folder_js()`, `minify_folder_html()` and `minify_folder_json()` do a bulk minification of the files found in a folder that matches the extension.
+-   `minify_package_js()`, `minify_package_css()`, `minify_package_html()` and `minify_package_json()` will minify the CSS and JavaScript files contained inside a package installed on the machine.
 
-Here is what it can look like inside a `Dockerfile` [^when_optimize-7]:
-
-[^when_optimize-7]: Note that you will need to install NodeJS inside the container
+Here is what it can look like inside a `Dockerfile` (Note that you will need to install NodeJS inside the container):
 
     FROM rocker/shiny-verse:3.6.3
 
