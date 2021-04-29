@@ -6,8 +6,8 @@ In its core, `{shiny}` runs R code on the server side.
 To be efficient, the R code computing your values and returning results also has to be optimized.
 
 Optimizing R code is a very broad topic, and it would be possible to write a full book about it.
-In fact a lot of books and blog posts already cover this topic.
-Instead of re-writing these books, we will try to point to some crucial resources you can refer to if you want get started optimizing your R code.
+In fact, a lot of books and blog posts already cover this topic.
+Instead of re-writing these books, we will try to point to some crucial resources you can refer to if you want to get started optimizing your R code.
 
 -   Efficient R programming [@colingillespie2017], has a series of methods you can quickly put into practice for more efficient R code.
 
@@ -18,27 +18,27 @@ Instead of re-writing these books, we will try to point to some crucial resource
 
 ### What is caching?
 
-Caching is the process of storing resources intensive results so that when they are needed again, your program can reuse the result another time without having to redo the computation again.
+Caching is the process of storing resources-intensive results so that when they are needed again, your program can reuse the result another time without having to redo the computation again.
 This is particularly useful for computation that will always return the same result, and should never be used if you expect the result could vary from one function call to the other.
 
 How does it work?
-Let's make a brief parallel with the human brain, and imagine that you know that you will need to use a phone number many time in the day, and for the purpose of this thought experiment you are completely unable to remember it [^optimizing-shiny-code-1] .
+Let's make a brief parallel with the human brain, and imagine that you know that you will need to use a phone number many times during the day, and for the purpose of this thought experiment, you are completely unable to remember it [^optimizing-shiny-code-1] .
 What are you going to do?
-There are two solutions here: either you look in the phone book or in your phone contact list every time you need it, which takes a couple of seconds every time, or you use a post-it that you put on your computer screen with the number of it, so that you have direct access to it when you need it.
+There are two solutions here: either you look in the phone book or in your phone contact list every time you need it, which takes a couple of seconds every time, or you use a post-it that you put on your computer screen with the number on it, so that you have direct access to it when you need it.
 It takes a couple of seconds the first time you look for the number, but it is almost instantaneous the next times you need it.
 
-[^optimizing-shiny-code-1]: Anyway, now that we all have smartphone, who still remembers phone numbers?
+[^optimizing-shiny-code-1]: Anyway, now that we all have smartphones, who still remembers phone numbers?
 
-This is what caching does: **store the result of an expensive computation, so that the next time you need the very same information again, you can read the result instead of redoing the full computation**.
-The downside being that you only have limited space on your screen: when your screen is covered by sticky notes, you can not store any more notes [^optimizing-shiny-code-2] .
+This is what caching does: **it stores the result of an expensive computation, so that the next time you need the very same information again, you can read the result instead of redoing the full computation**.
+The downside is that you only have limited space on your screen: when your screen is covered by sticky notes, you can not store any more notes [^optimizing-shiny-code-2] .
 
 [^optimizing-shiny-code-2]: In that case, you can either hide pre-existing sticky notes, or buy a bigger screen.
     But we are not here to talk about cache management theory.
-    If you are interesting in reading more about caching theory, we suggest the excellent *Algorithms to Live By*, by Brian Christian and Tom Griffiths [@brianchristian2016].
+    If you are interested in reading more about caching theory, we suggest the excellent *Algorithms to Live By*, by Brian Christian and Tom Griffiths [@brianchristian2016].
 
 In the context of an interactive application built with `{shiny}`, it makes sense to cache data structures: users tend to repeat what they do, or go back and forth between parameters.
 For example, if you have a graph which is taking 2 seconds to render (which is quite common in `{shiny}`, notably when relying on `{ggplot2}` [@R-ggplot2]), you do not want these 2 seconds to be repeated over and over again when users switch from one parameter to another.
-In that case, it does make sense to cache the result: if you call `ploting_function(input$selection)` twice with the same value for `input$selection`, and that you are sure that this plot will be the same every time, you can cache it.
+In that case, it does make sense to cache the result: if you call `ploting_function(input$selection)` twice with the same value for `input$selection`, and you are sure that this plot will be the same every time, you can cache it.
 In other words, instead of recomputing the graph on each `input$selection` change, you can cache the plot the first time it is generated, and then the application will read the cache instead of re-doing the computation.
 
 Same goes for queries to a database: if a query is done with the same parameters, and you know that they will return the same result, there is no need to ask the database again and again---ask the cache to retrieve the data.
@@ -47,7 +47,7 @@ Keep in mind that this caching mechanism is only to be used when **the data don'
 For example, if you are calling a database which is updated on a regular basis, you might not want to cache the results of a function.
 In that specific case, you will want the query to be performed every time the function is called, so that you get fresh data.
 
-### Native Caching in R
+### Native caching in R
 
 At least two packages in R implement caching of functions (also called memoization): `{R.cache}` [@R-R.cache], and `{memoise}` [@R-memoise].
 They both more or less work the same way: you will call a memoization function on another function, and cache is created for this function output, based on the arguments value.
@@ -81,7 +81,7 @@ msleep_and_return_time(2)
 toc()
 ```
 
-Let's try with another example that might look more like what we can find in a `{shiny}` App: connecting to a database, using the `{DBI}` [@R-DBI] and `{RSQLite}` [@R-RSQLite] packages
+Let's try with another example that might look more like what we can find in a `{shiny}` app: connecting to a database, using the `{DBI}` [@R-DBI] and `{RSQLite}` [@R-RSQLite] packages:
 
 ```{r 16-optimizing-shiny-code-2 }
 # We create an in-memory database using SQLite
@@ -195,60 +195,7 @@ try(fs::dir_delete(random_dir))
 
 ### Caching in `{shiny}`
 
-At the time of writing this page (April 2020), `{shiny}` [@R-shiny] has one caching function: `renderCachedPlot()`.
-This function behaves more or less like the `renderPlot()` function, except that it is tailored for caching.
-The extra arguments you will find are `cacheKeyExpr` and `sizePolicy`: the former is the list of inputs and values that allow to cache the plot---every time these values and inputs are the same, they produce the same graph, so `{shiny}` will be fetching inside the cache instead of computing the value another time.
-`sizePolicy` is a function that returns a `width` and an `height`, and which are used to round the plot dimension in pixels, so that not every pixel combination are generated in the cache.
-
-The good news is that converting existing `renderPlot()` functions to `renderCachedPlot()` is pretty straightforward in most cases: take your current `renderPlot()`, and add the cache keys [^optimizing-shiny-code-3] .
-
-[^optimizing-shiny-code-3]: In some cases you will have to configure the size policy, but in most cases the default values work just well.
-
-Here is an example:
-
-```{r 16-optimizing-shiny-code-7, eval=FALSE}
-library(shiny)
-ui <- function(){
-  tagList(
-    # We select a data.frame to plot
-    selectInput(
-      "tbl", 
-      "Table", 
-      c("iris", "mtcars", "airquality")
-    ),
-    # This plotOutput will be cached
-    plotOutput("plot")
-  )
-}
-
-server <- function(
-  input, 
-  output, 
-  session
-){
-  
-  # The cache mechanism is made available by renderCachedPlot
-  output$plot <- renderCachedPlot({
-    # Plotting the selected data.frame
-    plot( get(input$tbl) )
-  }, cacheKeyExpr = {
-    # List here all the reactive expression that will 
-    # be used as cache key when running the app, 
-    # you will see that the first time you plot one 
-    # graph, it takes a couple of seconds, 
-    # but the second time, it's almost 
-    # instantaneous
-    input$tbl
-  })
-  
-}
-
-shinyApp(ui, server)
-```
-
-If you try this app, the first rendering of the three plots will take a little bit of time, but every subsequent rendering of the plot is almost instantaneous.
-
-At the time of writing only one function is available, but we can apply what we have just seen with `{memoise}`, for example to render a table:
+We can apply what we have just seen with `{memoise}`, for example, to render a table:
 
 ```{r 16-optimizing-shiny-code-8, eval=TRUE}
 # We create an in-memory database using SQLite
@@ -322,13 +269,106 @@ shinyApp(ui, server)
 You will see that the first time you run this piece of code, it will take a couple of seconds to render the table for a new `input$cut` value.
 But if you re-select this input a second time, the output will show instantaneously.
 
-**Caching is a nice way to make your app faster: even more if you expect your output to be stable over time: if the plot created by a series of inputs stays the same all along your app lifecycle, it is worth thinking about implementing an on-disk caching**.
-At the time of writing these lines (April 2020), you can also use remote caching, in the form of Amazon S3 storage or with Google Cloud Storage.
-To do that, you will need the development version of `{memoise}` (version `r packageVersion("memoise")`).
+Since version `1.6.0`, `{shiny}` [@R-shiny] has two caching functions: `renderCachedPlot()` and `bindCache()`
+(note that `renderCachedPlot()` is in `{shiny}` since version `1.2.0`).
 
-If your application needs "fresh" data every time it is used, for example because data in the SQL database are updated every hour, cache will not be of much help here, on the contrary: the same inputs on the function will render different output depending on when they are called.
+`renderCachedPlot()` behaves more or less like the `renderPlot()` function, except that it is tailored for caching.
+The extra arguments you will find are `cacheKeyExpr` and `sizePolicy`: the former is the list of inputs and values that allow you to cache the plot---every time these values and inputs are the same, they produce the same graph, so `{shiny}` will be fetching inside the cache instead of computing the value another time.
+`sizePolicy` is a function that returns a `width` and a `height`, which are used to round the plot dimension in pixels, so that not every pixel combination is generated in the cache.
 
-One other thing to remember is that, just like our computer screen from our phone number example from before, you do not have unlimited space when it come to storing cache: storing a large amount of cache will take space on your disk.
+The good news is that converting existing `renderPlot()` functions to `renderCachedPlot()` is pretty straightforward in most cases: take your current `renderPlot()`, and add the cache keys [^optimizing-shiny-code-3] .
+
+[^optimizing-shiny-code-3]: In some cases you will have to configure the size policy, but in most cases the default values work just well.
+
+Here is an example:
+
+```{r 16-optimizing-shiny-code-7, eval=FALSE}
+library(shiny)
+ui <- function(){
+  tagList(
+    # We select a data.frame to plot
+    selectInput(
+      "tbl", 
+      "Table", 
+      c("iris", "mtcars", "airquality")
+    ),
+    # This plotOutput will be cached
+    plotOutput("plot")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  
+  # The cache mechanism is made available by renderCachedPlot
+  output$plot <- renderCachedPlot({
+    # Plotting the selected data.frame
+    plot( get(input$tbl) )
+  }, cacheKeyExpr = {
+    # List here all the reactive expression that will 
+    # be used as cache key when running the app, 
+    # you will see that the first time you plot one 
+    # graph, it takes a couple of seconds, 
+    # but the second time, it's almost 
+    # instantaneous
+    input$tbl
+  })
+  
+}
+
+shinyApp(ui, server)
+```
+
+If you try this app, the first rendering of the three plots will take a little bit of time, but every subsequent rendering of the plot is almost instantaneous.
+
+`bindCache()`, a new function from version `1.6.0`, offers a more general approach, as it can cache any reactive expression. 
+
+```{r 16-optimizing-shiny-code-7bis, eval=FALSE}
+library(shiny)
+ui <- function(){
+  tagList(
+    # Select a number of row to sample from mtcars
+    sliderInput(
+      "nrows", 
+      "Number of rows", 
+      1, 
+      nrow(mtcars), 
+      10
+    ),
+    tableOutput("tbl")
+  )
+}
+
+server <- function(
+  input, 
+  output, 
+  session
+){
+  
+  # The random sample will always be the same
+  # Whenever input$nrows is the same
+  output$tbl <- renderTable({
+    dplyr::sample_n(mtcars, input$nrows)
+  }) %>%
+    bindCache({
+      input$nrows
+    })
+}
+
+shinyApp(ui, server)
+```
+
+**Caching is a nice way to make your app faster, even more if you expect your output to be stable over time: if the plot created by a series of inputs stays the same throughout your app lifecycle, it is worth thinking about implementing on-disk caching**.
+With `{memoise}`, you can also use remote caching, in the form of Amazon S3 storage or with Google Cloud Storage.
+See also the [{bank}](https://github.com/ThinkR-open/bank) package for database caching of `{shiny}` expressions.
+
+If your application needs "fresh" data every time it is used, for example because data in the SQL database are updated every hour, cache will not be of much help here. 
+On the contrary, the same function inputs will render different output depending on when they are called.
+
+One other thing to remember is that, just like our computer screen from our phone number example from before, you do not have unlimited space when it comes to cache storage: storing a large amount of cache will take space on your disk.
 
 For example, from our stored cache from before:
 
@@ -348,29 +388,29 @@ Hence, when using cache, it might be interesting to periodically remove the olde
 
 ## Asynchronous in `{shiny}`
 
-One of the drawbacks of `{shiny}` is that as it is running on top of R, it is single threaded: meaning that each computation is run in sequence, one after the other.
+One of the drawbacks of `{shiny}` is that as it is running on top of R, it is single threaded, meaning that each computation is run in sequence, one after the other.
 Well, at least natively, as methods have emerged to run pieces of code in parallel.
 
 ### How to
 
 To launch code blocks in parallel, we will use a combination of two packages, `{future}` [@R-future] and `{promises}` [@R-promises], and a `reactiveValue()`.
-`{future}` is an R package which main purpose is to allow users to send code to be run elsewhere, i.e in another session, thread, or even on another machine.
+`{future}` is an R package whose main purpose is to allow users to send code to be run elsewhere, i.e in another session, thread, or even on another machine.
 `{promises}`, on the other hand, is a package providing structure for handling asynchronous programming in R [^optimizing-shiny-code-4].
 
 [^optimizing-shiny-code-4]: If you are familiar with promises in JavaScript, `{promises}` is an implementation of this structure into R.
 
-#### A. Asynchronous for Cross-sessions Availability {.unnumbered}
+#### A. Asynchronous for cross-sessions availability {.unnumbered}
 
-The first type of asynchronous programming in `{shiny}` is the one that **allows non-blocking programming at a cross-session context**.
-In other words, it is a programming method which is useful in the context of running one `{shiny}` session which is accessed by multiple users.
-Natively, in `{shiny}`, if *user1* comes and launches a 15 second computation, then *user2* has to wait for this computation to finish, before launching their own 15 second computation, and *user3* has to wait the 15 seconds of *user1* plus the 15 seconds for user, etc.
+The first type of asynchronous programming in `{shiny}` **allows non-blocking programming in a cross-session context**.
+In other words, it is a programming method which is useful in the context of running one `{shiny}` session that is accessed by multiple users.
+Natively, in `{shiny}`, if *user1* launches a 15-seconds computation, then *user2* has to wait for this computation to finish before launching their own 15-seconds computation, and *user3* has to wait the 15 seconds of *user1* plus the 15 seconds for user, etc.
 
-With `{future}` and `{promises}`, each long computation is sent to be run somewhere else, so when *user1* launches their 15 second computation, they are not blocking the R process for *user2* and *user3*.
+With `{future}` and `{promises}`, each long computation is sent to be run somewhere else, so when *user1* launches their 15-seconds computation, they are not blocking the R process for *user2* and *user3*.
 
 How does it work [^optimizing-shiny-code-5] ?
 `{promises}` comes with two operators which will be useful in our case, `%...>%` and `%...!%`: the first being "what happens when the `future()` is solved?" (i.e. when the computation from the `future()` is completed), and the second is "what happens if the `future()` fails?" (i.e. what to do when the `future()` returns an error).
 
-[^optimizing-shiny-code-5]: We're providing a short introduction with key concepts, but for a more thorough introduction, please refer to the [online documentation](https://rstudio.github.io/promises/index.html)
+[^optimizing-shiny-code-5]: We're providing a short introduction with key concepts, but for a more thorough introduction, please refer to the [online documentation](https://rstudio.github.io/promises/index.html).
 
 Here is an example of using this skeleton:
 
@@ -400,7 +440,7 @@ future({
 If you run this in your console, you will see that you have access to the R console directly after launching the code.
 And a couple of seconds later (a little bit more than 3), the result of the `rnorm(5)` will be printed to the console.
 
-Note that you can also write one-line function with `.` as a parameter, instead of building the full anonymous function (we will use this notation in the rest of the chapter):
+Note that you can also write a one-line function with `.` as a parameter, instead of building the full anonymous function (we will use this notation in the rest of the chapter):
 
 ```{r 16-optimizing-shiny-code-12, eval=FALSE}
 library(future)
@@ -448,11 +488,11 @@ server <- function(
 shinyApp(ui, server)
 ```
 
-If you have run this, that does not seem like a revolution: but trust us, the `Sys.sleep()` is not blocking as it allows other users to launch the same computation at the same moment.
+If you have run this, it does not seem like a revolution: but trust us, the `Sys.sleep()` is not blocking as it allows other users to launch the same computation at the same moment.
 
-#### B. Inner-session Asynchronousity {.unnumbered}
+#### B. Inner-session asynchronicity {.unnumbered}
 
-In the previous section we have implemented cross-session asynchronousity, meaning that the code is non-blocking, but **when two or more users access the same app: the code is still blocking at an inner-session level**.
+In the previous section, we implemented cross-session asynchronicity, meaning that the code is non-blocking, but **when two or more users access the same app: the code is still blocking at an inner-session level**.
 In other words, the code in the `renderPrint()` will still block the rest of the app for a single user.
 
 Let's have a look at this code:
@@ -556,23 +596,23 @@ server <- function(
 shinyApp(ui, server)
 ```
 
-Let's detail this code step by step:
+Let's detail this code step-by-step:
 
 -   `rv <- reactiveValues` creates a `reactiveValue()` that will contain `NULL`, and which will serve the content of `renderPrint()` when the `future()` is resolved.
     It is initiated as `NULL` so that the `renderPrint()` is silent at launch.
 
 -   `%...>% rv$output <- result %...!%` is the `{promises}` structure we have seen before.
 
--   `%...!% (function(error){ rv$output <- NULL ; warning(e) })` is what happens when the `future({})` fails: we are setting the `rv$res` value back to `NULL` so that the `renderPrint()` does not fails and print an error in case of failure.
+-   `%...!% (function(error){ rv$output <- NULL ; warning(e) })` is what happens when the `future({})` fails: we are setting the `rv$res` value back to `NULL` so that the `renderPrint()` does not fail and prints an error in case of failure.
 
-#### C. Potential Pitfalls of Asynchronous `{shiny}` {.unnumbered}
+#### C. Potential pitfalls of asynchronous `{shiny}` {.unnumbered}
 
-There is one thing to be aware of if you plan on using this async methodology: that you are not in a sequential context anymore.
+There is one thing to be aware of if you plan on using this async methodology: you are not in a sequential context anymore.
 Hence, the first `future({})` you will send is not necessarily the first you will get back.
-For example, if you send SQL requests to be run asynchronously and that each call takes between 1 an 10 seconds to return, there is a chance that the first request to return will be the last one you have sent.
+For example, if you send SQL requests to be run asynchronously and each call takes between 1 and 10 seconds to return, there is a chance that the first request to return will be the last one you sent.
 To handle that, we can adopt two different strategies, depending on what we need:
 
--   We need only the last expression sent. In other words, if we send three expressions to be evaluated somewhere, we only need to get back the last one.\
+-   We need only the last expression sent. In other words, if we send three expressions to be evaluated somewhere, we only need to get back the last one.
     To handle that, the best way is to have an id that is also sent to the future, and when the future comes back, we check that this id is the one we are expecting. If it is, we update the `reactiveValues()`. If it is not, we ignore it.
 
 ```{r 16-optimizing-shiny-code-16, eval = FALSE}
@@ -666,7 +706,7 @@ server <- function(
 shinyApp(ui, server)
 ```
 
--   We need to treat the outputs in the order they are received. In that case, instead of waiting for the very last input, you will need to build a structure that will receive the output, check if this output is the "next in line", store it if it is not, or return it if it is and see if there is another output in the queue. This type of implementation is a little bit more complex so we will not detail a full implementation inside this chapter, but here is a small example of using `{liteq}` [@R-liteq].
+-   We need to treat the outputs in the order they are received. In that case, instead of waiting for the very last input, you will need to build a structure that will receive the output, check if this output is the "next in line", store it if it is not, or return it if it is, and see if there is another output in the queue. This type of implementation is a little bit more complex, so we will not detail a full implementation in this chapter, but here is a small example of using `{liteq}` [@R-liteq].
 
 ```{r 16-optimizing-shiny-code-17 }
 library(promises)
@@ -700,7 +740,7 @@ for (i in 1:5){
 }
 ```
 
-For an example of an application built using `{promise}` and `{future}`, feel free to browse [engineering-shiny.org/shinyfuture/](https://engineering-shiny.org/shinyfuture/): you'll find here an example of blocking and non-blocking processes.
+For an example of an application built using `{promise}` and `{future}`, feel free to browse [engineering-shiny.org/shinyfuture/](https://engineering-shiny.org/shinyfuture/): there you will find an example of blocking and non-blocking processes.
 
 ```{r 16-optimizing-shiny-code-18, include = FALSE, error = TRUE}
 try(fs::dir_delete(tpd))
