@@ -2,7 +2,8 @@
 
 # The Need for Optimization {#need-for-optimization}
 
-> Only once we have a solid characterization of the surface area we want to improve can we begin to identify the best way to improve it.\
+> Only once we have a solid characterization of the surface area we want to improve can we begin to identify the best way to improve it.
+> 
 > _Refactoring at Scale_ [@lemaire2020]
 
 ## Build first, then optimize
@@ -18,7 +19,7 @@ What does that mean?
 That **focusing on optimizing small portions of your app before making it work fully is the best way to lose time along the way, even more in the context of a production application, where there are deadlines and a limited amount of time to build the application**.
 
 Why?
-Here is the general idea: let's say the schema in Figure \@ref(fig:14-when-optimize-1) represents your software, and its goal is to make things travel from *X1* to *X2*, but you have a bottleneck at μ.
+Here is the general idea: let's say the schema in Figure \@ref(fig:14-when-optimize-1) represents your software, and its goal is to make things travel from *X1* to *X2*, but you have a bottleneck at *U*.
 You are building elements piece by piece: first, the portion `X1.1` of the "road", then `X1.2`, etc.
 Only when you have your application ready can you really appreciate where your bottleneck is, and you can focus on making things go fast from `X1.1` to `X.1.2`, these performance gains won't make your application go faster: you will only make the elements move faster to the bottleneck.
 
@@ -40,8 +41,9 @@ This is something you will discover only when the application is fully functiona
 Or to sum up:
 
 > Get your design right with an un-optimized, slow, memory-intensive implementation before you try to tune.
-> Then, tune systematically, looking for the places where you can buy big performance wins with the smallest possible increases in local complexity.\
-> The Art of Unix Programming, [@ericraymond2003]
+> Then, tune systematically, looking for the places where you can buy big performance wins with the smallest possible increases in local complexity.
+> 
+> _The Art of UNIX Programming_ [@ericraymond2003]
 
 ### Do you need faster functions?
 
@@ -135,8 +137,9 @@ Without an automated tool to do the profiling, the developers would have to prof
 
 [^when_optimize-1]: `{utils}` also comes with a function call `Rprof()`, but we will not be examining this one here, as `{profvis}` provides a more user-friendly and enhanced interface to this profiling function.
 
-> One of the lessons that the original Unix programmers learned early is that intuition is a poor guide to where the bottlenecks are, even for one who knows the code in question intimately.\
-> The Art of Unix Programming, [@ericraymond2003]
+> One of the lessons that the original Unix programmers learned early is that intuition is a poor guide to where the bottlenecks are, even for one who knows the code in question intimately. 
+> 
+> _The Art of UNIX Programming_ [@ericraymond2003]
 
 Instead of guessing, it is a safe bet to go for a tool like `{profvis}`, which allows you to have a detailed view of what takes a long time to run in your R code.
 
@@ -534,8 +537,9 @@ And do not forget the following:
 
 > Extremely high-speed network infrastructures are becoming more and more popular in developed countries.
 > However, we still face crowded and low-speed Wi-Fi environments on airport, cafe, international conference, etc.
-> Especially, a network environment of mobile devices requires efficient usage of network bandwidth.\
-> [@Sakamoto2015]
+> Especially, a network environment of mobile devices requires efficient usage of network bandwidth.
+> 
+> _Empirical study on effects of script minification and HTTP compression for traffic reduction_ [@Sakamoto2015]
 
 To minify JavaScript, HTML and CSS files from R, you can use the `{minifyr}` [@R-minifyr] package, which wraps the `node-minify` NodeJS library.
 For example, compare the size of this file from `{shiny}`:
@@ -588,12 +592,15 @@ Here is what it can look like inside a `Dockerfile` (Note that you will need to 
 
     FROM rocker/shiny-verse:3.6.3
 
-    RUN apt-get -y install curl RUN curl -sL <https://deb.nodesource.com/setup_14.x> \| bash - RUN apt-get install -y nodejs
+    RUN apt-get -y install curl RUN curl -sL \
+      <https://deb.nodesource.com/setup_14.x> \
+      | bash - RUN apt-get install -y nodejs
 
-    RUN Rscript -e 'remotes::install\_github("colinfay/minifyr")' RUN Rscript -e 'remotes::install\_cran("cicerone")' RUN Rscript -e 'library(minifyr);\
-    minifyr\_npm\_install(TRUE);\
-    minify\_package\_js("cicerone", minifyr\_js\_uglify)
-    '
+    RUN Rscript -e 'remotes::install_github("colinfay/minifyr")' 
+    RUN Rscript -e 'remotes::install_cran("cicerone")' 
+    RUN Rscript -e 'library(minifyr);\
+        minifyr_npm_install(TRUE);\
+        minify_package_js("cicerone", minifyr_js_uglify)'
 
 ### More resources about web page performance
 
