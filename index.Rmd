@@ -79,110 +79,111 @@ What we will be discussing in this book is __the process of building an applicat
 Why this topic? Lots of blog posts and books talk about getting started with `{shiny}` [@R-shiny] or about what to do once your application is ready to be sent to production.
 Very few (if any) talk about this area in-between: how to confidently work with `{shiny}` once you know the basics, and before you send it to production. 
 
-This is what this book is going to talk about: building robust `{shiny}` applications, that are ready to be sent to production. 
+This is what this book is going to talk about: building robust `{shiny}` applications that are ready to be sent to production. 
 We'll focus on the process, the workflow, and the necessary tools for building production-grade `{shiny}` applications.
 
-## Who is this book for {-}
+## Audience for this book {-}
 
 If you are starting to read this book, we assume you have a working knowledge of how to build a small application using `{shiny}`, and want to know how to go one step further. 
 In other words, you already have some knowledge about how `{shiny}` works, are able to build a small working application, and want to know how to build a serious, production-grade application that can be sent to production. 
 
-The content of this book oscillates between conceptual discussions (e.g. what is complexity?), exploration of project-management questions (e.g. how do we organize work when building production `{shiny}` apps), and technical topics (e.g. what are `{shiny}` modules, or how to optimize `{shiny}`), with a large portion of the book being dedicated to technical questions. 
+The content of this book oscillates between conceptual discussions (e.g., what is complexity?), exploration of project-management questions (e.g., how do we organize work when building production `{shiny}` applications?), and technical topics (e.g. what are `{shiny}` modules, or how do I optimize `{shiny}`?), with a large portion of the book being dedicated to technical questions. 
 
-This book will then be of interest for two groups: 
+This book will then be of interest to two groups: 
 
-+ Team manager who want to help organizing work, and `{shiny}` developers who want to learn about project management. 
-This group will find relevant content in the first 1/3 of this book (roughly until chapter \@ref(workflow)).
++ Team managers who want to help to organize work, and `{shiny}` developers who want to learn about project management. 
+This group will find relevant content in the first 1/3 of this book (roughly until Chapter \@ref(workflow)).
 
 + Developers who want to cover medium to advanced `{shiny}` topics that will be relevant to production.
-This group will be more interested in the rest of the book, that roughly spans from chapter \@ref(matters) to the end.
+This group will be more interested in the rest of the book, which roughly spans from Chapter \@ref(matters) to the end.
 Note that the technical elements covered in this book range from intermediate to advanced topics, and we hope that you will find relevant topics for your current goals, whatever your level is.
 
-In practice, we've come to realize that a lot of `{shiny}` projects are built by small team, with a large proportion of these "team" being composed of only one developer. 
-In this context, we have realized that project management and development are most of the time assigned to the very same person^[Even if there are several developers in the team, the project manager is most of the time also involved in the coding process], making these two skills deeply intricate when carrying production projects. 
+In practice, we've come to realize that a lot of `{shiny}` projects are built by small team with a large number of these "teams" being composed of only one developer. 
+In this context, we have realized that project management and development are often assigned to the very same person,^[Even if there are several developers in the team, the project manager is also involved in the coding process] making these two skills deeply integrated when carrying production projects. 
 
-That's why this book tries to reconcile both these worlds, as building production-grade software needs a reliable and performing code-base which is made possible by having solid technical skills, but also a reliable and performing team-work and project management.
+That's why this book tries to reconcile both these worlds, as building production-grade software needs a reliable and operational code-base which is made possible by having solid technical skills, but also reliable and operational team-work and project management.
 
 ## What is "production"? {-}
 
 All throughout this book, we will be using the term "production" to refer to the way we build and deploy our application. 
 But what is "production"? 
 
-There has been a lot of definition about what is production, and even today if you ask around you will get a wide range of different answers. 
-We like to think that a piece of software is in production when it combines the three following properties, not only the users, but also the engineers working on it: 
+There have been a lot of definition of what is production, and even today if you ask around you will get a wide range of different answers. 
+We like to think that a piece of software is in production when it combines the three following properties, not only for the users, but also the engineers working on it: 
 
-+ It is __used__, be it by only one person
++ It is __used__, even if only by one person.
 
-+ It is __relied upon__ by its user(s)
++ It is __relied upon__ by its user(s).
 
-+ It has __real life impact__ if something goes wrong
++ It has __real life impact__ if something goes wrong.
 
 These three properties impact two specific groups: users, and the developers. 
 
 Indeed, the users rely on the app to work, so that they can do their job, and expect it to deliver meaningful results that they can count on. 
 From the engineering point of view, a production-grade software can be relied upon in the sense that developers count on it to run as expected, and they need to rely on the software to be resilient to change, _i.e_ to be modular, documented, and strongly tested so that changes can be integrated with confidence. 
 
-A production software also has real life impact if something goes wrong: users will take wrong decisions, they might be unable to do their day to day work, and all the things that can happen when the software you use on a daily basis fails to run. 
-From the engineering point of view, a production-grade software has real impact when something goes wrong: someone has to fix the bug, the company selling the software might lose money, data can be lost... 
+A production software also has real-life impact if something goes wrong: users will make wrong decisions, they might be unable to do their day-to-day work, and all the things that can happen when the software you use on a daily basis fails to run. 
+From the engineering point of view, a production-grade software has real impact when something goes wrong: someone has to fix the bug, the company selling the software might lose money, data can be lost, and so on. 
 
-Given these two properties, you can understand why being in production doesn't necessarily mean being served to gazillions of users^[
+Given these two properties, you can understand why being in production doesn't necessarily mean being served to gazillions of users,^[
 "Production" being equal to tons of users is a definition we regularly hear.
-], and serving trillions of GB of data: even a software that is used by one person who relies on this application to do their job is a production software. 
+] and serving trillions of gigabytes of data: even software that is used by one person who relies on this application to do their job is a production software. 
 
-This is what this book is about: building `{shiny}` applications that can be used, that you and your users can rely on, and using all the tools that will help you prevent thing to go wrong, and when they eventually do, be equipped to quickly be able to fix the bugs. 
+This is what this book is about: building `{shiny}` applications that can be used, on which you and your users can rely, and including all the tools that will help you prevent thing from going wrong, and when they eventually do, being equipped to quickly fix the bugs. 
 
 ## Book structure {-}
 
-+ Part I (Building Successful `{shiny}` Apps) gives a __general context about what we mean by "production-grade" and "successful" `{shiny}` Application, and what challenges arise when you are dealing with a large scale application designed for production__. 
++ Part 1, "Building Successful `{shiny}` apps" gives a __general context for what we mean by "production-grade" and "successful" `{shiny}` application, and what challenges arise when you are dealing with a large-scale application designed for production__. 
 In this part, we will define what we mean by "Successful", stress the importance of project management, develop how to structure your project for production, and introduce the `{golem}` [@R-golem] package.
-We will finally briefly introduce to our development workflow: a workflow that will be explored in part 2 to 6.
+We will finally briefly introduce to our development workflow: a workflow that will be explored in Parts 2 to 6.
 
-+ Part II to IV __explore the workflow for building successful applications__.  
-_Step 1: Design_ underlines the centrality of the user experience when engineering an application, emphasizes the importance of designing before coding, and gently introduces to CSS.  
-_Step 2: Prototype_ stresses the importance of prototyping, explores the setting of a `{golem}` based application, and presents `{shinipsum}`, `{fakir}`, and the "Rmd First" development methodology.  
-_Step 3: Build_ explores the building step of the application, _i.e_ the core engineering of the application once the prototyping phase is finished.  
-_Step 4: Strengthen_ explores in depth testing, continuous integration, and version control.  
-_Step 5: Deploy_ develops the various possibilities for preparing your application to be deployed.
++ Part 2 through 6 __explore the workflow for building successful applications__.  
+_Part 2: Design_ (Step 1) underlines the centrality of the user experience when engineering an application, and emphasizes the importance of designing before coding.  
+_Part 3: Prototype_ (Step 2) stresses the importance of prototyping, explores the setting of a `{golem}`-based application, and presents `{shinipsum}`, `{fakir}`, and the "Rmd First" development methodology.  
+_Part 4: Build_ (Step 3) explores the building step of the application, _i.e_ the core engineering of the application once the prototyping phase is finished.  
+_Part 5: Strengthen_ (Step 4) explores in-depth testing, continuous integration, and version control.  
+_Part 6: Deploy_ (Step 5) develops the various possibilities for preparing your application to be deployed.
 
-+ Part VII (Optimizing) __tackles the question of optimization__, first by introducing the general concepts about optimization, then by presenting some common caveats of `{shiny}` Apps, and then showing how to optimize R code, and how to use JavaScript to lighten R work.
++ Part 7, "Optimizing" __tackles the question of optimization__, first by introducing the general concepts about optimization, then by presenting some common caveats of `{shiny}` apps, and then showing how to optimize R code, and how to use JavaScript to lighten R work. 
+This part ends with a gentle introduction to CSS (Cascading Style Sheets).
 
 
 ## About the authors {-}
 
 ### <a href="https://colinfay.me/">Colin Fay</a> {-}
 
-Colin has written the vast majority of this book. He's responsible for its general structure, and for the original designer of the workflow described. Most of the time (if not every time) "we" actually refers to him. He is the lead developer of the `{golem}` framework, and creator of many tools described in this book. 
+Colin has written the vast majority of this book. He's responsible for its general structure, and for the original design of the workflow described. Most of the time (if not every time) "we" actually refers to him. He is the lead developer of the `{golem}` framework, and creator of many tools described in this book. 
 
-Colin works at ThinkR, a french agency focused on everything R-related. During the day, he helps companies to take full advantage of the power of R, by building tools (packages, web apps...) and setting up infrastructure. His main areas of expertise are data & software engineering, infrastructure, web applications (front-end and back-end), and R in production. 
+Colin works at ThinkR, a French agency focused on everything R-related. During the day, he helps companies to take full advantage of the power of R, by building tools (packages, web apps, etc.) and setting up infrastructure. His main areas of expertise are data & software engineering, infrastructure, web applications (front-end and back-end), and R in production. 
 
-During the night, Colin is also an hyperactive open source developer and an open data advocate. You can find a lot of his work on his GitHub account (https://github.com/ColinFay) and on ThinkR's account (https://github.com/thinkr-open).
+During the night, Colin is also a hyperactive open source developer and an open data advocate. You can find a lot of his work on his GitHub account (https://github.com/ColinFay) and on ThinkR's account (https://github.com/thinkr-open).
 
 He is also active in the R & Data community, and an international speaker.
 
 ### <a href="https://statnmap.com/">Sébastien Rochette</a> {-}
 
-Sébastien has been instrumental in the review of most of this book chapters. 
+Sébastien has been instrumental in the review of most of this book's chapters. 
 He has also written the section about prototyping in RMarkdown, a concept he initiated.  
 
 Sébastien is a data scientist at ThinkR, where he teaches anything R related from beginner to expert level, guides R developers towards implementation of best practices, and creates tailor-made R solutions for the needs of his customers.
 
 ### <a href="https://twitter.com/VincentGuyader">Vincent Guyader</a> {-}
 
-Vincent is the founder of ThinkR. He created the first proof-of-concept of a framework for `{shiny}` applications inside packages ; an idea which has led to the creation of `{golem}`. 
+Vincent is the founder of ThinkR. He created the first proof-of-concept framework for `{shiny}` applications inside packages; an idea which has led to the creation of `{golem}`. 
 If you feel like a GitHub archaeologist, this very first version is still available with a little bit of exploration!
 
-With more than 10 years of experience with R, and a scientific and technical background, Vincent is an R-enthusiast. 
-He still has his hands in the code, whether to develop applications, analyze data or build packages. 
+With more than 10 years of experience with R, and a scientific and technical background, Vincent is an R enthusiast. 
+He still has his hands in the code, whether to develop applications, analyze data, or build packages. 
 When he’s not coding, he plays with Docker and manages servers.
-He strongly believes that meeting highly technical challenges is not incompatible with pedagogy: he passionately trains very diverse learner profiles at R.
+He strongly believes that meeting highly technical challenges is not incompatible with pedagogy: he passionately trains very diverse learner profiles in R.
 
 ### <a href="https://twitter.com/CervanGirard">Cervan Girard</a> {-}
 
 Cervan has worked on some of the example applications that are used inside this book, namely `{shinipsumdemo}`, `{databasedemo}`, `{graysacle}`, `{bs4dashdemo}`, and `{shinyfuture}`.
 
-Cervan is Data Scientist at ThinkR. 
-He is enthusiastic and motivated when it comes to rolling up his sleeves for new challenges, even if it means venturing dangerously into the depths of R, learning new languages and experimenting outside your comfort zone.
-Whatever the challenge, he remains reliable, constructive and efficient when it comes to using his skills to train or develop. He also enjoys training learners of all levels in the R language.
+Cervan is a Data Scientist at ThinkR. 
+He is enthusiastic and motivated when it comes to rolling up his sleeves for new challenges, even if it means venturing dangerously into the depths of R, learning new languages, and experimenting outside your comfort zone.
+Whatever the challenge, he remains reliable, constructive, and efficient when it comes to using his skills to train or develop. He also enjoys training learners of all levels in the R language.
 
 ## Want to help? {-}
 
@@ -197,12 +198,12 @@ You can also find more resources in the bibliography.
 
 ### Getting started with `{shiny}`  {-}
 
++ [Mastering Shiny](https://github.com/hadley/shiny-book)
 + [Learn Shiny with RStudio](https://shiny.rstudio.com/tutorial/)
 + [Getting Started with Shiny](https://ourcodingclub.github.io/2017/03/07/shiny.html)
-+ [Mastering Shiny](https://github.com/hadley/shiny-book)
 + [A gRadual intRoduction to Shiny](https://laderast.github.io/gradual_shiny/)
 
-### `{shiny}` into production  {-}
+### Putting `{shiny}` into production  {-}
 
 + [Shiny in production: Principles, practices, and tools](https://resources.rstudio.com/rstudio-conf-2019/shiny-in-production-principles-practices-and-tools-joe-cheng)
 + [Shiny in Production](https://kellobri.github.io/shiny-prod-book/)
@@ -215,19 +216,17 @@ Open source is moving (very) fast, and some of the tools described in this book 
 But good news! 
 __A large portion of this book is about the methodology, and not purely the technology__, so even if some of the packages and code sections used in this book can (and will) become obsolete, a significant part of what is described in this book will still be relevant. 
 
-When reading this book, remember that they are a "snapshot" of various technologies and packages, which might some day become out of date, have breaking changes, or even disappear.
-The last revision to the pages you're reading now has been done on the `r Sys.Date()`.
-We will __try to update the online version whenever changes are made to the packages used in this book__, so feel free to browse the online version^[
-Available at <https://engineering-shiny.org>.
-] for up-to-date information.
+When reading this book, remember that they are a "snapshot" of various technologies and packages, which might someday become out of date, have breaking changes, or even disappear.
+The last revisions of the pages you're reading now have been done on the `r format(Sys.Date(), format="%B %d, %Y")`.
+We will __try to update the online version whenever changes are made to the packages used in this book__, so feel free to browse the online version^[Available at <https://engineering-shiny.org>.] for up-to-date information.
 
 ## Software information and conventions {-}
 
-This book has been built with `{knitr}` [@R-knitr] and `{bookdown}` [@R-bookdown]. 
+This book was built with `{knitr}` [@R-knitr] and `{bookdown}` [@R-bookdown]. 
 
 Package names are in curly brackets in code format (e.g., `{rmarkdown}`), and inline code and file names are formatted in a typewriter font (e.g., `knitr::knit('doc.Rmd')`).
 Function names are formatted in a typewriter font and followed by parentheses (e.g., `render_book()`).
-Larger code blocks are formated in a typewrite font and have a grey backgroud, e.g:  
+Larger code blocks are formatted in a typewriter font and have a gray backgroud, e.g.:  
 
 ```{r index-2, eval=FALSE}
 install.package("golem")
@@ -244,17 +243,17 @@ means that the package will be installed from GitHub, and that you can use the `
 
 ## Acknowledgments {-}
 
-### Special thank {-}
+### Special thanks {-}
 
-We want to thank ThinkR for freeing us time to write this book, and for always being supportive all along the project. 
+We want to thank ThinkR for allowing us time to write this book, and for always being supportive during the project. 
 
-Colin wants to personally thank [Christophe Dervieux](https://twitter.com/chrisderv) for all his help, be it for this book or any other project, and for being such an awesome person. 
-He also want to thank [Eric Nantz](https://r-podcast.org/) for taking the time to write the forewords, for being one of the first `{golem}` adopter, and for always being enthusiastic about all thing gravitating around the `golemverse`. 
+Colin wants to personally thank [Christophe Dervieux](https://twitter.com/chrisderv) for all his help with this book and any other projects, and for being such an awesome person. 
+He also wants to thank [Eric Nantz](https://r-podcast.org/) for taking the time to write the foreword, for being one of the first `{golem}` adopters, and for always being enthusiastic about all things gravitating around the `golemverse`. 
 A big thanks also to [David Granjon](https://divadnojnarg.github.io/) for his precious feedback on this book. 
 
 ### Contributors to this book {-}
 
-We want to thank all the people that have contributed to this book, either via Pull Requests, Issue on the book Github Repository, or via direct conversation.
+We want to thank all the people that have contributed to this book, either via Pull Requests, Issues on the book GitHub Repository, or via direct conversation.
 
 [&#x0040;allaway](https://github.com/allaway), [&#x0040;andreferraribr](https://github.com/andreferraribr), [&#x0040;aronolof](https://github.com/aronolof), [&#x0040;BenjaminLouis](https://github.com/BenjaminLouis), [&#x0040;bstrain71](https://github.com/bstrain71), [&#x0040;cedricbriandgithub](https://github.com/cedricbriandgithub), [&#x0040;dA505819](https://github.com/dA505819), [&#x0040;dan-reznik](https://github.com/dan-reznik), [&#x0040;davidpb90](https://github.com/davidpb90), [&#x0040;denrou](https://github.com/denrou), [&#x0040;DianeBeldame](https://github.com/DianeBeldame), [&#x0040;eroten](https://github.com/eroten), [&#x0040;espinielli](https://github.com/espinielli), [&#x0040;etiennebacher](https://github.com/etiennebacher), [&#x0040;fBedecarrats](https://github.com/fBedecarrats), [&#x0040;flrd](https://github.com/flrd), [&#x0040;frankschmitt](https://github.com/frankschmitt), [&#x0040;FrieseWoudloper](https://github.com/FrieseWoudloper), [&#x0040;giocomai](https://github.com/giocomai), [&#x0040;Guillaume-Lombardo](https://github.com/Guillaume-Lombardo), [&#x0040;gwd999](https://github.com/gwd999), [&#x0040;hadley](https://github.com/hadley), [&#x0040;hsm207](https://github.com/hsm207), [&#x0040;jamespooley](https://github.com/jamespooley), [&#x0040;jcrodriguez1989](https://github.com/jcrodriguez1989), [&#x0040;jonmcalder](https://github.com/jonmcalder), [&#x0040;josbop](https://github.com/josbop), [&#x0040;jpmarindiaz](https://github.com/jpmarindiaz), [&#x0040;julianstanley](https://github.com/julianstanley), [&#x0040;kdaily](https://github.com/kdaily), [&#x0040;maelle](https://github.com/maelle), [&#x0040;naomistrandberg](https://github.com/naomistrandberg), [&#x0040;psychometrician](https://github.com/psychometrician), [&#x0040;rainiercito](https://github.com/rainiercito), [&#x0040;ronniemo](https://github.com/ronniemo), [&#x0040;rpodcast](https://github.com/rpodcast), [&#x0040;sowla](https://github.com/sowla), [&#x0040;tellyshia](https://github.com/tellyshia), [&#x0040;ukyouhanDVSA](https://github.com/ukyouhanDVSA), [&#x0040;xari](https://github.com/xari), and [&#x0040;xvrdm](https://github.com/xvrdm).
 
