@@ -1,21 +1,21 @@
-# Structuring your Project {#structuring-project}
+# Structuring Your Project {#structuring-project}
 
-## `{shiny}` App as a Package
+## `{shiny}` app as a package
 
 ```{r 03-structure-1, include=FALSE}
 library(shiny)
 ```
 
-In the next chapter you will be introduced to the `{golem}` [@R-golem] package, **an opinionated framework for building production-ready `{shiny}` Applications**.
+In the next chapter you will be introduced to the `{golem}` [@R-golem] package, **an opinionated framework for building production-ready `{shiny}` applications**.
 This framework will be used a lot throughout this book, and it relies on the idea that every `{shiny}` application should be built as an R package.
 
 But in a world where `{shiny}` applications are mostly created as a series of files, why bother with a package?
 
-### What is in a production-grade `{shiny}` App?
+### What is in a production-grade `{shiny}` app?
 
-You probably haven't realized it yet, but if you have built a significant (in terms of size or complexity of the code base) `{shiny}` application, chances are you have been using a package-like structure without knowing it.
+You probably haven't realized it yet, but if you have built a significant (in terms of size or complexity of the codebase) `{shiny}` application, chances are you have been using a package-like structure without knowing it.
 
-Think about your last `{shiny}` application which was created as a single-file (`app.R`) or two-files app (`ui.R` and `server.R`).
+Think about your last `{shiny}` application, which was created as a single-file (`app.R`) or two-file app (`ui.R` and `server.R`).
 On top of these files, what do you needed to make it **a production-ready application**, and why is a package the perfect infrastructure?
 
 #### A. It has metadata {.unnumbered}
@@ -25,7 +25,7 @@ In other words, all the necessary information for something that runs in product
 
 This is what you will get when using a package `DESCRIPTION` file.
 
-#### B. It handles dependencies installation {.unnumbered}
+#### B. It handles dependencies {.unnumbered}
 
 Second, you need to find a way to **handle the dependencies**.
 When you want to push your app into production, you do not want to have this conversation with the IT team:
@@ -48,14 +48,14 @@ When you want to push your app into production, you do not want to have this con
 
 -   *R-dev: Sure!*
 
--   *IT: Ok so it says 'could not find function `runApp()`*
+-   *IT: Ok so it says "could not find function `runApp()`"*
 
 -   *R-dev: Ah, you got to do `library(shiny)` at the beginning of your script. And `library(purrr)`, and `library(jsonlite)`, and...*
 
-For example here, this `library(purrr)` and `library(jsonlite)` will lead to a NAMESPACE conflict on the `flatten()` function that can cause you some debugging headache (trust us, we have been there before).
+For example here, the `library(purrr)` and `library(jsonlite)` will lead to a NAMESPACE conflict on the `flatten()` function that can cause you some debugging headaches (trust us, we have been there before).
 It would be cool if we could have a `{shiny}` app that only imports specific functions from a package, right?
 
-We can not stress enough that **dependencies matter**.
+We cannot stress enough that **dependencies matter**.
 You need to handle them, and handle them correctly if you want to ensure a smooth deployment to production.
 This dependency management is native when you use a package structure: the packages your application depends on are listed in the `DESCRIPTION`, and the functions/packages you need to import are listed in the `NAMESPACE` file.
 
@@ -63,7 +63,7 @@ This dependency management is native when you use a package structure: the packa
 
 Third, let's say you are building a big application.
 Something with thousands of lines of code.
-You can not build this large application by writing one or two files, as it is simply impossible to maintain in the long run or use on a daily basis.
+You cannot build this large application by writing one or two files, as it is simply impossible to maintain in the long run or use on a daily basis.
 If we are developing a large application, we should split everything into smaller files.
 And maybe we can store those files in a specific directory.
 
@@ -76,39 +76,42 @@ Last but not least, we want our app to live long and prosper, which means we nee
 Documenting your `{shiny}` app involves explaining features to the end users and also to the future developers (chances are this future developer will be you).
 The good news is that using the R package structure helps you leverage the common tools for documentation in R:
 
--   A `README` file that you will put at the root of your package, which will document how to install the package, and some information about how to use the package. Note that in many cases developers go for a `.md` file (short for markdown) because this format is automatically rendered on services like GitHub, GitLab, or any other main version control system.\
--   `Vignettes` are longer form documentation that explain in more depth how to use your app. There are also useful if you need to detail the core functions of the application using a static document, notably for prototyping and/or for exchanging with the client. We will get back to `Vignettes` in Chapter \@ref(building-ispum-app) when we will talk about prototyping.
--   Function documentation. Every function in your package should come with its own documentation, even if it is just for your future self. "Exported" functions, the one which are available once you run `library(myapp)`, should be fully documented and will be listed in the package help page. Internal functions need less documentation, but documenting them is the best way to be sure you can come back to the app in a few months and still know why things are the way they are, what the pieces of the apps are used for, and how to use these functions [^structure-1] .
+-   A `README` file that you will put at the root of your package, which will document how to install the package, and some information about how to use the package. Note that in many cases developers go for a `.md` file (short for markdown) because this format is automatically rendered on services like GitHub, GitLab, or any other main version control system.
+
+-   `Vignettes` are longer-form documentation that explains in more depth how to use your app. They are also useful if you need to detail the core functions of the application using a static document, notably for prototyping and/or for exchanging with the client. We will get back to `Vignettes` in Chapter \@ref(building-ispum-app) when we will talk about prototyping.
+
+-   Function documentation. Every function in your package should come with its own documentation, even if it is just for your future self. "Exported" functions, the one which are available once you run `library(myapp)`, should be fully documented and will be listed in the package help page. Internal functions need less documentation, but documenting them is the best way to be sure you can come back to the app in a few months and still know why things are the way they are, what the pieces of the apps are used for, and how to use these functions.[^structure-1]
+
 -   If needed, you can build a `{pkgdown}` website, that can either be deployed on the web or kept internally. It can contain installation steps for I.T., internal features use for developers, a user guide, etc.
 
-[^structure-1]: `{roxygen2}` comes with a `@noRd` tag, that prevents the documentation from being built.
-    This allows to still write the documentation using the same tags as the exported function, without the internal functions being documented in the end package.
-    For example, that is why by default the modules built with `{golem}` version \> 0.2.0 come with `@noRd`: you should document them, but chances are your do not need to export them.
+[^structure-1]: `{roxygen2}` comes with a `@noRd` tag that prevents the documentation from being built.
+    This allows you to still write the documentation using the same tags as the exported function, without the internal functions being documented in the end package.
+    For example, that is why, by default, the modules built with `{golem}` version \> 0.2.0 come with `@noRd`: you should document them, but chances are your do not need to export them.
 
 #### E. It's tested {.unnumbered}
 
-The other thing we need for our application to be successful on the long run is a testing infrastructure, so that we are sure we are not introducing any regression along development.
+The other thing we need for our application to be successful in the long run is a testing infrastructure, so that we are sure we are not introducing any regression during development.
 
 **Nothing should go to production without being tested. Nothing.**
 
 Testing production apps is a broad question that we will come back to in another chapter, but let's talk briefly about why using a package structure helps with testing.
 
-Frameworks for package testing are robust and widely documented in the R world, and if you choose to embrace the "`{shiny}` App as a Package" structure, you do not have to put any extra-effort for testing your application back-end: use a canonical testing framework like `{testthat}` [@R-testthat].
-Learning how to use it is not the subject of this chapter, so feel free to refer to the documentation, and see also Chapter 5 of the [workshop: "Building a package that lasts"](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107).
+Frameworks for package testing are robust and widely documented in the R world, and if you choose to embrace the "`{shiny}` app as a package" structure, you do not have to put in any extra-effort for testing your application back-end: use a canonical testing framework like `{testthat}` [@R-testthat].
+Learning how to use it is not the subject of this chapter, so feel free to refer to the documentation, and see also Chapter 5 of the [workshop: "Building a Package that Lasts"](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop?slide=107).
 
-We will come back to testing in the "Build Yourself a Safety Net" chapter.
+We will come back to testing in Chapter 11: "Build Yourself a Safety Net".
 
 #### F. There is a native way to build and deploy it {.unnumbered}
 
 Oh, and it would also be nice if people could get a `tar.gz` and install it on their computer and have access to a local copy of the app!
 Or if we could install that on the server without any headache!
 
-When adopting the package structure, you can use classical tools to locally install your `{shiny}` application, *i.e* as any other R package, built as a `tar.gz`.
-On a server, be it RStudio products or as Docker containers, the package infrastructure will also allow to leverage the native R tools to build, install and launch R code.
+When adopting the package structure, you can use classical tools to locally install your `{shiny}` application, i.e. as any other R package, built as a `tar.gz`.
+On a server, be it RStudio products or as Docker containers, the package infrastructure will also allow you to leverage the native R tools to build, install and launch R code.
 
-More about this in chapter \@ref(\#deploy).
+More about this in Chapter \@ref(deploy).
 
-#### `{shiny}` app as a Package, a checklist {.unnumbered}
+#### `{shiny}` app as a package, a checklist {.unnumbered}
 
 Let's sum up what we need for our application:
 
@@ -120,9 +123,9 @@ Let's sum up what we need for our application:
 
 -   [ ] **Documentation** can be done using Vignettes, Readme, and native R package documentation.
 
--   [ ] **Testing toolkit**, done using the native `R CMD Check` and other packages like `{testthat}` [@R-testthat]
+-   [ ] **Testing toolkit**, done using the native `R CMD Check` and other packages like `{testthat}` [@R-testthat].
 
--   [ ] **Installation process**, possible using the package infrastructure.
+-   [ ] **Installation process**, which is possible using the package infrastructure.
 
 ### Resources
 
@@ -131,47 +134,48 @@ If you need to read some resources before continuing, feel free to have a look a
 
 -   [R packages](http://r-pkgs.had.co.nz/)
 
--   ["Building a package that lasts"](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop)
+-   [Building a Package that Lasts](https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop)
 
 -   [Writing R Extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Creating-R-packages)
 
--   [R package primer - a minimal tutorial](https://kbroman.org/pkg_primer/)
+-   [R Package Primer - a Minimal Tutorial](https://kbroman.org/pkg_primer/)
 
-## Using `{shiny}` Modules
+## Using `{shiny}` modules
 
-Modules are one of the most powerful tools for building `{shiny}` Applications in a maintainable and sustainable manner.
+Modules are one of the most powerful tools for building `{shiny}` applications in a maintainable and sustainable manner.
 
-### Why using `{shiny}` modules?
+### Why `{shiny}` modules?
 
 Small is beautiful.
-Being able to properly cut a codebase into small modules will help developers build a mental model of the application (Remember ["What is a complex `{shiny}` Application?"](#complex-shiny)).
+Being able to properly cut a codebase into small modules will help developers build a mental model of the application (Remember ["What is a complex `{shiny}` application?"](#complex-shiny)).
 But what are `{shiny}` modules?
 
-> `{shiny}` modules address the namespacing problem in `{shiny}` UI and server logic, adding a level of abstraction beyond functions.\
-> `r right_link("Modularizing Shiny app code", "https://shiny.rstudio.com/articles/modules.html")`
+> `{shiny}` modules address the namespacing problem in `{shiny}` UI (User Interface) and server logic, adding a level of abstraction beyond functions.\
+> 
+> _Modularizing Shiny app code_ (<https://shiny.rstudio.com/articles/modules.html>)
 
 Let us first untangle this quote with an example about the `{shiny}` namespace problem.
 
 #### A. The one million "Validate" buttons problem {.unnumbered}
 
-A big `{shiny}` application usually requires reusing pieces of ui/server, which makes it hard to name and identify similar inputs and outputs.
+A big `{shiny}` application usually requires reusing pieces of the UI/server, which makes it hard to name and identify similar inputs and outputs.
 
 `{shiny}` requires its outputs and inputs to have a **unique id**.
-And, unfortunately, we can not bypass that: when you send a plot **from R to the browser**, i.e from the `server` to the `ui`, the browser needs to know exactly where to put this element.
+And, unfortunately, we cannot bypass that: when you send a plot **from R to the browser**, i.e. from the `server` to the `ui`, the browser needs to know exactly where to put this element.
 This "exactly where" is handled through the use of an `id`.
 Ids are not `{shiny}` specific: they are at the very root of the way web pages work.
-Understanding all of this is not the purpose of this chapter: just remember that `{shiny}` inputs and outputs ids **have** to be unique, just as any id on a webpage, so that the browser knows where to put what it receives from R, and R knows what to listen to from the browser.
+Understanding all of this is not the purpose of this chapter: just remember that `{shiny}` input and output ids **have** to be unique, just as any id on a web page, so that the browser knows where to put what it receives from R, and R knows what to listen to from the browser.
 The need to be unique is made a little bit complex by the way `{shiny}` handles the names, as it shares a global pool for all the id names, with no native way to use namespaces.
 Wait, namespaces?
 
 Namespaces are a computer science concept created to handle a common issue: how to share the same name for a variable in various places of your program without them conflicting.
 In other words, how to use an object called `my_dataset` several times in the program, and still be sure that it is correctly used depending on the context.
 
-R itself has a system for namespaces; this is what packages do and why you can have `purrr::flatten` and `jsonlite::flatten` on the same computer and inside the same script: the function names are the same, but the two live in different namespaces, and the behavior of both functions can be totally different as the symbol is evaluated inside two different namespaces.
+R itself has a system for namespaces; this is what packages do and why you can have `purrr::flatten` and `jsonlite::flatten` on the same computer and inside the same script: the function names are the same, but the two exist in different namespaces, and the behavior of both functions can be totally different as the symbol is evaluated inside two different namespaces.
 If you want to learn more about namespaces, please refer to the [7.4 Special environments](https://adv-r.hadley.nz/environments.html#special-environments) chapter from *Advanced R*, or turn to any computer science book: namespaces are pretty common in any programming language.
 
-That is what modules are made for: **creating small namespaces where you can safely define `ids` without conflicting with other ids in the app.** Why do we need to do that?
-Think about the number of times you created a "OK" or "validate" button.
+That is what modules are made for: **creating small namespaces where you can safely define `ids` without conflicting with other `ids` in the app.** Why do we need to do that?
+Think about the number of times you have created an "OK" or "validate" button.
 How have you been handling that so far?
 By creating `validate1`, `validate2`, and so on and so forth.
 But if you think about it, you are mimicking a namespacing process: a `validate` in namespace `1`, another in namespace `2`.
@@ -235,27 +239,27 @@ shinyApp(ui, server)
 ```
 
 This, of course, is an approach that works.
-Well, it works as long as your code base is small.
+Well, it works as long as your codebase is small.
 But how can you be sure that you are not creating `validate6` on line 55 and another on line 837?
 How can you be sure that you are deleting the correct combination of UI/server components if they are named that way?
-Also, how do you work smoothly in a context where you have to scroll from `sliderInput("choice1"` to `observeEvent( input$choice1 , {` which might be separated by thousands of lines?
+Also, how do you work smoothly in a context where you have to scroll from `sliderInput("choice1")` to `observeEvent( input$choice1 , {})` which might be separated by thousands of lines?
 
-#### B. Working with a bite-sized code base {.unnumbered}
+#### B. Working with a bite-sized codebase {.unnumbered}
 
 Build your application through multiple smaller applications that are easier to understand, develop and maintain, using `{shiny}` [@R-shiny] modules.
 
-We assume that you know the saying that *"if you copy and paste something more than twice, you should make a function"*.
+We assume that you know the saying that "if you copy and paste something more than twice, you should make a function".
 In a `{shiny}` application, how can we refactor a partially repetitive piece of code so that it is reusable?
 
 Yes, you guessed right: using shiny modules.
-**`{shiny}` modules aim at three things: simplifying "id" namespacing, split the code base into a series of functions, and allow UI/Server parts of your app to be reused. Most of the time, modules are used to do the two first. In our case, we could say that 90% of the modules we write are never reused [^structure-2] ; they are here to allow us to split the code base into smaller, more manageable pieces**.
+**`{shiny}` modules aim at three things: simplify "id" namespacing, split the codebase into a series of functions, and allow UI/Server parts of your app to be reused. Most of the time, modules are used to do the two first. In our case, we could say that 90% of the modules we write are never reused;[^structure-2] they are here to allow us to split the codebase into smaller, more manageable pieces**.
 
 [^structure-2]: Most of the time, pieces / panels of the app are too unique to be reused elsewhere.
 
 With `{shiny}` modules, you will be writing a combination of UI and server functions.
 Think of them as small, standalone `{shiny}` apps, which handle a fraction of your global application.
 If you develop R packages, chances are you have split your functions into series of smaller functions.
-With `{shiny}` modules, you are doing the exact same thing: with just a little bit of tweaking, you can split your application into series of smaller applications.
+With `{shiny}` modules, you are doing the exact same thing: with just a little bit of tweaking, you can split your application into a series of smaller applications.
 
 ### When to use `{shiny}` modules
 
@@ -263,22 +267,22 @@ No matter how big your application is, it is always safe to start modularizing f
 The sooner you use modules, the easier downstream development will be.
 It is even easier if you are working with `{golem}`, which promotes the use of modules from the very beginning of your application.
 
-"*Yes, but I just want to write a small app, nothing fancy*"
+"*Yes, but I just want to write a small app, nothing fancy.*"
 
-A production apps almost always started as a small Proof of Concept.
+A production app almost always started as a small proof of concept.
 Then, the small PoC becomes an interesting idea.
 Then, this idea becomes a strategic asset.
-And before you know it, your 'not-that-fancy' app needs to become larger and larger.
+And before you know it, your not-that-fancy app needs to become larger and larger.
 So, you will be better off starting on solid foundations from the very beginning.
 
-### A practical walk through
+### A practical walkthrough
 
 An example is worth a thousand words, so let's explore the code of a very small `{shiny}` application that is split into modules.
 
-#### A. Your first `{shiny}` Module {.unnumbered}
+#### A. Your first `{shiny}` module {.unnumbered}
 
 Let's try to transform the above example (the one with two sliders and two action buttons) into an application with a module.
-Note that the following code will work only for `{shiny}`, version 1.5.0 and after.
+Note that the following code will work only for `{shiny}` version 1.5.0 and after.
 
 ```{r 03-structure-3, eval = FALSE}
 # Re-usable module
@@ -350,9 +354,9 @@ The **server** function of the module (`mod_server()`) is pretty much the same a
 The **ui** function of the module (`mod_ui()`) requires specific things.
 There are two new things: `ns <- NS(id)` and `ns(inputId)`.
 That is where the namespacing happens.
-Remember the previous version where we identified out two "validate" buttons with slightly different namespaces: `validate1` and `validate2`?
+Remember the previous version where we identified our two "validate" buttons with slightly different namespaces: `validate1` and `validate2`?
 Here, we create namespaces with the `ns()` function, built with `ns <- NS(id)`.
-This line, `ns <- NS(id)`, is added on top of all module ui functions and will allow building namespaces with the module id.
+This line, `ns <- NS(id)`, is added on top of all module UI functions and will allow building namespaces with the module id.
 
 To understand what it does, let us try and run it outside `{shiny}`:
 
@@ -367,25 +371,26 @@ ns("choice")
 
 And here it is, our namespaced `id`!
 
-Each call to a module with `choice_server()` requires a different `id` argument that will allow creating various internal namespaces, preventing from id conflicts [^structure-3] .
+Each call to a module with `choice_server()` requires a different `id` argument that will allow creating various internal namespaces to prevent from id conflicts.[^structure-3]
 Then you can have as many `validate` ids as you want in your whole app, as long as this input has a unique id inside your module.
 
 [^structure-3]: Well, of course you can still have inner module id conflicts, but they are easier to avoid, detect, and fix.
 
 ##### Note for `{shiny}` \< 1.5.0 {.unnumbered}
 
-Released on the 2020-06-23, the version 1.5.0 of `{shiny}` introduced a new way to write shiny modules, using a new function called `moduleServer()`.
+Released on 2020-06-23, the version 1.5.0 of `{shiny}` introduced a new way to write shiny modules, using a new function called `moduleServer()`.
 This new function was introduced to make the couple `ui_function` / `server_function` more obvious, where the old version used to require a `callModule(server_function, id)` call.
 This `callModule` notation is still valid (at least at the time of writing these lines), but we chose to go for the `moduleServer()` notation in this book.
-Most of the application used as example in this book has been built before this new function though, so when you will read their code, you will find the `callModule` implementation.
+Most of the applications that are used as examples in this book have been built before this new function though, so when you will read their code, you will find the `callModule` implementation.
 
 #### B. Passing arguments to your modules {.unnumbered}
 
-`{shiny}` modules will potentially be reused and may need specific user interface and inputs.
+`{shiny}` modules will potentially be reused and may need a specific user interface and inputs.
 This requires using extra arguments to generate the UI and server.
-As UI and server are functions, you can set parameters that will be used to configure the internals of the result.
+As the UI and server are functions, you can set parameters that will be used to configure the internals of the result.
 
-As you can see, the **app\_ui** contains a series of call to `mod_ui(unique_id, ...)` function, allowing additional arguments like any other function:
+As you can see, the **app\_ui** contains a series of calls to thz
+ `mod_ui(unique_id, ...)` function, allowing additional arguments like any other function:
 
 ```{r 03-structure-5, eval=FALSE}
 mod_ui <- function(id, button_label) {
@@ -395,7 +400,7 @@ mod_ui <- function(id, button_label) {
   )
 }
 
-# Printing the html for this piece of UI
+# Printing the HTML for this piece of UI
 mod_ui("mod_ui_1", button_label = "Validate ")
 mod_ui("mod_ui_2", button_label = "Validate, again")
 ```
@@ -411,11 +416,12 @@ mod_ui("mod_ui_2", button_label = "Validate, again")
 The **app\_server** side contains a series of `mod_server(unique_id, ...)`, also allowing additional parameters, just like any other function.
 
 As a live example, we can have a look at [mod\_dataviz.R](https://github.com/ColinFay/tidytuesday201942/blob/master/R/mod_dataviz.R#L17) from the `{tidytuesday201942}` [@R-tidytuesday201942] `{shiny}` application, available at <https://connect.thinkr.fr/tidytuesday201942/>.
+Figure \@ref(fig:03-structure-6) is a screenshot of this application.
 
 This application contains 6 tabs, 4 of them being pretty much alike: a side bar with inputs, a main panel with a button, and the plot.
-This plot can be, depending on the tab: a scatterplot, an histogram, a boxplot, or a barplot.
+This plot can be, depending on the tab, a scatterplot, a histogram, a boxplot, or a barplot.
 
-This is a typical case where you should reuse modules: if several parts are relatively similar, it is easier to bundle it inside a reusable module, and condition the ui/server with function arguments.
+This is a typical case where you should reuse modules: if several parts are relatively similar, it is easier to bundle it inside a reusable module, and condition the UI/server with function arguments.
 
 (ref:tidytuesdayappcap) Snapshot of the `{tidytuesday201942}` `{shiny}` application.
 
@@ -430,7 +436,7 @@ mod_dataviz_ui <- function(
   id, 
   type = c("point", "hist", "boxplot", "bar")
 ) {
-  # Setting an header with the specified type of graph
+  # Setting a header with the specified type of graph
   h4(
     sprintf( "Create a geom_%s", type )
   ),
@@ -581,14 +587,14 @@ One of the hardest part of using modules is sharing data across them.
 There are at least three approaches:
 
 -   Returning a `reactive` function
--   The "stratégie du petit r" (to be pronounced with a french accent of course)
--   The "stratégie du grand R6".
+-   The "stratégie du petit r" (to be pronounced with a French accent of course)
+-   The "stratégie du grand R6"
 
 #### A. Returning values from the module {.unnumbered}
 
 One common approach is to return a `reactive` function from one module**, and pass it to another** in the general `app_server()` function.
 
-Here is an example that illustrate this pattern.
+Here is an example that illustrates this pattern.
 
 ```{r 03-structure-11, eval = FALSE}
 # Module 1, which will allow to select a number
@@ -656,14 +662,14 @@ app_server <- function(input, output, session) {
 shinyApp(app_ui, app_server)
 ```
 
-This strategy works well, but for large `{shiny}` Apps it might be hard to handle large lists of reactive outputs / inputs and to keep track of how things are organized.
+This strategy works well, but for large `{shiny}` apps it might be hard to handle large lists of reactive outputs / inputs and to keep track of how things are organized.
 It might also create some reactivity issues, as a lot of `reactive` function calls is harder to control, or lead to too much computation from the server.
 
 #### B. The "stratégie du petit r" {.unnumbered}
 
-In this strategy, we **create a global `reactiveValues` list that is passed along other modules**.
-The idea is that it allows to be less preoccupied about what your module takes as input and what it outputs.
-You can think of this approach as creating a small, internal database that is passed along all the modules of your application.
+In this strategy, we **create a global `reactiveValues` list that is passed along through other modules**.
+The idea is that it allows you to be less preoccupied about what your module takes as input and what it outputs.
+You can think of this approach as creating a small, internal database that is passed along through all the modules of your application.
 
 Below, we create a "global" (in the sense that it is initiated at the top of the module hierarchy) `reactiveValues()` object in the `app_server()` function.
 It will then go through all modules, passed as a function argument.
@@ -748,43 +754,45 @@ For example:
 
 #### C. The "stratégie du grand R6" {.unnumbered}
 
-Similarly to the "stratégie du petit r", we can create an R6 object, which is passed along inside the modules.
+Similar to the "stratégie du petit r", we can create an R6 object, which is passed along inside the modules.
 
-R6 objects, created using the package of the same name, are "traditionnal" object-oriented programming implementation in R.
-And R6 object is a data structure that can hold in itself data and functions.
-Its particularity being that if **it's modified inside a function, this modified value is kept outside of the function it's called in, making it a powerful tool to manage data across the application**.
+R6 objects, created using the package of the same name, are "traditional" object-oriented programming implementations in R.
+An R6 object is a data structure that can hold in itself data and functions.
+Its particularity is that if **it's modified inside a function, this modified value is kept outside the function in which it's called, making it a powerful tool to manage data across the application**.
 
-As this R6 object is not a reactive object and is not meant to be used as such, this reduces uncontrolled reactivity of the application, thus reduces the complexity of handling chain reactions across modules.
+As this R6 object is not a reactive object and is not meant to be used as such, uncontrolled reactivity of the application is reduced, thus reduces the complexity of handling chain reactions across modules.
 Of course, you need to have another special tool in your app to trigger elements.
-All this will be explained in details in chapter \@ref(common-app-caveats) of this book, and you can find an example of this pattern inside the [`{hexmake}`](https://github.com/ColinFay/hexmake/blob/master/R/R6.R) [@R-hexmake] application.
+All this will be explained in detail in Chapter \@ref(common-app-caveats) of this book, and you can find an example of this pattern inside the [`{hexmake}`](https://github.com/ColinFay/hexmake/blob/master/R/R6.R) [@R-hexmake] application.
 
-If you eager to know more about what `{R6}` is and how it works, we advice the chapter on this subject in *Advanced R* [@hadleywickham2019], [R6](https://adv-r.hadley.nz/r6.html).
+If you are eager to know more about what `{R6}` is and how it works, we suggest the chapter on this subject in *Advanced R* [@hadleywickham2019], [R6](https://adv-r.hadley.nz/r6.html).
 
-#### D. Other approaches: about `{tidymodules}` {.unnumbered}
+#### D. Other approaches: About `{tidymodules}` {.unnumbered}
 
-`{tidymodules}` [@R-tidymodules] is a package that helps building shiny modules using an object-oriented paradigm, based on `{R6}`.
-It allows to automatically take care of namespaces, and makes sharing data across modules easier.
+`{tidymodules}` [@R-tidymodules] is a package that helps in building shiny modules using an object-oriented paradigm, based on `{R6}`.
+It allows you to automatically take care of namespaces, and makes sharing data across modules easier.
 With this approach, as modules are objects, you can also define inheritance between modules.
 
 The ["Getting Started"](https://opensource.nibr.com/tidymodules/articles/tidymodules.html) page for `{tidymodules}` offers a presentation of how you can build modules using this approach, so feel free to refer to it if you want to know more, and to dive into the article for the advanced features offered by this package.
 
 ## Structuring your app
 
-### Business logic & application logic
+### Business logic and application logic
 
 A shiny application has two main components: the application logic and the business logic.
 
 -   **Application logic is what makes your `{shiny}` app interactive**: structure, buttons, tables, interactivity, etc.
-    These components are not specific to your core business: you could use them for any other line of work or professional context.
-    This has no other use case than your interactive application: it is not meant to be used outside your app, you would not use them in a markdown report for instance.
+    These components are not specific to your core business. 
+    You could use them for any other line of work or professional context.
+    This has no other use case than your interactive application. 
+    It is not meant to be used outside your app, and you would not use them in a markdown report for instance.
 
--   **Business logic is the components with the core algorithms and functions that make your application specific to your area of work**.
+-   **Business logic includes the components with the core algorithms and functions that make your application specific to your area of work**.
     You can recognize these elements as the ones that can be run outside any interactive context.
-    This is the case for specific computation and algorithm, custom plot or `geom` for `{ggplot2}` [@R-ggplot2], specific calls to a database, etc.
+    This is the case for specific computations and algorithms, custom plots or `geom` for `{ggplot2}` [@R-ggplot2], specific calls to a database, etc.
 
 These two components do not have to live together.
 And in reality, they should not live together if you want to keep your sanity when you are building an app.
-If you keep all together in the same file, you will end up having to rerun the app from scratch and spend five minutes clicking everywhere just to be sure you have correctly set the color palette for the graph on the last `tabPanel()`.
+If you keep all components together in the same file, you will end up having to rerun the app from scratch and spend five minutes clicking everywhere just to be sure you have correctly set the color palette for the graph on the last `tabPanel()`.
 
 Trust us, we have been there, and it is not pretty.
 
@@ -860,18 +868,19 @@ shinyApp(ui, server)
 
 Both scripts do the exact same thing.
 The difference is that the second code can be easily explored without having to relaunch the app.
-You will be able to build a reproducible example to explore, illustrate and improve `top_this()`.
-This function can be tested, documented and reused outside the application.
+You will be able to build a reproducible example to explore, illustrate, and improve `top_this()`.
+This function can be tested, documented, and reused outside the application.
 Moreover, this approach lowers the cognitive load when debugging: you either debug an application issue, or a business logic issue.
 You never debug both at the same time.
 
 Even more, think about the future: how likely are the colors or the UI subject to change, compared to how likely the core algorithms are to change?
 As said in *The Art of Unix Programming*, "*Fashions in the look and feel of GUI toolkits may come and go, but raster operations and compositing are forever*" [@ericraymond2003].
 In other words, the core back-end, once consolidated, will potentially stay unchanged forever.
-On the other hand, the front-end might change: new colors, new graphic designs, new interactions, new visualization libraries... Whenever this happens, you will be happy you have separated the business logic from the application logic, as you will have to change less code.
+On the other hand, the front-end might change: new colors, new graphic designs, new interactions, new visualization libraries, etc. 
+Whenever this happens, you will be happy you have separated the business logic from the application logic, as you will have to change less code.
 
 How to do that?
-Add your application logic inside a file (typically, a module), and the business logic in another R script (typically starting with `fct_` or `utils_`).
+Add your application logic in a file (typically, a module), and the business logic in another R script (typically starting with `fct_` or `utils_`).
 You can even write the business logic inside another package, making these functions really reusable outside your application.
 
 ### Small is beautiful (bis repetita)
@@ -890,11 +899,11 @@ Here is what happens when you work on an application for production:
     Hence, you will have to get back to pieces of code you wrote a long time ago.
 
 -   You will possibly develop with other developers.
-    Maintaining a code base when several people work on the same directory is already a complex thing: from time to time you might work on the same file separately, a situation where you will have to be careful about what and how to merge things when changes are implemented.
-    It is almost impossible to work together on one same file all along the project without losing your mind: even more if this file is thousands of lines long.
+    Maintaining a codebase when several people work on the same directory is already a complex thing: from time to time you might work on the same file separately, a situation where you will have to be careful about what and how to merge things when changes are implemented.
+    It is almost impossible to work together on the same file throughout the project without losing your mind: even more if this file is thousands of lines long.
 
 -   You will implement numerous features.
-    Numerous features imply a lot of UI & server interactions.
+    Numerous features imply a lot of UI and server interactions.
     In an `app.R` file containing thousands of lines, it is very hard to match the UI element with its server counterpart.
     When the UI is on line 50 and the server on line 570, you will be scrolling a lot when working on these elements.
 
@@ -905,16 +914,17 @@ In this section you will find a suggestion for a naming convention for your app 
 Splitting files is good.
 Splitting files using a defined convention is better.
 Why?
-Because using a common convention for your files helps the other developers (and potentially you) to know exactly what is contained in a specific file, making it easier to navigate through the codebase, be it for new-comers or for developers already familiar with the software.
+Because using a common convention for your files helps the other developers (and potentially you) to know exactly what is contained in a specific file, making it easier to navigate through the codebase, be it for newcomers or for developers already familiar with the software.
 
-As developed in "Refactoring at Scale" [@lemaire2020], lacking a defined file structure when it comes to codebase leads to a slower productivity on the long run, notably when new engineers join the team: engineers with a knowledge of the file structure have learned how to navigate through the codebase, but new comers will find it hard to understand how everything is organized.
-And of course, on the long run, even developers with a knowledge of the structure can get lost, even more if getting back to a project that they have not
+As developed in _Refactoring at Scale_ [@lemaire2020], lacking a defined file structure when it comes to the codebase leads to slower productivity in the long run, notably when new engineers join the team: engineers with a knowledge of the file structure have learned how to navigate through the codebase, but new comers will find it hard to understand how everything is organized.
+And of course, in the long run, even developers with a knowledge of the structure can get lost, even more if they haven't worked on the project for months.
 
 > Because it's easier to maintain the status quo, instead of proactively beginning to organize related files [...], engineers instead learn to navigate the increasingly sprawling code.
 > New engineers introduced to the growing chaos raise a warning flag and encourage the team to begin splitting up the code, but these concerns fall to deaf ears [...].
 > Eventually, the codebase reaches a critical mass where the persistent lack of organization has dramatically slowed productivity across the engineering team.
 > Only then does the team take the time to draft a plan for grooming the codebase, at which point the number of variables to consider is far greater than had they made a concerted effort to tackle the problem months (or even years) earlier.\
-> [@lemaire2020]
+> 
+> _Refactoring at Scale_ [@lemaire2020]
 
 Using a convention allows everyone to know where to look when debugging, refactoring, or implementing new features.
 For example, if you follow `{golem}`'s convention (which is the one developed in this section), you will know immediately that a file starting with `mod_` contains a module.
@@ -928,15 +938,15 @@ We use the package convention to hold the functions of our application.
 
 The naming convention in `{golem}` is the following:
 
--   `app_*.R` (typically `app_ui.R` and `app_server.R`) contain the top level functions defining your user interface and your server function.
+-   `app_*.R` (typically `app_ui.R` and `app_server.R`) contain the top-level functions defining your user interface and your server function.
 
--   `fct_*` files contains the business logic, potentially large functions.
+-   `fct_*` files contain the business logic, which are potentially large functions.
     They are the backbone of the application and may not be specific to a given module.
     They can be added using `{golem}` with the `add_fct("name")` function.
 
 -   `mod_*` files contain a unique module.
     Many `{shiny}` apps contain a series of tabs, or at least a tab-like pattern, so we suggest that you number them according to their step in the application.
-    Tabs are almost always named in the user interface, so that you can use this tab-name as the file name.
+    Tabs are almost always named in the user interface, so that you can use this tab name as the file name.
     For example, if you build a dashboard where the first tab is called "Import", you should name your file `mod_01_import.R`.
     You can create this file with a module skeleton using `golem::add_module("01_import")`.
 
@@ -947,11 +957,11 @@ The naming convention in `{golem}` is the following:
 -   `*_ui_*`, for example `utils_ui.R`, relates to the user interface.
 
 -   `*_server_*` are files that contain anything related to the application's back-end.
-    For example `fct_connection_server.R` will contain functions that are related to the connection to a database, and which are specifically used from the server side.
+    For example, `fct_connection_server.R` will contain functions that are related to the connection to a database, and are specifically used from the server side.
 
 Note that when building a module file with `{golem}`, you can also create `fct_` and `utils_` files that will hold functions and utilities for this specific module.
 For example, `golem::add_module("01_import", fct = "readr", utils = "ui")` will create `R/mod_01_import.R`, `R/mod_01_import_fct_readr.R` and `R/mod_01_import_utils_ui.R`.
 
 Of course, as with any convention, you might occasionally feel like deviating from the general pattern.
 Your app may not have that many functions, or maybe the functions can all fit into one `utils_` file.
-But be it one or thousands of files, it is always a good practice to stick to a formalized pattern as much as possible.
+But whether you have one or thousands of files, it is always a good practice to stick to a formalized pattern as much as possible.
