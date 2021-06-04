@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>References | Engineering Production-Grade Shiny Apps</title>
+  <title>Appendix A - Use Case: Building an App from Start to Finish | Engineering Production-Grade Shiny Apps</title>
   <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="References | Engineering Production-Grade Shiny Apps" />
+  <meta property="og:title" content="Appendix A - Use Case: Building an App from Start to Finish | Engineering Production-Grade Shiny Apps" />
   <meta property="og:type" content="book" />
   
   <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="ThinkR-open/building-shiny-apps-workflow" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="References | Engineering Production-Grade Shiny Apps" />
+  <meta name="twitter:title" content="Appendix A - Use Case: Building an App from Start to Finish | Engineering Production-Grade Shiny Apps" />
   
   <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
   <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="appendix-b-session-info.html"/>
-
+<link rel="prev" href="css.html"/>
+<link rel="next" href="appendix-b-session-info.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
@@ -484,525 +484,416 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="references" class="section level1 unnumbered">
-<h1>References</h1>
+<div id="appendix-a---use-case-building-an-app-from-start-to-finish" class="section level1 unnumbered">
+<h1>Appendix A - Use Case: Building an App from Start to Finish</h1>
+<p>This chapter aims at exemplifying the workflow developed in this book using a “real-life” example.
+In this appendix, we will be building a <code>{shiny}</code> application from start to finish.
+We’ve chosen to build an application that doesn’t rely on heavy computation/data analysis, so that we can focus on the engineering process, not on the internals of the analytic methodology, nor on spending time explaining the dataset.</p>
+<div id="about-the-application" class="section level2 unnumbered">
+<h2>About the application</h2>
+<p>In this appendix, we will build a “minify” application, an application that takes a CSS, JavaScript, HTML or JSON input, and outputs a minified version of this file.
+We will rely on the <code>{minifyr}</code> package to build this application.</p>
+<p>Here is an example of what the specifications for this app could look like:</p>
+<div class="sourceCode" id="cb377"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb377-1"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-1"></a>Hello! </span>
+<span id="cb377-2"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-2"></a></span>
+<span id="cb377-3"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-3"></a>We want to build a small application that can </span>
+<span id="cb377-4"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-4"></a>minify CSS, JavaScript, HTML and JSON. </span>
+<span id="cb377-5"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-5"></a></span>
+<span id="cb377-6"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-6"></a>In this app, user will be able either to paste </span>
+<span id="cb377-7"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-7"></a>the content or to upload a file. </span>
+<span id="cb377-8"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-8"></a></span>
+<span id="cb377-9"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-9"></a>Once the content is pasted/upladed, they select </span>
+<span id="cb377-10"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-10"></a>the type, which is pre-selected based on the </span>
+<span id="cb377-11"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-11"></a>file extension. Then they click on a button, </span>
+<span id="cb377-12"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-12"></a>and the content is minified. </span>
+<span id="cb377-13"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-13"></a></span>
+<span id="cb377-14"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-14"></a>They can then copy the output, or download it as a file. </span>
+<span id="cb377-15"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-15"></a></span>
+<span id="cb377-16"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb377-16"></a>Cheers!</span></code></pre></div>
+</div>
+<div id="step-1-design-1" class="section level2 unnumbered">
+<h2>Step 1: Design</h2>
+<div id="deciphering-the-specifications" class="section level3 unnumbered">
+<h3>Deciphering the specifications</h3>
+<div id="general-observations" class="section level4 unnumbered">
+<h4>General observations</h4>
+<ul>
+<li><p>As this app is pretty straightforward, it would be better to handle everything in the same page, <em>i.e</em> everything should happen on the same page (no tab).</p></li>
+<li><p>It would be a plus to have the “before minification”/“after minification” gain, so that the users have a better idea of the purpose of the application.</p></li>
+</ul>
+</div>
+<div id="user-experience-considerations" class="section level4 unnumbered">
+<h4>User experience considerations</h4>
+<ul>
+<li><p>We should provide a link to an explanation of minification.</p></li>
+<li><p>The user might get different results based on the minifying algorithm they use, which can be surprising at first.
+The application should alert about this.</p></li>
+<li><p>For long printed outputs, if we use <code>verbatimTextOuput</code>, we should be careful about the page width, as these elements will natively overflow on the x-axis of the page.
+This should be doable with the following CSS: <code>pre{ white-space: pre-wrap; word-break: keep-all; }</code>.</p></li>
+<li><p>We should be careful about using semantic HTML for the inputs and outputs.</p></li>
+</ul>
+</div>
+<div id="technical-points" class="section level4 unnumbered">
+<h4>Technical points</h4>
+<ul>
+<li><p>As <code>{minifyr}</code> wraps a NodeJS module, we will need to install NodeJS when deploying.</p></li>
+<li><p>To be sure that the process works, we should check the validity of the file extension from the UI and from the server side.</p></li>
+</ul>
+</div>
+</div>
+<div id="building-a-concept-map" class="section level3 unnumbered">
+<h3>Building a concept map</h3>
+<p>Figure <a href="#fig:19-appendix-1"><strong>??</strong></a> is the concept map for this application, using Xmind.</p>
+
+</div>
+<div id="asking-questions" class="section level3 unnumbered">
+<h3>Asking questions</h3>
+<div id="about-the-end-users-1" class="section level4 unnumbered">
+<h4>About the end users</h4>
+<ul>
+<li><em>Who are the end users of your app?</em></li>
+</ul>
+<p>This application is mainly useful for web developers.</p>
+<ul>
+<li><em>Are they tech-literate?</em></li>
+</ul>
+<p>Yes.</p>
+<ul>
+<li><em>In which context will they be using your app?</em></li>
+</ul>
+<p>Notably at work, or while building pet projects.</p>
+<ul>
+<li><em>On what machines?</em></li>
+</ul>
+<p>Laptop/personal computer.
+Small chance of using this on a smartphone.</p>
+<ul>
+<li><em>What browser version will they be using?</em></li>
+</ul>
+<p>Hard to say, but given that we aim for a public of community developers, probably modern browsers.</p>
+<ul>
+<li><em>Will they be using the app in their office, on their phone while driving a tractor, in a plant, or while wearing lab coats?</em></li>
+</ul>
+<p>Nothing of the like: they should be using this application while developing, so chances are they are using it at a desk.</p>
+</div>
+</div>
+<div id="building-personas-1" class="section level3 unnumbered">
+<h3>Building personas</h3>
+<p>Let’s pick two random names for our personas, and two fake companies where they might be working.</p>
+<div class="sourceCode" id="cb378"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb378-1"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb378-1"></a>nms &lt;-<span class="st"> </span>withr<span class="op">::</span><span class="kw">with_seed</span>(</span>
+<span id="cb378-2"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb378-2"></a>  <span class="dv">608</span>, {</span>
+<span id="cb378-3"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb378-3"></a>    charlatan<span class="op">::</span><span class="kw">ch_name</span>(<span class="dv">2</span>)</span>
+<span id="cb378-4"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb378-4"></a>    </span>
+<span id="cb378-5"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb378-5"></a>  }</span>
+<span id="cb378-6"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb378-6"></a>)</span>
+<span id="cb378-7"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb378-7"></a>nms</span></code></pre></div>
+<pre><code>[1] &quot;Delina Stanton&quot; &quot;Theo Torphy&quot;   </code></pre>
+<div class="sourceCode" id="cb380"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb380-1"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb380-1"></a>company &lt;-<span class="st"> </span>withr<span class="op">::</span><span class="kw">with_seed</span>(</span>
+<span id="cb380-2"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb380-2"></a>  <span class="dv">608</span>, {</span>
+<span id="cb380-3"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb380-3"></a>    charlatan<span class="op">::</span><span class="kw">ch_company</span>(<span class="dv">2</span>)</span>
+<span id="cb380-4"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb380-4"></a>  }</span>
+<span id="cb380-5"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb380-5"></a>)</span>
+<span id="cb380-6"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb380-6"></a>company</span></code></pre></div>
+<pre><code>[1] &quot;Witting-Witting&quot; &quot;Stehr-Stehr&quot;    </code></pre>
+<div id="delina-stanton-shiny-developer-at-witting-witting" class="section level4 unnumbered">
+<h4>Delina Stanton: <code>{shiny}</code> developer at Witting-Witting</h4>
+<p>Delina Stanton is a <code>{shiny}</code> developer at Witting-Witting.
+She’s been learning R in graduate school while working on her master’s degree in statistics.
+When she started at Witting-Witting, she was mainly doing data analysis in Rmd, but has gradually switched to building <code>{shiny}</code> applications full-time.
+She discovered minification while reading the “Engineering Production-Grade Shiny App” book, and now wants to add this to her <code>{shiny}</code> application.</p>
+</div>
+<div id="theo-torphy-web-developer-and-trainer-at-stehr-stehr" class="section level4 unnumbered">
+<h4>Theo Torphy: web developer and trainer at Stehr-Stehr</h4>
+<p>Theo Torphy is a web developer at Stehr-Stehr.
+He studied web development at the university, where he learned about minification.
+He is now also in charge of training new recruits for the company where he works, and also gives some lectures at the university he attended.
+Most of the minification he does is automated, but he is looking for a tool he can use during training and classes to explain how minification works.</p>
+<p>This step is available at <a href="https://github.com/ColinFay/minifying/tree/master/step-1-design" class="uri">https://github.com/ColinFay/minifying/tree/master/step-1-design</a>.</p>
+</div>
+</div>
+</div>
+<div id="step-2-prototyping" class="section level2 unnumbered">
+<h2>Step 2: Prototyping</h2>
+<p>In this step, we will be building the back-end of the application on one side, and the UI on the other side.
+Once we have the back-end settled and the UI defined, we will be working on making the two work with each other.</p>
+<div id="back-end-in-rmd" class="section level3 unnumbered">
+<h3>Back-end in Rmd</h3>
+<p>Our back-end will be composed of two functions:</p>
+<ul>
+<li><code>guess_minifier</code>, which will take a function and return the available algorithms for that file: for example, if you have a JavaScript file, you’ll be able to use the <code>minifyr_js_babel()</code>, <code>minifyr_js_gcc()</code>, <code>minifyr_js_terser()</code>, <code>minifyr_js_uglify()</code>, and <code>minifyr_js_yui()</code> functions. If the type is not guessed based on the extension, the function should fail gracefully, and not make <code>{shiny}</code> crash. We’ll chose to return an empty string if this extension is not guessed.</li>
+</ul>
+<div class="sourceCode" id="cb382"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb382-1"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-1"></a><span class="kw">library</span>(minifyr)</span>
+<span id="cb382-2"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-2"></a>guess_minifier &lt;-<span class="st"> </span><span class="cf">function</span>(file){</span>
+<span id="cb382-3"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-3"></a>  <span class="co"># We&#39;ll start by getting the file extension</span></span>
+<span id="cb382-4"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-4"></a>  ext &lt;-<span class="st"> </span>tools<span class="op">::</span><span class="kw">file_ext</span>(file)</span>
+<span id="cb382-5"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-5"></a>  <span class="co"># Check that the extension is correct, if not, return early</span></span>
+<span id="cb382-6"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-6"></a>  <span class="co"># It&#39;s important to do this kind of check also </span></span>
+<span id="cb382-7"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-7"></a>  <span class="co"># on the server side as HTML manual tempering </span></span>
+<span id="cb382-8"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-8"></a>  <span class="co"># would allow to also send other type of files</span></span>
+<span id="cb382-9"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-9"></a>  <span class="cf">if</span> (</span>
+<span id="cb382-10"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-10"></a>    <span class="op">!</span><span class="st"> </span>ext <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;js&quot;</span>, <span class="st">&quot;css&quot;</span>, <span class="st">&quot;html&quot;</span>, <span class="st">&quot;json&quot;</span>)</span>
+<span id="cb382-11"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-11"></a>  ){</span>
+<span id="cb382-12"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-12"></a>    <span class="co"># Return early</span></span>
+<span id="cb382-13"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-13"></a>    <span class="kw">return</span>(<span class="kw">list</span>())</span>
+<span id="cb382-14"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-14"></a>  }</span>
+<span id="cb382-15"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-15"></a>  <span class="co"># We&#39;ll then retrieve the available </span></span>
+<span id="cb382-16"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-16"></a>  <span class="co"># pattern based on the extension</span></span>
+<span id="cb382-17"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-17"></a>  patt &lt;-<span class="st"> </span><span class="cf">switch</span>(</span>
+<span id="cb382-18"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-18"></a>    ext, </span>
+<span id="cb382-19"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-19"></a>    <span class="dt">js =</span> <span class="st">&quot;minifyr_js_.+&quot;</span>,</span>
+<span id="cb382-20"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-20"></a>    <span class="dt">html =</span> <span class="st">&quot;minifyr_html_.+&quot;</span>,</span>
+<span id="cb382-21"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-21"></a>    <span class="dt">css =</span> <span class="st">&quot;minifyr_css_.+&quot;</span>,</span>
+<span id="cb382-22"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-22"></a>    <span class="dt">json =</span> <span class="st">&quot;minifyr_json_.+&quot;</span></span>
+<span id="cb382-23"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-23"></a>  )</span>
+<span id="cb382-24"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-24"></a>  <span class="co"># List all the available functions to minify the file</span></span>
+<span id="cb382-25"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-25"></a>  <span class="kw">list</span>(</span>
+<span id="cb382-26"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-26"></a>    <span class="dt">file =</span> file,</span>
+<span id="cb382-27"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-27"></a>    <span class="dt">ext =</span> ext,</span>
+<span id="cb382-28"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-28"></a>    <span class="co"># We return this pattern so that </span></span>
+<span id="cb382-29"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-29"></a>    <span class="co"># it will be used to update the selectInput that </span></span>
+<span id="cb382-30"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-30"></a>    <span class="co"># is used to select an algo</span></span>
+<span id="cb382-31"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-31"></a>    <span class="dt">pattern =</span> patt, </span>
+<span id="cb382-32"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-32"></a>    <span class="dt">functions =</span> <span class="kw">grep</span>(</span>
+<span id="cb382-33"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-33"></a>      patt, </span>
+<span id="cb382-34"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-34"></a>      <span class="kw">names</span>(</span>
+<span id="cb382-35"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-35"></a>        <span class="kw">loadNamespace</span>(<span class="st">&quot;minifyr&quot;</span>)</span>
+<span id="cb382-36"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-36"></a>      ), </span>
+<span id="cb382-37"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-37"></a>      <span class="dt">value =</span> <span class="ot">TRUE</span></span>
+<span id="cb382-38"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-38"></a>    )</span>
+<span id="cb382-39"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-39"></a>  )</span>
+<span id="cb382-40"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-40"></a>  </span>
+<span id="cb382-41"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-41"></a>}</span>
+<span id="cb382-42"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-42"></a></span>
+<span id="cb382-43"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-43"></a><span class="co"># minifyr comes with a series of examples, </span></span>
+<span id="cb382-44"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-44"></a><span class="co"># so we can use them as tests</span></span>
+<span id="cb382-45"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-45"></a><span class="kw">guess_minifier</span>(</span>
+<span id="cb382-46"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-46"></a>  <span class="kw">minifyr_example</span>(<span class="st">&quot;css&quot;</span>)</span>
+<span id="cb382-47"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-47"></a>)[<span class="dv">2</span><span class="op">:</span><span class="dv">4</span>]</span>
+<span id="cb382-48"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-48"></a><span class="kw">guess_minifier</span>(</span>
+<span id="cb382-49"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-49"></a>  <span class="kw">minifyr_example</span>(<span class="st">&quot;js&quot;</span>)</span>
+<span id="cb382-50"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-50"></a>)[<span class="dv">2</span><span class="op">:</span><span class="dv">4</span>]</span>
+<span id="cb382-51"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-51"></a><span class="kw">guess_minifier</span>(</span>
+<span id="cb382-52"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-52"></a>  <span class="kw">minifyr_example</span>(<span class="st">&quot;html&quot;</span>)</span>
+<span id="cb382-53"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-53"></a>)[<span class="dv">2</span><span class="op">:</span><span class="dv">4</span>]</span>
+<span id="cb382-54"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-54"></a><span class="kw">guess_minifier</span>(</span>
+<span id="cb382-55"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-55"></a>  <span class="kw">minifyr_example</span>(<span class="st">&quot;json&quot;</span>)</span>
+<span id="cb382-56"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-56"></a>)[<span class="dv">2</span><span class="op">:</span><span class="dv">4</span>]</span>
+<span id="cb382-57"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-57"></a><span class="co"># Try with a non valid extension</span></span>
+<span id="cb382-58"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-58"></a><span class="kw">guess_minifier</span>(</span>
+<span id="cb382-59"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-59"></a>  <span class="st">&quot;path/to/text.docx&quot;</span></span>
+<span id="cb382-60"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb382-60"></a>)</span></code></pre></div>
+<ul>
+<li>A <code>compress()</code> function, which takes three parameters: the file as <code>input</code>, the <code>algo</code> outputted from our last function, and the selection, which is the one selected by the user. The compressed file will be outputted to a tempfile.</li>
+</ul>
+<div class="sourceCode" id="cb383"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb383-1"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-1"></a>compress &lt;-<span class="st"> </span><span class="cf">function</span>(algo, selection){</span>
+<span id="cb383-2"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-2"></a>  <span class="co"># Creating a tempfile using our algo object</span></span>
+<span id="cb383-3"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-3"></a>  tps &lt;-<span class="st"> </span><span class="kw">tempfile</span>(<span class="dt">fileext =</span> <span class="kw">sprintf</span>(<span class="st">&quot;.%s&quot;</span>, algo<span class="op">$</span>ext))</span>
+<span id="cb383-4"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-4"></a>  <span class="co"># Getting the function with the selection</span></span>
+<span id="cb383-5"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-5"></a>  converter &lt;-<span class="st"> </span><span class="kw">get</span>(</span>
+<span id="cb383-6"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-6"></a>    <span class="kw">grep</span>(selection, algo<span class="op">$</span>functions, <span class="dt">value =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb383-7"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-7"></a>  )</span>
+<span id="cb383-8"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-8"></a>  <span class="co"># Do the conversion</span></span>
+<span id="cb383-9"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-9"></a>  <span class="kw">converter</span>(algo<span class="op">$</span>file, tps)</span>
+<span id="cb383-10"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-10"></a>  <span class="co"># Return the temp file</span></span>
+<span id="cb383-11"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-11"></a>  <span class="kw">return</span>(tps)</span>
+<span id="cb383-12"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-12"></a>}</span>
+<span id="cb383-13"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-13"></a></span>
+<span id="cb383-14"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-14"></a>algo &lt;-<span class="st"> </span><span class="kw">guess_minifier</span>(</span>
+<span id="cb383-15"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-15"></a>  <span class="kw">minifyr_example</span>(<span class="st">&quot;js&quot;</span>)</span>
+<span id="cb383-16"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-16"></a>)</span>
+<span id="cb383-17"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-17"></a></span>
+<span id="cb383-18"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-18"></a><span class="kw">compress</span>(</span>
+<span id="cb383-19"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-19"></a>  <span class="dt">algo =</span> algo, </span>
+<span id="cb383-20"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-20"></a>  <span class="dt">selection =</span> <span class="st">&quot;babel&quot;</span></span>
+<span id="cb383-21"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb383-21"></a>) </span></code></pre></div>
+<ul>
+<li>Finally, a <code>compare()</code> function, that can compare the size of two files, so that we can measure the minification gain. This function will take two file paths.</li>
+</ul>
+<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb384-1"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb384-1"></a>compare &lt;-<span class="st"> </span><span class="cf">function</span>(original, minified){</span>
+<span id="cb384-2"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb384-2"></a>  <span class="co"># Get the file size of both</span></span>
+<span id="cb384-3"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb384-3"></a>  original &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">file_info</span>(original)<span class="op">$</span>size</span>
+<span id="cb384-4"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb384-4"></a>  minified &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">file_info</span>(minified)<span class="op">$</span>size</span>
+<span id="cb384-5"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb384-5"></a>  <span class="kw">return</span>(original <span class="op">-</span><span class="st"> </span>minified)</span>
+<span id="cb384-6"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb384-6"></a>}</span></code></pre></div>
+<p>So, for the complete process:</p>
+<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb385-1"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb385-1"></a>algo &lt;-<span class="st"> </span><span class="kw">guess_minifier</span>(</span>
+<span id="cb385-2"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb385-2"></a>  <span class="kw">minifyr_example</span>(<span class="st">&quot;js&quot;</span>)</span>
+<span id="cb385-3"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb385-3"></a>)</span>
+<span id="cb385-4"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb385-4"></a></span>
+<span id="cb385-5"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb385-5"></a>compressed &lt;-<span class="st"> </span><span class="kw">compress</span>(</span>
+<span id="cb385-6"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb385-6"></a>  <span class="dt">algo =</span> algo, </span>
+<span id="cb385-7"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb385-7"></a>  <span class="dt">selection =</span> <span class="st">&quot;babel&quot;</span></span>
+<span id="cb385-8"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb385-8"></a>)</span>
+<span id="cb385-9"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb385-9"></a><span class="kw">compare</span>(</span>
+<span id="cb385-10"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb385-10"></a>  <span class="kw">minifyr_example</span>(<span class="st">&quot;js&quot;</span>), </span>
+<span id="cb385-11"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb385-11"></a>  compressed</span>
+<span id="cb385-12"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb385-12"></a>)</span></code></pre></div>
+<p>Now, time to move this into a vignette!</p>
+</div>
+<div id="ui-prototyping" class="section level3 unnumbered">
+<h3>UI prototyping</h3>
+<p>Let’s start by drawing a small mockup of our front-end using <a href="https://excalidraw.com/">Excalidraw</a>, as seen in Figure <a href="#fig:19-appendix-8"><strong>??</strong></a>.</p>
+
+<p>We would love this application to be “full screen”, and to do that, we’ll take inspiration from the <a href="https://www.w3schools.com/howto/howto_css_split_screen.asp">split-screen layout</a> available at W3Schools.
+To mock up the UI, we will also use the <code>{shinipsum}</code> package.</p>
+<p>In this first step, we will start generating the module skeleton for the application.
+Here, we will have a <code>left</code> module for the left part of the app, and a <code>right</code> module for the right part.
+Each will receive their corresponding <code>class</code>, based on the CSS from W3.
+Now that these two spots are available, we’ll add the two modules, with some fake output, to simulate our application behavior.
+The left side will be functional in the sense that uploading a file will randomly add algorithms to the <code>selectInput()</code>, and clicking on <code>Launch the minification</code> will regenerate a fake text.</p>
+<p>Now, let’s pick a soft palette of colors, using <a href="https://coolors.co/palettes/">coolors.co</a>, and a font family from <a href="https://fonts.google.com/">fonts.google.com</a>.
+We went for:</p>
+<ul>
+<li>One of the monochrome palettes from <a href="https://coolors.co/fbfbf2-e5e6e4-cfd2cd-a6a2a2-847577">coolors.co</a>.</li>
+<li>The <code>Sora</code> font <a href="https://fonts.google.com/specimen/Sora">fonts.google.com/specimen/Sora</a>. There is not that much text displayed on the screen, so this font should work well.</li>
+</ul>
+<p>We then used CSS to arrange our page: size, padding, alignment, colors, etc.
+If you want to know more about this file, it’s located in the <code>inst/app/www</code> folder of the package.</p>
+<p>This step is available at <a href="https://github.com/ColinFay/minifying/tree/master/step-2-prototype">github.com/ColinFay/minifying, folder step-2-prototype</a>.</p>
+</div>
+</div>
+<div id="step-3-build-1" class="section level2 unnumbered">
+<h2>Step 3: Build</h2>
+<p>Now we’ve got the back-end in an Rmd, the front end working with <code>{shinipsum}</code>.
+Now is the time to make the two work together!</p>
+<p>Here is the logic we will be adding to the application:</p>
+<ul>
+<li><p>When a file is uploaded, we also check the format from the server-side: the UI restriction with the <code>accept</code> parameter of <code>fileInput()</code> will not be enough to stop users who <strong>really</strong> want to upload something else.</p></li>
+<li><p>If the file comes with the right extension, we update the algorithm selection and read it inside the “Original content” block.</p></li>
+<li><p>Once the user clicks on “Launch the minification”, we create a temp file and minify the original file inside this temp file.</p></li>
+<li><p>When the file is minified, we update the gain output to reflect how many bytes have been gained from the minification, and add the result of this minification to the “Minified content” block.</p></li>
+<li><p>Finally, when the “Download the output” button is clicked, the minified file is downloaded.</p></li>
+</ul>
+<p>During this process, we will migrate the functions from the Rmd to files inside the <code>R/</code> folder, use external dependencies, and document our business logic functions.
+You can refer to the <code>dev/02_dev.R</code> file if you want to read the exact steps taken here.</p>
+<p>This step is available at <a href="https://github.com/ColinFay/minifying/tree/master/step-3-build" class="uri">https://github.com/ColinFay/minifying/tree/master/step-3-build</a>.</p>
+</div>
+<div id="step-4-strengthen-1" class="section level2 unnumbered">
+<h2>Step 4: Strengthen</h2>
+<p>As of now, we have a working application.
+Time to strengthen it!</p>
+<p>Here are the few steps we will be working on:</p>
+<ul>
+<li><p>Turning our business logic into an R6 class.
+This R6 class will generate an object at the very start of our app, and it will be passed into the modules.</p></li>
+<li><p>As the minification process takes a couple of seconds, we will add a small progress bar so that the user knows something is happening.</p></li>
+<li><p>As we will use R6, we will need to manually set the reactive context invalidation.
+To do so, we will use <code>triggers</code> from <code>{gargoyle}</code>.</p></li>
+<li><p>Chances are, users will be testing several algorithms when using the application, and we don’t want the minification process to happen another time when it is called on the same file and with the same algorithm.
+This is even even more important because the process involves calling an external NodeJS process.
+To prevent that, we will be caching the function that does the computation.</p></li>
+<li><p>Create an unseen input that will upload data, so that we can build an interactivity test using <code>{crrry}</code>.
+This input will look like the following on the server:</p></li>
+</ul>
+<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb386-1"></a><span class="kw">observeEvent</span>( input<span class="op">$</span>testingtrigger , {</span>
+<span id="cb386-2"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb386-2"></a>  </span>
+<span id="cb386-3"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb386-3"></a>  <span class="cf">if</span> (golem<span class="op">::</span><span class="kw">app_dev</span>()){</span>
+<span id="cb386-4"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb386-4"></a>    file<span class="op">$</span>original_file &lt;-<span class="st"> </span>minifyr<span class="op">::</span><span class="kw">minifyr_example</span>(</span>
+<span id="cb386-5"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb386-5"></a>      <span class="dt">ext =</span> input<span class="op">$</span>testingtext</span>
+<span id="cb386-6"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb386-6"></a>    )</span>
+<span id="cb386-7"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb386-7"></a>    file<span class="op">$</span><span class="kw">guess_minifier</span>()</span>
+<span id="cb386-8"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb386-8"></a>    file<span class="op">$</span>type &lt;-<span class="st"> </span>input<span class="op">$</span>upload<span class="op">$</span>type</span>
+<span id="cb386-9"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb386-9"></a>    file<span class="op">$</span>minified_file &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb386-10"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb386-10"></a>    file<span class="op">$</span>original_name &lt;-<span class="st"> </span>input<span class="op">$</span>upload<span class="op">$</span>name</span>
+<span id="cb386-11"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb386-11"></a>    gargoyle<span class="op">::</span><span class="kw">trigger</span>(<span class="st">&quot;uploaded&quot;</span>)</span>
+<span id="cb386-12"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb386-12"></a>  }</span>
+<span id="cb386-13"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb386-13"></a>  </span>
+<span id="cb386-14"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb386-14"></a>})</span></code></pre></div>
+<p>We use this pattern so that we can combine it with a testing suite with <code>{crrry}</code>, using the following pattern:</p>
+<div class="sourceCode" id="cb387"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb387-1"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-1"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryProc<span class="op">$</span><span class="kw">new</span>(</span>
+<span id="cb387-2"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-2"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
+<span id="cb387-3"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-3"></a>  <span class="co"># Process to launch locally</span></span>
+<span id="cb387-4"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-4"></a>  <span class="dt">fun =</span> <span class="st">&quot;golem::document_and_reload();run_app()&quot;</span>,</span>
+<span id="cb387-5"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-5"></a>  <span class="co"># Note that you will need httpuv &gt;= 1.5.2 for randomPort</span></span>
+<span id="cb387-6"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-6"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(), </span>
+<span id="cb387-7"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-7"></a>  <span class="dt">headless =</span> <span class="ot">FALSE</span></span>
+<span id="cb387-8"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-8"></a>)</span>
+<span id="cb387-9"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-9"></a></span>
+<span id="cb387-10"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-10"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span>
+<span id="cb387-11"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-11"></a>ext &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;css&quot;</span>, <span class="st">&quot;js&quot;</span>, <span class="st">&quot;json&quot;</span>, <span class="st">&quot;html&quot;</span>)</span>
+<span id="cb387-12"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-12"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(ext)){</span>
+<span id="cb387-13"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-13"></a>  <span class="co"># Set the extension value</span></span>
+<span id="cb387-14"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-14"></a>  test<span class="op">$</span><span class="kw">shiny_set_input</span>(<span class="st">&quot;left_ui_1-testingtext&quot;</span>, ext[i])</span>
+<span id="cb387-15"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-15"></a>  <span class="co"># Trigger the file to be read</span></span>
+<span id="cb387-16"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-16"></a>  test<span class="op">$</span><span class="kw">shiny_set_input</span>(<span class="st">&quot;left_ui_1-testingtrigger&quot;</span>, i)</span>
+<span id="cb387-17"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-17"></a>  <span class="co"># Launch the minification</span></span>
+<span id="cb387-18"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-18"></a>  test<span class="op">$</span><span class="kw">shiny_set_input</span>(<span class="st">&quot;left_ui_1-launch&quot;</span>, i)</span>
+<span id="cb387-19"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-19"></a>}</span>
+<span id="cb387-20"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-20"></a></span>
+<span id="cb387-21"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb387-21"></a>test<span class="op">$</span><span class="kw">stop</span>()</span></code></pre></div>
+<p>It’s safer to wrap these tests between <code>if(interactive())</code>, as running the checks outside of your current session might not launch the app correctly, and launching external processes (the one running the app with Chrome) might fail when run non-interactively.
+And on top of that, running these inside your CI might cause some pain, and of course, it will not work on CRAN checks.</p>
+<p>We’ll also be building “standard” function checks, which you can find in the <code>test/</code> folder.</p>
+<p>This step is available at <a href="https://github.com/ColinFay/minifying/tree/master/step-4-strengthen">github.com/ColinFay/minifying, folder step-4-strengthen</a>.</p>
+</div>
+<div id="step-5-deploy-1" class="section level2 unnumbered">
+<h2>Step 5: Deploy</h2>
+<p>As an example, we will deploy this app in three media: as a package, on RStudio Connect, and with Docker.</p>
+<div id="before-deployment-checklist-1" class="section level3 unnumbered">
+<h3>Before deployment checklist</h3>
+<ul>
+<li><p><input type="checkbox" disabled="" checked="" />
+<em><code>devtools::check()</code>, run from the command line, return 0 errors, 0 warnings, 0 notes</em></p></li>
+<li><p><input type="checkbox" disabled="" checked="" />
+<em>The current version number is valid, i.e</em> if the current app is an update, the version number has been bumped: it makes sense, before the first deployment, to keep a version number of <code>0.0.0.9000</code>, and increment this dev version whenever we implement changes or do test deployments.
+Because this is a “true” deployment, we bumped the version to <code>0.1.0</code>.</p></li>
+<li><p><input type="checkbox" disabled="" checked="" />
+<em>Everything is fully documented</em>: we have documented all the functions, even the internal, there is a Vignette that describes the business logic, and the README is filled.</p></li>
+<li><p><input type="checkbox" disabled="" checked="" />
+<em>Test coverage is good, i.e. you cover a sufficient amount of the codebase, and these tests cover the core/strategic algorithms</em>.</p></li>
+<li><p><input type="checkbox" disabled="" checked="" />
+<em>The person to call if something goes wrong is clear to everyone involved in the product.</em>.</p></li>
+<li><p><input type="checkbox" disabled="" checked="" />
+<em>The debugging process is clear to everyone involved in the project, including how to communicate bugs to the developer team, and how long it will take to get changes implemented</em>: this project will be made open source, so the bug will have to be listed on the Github repo.
+To help that, we added a link to the GitHub repository on the application.</p></li>
+<li><p><input type="checkbox" disabled="" checked="" />
+<em>(If relevant) The server it is deployed on has all the necessary software installed (Docker, Connect, <code>Shiny Server</code>, etc.) to make the application run</em>.</p></li>
+<li><p><input type="checkbox" disabled="" checked="" />
+<em>The server has all the system requirements needed (the system libraries), and if not, they are installed with the application (if it’s dockerized)</em>: NodeJS will need to be installed on Docker and on the server running RStudio Connect.
+A check is also added on top of <code>run_app()</code> for the availability of NodeJS on the system, especially for people installing it as a package.
+This check will also check if <code>node-minify</code> has been installed, and if not, it will be installed.
+This check might take some time to run, but it will only be performed the first time the app is launched.</p></li>
+<li><p><input type="checkbox" disabled="" checked="" />
+<em>The application, if deployed on a server, will be deployed on a port which will be accessible by the users</em>: when building the Dockerfile using <code>{golem}</code>, the correct port is exposed (<em>i.e</em> the app will run on port 80, which is also made available).
+For the other medium, the port will be automatically chosen, either by <code>{shiny}</code> or by Connect.</p></li>
+<li><p><input type="checkbox" disabled="" checked="" />
+<em>(If relevant) The environment variables from the production server are managed inside the application</em>: not relevant.</p></li>
+<li><p><input type="checkbox" disabled="" checked="" />
+<em>(If relevant) The app is launched on the correct port, or at least this port can be configured via an environment variable</em>: not relevant.</p></li>
+<li><p><input type="checkbox" disabled="" checked="" />
+<em>(If relevant) The server where the app is deployed has access to the data sources (database, API…)</em>: not relevant.</p></li>
+<li><p><input type="checkbox" disabled="" checked="" />
+<em>If the app records data and there are backups for these data</em>: not relevant</p></li>
+</ul>
+</div>
+<div id="deploy-as-a-tar.gz" class="section level3 unnumbered">
+<h3>Deploy as a tar.gz</h3>
+<p>To share an application as a tar.gz, you can call <code>devtools::build()</code>, which will compile a <code>tar.gz</code> file inside the parent folder of your current application.
+You can then share this archive, and install it with <code>remotes::install_local("path/to/tar.gz")</code>.
+Note that this can also be done with base R, but <code>{remotes}</code> offers a smarter way when it comes to managing the dependencies of your archived package.</p>
+<p>This <code>tar.gz</code> can also be sent to a package repository; be it the CRAN or any other package manager you might have in your company.</p>
+</div>
+<div id="deploy-on-rstudio-connect" class="section level3 unnumbered">
+<h3>Deploy on RStudio Connect</h3>
+<p>Once we are sure that the server running Connect has NodeJS installed, and that we have installed the minify module with <code>minifyr::minifyr_npm_install()</code>, we can create the app.R using <code>golem::add_rstudioconnect_file()</code>, and then push to the Connect server.</p>
+</div>
+<div id="deploy-with-docker" class="section level3 unnumbered">
+<h3>Deploy with Docker</h3>
+<p>To create the <code>Dockerfile</code>, we’ll start by launching <code>golem::add_dockerfile()</code>.
+This function will compute the system requirements,<a href="#fn73" class="footnote-ref" id="fnref73"><sup>73</sup></a> and create a generic <code>Dockerfile</code> for your application.
+Once this is done, we will create/update the <code>.dockerignore</code> file at the root of the package, so that unwanted files are not bundled with our Docker image.</p>
+<p>Inside our <code>Dockerfile</code>, we will also change the default repo to use <a href="https://packagemanager.rstudio.com/all/latest" class="uri">https://packagemanager.rstudio.com/all/latest</a>, which proposes precompiled packages for our system, making the installation faster.
+We will also add an installation of NodeJS, which is needed by our application..</p>
+<p>Then, we can go to our terminal and compile the image!</p>
+<div class="sourceCode" id="cb388"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb388-1"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb388-1"></a><span class="ex">docker</span> build -t minifying . </span></code></pre></div>
+<p>Now we’ve got a working image!
+We can try it with:</p>
+<div class="sourceCode" id="cb389"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb389-1"><a href="appendix-a-use-case-building-an-app-from-start-to-finish.html#cb389-1"></a><span class="ex">docker</span> run -p 2811:80 minifying</span></code></pre></div>
+<p>This step is available at <a href="https://github.com/ColinFay/minifying/tree/master/step-5-deploy">github.com/ColinFay/minifying, folder step-5-deploy</a>.</p>
 
-<div id="refs" class="references">
-<div>
-<p>Allaire, JJ. 2018. <em>Config: Manage Environment Specific Configuration Values</em>. <a href="https://github.com/rstudio/config">https://github.com/rstudio/config</a>.</p>
 </div>
-<div>
-<p>———. 2019. <em>Rsconnect: Deployment Interface for R Markdown Documents and Shiny Applications</em>. <a href="https://github.com/rstudio/rsconnect">https://github.com/rstudio/rsconnect</a>.</p>
 </div>
-<div>
-<p>Allaire, JJ, Yihui Xie, Jonathan McPherson, Javier Luraschi, Kevin Ushey, Aron Atkins, Hadley Wickham, Joe Cheng, Winston Chang, and Richard Iannone. 2020. <em>Rmarkdown: Dynamic Documents for R</em>. <a href="https://github.com/rstudio/rmarkdown">https://github.com/rstudio/rmarkdown</a>.</p>
 </div>
-<div>
-<p>Attali, Dean. 2020. <em>Shinyjs: Easily Improve the User Experience of Your Shiny Apps in Seconds</em>. <a href="https://deanattali.com/shinyjs">https://deanattali.com/shinyjs</a>.</p>
-</div>
-<div>
-<p>Attali, Dean, and Tristan Edwards. 2020. <em>Shinyalert: Easily Create Pretty Popup Messages (Modals) in Shiny</em>. <a href="https://github.com/daattali/shinyalert%0Ahttps://daattali.com/shiny/shinyalert-demo/">https://github.com/daattali/shinyalert
-https://daattali.com/shiny/shinyalert-demo/</a>.</p>
-</div>
-<div>
-<p>Bache, Stefan Milton, and Hadley Wickham. 2014. <em>Magrittr: A Forward-Pipe Operator for R</em>.</p>
-</div>
-<div>
-<p>Bengtsson, Henrik. 2018. <em>Profmem: Simple Memory Profiling for R</em>. <a href="https://github.com/HenrikBengtsson/profmem">https://github.com/HenrikBengtsson/profmem</a>.</p>
-</div>
-<div>
-<p>———. 2019. <em>R.cache: Fast and Light-Weight Caching (Memoization) of Objects and Results to Speed up Computations</em>. <a href="https://github.com/HenrikBengtsson/R.cache">https://github.com/HenrikBengtsson/R.cache</a>.</p>
-</div>
-<div>
-<p>———. 2020. <em>Future: Unified Parallel and Distributed Processing in R for Everyone</em>. <a href="https://github.com/HenrikBengtsson/future">https://github.com/HenrikBengtsson/future</a>.</p>
-</div>
-<div>
-<p>Billestrup, Jane, Jan Stage, Anders Bruun, Lene Nielsen, and Kira S. Nielsen. 2014. “Creating and Using Personas in Software Development: Experiences from Practice.” In <em>Human-Centered Software Engineering</em>, 251–58. Springer Berlin Heidelberg. <a href="https://doi.org/10.1007/978-3-662-44811-3_16">https://doi.org/10.1007/978-3-662-44811-3_16</a>.</p>
-</div>
-<div>
-<p>Boettiger, Carl, and Dirk Eddelbuettel. 2017. “An Introduction to Rocker: Docker Containers for R.” <em>The R Journal</em> 9 (2): 527–36. <a href="https://doi.org/10.32614/RJ-2017-065">https://doi.org/10.32614/RJ-2017-065</a>.</p>
-</div>
-<div>
-<p>Chang, Winston. 2020. <em>Chromote: Headless Chrome Web Browser Interface</em>.</p>
-</div>
-<div>
-<p>Chang, Winston, Joe Cheng, JJ Allaire, Yihui Xie, and Jonathan McPherson. 2020. <em>Shiny: Web Application Framework for R</em>. <a href="http://shiny.rstudio.com">http://shiny.rstudio.com</a>.</p>
-</div>
-<div>
-<p>Chang, Winston, and Gábor Csárdi. 2019. <em>Shinytest: Test Shiny Apps</em>. <a href="https://github.com/rstudio/shinytest">https://github.com/rstudio/shinytest</a>.</p>
-</div>
-<div>
-<p>Chang, Winston, Javier Luraschi, and Timothy Mastny. 2019. <em>Profvis: Interactive Visualizations for Profiling R Code</em>. <a href="https://rstudio.github.io/profvis/">https://rstudio.github.io/profvis/</a>.</p>
-</div>
-<div>
-<p>Chapman, Christopher N., Edwin Love, Russell P. Milham, Paul ElRif, and James L. Alford. 2008. “Quantitative Evaluation of Personas as Information.” <em>Proceedings of the Human Factors and Ergonomics Society Annual Meeting</em> 52 (16): 1107–11. <a href="https://doi.org/10.1177/154193120805201602">https://doi.org/10.1177/154193120805201602</a>.</p>
-</div>
-<div>
-<p>Cheng, Joe. 2020. <em>Promises: Abstractions for Promise-Based Asynchronous Programming</em>.</p>
-</div>
-<div>
-<p>Cheng, Joe, and Winston Chang. 2020. <em>Httpuv: HTTP and Websocket Server Library</em>. <a href="https://github.com/rstudio/httpuv">https://github.com/rstudio/httpuv</a>.</p>
-</div>
-<div>
-<p>Cheng, Joe, Carson Sievert, Winston Chang, Yihui Xie, and Jeff Allen. 2021. <em>Htmltools: Tools for Html</em>. <a href="https://github.com/rstudio/htmltools">https://github.com/rstudio/htmltools</a>.</p>
-</div>
-<div>
-<p>Christian, Brian, and Tom Griffiths. 2016. <em>Algorithms to Live by : The Computer Science of Human Decisions</em>. Henry Holt.</p>
-</div>
-<div>
-<p>Clarke, Erik, and Scott Sherrill-Mix. 2017. <em>Ggbeeswarm: Categorical Scatter (Violin Point) Plots</em>. <a href="https://github.com/eclarke/ggbeeswarm">https://github.com/eclarke/ggbeeswarm</a>.</p>
-</div>
-<div>
-<p>Coene, John. 2020a. <em>FullPage: Three Families of Functions for Three Different Single Page Shiny Apps</em>. <a href="https://github.com/RinteRface/fullPage">https://github.com/RinteRface/fullPage</a>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Sever: Customise Shiny Disconnected Screens and Error Messages</em>. <a href="http://sever.john-coene.com/">http://sever.john-coene.com/</a>.</p>
-</div>
-<div>
-<p>Collado-Torres, Leonardo, Kristen R. Maynard, and Andrew E. Jaffe. 2020. <em>LIBD Visium Spatial Transcriptomics Human Pilot Data Inspector</em>. <a href="https://doi.org/10.18129/B9.bioc.spatialLIBD">https://doi.org/10.18129/B9.bioc.spatialLIBD</a>.</p>
-</div>
-<div>
-<p>Cooley, David. 2020. <em>Geojsonsf: GeoJSON to Simple Feature Converter</em>. <a href="https://github.com/SymbolixAU/geojsonsf">https://github.com/SymbolixAU/geojsonsf</a>.</p>
-</div>
-<div>
-<p>Csardi, Gabor. 2016. <em>Cyclocomp: Cyclomatic Complexity of R Code</em>. <a href="https://github.com/MangoTheCat/cyclocomp">https://github.com/MangoTheCat/cyclocomp</a>.</p>
-</div>
-<div>
-<p>———. 2020. <em>PackageMetrics2: Collect Metrics About R Packages</em>. <a href="http://git.mango.local/gcsardi/packageMetrics2">http://git.mango.local/gcsardi/packageMetrics2</a>.</p>
-</div>
-<div>
-<p>Csárdi, Gábor. 2019. <em>Rcmdcheck: Run R Cmd Check from R and Capture Results</em>. <a href="https://github.com/r-Lib/rcmdcheck#readme">https://github.com/r-Lib/rcmdcheck#readme</a>.</p>
-</div>
-<div>
-<p>———. 2020. <em>Liteq: Lightweight Portable Message Queue Using Sqlite</em>. <a href="https://github.com/r-lib/liteq#readme">https://github.com/r-lib/liteq#readme</a>.</p>
-</div>
-<div>
-<p>———. 2021. <em>Cli: Helpers for Developing Command Line Interfaces</em>. <a href="https://github.com/r-lib/cli#readme">https://github.com/r-lib/cli#readme</a>.</p>
-</div>
-<div>
-<p>Csárdi, Gábor, and Winston Chang. 2020. <em>Processx: Execute and Control System Processes</em>.</p>
-</div>
-<div>
-<p>Csárdi, Gábor, Kirill Müller, and Jim Hester. 2018. <em>Desc: Manipulate Description Files</em>. <a href="https://github.com/r-lib/desc#readme">https://github.com/r-lib/desc#readme</a>.</p>
-</div>
-<div>
-<p>Csárdi, Gábor, and Maëlle Salmon. 2019. <em>Rhub: Connect to R-Hub</em>.</p>
-</div>
-<div>
-<p>Dipert, Alan, Barret Schloerke, and Barbara Borges. 2020. <em>Shinyloadtest: Load Test Shiny Applications</em>.</p>
-</div>
-<div>
-<p>Dowle, Matt, and Arun Srinivasan. 2019. <em>Data.table: Extension of ‘Data.frame‘</em>.</p>
-</div>
-<div>
-<p>Eddelbuettel, Dirk. 2013. <em>Seamless R and C++ Integration with Rcpp</em>. New York: Springer. <a href="https://doi.org/10.1007/978-1-4614-6868-4">https://doi.org/10.1007/978-1-4614-6868-4</a>.</p>
-</div>
-<div>
-<p>Eddelbuettel, Dirk, and James Joseph Balamuta. 2017. “Extending extitR with extitC++: A Brief Introduction to extitRcpp.” <em>PeerJ Preprints</em> 5 (August): e3188v1. <a href="https://doi.org/10.7287/peerj.preprints.3188v1">https://doi.org/10.7287/peerj.preprints.3188v1</a>.</p>
-</div>
-<div>
-<p>Eddelbuettel, Dirk, Romain Francois, JJ Allaire, Kevin Ushey, Qiang Kou, Nathan Russell, Douglas Bates, and John Chambers. 2020. <em>Rcpp: Seamless R and C++ Integration</em>.</p>
-</div>
-<div>
-<p>Eddelbuettel, Dirk, and Romain François. 2011. “Rcpp: Seamless R and C++ Integration.” <em>Journal of Statistical Software</em> 40 (8): 1–18. <a href="https://doi.org/10.18637/jss.v040.i08">https://doi.org/10.18637/jss.v040.i08</a>.</p>
-</div>
-<div>
-<p>Eddelbuettel, Dirk, and Brendan Knapp. 2020. <em>RcppSimdJson: Rcpp Bindings for the Simdjson Header-Only Library for Json Parsing</em>.</p>
-</div>
-<div>
-<p>Fay, Colin. 2019. <em>Dockerfiler: Easy Dockerfile Creation from R</em>. <a href="https://github.com/ColinFay/dockerfiler">https://github.com/ColinFay/dockerfiler</a>.</p>
-</div>
-<div>
-<p>———. 2020a. <em>Attempt: Tools for Defensive Programming</em>. <a href="https://github.com/ColinFay/attempt">https://github.com/ColinFay/attempt</a>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Bubble: Launch and Interact with a Nodejs Session</em>.</p>
-</div>
-<div>
-<p>———. 2020c. <em>Crrry: Crrri Recipes for Shiny</em>. <a href="https://github.com/ColinFay/crrry">https://github.com/ColinFay/crrry</a>.</p>
-</div>
-<div>
-<p>———. 2020d. <em>Dockerstats: A Wrapper Around Docker Stats</em>. <a href="https://github.com/ColinFay/dockerstats">https://github.com/ColinFay/dockerstats</a>.</p>
-</div>
-<div>
-<p>———. 2020e. <em>Gargoyle: An Event-Based Framework for Shiny</em>.</p>
-</div>
-<div>
-<p>———. 2020f. <em>Glouton: JS-Cookies for Shiny</em>.</p>
-</div>
-<div>
-<p>———. 2020g. <em>Hexmake: Hex Stickers Maker</em>. <a href="https://github.com/colinfay/hexmake">https://github.com/colinfay/hexmake</a>.</p>
-</div>
-<div>
-<p>———. 2020h. <em>Minifyr: Minify Css, Html and Javascript Files</em>.</p>
-</div>
-<div>
-<p>———. 2020i. <em>Nessy: A Nes Css for Shiny</em>. <a href="https://github.com/ColinFay/nessy">https://github.com/ColinFay/nessy</a>.</p>
-</div>
-<div>
-<p>———. 2020j. <em>Resume: Bootstrap Resume Template for Shiny</em>.</p>
-</div>
-<div>
-<p>———. 2020k. <em>Skeleton: Skeleton Css for Shiny</em>.</p>
-</div>
-<div>
-<p>———. 2020l. <em>Tidytuesday201942: A Golem App for Tidy Tuesday</em>. <a href="http://www.github.com/ColinFay/tidytuesday201942">http://www.github.com/ColinFay/tidytuesday201942</a>.</p>
-</div>
-<div>
-<p>Fay, Colin, Vincent Guyader, Sébastien Rochette, and Cervan Girard. 2020. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.</p>
-</div>
-<div>
-<p>Fay, Colin, and Sebastien Rochette. 2020a. <em>Fakir: Create Fake Data in R for Tutorials</em>. <a href="https://github.com/Thinkr-open/fakir">https://github.com/Thinkr-open/fakir</a>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Shinipsum: Lorem-Ipsum Helper Function for Shiny Prototyping</em>. <a href="https://github.com/Thinkr-open/shinipsum">https://github.com/Thinkr-open/shinipsum</a>.</p>
-</div>
-<div>
-<p>file., See AUTHORS. 2020. <em>Git2r: Provides Access to Git Repositories</em>.</p>
-</div>
-<div>
-<p>Garnier, Simon. 2018. <em>Viridis: Default Color Maps from Matplotlib</em>. <a href="https://github.com/sjmgarnier/viridis">https://github.com/sjmgarnier/viridis</a>.</p>
-</div>
-<div>
-<p>Gillespie, Colin, and Robin Lovelace. 2017. <em>Efficient R Programming</em>. O’Reilly Media, Inc, USA.</p>
-</div>
-<div>
-<p>Granjon, David. 2019a. <em>Bs4Dash: A Bootstrap 4 Version of Shinydashboard</em>.</p>
-</div>
-<div>
-<p>———. 2019b. <em>ShinydashboardPlus: Add More Adminlte2 Components to Shinydashboard</em>.</p>
-</div>
-<div>
-<p>Granjon, David, Victor Perrier, and Isabelle Rudolf. 2019. <em>ShinyMobile: Mobile Ready Shiny Apps with Standalone Capabilities</em>.</p>
-</div>
-<div>
-<p>Grolemund, Garrett, and Hadley Wickham. 2011. “Dates and Times Made Easy with lubridate.” <em>Journal of Statistical Software</em> 40 (3): 1–25. <a href="http://www.jstatsoft.org/v40/i03/">http://www.jstatsoft.org/v40/i03/</a>.</p>
-</div>
-<div>
-<p>Guyader, Vincent, and Sébastien Rochette. 2020. <em>Attachment: Deal with Dependencies</em>. <a href="https://github.com/Thinkr-open/attachment">https://github.com/Thinkr-open/attachment</a>.</p>
-</div>
-<div>
-<p>Henry, Lionel, and Hadley Wickham. 2020. <em>Purrr: Functional Programming Tools</em>.</p>
-</div>
-<div>
-<p>Hester, Jim. 2020a. <em>Bench: High Precision Timing of R Expressions</em>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Covr: Test Coverage for Packages</em>.</p>
-</div>
-<div>
-<p>———. 2020c. <em>Glue: Interpreted String Literals</em>.</p>
-</div>
-<div>
-<p>Hester, Jim, Gábor Csárdi, Hadley Wickham, Winston Chang, Martin Morgan, and Dan Tenenbaum. 2020. <em>Remotes: R Package Installation from Remote Repositories, Including Github</em>.</p>
-</div>
-<div>
-<p>Hester, Jim, and Hadley Wickham. 2020a. <em>Fs: Cross-Platform File System Operations Based on Libuv</em>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Vroom: Read and Write Rectangular Text Data Quickly</em>. <a href="https://github.com/r-lib/vroom">https://github.com/r-lib/vroom</a>.</p>
-</div>
-<div>
-<p>Izrailev, Sergei. 2021. <em>Tictoc: Functions for Timing R Scripts, as Well as Implementations of Stack and List Structures</em>. <a href="https://github.com/collectivemedia/tictoc">https://github.com/collectivemedia/tictoc</a>.</p>
-</div>
-<div>
-<p>Kim, Gene. 2016. <em>The Devops Handbook: How to Create World-Class Agility, Reliability, and Security in Technology Organizations</em>. IT Revolution Press. <a href="https://www.xarg.org/ref/a/1942788002/">https://www.xarg.org/ref/a/1942788002/</a>.</p>
-</div>
-<div>
-<p>———. 2019. <em>The Unicorn Project: A Novel About Developers, Digital Disruption, and Thriving in the Age of Data</em>. IT Revolution Press. <a href="https://itrevolution.com/the-unicorn-project/">https://itrevolution.com/the-unicorn-project/</a>.</p>
-</div>
-<div>
-<p>Krug, Steve. 2014. <em>Don’t Make Me Think, Revisited: A Common Sense Approach to Web Usability (3rd Edition) (Voices That Matter)</em>. New Riders.</p>
-</div>
-<div>
-<p>Larbaoui, Mustapha. 2020. <em>Tidymodules: A Robust Framework for Developing Shiny Modules</em>. <a href="https://github.com/Novartis/tidymodules">https://github.com/Novartis/tidymodules</a>.</p>
-</div>
-<div>
-<p>Lemaire, Maude. 2020. <em>Refactoring at Scale</em>. Henry Holt. <a href="https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/">https://learning.oreilly.com/library/view/refactoring-at-scale/9781492075523/</a>.</p>
-</div>
-<div>
-<p>Lesur, Romain, and Christophe Dervieux. 2020. <em>Crrri: An Interface with Headless Chromium/Chrome</em>.</p>
-</div>
-<div>
-<p>Locke, Steph, and Maëlle Salmon. 2019. <em>Namer: Names Your R Markdown Chunks</em>. <a href="https://github.com/lockedata/namer">https://github.com/lockedata/namer</a>.</p>
-</div>
-<div>
-<p>Lumley, Thomas. 2013. <em>Dichromat: Color Schemes for Dichromats</em>.</p>
-</div>
-<div>
-<p>Merlino, Andy, and Patrick Howard. 2020. <em>ShinyFeedback: Display User Feedback in Shiny Apps</em>. <a href="https://github.com/merlinoa/shinyFeedback">https://github.com/merlinoa/shinyFeedback</a>.</p>
-</div>
-<div>
-<p>Müller, Kirill. 2017. <em>Here: A Simpler Way to Find Your Files</em>.</p>
-</div>
-<div>
-<p>Müller, Kirill, and Hadley Wickham. 2020. <em>Tibble: Simple Data Frames</em>.</p>
-</div>
-<div>
-<p>Müller, Kirill, Hadley Wickham, David A. James, and Seth Falcon. 2020. <em>RSQLite: SQLite Interface for R</em>.</p>
-</div>
-<div>
-<p>Nüst, Daniel, Dirk Eddelbuettel, Dom Bennett, Robrecht Cannoodt, Dav Clark, Gergely Daroczi, Mark Edmondson, et al. 2020. “The Rockerverse: Packages and Applications for Containerization with R.”</p>
-</div>
-<div>
-<p>Ooms, Jeroen. 2014. “The Jsonlite Package: A Practical and Consistent Mapping Between Json Data and R Objects.” <em>arXiv:1403.2805 [stat.CO]</em>. <a href="https://arxiv.org/abs/1403.2805">https://arxiv.org/abs/1403.2805</a>.</p>
-</div>
-<div>
-<p>———. 2018. <em>Hunspell: High-Performance Stemmer, Tokenizer, and Spell Checker</em>.</p>
-</div>
-<div>
-<p>———. 2020. <em>Jsonlite: A Simple and Robust Json Parser and Generator for R</em>.</p>
-</div>
-<div>
-<p>Ooms, Jeroen, and Jim Hester. 2019. <em>Spelling: Tools for Spell Checking in R</em>. <a href="https://github.com/ropensci/spelling#readme">https://github.com/ropensci/spelling#readme</a>.</p>
-</div>
-<div>
-<p>Pebesma, Edzer. 2018. “Simple Features for R: Standardized Support for Spatial Vector Data.” <em>The R Journal</em> 10 (1): 439–46. <a href="https://doi.org/10.32614/RJ-2018-009">https://doi.org/10.32614/RJ-2018-009</a>.</p>
-</div>
-<div>
-<p>———. 2020. <em>Sf: Simple Features for R</em>.</p>
-</div>
-<div>
-<p>Raymond, Eric S. 2003. <em>The Art of Unix Programming (the Addison-Wesley Professional Computng Series)</em>. Addison-Wesley.</p>
-</div>
-<div>
-<p>R Core Team. 2020. <em>Foreign: Read Data Stored by Minitab, S, Sas, Spss, Stata, Systat, Weka, dBase, ...</em> <a href="https://svn.r-project.org/R-packages/trunk/foreign">https://svn.r-project.org/R-packages/trunk/foreign</a>.</p>
-</div>
-<div>
-<p>Roebuck, P. 2014. <em>Matlab: MATLAB Emulation Package</em>. <a href="http://cran.r-project.org/package=matlab">http://cran.r-project.org/package=matlab</a>.</p>
-</div>
-<div>
-<p>R Special Interest Group on Databases (R-SIG-DB), Hadley Wickham, and Kirill Müller. 2019. <em>DBI: R Database Interface</em>.</p>
-</div>
-<div>
-<p>Rudis, Bob, and Al Danial. 2020. <em>Cloc: Count Lines of Code, Comments and Whitespace in Source Files and Archives</em>. <a href="https://gitlab.com/hrbrmstr/cloc">https://gitlab.com/hrbrmstr/cloc</a>.</p>
-</div>
-<div>
-<p>Sakamoto, Yasutaka, Shinsuke Matsumoto, Seiki Tokunaga, Sachio Saiki, and Masahide Nakamura. 2015. “Empirical Study on Effects of Script Minification and HTTP Compression for Traffic Reduction.” In <em>2015 Third International Conference on Digital Information, Networking, and Wireless Communications (DINWC)</em>. IEEE. <a href="https://doi.org/10.1109/dinwc.2015.7054230">https://doi.org/10.1109/dinwc.2015.7054230</a>.</p>
-</div>
-<div>
-<p>Sidi, Jonathan. 2020. <em>Covrpage: Create a Readme Summary Page for Github Testthat and Covr Outputs</em>. <a href="https://github.com/metrumresearchgroup/covrpage">https://github.com/metrumresearchgroup/covrpage</a>.</p>
-</div>
-<div>
-<p>Sidi, Jonathan, and Kirill Müller. 2019. <em>Whereami: Reliably Return the Source and Call Location of a Command</em>. <a href="https://github.com/yonicd/whereami">https://github.com/yonicd/whereami</a>.</p>
-</div>
-<div>
-<p>Sievert, Carson. 2020. <em>Interactive Web-Based Data Visualization with R, Plotly, and Shiny</em>. Chapman; Hall/CRC. <a href="https://plotly-r.com">https://plotly-r.com</a>.</p>
-</div>
-<div>
-<p>Sievert, Carson, Chris Parmer, Toby Hocking, Scott Chamberlain, Karthik Ram, Marianne Corvellec, and Pedro Despouy. 2020. <em>Plotly: Create Interactive Web Graphics via Plotly.js</em>.</p>
-</div>
-<div>
-<p>Simon, H. A. 1956. “Rational Choice and the Structure of the Environment.” <em>Psychological Review</em> 63 (2): 129–38. <a href="https://doi.org/10.1037/h0042769">https://doi.org/10.1037/h0042769</a>.</p>
-</div>
-<div>
-<p>Spinu, Vitalie, Garrett Grolemund, and Hadley Wickham. 2020. <em>Lubridate: Make Dealing with Dates a Little Easier</em>.</p>
-</div>
-<div>
-<p>Urbanek, Simon, and Theodore Ts’o. 2020. <em>Uuid: Tools for Generating and Handling of Uuids</em>. <a href="http://www.rforge.net/uuid">http://www.rforge.net/uuid</a>.</p>
-</div>
-<div>
-<p>Ushey, Kevin. 2020. <em>Renv: Project Environments</em>. <a href="https://rstudio.github.io/renv/">https://rstudio.github.io/renv/</a>.</p>
-</div>
-<div>
-<p>Ushey, Kevin, JJ Allaire, Hadley Wickham, and Gary Ritchie. 2020. <em>Rstudioapi: Safely Access the Rstudio Api</em>. <a href="https://github.com/rstudio/rstudioapi">https://github.com/rstudio/rstudioapi</a>.</p>
-</div>
-<div>
-<p>Vaidyanathan, Ramnath, Yihui Xie, JJ Allaire, Joe Cheng, Carson Sievert, and Kenton Russell. 2020. <em>Htmlwidgets: HTML Widgets for R</em>. <a href="https://github.com/ramnathv/htmlwidgets">https://github.com/ramnathv/htmlwidgets</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley. 2011. “Testthat: Get Started with Testing.” <em>The R Journal</em> 3: 5–10. <a href="https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf">https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf</a>.</p>
-</div>
-<div>
-<p>———. 2016. <em>Ggplot2: Elegant Graphics for Data Analysis</em>. Springer-Verlag New York. <a href="https://ggplot2.tidyverse.org">https://ggplot2.tidyverse.org</a>.</p>
-</div>
-<div>
-<p>———. 2019a. <em>Tidyverse: Easily Install and Load the Tidyverse</em>.</p>
-</div>
-<div>
-<p>———. 2020. <em>Testthat: Unit Testing for R</em>.</p>
-</div>
-<div>
-<p>———. 2019b. <em>Advanced R, Second Edition</em>. Chapman; Hall/CRC.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. “Welcome to the tidyverse.” <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, and Jennifer Bryan. 2019. <em>Readxl: Read Excel Files</em>.</p>
-</div>
-<div>
-<p>———. 2020a. <em>R Packages</em>. <a href="https://r-pkgs.org/">https://r-pkgs.org/</a>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Usethis: Automate Package and Project Setup</em>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Winston Chang, Lionel Henry, Thomas Lin Pedersen, Kohske Takahashi, Claus Wilke, Kara Woo, Hiroaki Yutani, and Dewey Dunnington. 2020. <em>Ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics</em>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Peter Danenberg, Gábor Csárdi, and Manuel Eugster. 2020. <em>Roxygen2: In-Line Documentation for R</em>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Romain François, Lionel Henry, and Kirill Müller. 2021. <em>Dplyr: A Grammar of Data Manipulation</em>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, and Garrett Grolemund. 2017. <em>R for Data Science: Import, Tidy, Transform, Visualize, and Model Data</em>. O’Reilly Media. <a href="https://www.xarg.org/ref/a/1491910399/">https://www.xarg.org/ref/a/1491910399/</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, and Jim Hester. 2020. <em>Pkgbuild: Find Tools Needed to Build R Packages</em>. <a href="https://github.com/r-lib/pkgbuild">https://github.com/r-lib/pkgbuild</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Jim Hester, and Winston Chang. 2020. <em>Devtools: Tools to Make Developing R Packages Easier</em>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Jim Hester, and Romain Francois. 2018. <em>Readr: Read Rectangular Text Data</em>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, Jim Hester, Kirill Müller, and Daniel Cook. 2020. <em>Memoise: Memoisation of Functions</em>. <a href="https://github.com/r-lib/memoise">https://github.com/r-lib/memoise</a>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, and Evan Miller. 2019. <em>Haven: Import and Export Spss, Stata and Sas Files</em>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, and Edgar Ruiz. 2020. <em>Dbplyr: A Dplyr Back End for Databases</em>.</p>
-</div>
-<div>
-<p>Wickham, Hadley, and Dana Seidel. 2019. <em>Scales: Scale Functions for Visualization</em>.</p>
-</div>
-<div>
-<p>Woo, Kara, Nicole Kauer, and Kelsey Montgomery. 2020. <em>Dccvalidator: Metadata Validation for Data Coordinating Centers</em>.</p>
-</div>
-<div>
-<p>Xie, Yihui. 2014. “Knitr: A Comprehensive Tool for Reproducible Research in R.” In <em>Implementing Reproducible Computational Research</em>, edited by Victoria Stodden, Friedrich Leisch, and Roger D. Peng. Chapman; Hall/CRC. <a href="http://www.crcpress.com/product/isbn/9781466561595">http://www.crcpress.com/product/isbn/9781466561595</a>.</p>
-</div>
-<div>
-<p>———. 2015. <em>Dynamic Documents with R and Knitr</em>. 2nd ed. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://yihui.org/knitr/">https://yihui.org/knitr/</a>.</p>
-</div>
-<div>
-<p>———. 2016. <em>Bookdown: Authoring Books and Technical Documents with R Markdown</em>. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://github.com/rstudio/bookdown">https://github.com/rstudio/bookdown</a>.</p>
-</div>
-<div>
-<p>———. 2020a. <em>Bookdown: Authoring Books and Technical Documents with R Markdown</em>. <a href="https://github.com/rstudio/bookdown">https://github.com/rstudio/bookdown</a>.</p>
-</div>
-<div>
-<p>———. 2020b. <em>Knitr: A General-Purpose Package for Dynamic Report Generation in R</em>. <a href="https://yihui.org/knitr/">https://yihui.org/knitr/</a>.</p>
-</div>
-<div>
-<p>———. 2020c. <em>Xfun: Miscellaneous Functions by Yihui Xie</em>. <a href="https://github.com/yihui/xfun">https://github.com/yihui/xfun</a>.</p>
-</div>
-<div>
-<p>Xie, Yihui, and JJ Allaire. 2020. <em>Tufte: Tufte’s Styles for R Markdown Documents</em>. <a href="https://github.com/rstudio/tufte">https://github.com/rstudio/tufte</a>.</p>
-</div>
-<div>
-<p>Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. <em>R Markdown: The Definitive Guide</em>. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://bookdown.org/yihui/rmarkdown">https://bookdown.org/yihui/rmarkdown</a>.</p>
-</div>
-<div>
-<p>Xie, Yihui, Joe Cheng, and Xianying Tan. 2020. <em>DT: A Wrapper of the Javascript Library Datatables</em>. <a href="https://github.com/rstudio/DT">https://github.com/rstudio/DT</a>.</p>
-</div>
-<div>
-<p>Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. <em>R Markdown Cookbook</em>. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://bookdown.org/yihui/rmarkdown-cookbook">https://bookdown.org/yihui/rmarkdown-cookbook</a>.</p>
-</div>
-<div>
-<p>Xie, Yihui, Romain Lesur, and Brent Thorne. 2020. <em>Pagedown: Paginate the Html Output of R Markdown with Css for Print</em>. <a href="https://github.com/rstudio/pagedown">https://github.com/rstudio/pagedown</a>.</p>
-</div>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <hr/>
 <footer>
 <a href="rtask.thinkr.fr"><img src="img/logo400_129.png" alt="ThinkR Website"/></a>
@@ -1023,8 +914,8 @@ https://daattali.com/shiny/shinyalert-demo/</a>.</p>
           </div>
         </div>
       </div>
-<a href="appendix-b-session-info.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="css.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="appendix-b-session-info.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -1055,7 +946,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/21-references.Rmd",
+"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/19-appendix.Rmd",
 "text": "Edit"
 },
 "history": {
