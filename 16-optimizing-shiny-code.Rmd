@@ -83,7 +83,7 @@ toc()
 
 Let's try with another example that might look more like what we can find in a `{shiny}` app: connecting to a database, using the `{DBI}` [@R-DBI] and `{RSQLite}` [@R-RSQLite] packages:
 
-```{r 16-optimizing-shiny-code-2 }
+```{r 16-optimizing-shiny-code-2, eval = FALSE}
 # We create an in-memory database using SQLite
 con <- DBI::dbConnect(
   RSQLite::SQLite(), 
@@ -114,6 +114,14 @@ res_a <- m_get_query(
   "SELECT * FROM diams WHERE cut = 'Ideal'"
 )
 toc()
+
+```
+
+```
+0.832 sec elapsed
+```
+
+```{r eval = FALSE}
 # We call this function a second time, 
 # with the same parameters
 tic()
@@ -122,11 +130,25 @@ res_b <- m_get_query(
   "SELECT * FROM diams WHERE cut = 'Ideal'"
 )
 toc()
+```
+
+```
+0.093 sec elapsed
+```
+
+```{r eval = FALSE}
 # Let's check that the two are equal
 all.equal(
   res_a, 
   res_b
 )
+```
+
+```
+[1] TRUE
+```
+
+```{r eval = FALSE}
 # We now try with a new SQL code (cut = 'Good')
 tic()
 res_c <- m_get_query(
@@ -134,14 +156,25 @@ res_c <- m_get_query(
   "SELECT * FROM diams WHERE cut = 'Good'"
 )
 toc()
+```
+
+```
+0.333 sec elapsed
+```
+
+```{r eval = FALSE}
 # The function has effectively returned a different result
 setequal(res_a, res_c)
+```
+
+```
+[1] FALSE
 ```
 
 Note that you can change where the cache is stored by `{memoise}`.
 Here, we will save it in a random directory (do not do this in production).
 
-```{r 16-optimizing-shiny-code-3, error = TRUE}
+```{r 16-optimizing-shiny-code-3, error = TRUE, eval = FALSE}
 random_dir <- fs::path(
   paste(
     sample(
@@ -154,11 +187,15 @@ random_dir <- fs::path(
 random_dir
 ```
 
+```
+xawcubtjzp
+```
+
 ```{r 16-optimizing-shiny-code-4, include = FALSE, error = TRUE}
 try(fs::dir_delete(random_dir))
 ```
 
-```{r 16-optimizing-shiny-code-5, error = TRUE}
+```{r 16-optimizing-shiny-code-5, error = TRUE, eval = FALSE, eval = FALSE}
 # We create a directory in the current working directory
 fs::dir_create(random_dir)
 # We use this directory as the cache_filesystem for {memoise}
@@ -184,6 +221,12 @@ res_c <- m_get_query(
 # The random directory now contains two objects, 
 # one for each memoized call
 fs::dir_tree(random_dir)
+```
+
+```
+xawcubtjzp
+├── 3764a0a4950cb30b
+└── c295e060ea7d77c1
 ```
 
 As you can see, we now have two cache objects inside the directory we have specified as a `cache_filesystem`.
@@ -385,6 +428,8 @@ fs::dir_info("cache")[, "access_time", drop  = FALSE]
 ```
 
 Hence, when using cache, it might be interesting to periodically remove the oldest used cache, so that you can regain some space on the server running the application.
+
+\newpage
 
 ## Asynchronous in `{shiny}`
 
