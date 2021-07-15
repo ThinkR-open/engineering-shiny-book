@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2021-06-04" />
+<meta name="date" content="2021-07-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -588,7 +588,6 @@ If we run this code two times, we should get different results, as seen on Figur
 
 <div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="building-ispum-app.html#cb116-1"></a><span class="kw">random_ggplot</span>() <span class="op">+</span><span class="st"> </span></span>
 <span id="cb116-2"><a href="building-ispum-app.html#cb116-2"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Random plot&quot;</span>) </span></code></pre></div>
-<pre><code>`stat_bindot()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 <div class="figure" style="text-align: center"><span id="fig:09-prototyping-5"></span>
 <img src="engineering-production-grade-shiny-apps_files/figure-html/09-prototyping-5-1.png" alt="A random plot." width="100%" />
 <p class="caption">
@@ -596,8 +595,8 @@ FIGURE 9.2: A random plot.
 </p>
 </div>
 
-<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="building-ispum-app.html#cb118-1"></a><span class="kw">random_ggplot</span>() <span class="op">+</span><span class="st"> </span></span>
-<span id="cb118-2"><a href="building-ispum-app.html#cb118-2"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Random plot&quot;</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="building-ispum-app.html#cb117-1"></a><span class="kw">random_ggplot</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb117-2"><a href="building-ispum-app.html#cb117-2"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Random plot&quot;</span>) </span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:09-prototyping-6"></span>
 <img src="engineering-production-grade-shiny-apps_files/figure-html/09-prototyping-6-1.png" alt="Another random plot." width="100%" />
 <p class="caption">
@@ -607,30 +606,30 @@ FIGURE 9.3: Another random plot.
 <p>Of course, the idea is to combine this with a <code>{shiny}</code> interface, for example, <code>random_ggplot()</code> will be used with a <code>renderPlot()</code> and <code>plotOutput()</code>.
 And as we want to prototype but still be close to what the app might look like, these functions take arguments that can shape the output: for example, <code>random_ggplot()</code> has a <code>type</code> parameter that can help you select a specific <code>{ggplot2}</code> geom.</p>
 <p>Figure <a href="building-ispum-app.html#fig:09-prototyping-8">9.4</a> is a screenshot of this application.</p>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="building-ispum-app.html#cb119-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb119-2"><a href="building-ispum-app.html#cb119-2"></a><span class="kw">library</span>(shinipsum)</span>
-<span id="cb119-3"><a href="building-ispum-app.html#cb119-3"></a><span class="kw">library</span>(DT)</span>
-<span id="cb119-4"><a href="building-ispum-app.html#cb119-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb119-5"><a href="building-ispum-app.html#cb119-5"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random DT&quot;</span>),</span>
-<span id="cb119-6"><a href="building-ispum-app.html#cb119-6"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;data_table&quot;</span>),</span>
-<span id="cb119-7"><a href="building-ispum-app.html#cb119-7"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random Plot&quot;</span>),</span>
-<span id="cb119-8"><a href="building-ispum-app.html#cb119-8"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>),</span>
-<span id="cb119-9"><a href="building-ispum-app.html#cb119-9"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random Text&quot;</span>),</span>
-<span id="cb119-10"><a href="building-ispum-app.html#cb119-10"></a>  <span class="kw">tableOutput</span>(<span class="st">&quot;text&quot;</span>)</span>
-<span id="cb119-11"><a href="building-ispum-app.html#cb119-11"></a>)</span>
-<span id="cb119-12"><a href="building-ispum-app.html#cb119-12"></a></span>
-<span id="cb119-13"><a href="building-ispum-app.html#cb119-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb119-14"><a href="building-ispum-app.html#cb119-14"></a>  output<span class="op">$</span>data_table &lt;-<span class="st"> </span>DT<span class="op">::</span><span class="kw">renderDT</span>({</span>
-<span id="cb119-15"><a href="building-ispum-app.html#cb119-15"></a>    <span class="kw">random_DT</span>(<span class="dv">5</span>, <span class="dv">5</span>)</span>
-<span id="cb119-16"><a href="building-ispum-app.html#cb119-16"></a>  })</span>
-<span id="cb119-17"><a href="building-ispum-app.html#cb119-17"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb119-18"><a href="building-ispum-app.html#cb119-18"></a>    <span class="kw">random_ggplot</span>()</span>
-<span id="cb119-19"><a href="building-ispum-app.html#cb119-19"></a>  })</span>
-<span id="cb119-20"><a href="building-ispum-app.html#cb119-20"></a>  output<span class="op">$</span>text &lt;-<span class="st"> </span><span class="kw">renderText</span>({</span>
-<span id="cb119-21"><a href="building-ispum-app.html#cb119-21"></a>    <span class="kw">random_text</span>(<span class="dt">nwords =</span> <span class="dv">50</span>)</span>
-<span id="cb119-22"><a href="building-ispum-app.html#cb119-22"></a>  })</span>
-<span id="cb119-23"><a href="building-ispum-app.html#cb119-23"></a>}</span>
-<span id="cb119-24"><a href="building-ispum-app.html#cb119-24"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="building-ispum-app.html#cb118-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb118-2"><a href="building-ispum-app.html#cb118-2"></a><span class="kw">library</span>(shinipsum)</span>
+<span id="cb118-3"><a href="building-ispum-app.html#cb118-3"></a><span class="kw">library</span>(DT)</span>
+<span id="cb118-4"><a href="building-ispum-app.html#cb118-4"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb118-5"><a href="building-ispum-app.html#cb118-5"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random DT&quot;</span>),</span>
+<span id="cb118-6"><a href="building-ispum-app.html#cb118-6"></a>  <span class="kw">DTOutput</span>(<span class="st">&quot;data_table&quot;</span>),</span>
+<span id="cb118-7"><a href="building-ispum-app.html#cb118-7"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random Plot&quot;</span>),</span>
+<span id="cb118-8"><a href="building-ispum-app.html#cb118-8"></a>  <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>),</span>
+<span id="cb118-9"><a href="building-ispum-app.html#cb118-9"></a>  <span class="kw">h2</span>(<span class="st">&quot;A Random Text&quot;</span>),</span>
+<span id="cb118-10"><a href="building-ispum-app.html#cb118-10"></a>  <span class="kw">tableOutput</span>(<span class="st">&quot;text&quot;</span>)</span>
+<span id="cb118-11"><a href="building-ispum-app.html#cb118-11"></a>)</span>
+<span id="cb118-12"><a href="building-ispum-app.html#cb118-12"></a></span>
+<span id="cb118-13"><a href="building-ispum-app.html#cb118-13"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb118-14"><a href="building-ispum-app.html#cb118-14"></a>  output<span class="op">$</span>data_table &lt;-<span class="st"> </span>DT<span class="op">::</span><span class="kw">renderDT</span>({</span>
+<span id="cb118-15"><a href="building-ispum-app.html#cb118-15"></a>    <span class="kw">random_DT</span>(<span class="dv">5</span>, <span class="dv">5</span>)</span>
+<span id="cb118-16"><a href="building-ispum-app.html#cb118-16"></a>  })</span>
+<span id="cb118-17"><a href="building-ispum-app.html#cb118-17"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb118-18"><a href="building-ispum-app.html#cb118-18"></a>    <span class="kw">random_ggplot</span>()</span>
+<span id="cb118-19"><a href="building-ispum-app.html#cb118-19"></a>  })</span>
+<span id="cb118-20"><a href="building-ispum-app.html#cb118-20"></a>  output<span class="op">$</span>text &lt;-<span class="st"> </span><span class="kw">renderText</span>({</span>
+<span id="cb118-21"><a href="building-ispum-app.html#cb118-21"></a>    <span class="kw">random_text</span>(<span class="dt">nwords =</span> <span class="dv">50</span>)</span>
+<span id="cb118-22"><a href="building-ispum-app.html#cb118-22"></a>  })</span>
+<span id="cb118-23"><a href="building-ispum-app.html#cb118-23"></a>}</span>
+<span id="cb118-24"><a href="building-ispum-app.html#cb118-24"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 
 <div class="figure" style="text-align: center"><span id="fig:09-prototyping-8"></span>
 <img src="img/shinipsumapp.png" alt="An app built with {shinipsum}." width="100%" />
@@ -642,20 +641,22 @@ FIGURE 9.4: An app built with <code>{shinipsum}</code>.
 <ul>
 <li>tables:</li>
 </ul>
-<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="building-ispum-app.html#cb120-1"></a><span class="kw">random_table</span>(<span class="dt">nrow =</span> <span class="dv">3</span>, <span class="dt">ncol =</span> <span class="dv">3</span>)</span></code></pre></div>
-<pre><code>  Plant   Type  Treatment
-1   Qn1 Quebec nonchilled
-2   Qn1 Quebec nonchilled
-3   Qn1 Quebec nonchilled</code></pre>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="building-ispum-app.html#cb119-1"></a><span class="kw">random_table</span>(<span class="dt">nrow =</span> <span class="dv">3</span>, <span class="dt">ncol =</span> <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>  day time  temp
+1 346  840 36.33
+2 346  850 36.34
+3 346  900 36.35</code></pre>
 <ul>
 <li>print outputs:</li>
 </ul>
-<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="building-ispum-app.html#cb122-1"></a><span class="kw">random_print</span>(<span class="dt">type =</span> <span class="st">&quot;model&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="building-ispum-app.html#cb121-1"></a><span class="kw">random_print</span>(<span class="dt">type =</span> <span class="st">&quot;model&quot;</span>)</span></code></pre></div>
 <pre><code>
-    Shapiro-Wilk normality test
+Call:
+lm(formula = Sepal.Length ~ Sepal.Width, data = datasets::iris)
 
-data:  datasets::airquality$Ozone
-W = 0.88, p-value = 3e-08</code></pre>
+Coefficients:
+(Intercept)  Sepal.Width  
+      6.526       -0.223  </code></pre>
 <p>and text, image, <code>ggplotly</code>, <code>dygraph</code>, and <code>DT</code>.</p>
 <p><code>{shinipsum}</code> is also a good tool if you want to demonstrate what a given UI framework will look like if used in <code>{shiny}</code>.
 This is, for example, what you find with <code>{golemhtmltemplate}</code>, available at <a href="https://engineering-shiny.org/golemhtmltemplate/">engineering-shiny.org/golemhtmltemplate/</a>, which uses a W3 web page template.<a href="#fn38" class="footnote-ref" id="fnref38"><sup>38</sup></a></p>
@@ -665,15 +666,15 @@ This is, for example, what you find with <code>{golemhtmltemplate}</code>, avail
 <p>Generating random placeholders for <code>{shiny}</code> might not be enough: maybe you also need example datasets.</p>
 <p>This can be accomplished using the <code>{fakir}</code> package, which was primarily created to provide fake datasets for R tutorials and exercises, but that can easily be used inside a <code>{shiny}</code> application.</p>
 <p>At the time of writing these lines, the package is only available on GitHub, and can be installed with:</p>
-<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="building-ispum-app.html#cb124-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;Thinkr-open/fakir&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="building-ispum-app.html#cb123-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;Thinkr-open/fakir&quot;</span>)</span></code></pre></div>
 <p>This package contains three datasets that are randomly generated when you call the corresponding functions:</p>
 <ul>
 <li><p><code>fake_base_clients()</code> generates a fake dataset for a ticketing service.</p></li>
 <li><p><code>fake_sondage_answers()</code> is a fake survey about transportation.</p></li>
 <li><p><code>fake_visits()</code> is a fake dataset for the visits on a website.</p></li>
 </ul>
-<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="building-ispum-app.html#cb125-1"></a><span class="kw">library</span>(fakir)</span>
-<span id="cb125-2"><a href="building-ispum-app.html#cb125-2"></a><span class="kw">fake_visits</span>(<span class="dt">from =</span> <span class="st">&quot;2017-01-01&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;2017-01-31&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="building-ispum-app.html#cb124-1"></a><span class="kw">library</span>(fakir)</span>
+<span id="cb124-2"><a href="building-ispum-app.html#cb124-2"></a><span class="kw">fake_visits</span>(<span class="dt">from =</span> <span class="st">&quot;2017-01-01&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;2017-01-31&quot;</span>)</span></code></pre></div>
 <pre><code>Warning: `...` is not empty.
 
 We detected these problematic arguments:

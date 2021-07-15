@@ -24,7 +24,7 @@
 <meta name="author" content="Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard" />
 
 
-<meta name="date" content="2021-06-04" />
+<meta name="date" content="2021-07-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -496,56 +496,56 @@ Most of the time, issues come from the fact that <strong>there is too much react
 <p>Of course, it is a nice feature to make everything react instantly to changes, but when building larger apps it is easy to create monsters, i.e. complicated, messy, reactive graphs where everything is updated too much and too often.
 Or worse, we generate endless reactive loops, aka “the reactive inferno” where A invalidates B which invalidates C which invalidates A which invalidates B which invalidates C, and so on.</p>
 <p>Let’s take a small example of a reactive inferno:</p>
-<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb267-1"><a href="common-app-caveats.html#cb267-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb267-2"><a href="common-app-caveats.html#cb267-2"></a><span class="kw">library</span>(lubridate)</span>
-<span id="cb267-3"><a href="common-app-caveats.html#cb267-3"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb267-4"><a href="common-app-caveats.html#cb267-4"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb267-5"><a href="common-app-caveats.html#cb267-5"></a>    <span class="co"># Adding a first input which allow </span></span>
-<span id="cb267-6"><a href="common-app-caveats.html#cb267-6"></a>    <span class="co"># to select a specific date</span></span>
-<span id="cb267-7"><a href="common-app-caveats.html#cb267-7"></a>    <span class="kw">dateInput</span>(</span>
-<span id="cb267-8"><a href="common-app-caveats.html#cb267-8"></a>      <span class="st">&quot;date&quot;</span>, </span>
-<span id="cb267-9"><a href="common-app-caveats.html#cb267-9"></a>      <span class="st">&quot;choose a date&quot;</span></span>
-<span id="cb267-10"><a href="common-app-caveats.html#cb267-10"></a>    ), </span>
-<span id="cb267-11"><a href="common-app-caveats.html#cb267-11"></a>    <span class="co"># Adding a second input allowing </span></span>
-<span id="cb267-12"><a href="common-app-caveats.html#cb267-12"></a>    <span class="co"># to specify a year</span></span>
-<span id="cb267-13"><a href="common-app-caveats.html#cb267-13"></a>    <span class="kw">selectInput</span>(</span>
-<span id="cb267-14"><a href="common-app-caveats.html#cb267-14"></a>      <span class="st">&quot;year&quot;</span>, </span>
-<span id="cb267-15"><a href="common-app-caveats.html#cb267-15"></a>      <span class="st">&quot;Choose a year&quot;</span>, </span>
-<span id="cb267-16"><a href="common-app-caveats.html#cb267-16"></a>      <span class="dt">choices =</span> <span class="dv">2010</span><span class="op">:</span><span class="dv">2030</span></span>
-<span id="cb267-17"><a href="common-app-caveats.html#cb267-17"></a>    )</span>
-<span id="cb267-18"><a href="common-app-caveats.html#cb267-18"></a>  )</span>
-<span id="cb267-19"><a href="common-app-caveats.html#cb267-19"></a>}</span>
-<span id="cb267-20"><a href="common-app-caveats.html#cb267-20"></a></span>
-<span id="cb267-21"><a href="common-app-caveats.html#cb267-21"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb267-22"><a href="common-app-caveats.html#cb267-22"></a>  input, </span>
-<span id="cb267-23"><a href="common-app-caveats.html#cb267-23"></a>  output, </span>
-<span id="cb267-24"><a href="common-app-caveats.html#cb267-24"></a>  session</span>
-<span id="cb267-25"><a href="common-app-caveats.html#cb267-25"></a>){</span>
-<span id="cb267-26"><a href="common-app-caveats.html#cb267-26"></a>  <span class="co"># We want the year to be update whenever </span></span>
-<span id="cb267-27"><a href="common-app-caveats.html#cb267-27"></a>  <span class="co"># the dateInput is updated</span></span>
-<span id="cb267-28"><a href="common-app-caveats.html#cb267-28"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>date , {</span>
-<span id="cb267-29"><a href="common-app-caveats.html#cb267-29"></a>    <span class="kw">updateSelectInput</span>(</span>
-<span id="cb267-30"><a href="common-app-caveats.html#cb267-30"></a>      session, </span>
-<span id="cb267-31"><a href="common-app-caveats.html#cb267-31"></a>      <span class="st">&quot;year&quot;</span>, </span>
-<span id="cb267-32"><a href="common-app-caveats.html#cb267-32"></a>      <span class="dt">selected =</span> <span class="kw">year</span>(input<span class="op">$</span>date)</span>
-<span id="cb267-33"><a href="common-app-caveats.html#cb267-33"></a>    )</span>
-<span id="cb267-34"><a href="common-app-caveats.html#cb267-34"></a>  })</span>
-<span id="cb267-35"><a href="common-app-caveats.html#cb267-35"></a>  </span>
-<span id="cb267-36"><a href="common-app-caveats.html#cb267-36"></a>  <span class="co"># We want the date to be update whenever </span></span>
-<span id="cb267-37"><a href="common-app-caveats.html#cb267-37"></a>  <span class="co"># the selectInput is updated</span></span>
-<span id="cb267-38"><a href="common-app-caveats.html#cb267-38"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>year , {</span>
-<span id="cb267-39"><a href="common-app-caveats.html#cb267-39"></a>    <span class="kw">updateDateInput</span>(</span>
-<span id="cb267-40"><a href="common-app-caveats.html#cb267-40"></a>      session, </span>
-<span id="cb267-41"><a href="common-app-caveats.html#cb267-41"></a>      <span class="st">&quot;date&quot;</span>, </span>
-<span id="cb267-42"><a href="common-app-caveats.html#cb267-42"></a>      <span class="dt">value =</span> lubridate<span class="op">::</span><span class="kw">as_date</span>(</span>
-<span id="cb267-43"><a href="common-app-caveats.html#cb267-43"></a>        <span class="kw">sprintf</span>(<span class="st">&quot;%s-01-01&quot;</span>, input<span class="op">$</span>year)</span>
-<span id="cb267-44"><a href="common-app-caveats.html#cb267-44"></a>      )</span>
-<span id="cb267-45"><a href="common-app-caveats.html#cb267-45"></a>    )</span>
-<span id="cb267-46"><a href="common-app-caveats.html#cb267-46"></a>  })</span>
-<span id="cb267-47"><a href="common-app-caveats.html#cb267-47"></a>  </span>
-<span id="cb267-48"><a href="common-app-caveats.html#cb267-48"></a>}</span>
-<span id="cb267-49"><a href="common-app-caveats.html#cb267-49"></a></span>
-<span id="cb267-50"><a href="common-app-caveats.html#cb267-50"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb266"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb266-1"><a href="common-app-caveats.html#cb266-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb266-2"><a href="common-app-caveats.html#cb266-2"></a><span class="kw">library</span>(lubridate)</span>
+<span id="cb266-3"><a href="common-app-caveats.html#cb266-3"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb266-4"><a href="common-app-caveats.html#cb266-4"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb266-5"><a href="common-app-caveats.html#cb266-5"></a>    <span class="co"># Adding a first input which allow </span></span>
+<span id="cb266-6"><a href="common-app-caveats.html#cb266-6"></a>    <span class="co"># to select a specific date</span></span>
+<span id="cb266-7"><a href="common-app-caveats.html#cb266-7"></a>    <span class="kw">dateInput</span>(</span>
+<span id="cb266-8"><a href="common-app-caveats.html#cb266-8"></a>      <span class="st">&quot;date&quot;</span>, </span>
+<span id="cb266-9"><a href="common-app-caveats.html#cb266-9"></a>      <span class="st">&quot;choose a date&quot;</span></span>
+<span id="cb266-10"><a href="common-app-caveats.html#cb266-10"></a>    ), </span>
+<span id="cb266-11"><a href="common-app-caveats.html#cb266-11"></a>    <span class="co"># Adding a second input allowing </span></span>
+<span id="cb266-12"><a href="common-app-caveats.html#cb266-12"></a>    <span class="co"># to specify a year</span></span>
+<span id="cb266-13"><a href="common-app-caveats.html#cb266-13"></a>    <span class="kw">selectInput</span>(</span>
+<span id="cb266-14"><a href="common-app-caveats.html#cb266-14"></a>      <span class="st">&quot;year&quot;</span>, </span>
+<span id="cb266-15"><a href="common-app-caveats.html#cb266-15"></a>      <span class="st">&quot;Choose a year&quot;</span>, </span>
+<span id="cb266-16"><a href="common-app-caveats.html#cb266-16"></a>      <span class="dt">choices =</span> <span class="dv">2010</span><span class="op">:</span><span class="dv">2030</span></span>
+<span id="cb266-17"><a href="common-app-caveats.html#cb266-17"></a>    )</span>
+<span id="cb266-18"><a href="common-app-caveats.html#cb266-18"></a>  )</span>
+<span id="cb266-19"><a href="common-app-caveats.html#cb266-19"></a>}</span>
+<span id="cb266-20"><a href="common-app-caveats.html#cb266-20"></a></span>
+<span id="cb266-21"><a href="common-app-caveats.html#cb266-21"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb266-22"><a href="common-app-caveats.html#cb266-22"></a>  input, </span>
+<span id="cb266-23"><a href="common-app-caveats.html#cb266-23"></a>  output, </span>
+<span id="cb266-24"><a href="common-app-caveats.html#cb266-24"></a>  session</span>
+<span id="cb266-25"><a href="common-app-caveats.html#cb266-25"></a>){</span>
+<span id="cb266-26"><a href="common-app-caveats.html#cb266-26"></a>  <span class="co"># We want the year to be update whenever </span></span>
+<span id="cb266-27"><a href="common-app-caveats.html#cb266-27"></a>  <span class="co"># the dateInput is updated</span></span>
+<span id="cb266-28"><a href="common-app-caveats.html#cb266-28"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>date , {</span>
+<span id="cb266-29"><a href="common-app-caveats.html#cb266-29"></a>    <span class="kw">updateSelectInput</span>(</span>
+<span id="cb266-30"><a href="common-app-caveats.html#cb266-30"></a>      session, </span>
+<span id="cb266-31"><a href="common-app-caveats.html#cb266-31"></a>      <span class="st">&quot;year&quot;</span>, </span>
+<span id="cb266-32"><a href="common-app-caveats.html#cb266-32"></a>      <span class="dt">selected =</span> <span class="kw">year</span>(input<span class="op">$</span>date)</span>
+<span id="cb266-33"><a href="common-app-caveats.html#cb266-33"></a>    )</span>
+<span id="cb266-34"><a href="common-app-caveats.html#cb266-34"></a>  })</span>
+<span id="cb266-35"><a href="common-app-caveats.html#cb266-35"></a>  </span>
+<span id="cb266-36"><a href="common-app-caveats.html#cb266-36"></a>  <span class="co"># We want the date to be update whenever </span></span>
+<span id="cb266-37"><a href="common-app-caveats.html#cb266-37"></a>  <span class="co"># the selectInput is updated</span></span>
+<span id="cb266-38"><a href="common-app-caveats.html#cb266-38"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>year , {</span>
+<span id="cb266-39"><a href="common-app-caveats.html#cb266-39"></a>    <span class="kw">updateDateInput</span>(</span>
+<span id="cb266-40"><a href="common-app-caveats.html#cb266-40"></a>      session, </span>
+<span id="cb266-41"><a href="common-app-caveats.html#cb266-41"></a>      <span class="st">&quot;date&quot;</span>, </span>
+<span id="cb266-42"><a href="common-app-caveats.html#cb266-42"></a>      <span class="dt">value =</span> lubridate<span class="op">::</span><span class="kw">as_date</span>(</span>
+<span id="cb266-43"><a href="common-app-caveats.html#cb266-43"></a>        <span class="kw">sprintf</span>(<span class="st">&quot;%s-01-01&quot;</span>, input<span class="op">$</span>year)</span>
+<span id="cb266-44"><a href="common-app-caveats.html#cb266-44"></a>      )</span>
+<span id="cb266-45"><a href="common-app-caveats.html#cb266-45"></a>    )</span>
+<span id="cb266-46"><a href="common-app-caveats.html#cb266-46"></a>  })</span>
+<span id="cb266-47"><a href="common-app-caveats.html#cb266-47"></a>  </span>
+<span id="cb266-48"><a href="common-app-caveats.html#cb266-48"></a>}</span>
+<span id="cb266-49"><a href="common-app-caveats.html#cb266-49"></a></span>
+<span id="cb266-50"><a href="common-app-caveats.html#cb266-50"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>Here, we want to handle something pretty common:</p>
 <ul>
 <li>The user can pick a <code>date</code> and the <code>year</code> input is updated.</li>
@@ -556,42 +556,42 @@ Or worse, we generate endless reactive loops, aka “the reactive inferno” whe
 In this section, we will deal with reactivity, how to have more control over it, and how to share data across modules without relying on passing along reactive objects.</p>
 <p>This application is in this state of infinite loop because it starts in a mutually inconsistent state: the <code>dateInput()</code> year value is the current year, while the <code>selectInput()</code> value is <code>2010</code>.
 One way to solve this is to add some extra logic to the app by selecting the current year for <code>selectInput()</code>, and adding an <code>if</code> statement in the <code>observeEvent(input$year, {})</code>, as shown below.<a href="#fn59" class="footnote-ref" id="fnref59"><sup>59</sup></a></p>
-<div class="sourceCode" id="cb268"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb268-1"><a href="common-app-caveats.html#cb268-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb268-2"><a href="common-app-caveats.html#cb268-2"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
-<span id="cb268-3"><a href="common-app-caveats.html#cb268-3"></a>  <span class="kw">dateInput</span>(</span>
-<span id="cb268-4"><a href="common-app-caveats.html#cb268-4"></a>    <span class="st">&quot;date&quot;</span>, </span>
-<span id="cb268-5"><a href="common-app-caveats.html#cb268-5"></a>    <span class="st">&quot;choose a date&quot;</span></span>
-<span id="cb268-6"><a href="common-app-caveats.html#cb268-6"></a>    ), </span>
-<span id="cb268-7"><a href="common-app-caveats.html#cb268-7"></a>  <span class="kw">selectInput</span>(</span>
-<span id="cb268-8"><a href="common-app-caveats.html#cb268-8"></a>    <span class="st">&quot;year&quot;</span>, </span>
-<span id="cb268-9"><a href="common-app-caveats.html#cb268-9"></a>    <span class="st">&quot;Choose a year&quot;</span>, </span>
-<span id="cb268-10"><a href="common-app-caveats.html#cb268-10"></a>    <span class="dt">choices =</span> <span class="dv">2010</span><span class="op">:</span><span class="dv">2030</span>, </span>
-<span id="cb268-11"><a href="common-app-caveats.html#cb268-11"></a>    <span class="co"># Setting a state for the year</span></span>
-<span id="cb268-12"><a href="common-app-caveats.html#cb268-12"></a>    <span class="dt">selected =</span> <span class="kw">format</span>(</span>
-<span id="cb268-13"><a href="common-app-caveats.html#cb268-13"></a>      <span class="kw">Sys.Date</span>(), </span>
-<span id="cb268-14"><a href="common-app-caveats.html#cb268-14"></a>      <span class="st">&quot;%Y&quot;</span></span>
-<span id="cb268-15"><a href="common-app-caveats.html#cb268-15"></a>    )</span>
-<span id="cb268-16"><a href="common-app-caveats.html#cb268-16"></a>  )</span>
-<span id="cb268-17"><a href="common-app-caveats.html#cb268-17"></a>)</span>
-<span id="cb268-18"><a href="common-app-caveats.html#cb268-18"></a></span>
-<span id="cb268-19"><a href="common-app-caveats.html#cb268-19"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
-<span id="cb268-20"><a href="common-app-caveats.html#cb268-20"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>date, {</span>
-<span id="cb268-21"><a href="common-app-caveats.html#cb268-21"></a>    year &lt;-<span class="st"> </span><span class="kw">format</span>(input<span class="op">$</span>date, <span class="st">&quot;%Y&quot;</span>)</span>
-<span id="cb268-22"><a href="common-app-caveats.html#cb268-22"></a>    <span class="kw">message</span>(<span class="st">&quot;Changing year to &quot;</span>, year)</span>
-<span id="cb268-23"><a href="common-app-caveats.html#cb268-23"></a>    <span class="kw">updateSelectInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;year&quot;</span>, <span class="dt">selected =</span> year)</span>
-<span id="cb268-24"><a href="common-app-caveats.html#cb268-24"></a>  })</span>
-<span id="cb268-25"><a href="common-app-caveats.html#cb268-25"></a>  </span>
-<span id="cb268-26"><a href="common-app-caveats.html#cb268-26"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>year, {</span>
-<span id="cb268-27"><a href="common-app-caveats.html#cb268-27"></a>    <span class="co"># Preventing this update to be sent at application launch</span></span>
-<span id="cb268-28"><a href="common-app-caveats.html#cb268-28"></a>    <span class="cf">if</span> (input<span class="op">$</span>year <span class="op">!=</span><span class="st"> </span><span class="kw">format</span>(input<span class="op">$</span>date, <span class="st">&quot;%Y&quot;</span>)) {</span>
-<span id="cb268-29"><a href="common-app-caveats.html#cb268-29"></a>      date &lt;-<span class="st"> </span><span class="kw">as.Date</span>(<span class="kw">ISOdate</span>(input<span class="op">$</span>year, <span class="dv">1</span>, <span class="dv">1</span>))</span>
-<span id="cb268-30"><a href="common-app-caveats.html#cb268-30"></a>      <span class="kw">message</span>(<span class="st">&quot;Changing date to &quot;</span>, date)</span>
-<span id="cb268-31"><a href="common-app-caveats.html#cb268-31"></a>      <span class="kw">updateDateInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;date&quot;</span>, <span class="dt">value =</span> date)</span>
-<span id="cb268-32"><a href="common-app-caveats.html#cb268-32"></a>    }</span>
-<span id="cb268-33"><a href="common-app-caveats.html#cb268-33"></a>  })</span>
-<span id="cb268-34"><a href="common-app-caveats.html#cb268-34"></a>}</span>
-<span id="cb268-35"><a href="common-app-caveats.html#cb268-35"></a></span>
-<span id="cb268-36"><a href="common-app-caveats.html#cb268-36"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb267-1"><a href="common-app-caveats.html#cb267-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb267-2"><a href="common-app-caveats.html#cb267-2"></a>ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(</span>
+<span id="cb267-3"><a href="common-app-caveats.html#cb267-3"></a>  <span class="kw">dateInput</span>(</span>
+<span id="cb267-4"><a href="common-app-caveats.html#cb267-4"></a>    <span class="st">&quot;date&quot;</span>, </span>
+<span id="cb267-5"><a href="common-app-caveats.html#cb267-5"></a>    <span class="st">&quot;choose a date&quot;</span></span>
+<span id="cb267-6"><a href="common-app-caveats.html#cb267-6"></a>    ), </span>
+<span id="cb267-7"><a href="common-app-caveats.html#cb267-7"></a>  <span class="kw">selectInput</span>(</span>
+<span id="cb267-8"><a href="common-app-caveats.html#cb267-8"></a>    <span class="st">&quot;year&quot;</span>, </span>
+<span id="cb267-9"><a href="common-app-caveats.html#cb267-9"></a>    <span class="st">&quot;Choose a year&quot;</span>, </span>
+<span id="cb267-10"><a href="common-app-caveats.html#cb267-10"></a>    <span class="dt">choices =</span> <span class="dv">2010</span><span class="op">:</span><span class="dv">2030</span>, </span>
+<span id="cb267-11"><a href="common-app-caveats.html#cb267-11"></a>    <span class="co"># Setting a state for the year</span></span>
+<span id="cb267-12"><a href="common-app-caveats.html#cb267-12"></a>    <span class="dt">selected =</span> <span class="kw">format</span>(</span>
+<span id="cb267-13"><a href="common-app-caveats.html#cb267-13"></a>      <span class="kw">Sys.Date</span>(), </span>
+<span id="cb267-14"><a href="common-app-caveats.html#cb267-14"></a>      <span class="st">&quot;%Y&quot;</span></span>
+<span id="cb267-15"><a href="common-app-caveats.html#cb267-15"></a>    )</span>
+<span id="cb267-16"><a href="common-app-caveats.html#cb267-16"></a>  )</span>
+<span id="cb267-17"><a href="common-app-caveats.html#cb267-17"></a>)</span>
+<span id="cb267-18"><a href="common-app-caveats.html#cb267-18"></a></span>
+<span id="cb267-19"><a href="common-app-caveats.html#cb267-19"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session) {</span>
+<span id="cb267-20"><a href="common-app-caveats.html#cb267-20"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>date, {</span>
+<span id="cb267-21"><a href="common-app-caveats.html#cb267-21"></a>    year &lt;-<span class="st"> </span><span class="kw">format</span>(input<span class="op">$</span>date, <span class="st">&quot;%Y&quot;</span>)</span>
+<span id="cb267-22"><a href="common-app-caveats.html#cb267-22"></a>    <span class="kw">message</span>(<span class="st">&quot;Changing year to &quot;</span>, year)</span>
+<span id="cb267-23"><a href="common-app-caveats.html#cb267-23"></a>    <span class="kw">updateSelectInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;year&quot;</span>, <span class="dt">selected =</span> year)</span>
+<span id="cb267-24"><a href="common-app-caveats.html#cb267-24"></a>  })</span>
+<span id="cb267-25"><a href="common-app-caveats.html#cb267-25"></a>  </span>
+<span id="cb267-26"><a href="common-app-caveats.html#cb267-26"></a>  <span class="kw">observeEvent</span>(input<span class="op">$</span>year, {</span>
+<span id="cb267-27"><a href="common-app-caveats.html#cb267-27"></a>    <span class="co"># Preventing this update to be sent at application launch</span></span>
+<span id="cb267-28"><a href="common-app-caveats.html#cb267-28"></a>    <span class="cf">if</span> (input<span class="op">$</span>year <span class="op">!=</span><span class="st"> </span><span class="kw">format</span>(input<span class="op">$</span>date, <span class="st">&quot;%Y&quot;</span>)) {</span>
+<span id="cb267-29"><a href="common-app-caveats.html#cb267-29"></a>      date &lt;-<span class="st"> </span><span class="kw">as.Date</span>(<span class="kw">ISOdate</span>(input<span class="op">$</span>year, <span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb267-30"><a href="common-app-caveats.html#cb267-30"></a>      <span class="kw">message</span>(<span class="st">&quot;Changing date to &quot;</span>, date)</span>
+<span id="cb267-31"><a href="common-app-caveats.html#cb267-31"></a>      <span class="kw">updateDateInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;date&quot;</span>, <span class="dt">value =</span> date)</span>
+<span id="cb267-32"><a href="common-app-caveats.html#cb267-32"></a>    }</span>
+<span id="cb267-33"><a href="common-app-caveats.html#cb267-33"></a>  })</span>
+<span id="cb267-34"><a href="common-app-caveats.html#cb267-34"></a>}</span>
+<span id="cb267-35"><a href="common-app-caveats.html#cb267-35"></a></span>
+<span id="cb267-36"><a href="common-app-caveats.html#cb267-36"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
 <div id="observe-vs-observeevent" class="section level3">
 <h3><span class="header-section-number">15.1.2</span> <code>observe</code> vs <code>observeEvent</code></h3>
@@ -604,71 +604,118 @@ This function updates <strong>every time a reactive object it contains is invali
 Yes, this works well if you have a small number of reactive objects in the observer, but that gets tricky when you start adding a long list of things inside your <code>observe()</code>, as you might be launching a computation 10 times if your reactive scope contains 10 reactive objects that are somehow invalidated in chain.
 And believe us, we have seen pieces of code where the <code>observe()</code> contains hundreds of lines of code, with reactive objects all over the place, with one <code>observe()</code> context being invalidated dozens of times when one input changes in the application.</p>
 <p>For example, let’s start with that:</p>
-<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb269-1"><a href="common-app-caveats.html#cb269-1"></a><span class="co">## DO NOT DO GLOBAL VARIABLES, IT&#39;S JUST TO SIMPLIFY THE EXAMPLE</span></span>
-<span id="cb269-2"><a href="common-app-caveats.html#cb269-2"></a><span class="co"># We initiate a counter that will help to track how many times </span></span>
-<span id="cb269-3"><a href="common-app-caveats.html#cb269-3"></a><span class="co"># some pieces of the code are called</span></span>
-<span id="cb269-4"><a href="common-app-caveats.html#cb269-4"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
-<span id="cb269-5"><a href="common-app-caveats.html#cb269-5"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb269-6"><a href="common-app-caveats.html#cb269-6"></a><span class="kw">library</span>(cli)</span>
-<span id="cb269-7"><a href="common-app-caveats.html#cb269-7"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb269-8"><a href="common-app-caveats.html#cb269-8"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb269-9"><a href="common-app-caveats.html#cb269-9"></a>    <span class="co"># We are adding a simple text input </span></span>
-<span id="cb269-10"><a href="common-app-caveats.html#cb269-10"></a>    <span class="co"># that will be printed to the console</span></span>
-<span id="cb269-11"><a href="common-app-caveats.html#cb269-11"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;Text&quot;</span>)</span>
-<span id="cb269-12"><a href="common-app-caveats.html#cb269-12"></a>  )</span>
-<span id="cb269-13"><a href="common-app-caveats.html#cb269-13"></a>}</span>
-<span id="cb269-14"><a href="common-app-caveats.html#cb269-14"></a></span>
-<span id="cb269-15"><a href="common-app-caveats.html#cb269-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb269-16"><a href="common-app-caveats.html#cb269-16"></a>  <span class="kw">observe</span>({</span>
-<span id="cb269-17"><a href="common-app-caveats.html#cb269-17"></a>    <span class="co"># Every time this reactive context is invalidated, </span></span>
-<span id="cb269-18"><a href="common-app-caveats.html#cb269-18"></a>    <span class="co"># we add 1 to the i value</span></span>
-<span id="cb269-19"><a href="common-app-caveats.html#cb269-19"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb269-20"><a href="common-app-caveats.html#cb269-20"></a>    <span class="co"># We print the i value to the console, </span></span>
-<span id="cb269-21"><a href="common-app-caveats.html#cb269-21"></a>    <span class="co"># and the value of input$txt</span></span>
-<span id="cb269-22"><a href="common-app-caveats.html#cb269-22"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb269-23"><a href="common-app-caveats.html#cb269-23"></a>    <span class="kw">print</span>(input<span class="op">$</span>txt)</span>
-<span id="cb269-24"><a href="common-app-caveats.html#cb269-24"></a>  })</span>
-<span id="cb269-25"><a href="common-app-caveats.html#cb269-25"></a>}</span>
-<span id="cb269-26"><a href="common-app-caveats.html#cb269-26"></a></span>
-<span id="cb269-27"><a href="common-app-caveats.html#cb269-27"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb268"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb268-1"><a href="common-app-caveats.html#cb268-1"></a><span class="co">## DO NOT DO GLOBAL VARIABLES, IT&#39;S JUST TO SIMPLIFY THE EXAMPLE</span></span>
+<span id="cb268-2"><a href="common-app-caveats.html#cb268-2"></a><span class="co"># We initiate a counter that will help to track how many times </span></span>
+<span id="cb268-3"><a href="common-app-caveats.html#cb268-3"></a><span class="co"># some pieces of the code are called</span></span>
+<span id="cb268-4"><a href="common-app-caveats.html#cb268-4"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
+<span id="cb268-5"><a href="common-app-caveats.html#cb268-5"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb268-6"><a href="common-app-caveats.html#cb268-6"></a><span class="kw">library</span>(cli)</span>
+<span id="cb268-7"><a href="common-app-caveats.html#cb268-7"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb268-8"><a href="common-app-caveats.html#cb268-8"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb268-9"><a href="common-app-caveats.html#cb268-9"></a>    <span class="co"># We are adding a simple text input </span></span>
+<span id="cb268-10"><a href="common-app-caveats.html#cb268-10"></a>    <span class="co"># that will be printed to the console</span></span>
+<span id="cb268-11"><a href="common-app-caveats.html#cb268-11"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;Text&quot;</span>)</span>
+<span id="cb268-12"><a href="common-app-caveats.html#cb268-12"></a>  )</span>
+<span id="cb268-13"><a href="common-app-caveats.html#cb268-13"></a>}</span>
+<span id="cb268-14"><a href="common-app-caveats.html#cb268-14"></a></span>
+<span id="cb268-15"><a href="common-app-caveats.html#cb268-15"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb268-16"><a href="common-app-caveats.html#cb268-16"></a>  <span class="kw">observe</span>({</span>
+<span id="cb268-17"><a href="common-app-caveats.html#cb268-17"></a>    <span class="co"># Every time this reactive context is invalidated, </span></span>
+<span id="cb268-18"><a href="common-app-caveats.html#cb268-18"></a>    <span class="co"># we add 1 to the i value</span></span>
+<span id="cb268-19"><a href="common-app-caveats.html#cb268-19"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb268-20"><a href="common-app-caveats.html#cb268-20"></a>    <span class="co"># We print the i value to the console, </span></span>
+<span id="cb268-21"><a href="common-app-caveats.html#cb268-21"></a>    <span class="co"># and the value of input$txt</span></span>
+<span id="cb268-22"><a href="common-app-caveats.html#cb268-22"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
+<span id="cb268-23"><a href="common-app-caveats.html#cb268-23"></a>    <span class="kw">print</span>(input<span class="op">$</span>txt)</span>
+<span id="cb268-24"><a href="common-app-caveats.html#cb268-24"></a>  })</span>
+<span id="cb268-25"><a href="common-app-caveats.html#cb268-25"></a>}</span>
+<span id="cb268-26"><a href="common-app-caveats.html#cb268-26"></a></span>
+<span id="cb268-27"><a href="common-app-caveats.html#cb268-27"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>Oh, and then, let’s add a small <code>selectInput()</code>:</p>
+<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb269-1"><a href="common-app-caveats.html#cb269-1"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
+<span id="cb269-2"><a href="common-app-caveats.html#cb269-2"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb269-3"><a href="common-app-caveats.html#cb269-3"></a><span class="kw">library</span>(cli)</span>
+<span id="cb269-4"><a href="common-app-caveats.html#cb269-4"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb269-5"><a href="common-app-caveats.html#cb269-5"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb269-6"><a href="common-app-caveats.html#cb269-6"></a>    <span class="co"># We are adding a simple text input </span></span>
+<span id="cb269-7"><a href="common-app-caveats.html#cb269-7"></a>    <span class="co"># that will be printed to the console</span></span>
+<span id="cb269-8"><a href="common-app-caveats.html#cb269-8"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;Text&quot;</span>),</span>
+<span id="cb269-9"><a href="common-app-caveats.html#cb269-9"></a>    <span class="co"># We add a selectInput() to allow text transformation</span></span>
+<span id="cb269-10"><a href="common-app-caveats.html#cb269-10"></a>    <span class="kw">selectInput</span>(</span>
+<span id="cb269-11"><a href="common-app-caveats.html#cb269-11"></a>      <span class="st">&quot;casefolding&quot;</span>, </span>
+<span id="cb269-12"><a href="common-app-caveats.html#cb269-12"></a>      <span class="st">&quot;Casefolding&quot;</span>, </span>
+<span id="cb269-13"><a href="common-app-caveats.html#cb269-13"></a>      <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)</span>
+<span id="cb269-14"><a href="common-app-caveats.html#cb269-14"></a>    )</span>
+<span id="cb269-15"><a href="common-app-caveats.html#cb269-15"></a>  )</span>
+<span id="cb269-16"><a href="common-app-caveats.html#cb269-16"></a>}</span>
+<span id="cb269-17"><a href="common-app-caveats.html#cb269-17"></a></span>
+<span id="cb269-18"><a href="common-app-caveats.html#cb269-18"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb269-19"><a href="common-app-caveats.html#cb269-19"></a>  <span class="kw">observe</span>({</span>
+<span id="cb269-20"><a href="common-app-caveats.html#cb269-20"></a>    <span class="co"># Every time this reactive context </span></span>
+<span id="cb269-21"><a href="common-app-caveats.html#cb269-21"></a>    <span class="co"># is invalidated, we add 1 to the i value</span></span>
+<span id="cb269-22"><a href="common-app-caveats.html#cb269-22"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb269-23"><a href="common-app-caveats.html#cb269-23"></a>    <span class="co"># We print the i value to the console</span></span>
+<span id="cb269-24"><a href="common-app-caveats.html#cb269-24"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
+<span id="cb269-25"><a href="common-app-caveats.html#cb269-25"></a>    <span class="co"># If the user select lower, then the text is </span></span>
+<span id="cb269-26"><a href="common-app-caveats.html#cb269-26"></a>    <span class="co"># passed through tolower, otherwise it&#39;s passed </span></span>
+<span id="cb269-27"><a href="common-app-caveats.html#cb269-27"></a>    <span class="co"># through toupper</span></span>
+<span id="cb269-28"><a href="common-app-caveats.html#cb269-28"></a>    <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
+<span id="cb269-29"><a href="common-app-caveats.html#cb269-29"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(input<span class="op">$</span>txt))</span>
+<span id="cb269-30"><a href="common-app-caveats.html#cb269-30"></a>    } <span class="cf">else</span>  {</span>
+<span id="cb269-31"><a href="common-app-caveats.html#cb269-31"></a>      <span class="kw">print</span>(<span class="kw">toupper</span>(input<span class="op">$</span>txt))</span>
+<span id="cb269-32"><a href="common-app-caveats.html#cb269-32"></a>    }</span>
+<span id="cb269-33"><a href="common-app-caveats.html#cb269-33"></a>  })</span>
+<span id="cb269-34"><a href="common-app-caveats.html#cb269-34"></a>}</span>
+<span id="cb269-35"><a href="common-app-caveats.html#cb269-35"></a></span>
+<span id="cb269-36"><a href="common-app-caveats.html#cb269-36"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>And, as time goes by, we add another control flow to our <code>observe()</code>:</p>
 <div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb270-1"><a href="common-app-caveats.html#cb270-1"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
 <span id="cb270-2"><a href="common-app-caveats.html#cb270-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb270-3"><a href="common-app-caveats.html#cb270-3"></a><span class="kw">library</span>(cli)</span>
-<span id="cb270-4"><a href="common-app-caveats.html#cb270-4"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb270-5"><a href="common-app-caveats.html#cb270-5"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb270-6"><a href="common-app-caveats.html#cb270-6"></a>    <span class="co"># We are adding a simple text input </span></span>
-<span id="cb270-7"><a href="common-app-caveats.html#cb270-7"></a>    <span class="co"># that will be printed to the console</span></span>
-<span id="cb270-8"><a href="common-app-caveats.html#cb270-8"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;Text&quot;</span>),</span>
-<span id="cb270-9"><a href="common-app-caveats.html#cb270-9"></a>    <span class="co"># We add a selectInput() to allow text transformation</span></span>
-<span id="cb270-10"><a href="common-app-caveats.html#cb270-10"></a>    <span class="kw">selectInput</span>(</span>
-<span id="cb270-11"><a href="common-app-caveats.html#cb270-11"></a>      <span class="st">&quot;casefolding&quot;</span>, </span>
-<span id="cb270-12"><a href="common-app-caveats.html#cb270-12"></a>      <span class="st">&quot;Casefolding&quot;</span>, </span>
-<span id="cb270-13"><a href="common-app-caveats.html#cb270-13"></a>      <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)</span>
-<span id="cb270-14"><a href="common-app-caveats.html#cb270-14"></a>    )</span>
-<span id="cb270-15"><a href="common-app-caveats.html#cb270-15"></a>  )</span>
-<span id="cb270-16"><a href="common-app-caveats.html#cb270-16"></a>}</span>
-<span id="cb270-17"><a href="common-app-caveats.html#cb270-17"></a></span>
-<span id="cb270-18"><a href="common-app-caveats.html#cb270-18"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb270-19"><a href="common-app-caveats.html#cb270-19"></a>  <span class="kw">observe</span>({</span>
-<span id="cb270-20"><a href="common-app-caveats.html#cb270-20"></a>    <span class="co"># Every time this reactive context </span></span>
-<span id="cb270-21"><a href="common-app-caveats.html#cb270-21"></a>    <span class="co"># is invalidated, we add 1 to the i value</span></span>
-<span id="cb270-22"><a href="common-app-caveats.html#cb270-22"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb270-23"><a href="common-app-caveats.html#cb270-23"></a>    <span class="co"># We print the i value to the console</span></span>
-<span id="cb270-24"><a href="common-app-caveats.html#cb270-24"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb270-25"><a href="common-app-caveats.html#cb270-25"></a>    <span class="co"># If the user select lower, then the text is </span></span>
-<span id="cb270-26"><a href="common-app-caveats.html#cb270-26"></a>    <span class="co"># passed through tolower, otherwise it&#39;s passed </span></span>
-<span id="cb270-27"><a href="common-app-caveats.html#cb270-27"></a>    <span class="co"># through toupper</span></span>
-<span id="cb270-28"><a href="common-app-caveats.html#cb270-28"></a>    <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
-<span id="cb270-29"><a href="common-app-caveats.html#cb270-29"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(input<span class="op">$</span>txt))</span>
-<span id="cb270-30"><a href="common-app-caveats.html#cb270-30"></a>    } <span class="cf">else</span>  {</span>
-<span id="cb270-31"><a href="common-app-caveats.html#cb270-31"></a>      <span class="kw">print</span>(<span class="kw">toupper</span>(input<span class="op">$</span>txt))</span>
-<span id="cb270-32"><a href="common-app-caveats.html#cb270-32"></a>    }</span>
-<span id="cb270-33"><a href="common-app-caveats.html#cb270-33"></a>  })</span>
-<span id="cb270-34"><a href="common-app-caveats.html#cb270-34"></a>}</span>
-<span id="cb270-35"><a href="common-app-caveats.html#cb270-35"></a></span>
-<span id="cb270-36"><a href="common-app-caveats.html#cb270-36"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>And, as time goes by, we add another control flow to our <code>observe()</code>:</p>
+<span id="cb270-4"><a href="common-app-caveats.html#cb270-4"></a><span class="kw">library</span>(stringi)</span>
+<span id="cb270-5"><a href="common-app-caveats.html#cb270-5"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb270-6"><a href="common-app-caveats.html#cb270-6"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb270-7"><a href="common-app-caveats.html#cb270-7"></a>    <span class="co"># We are adding a simple text input </span></span>
+<span id="cb270-8"><a href="common-app-caveats.html#cb270-8"></a>    <span class="co"># that will be printed to the console</span></span>
+<span id="cb270-9"><a href="common-app-caveats.html#cb270-9"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;Text&quot;</span>),</span>
+<span id="cb270-10"><a href="common-app-caveats.html#cb270-10"></a>    <span class="co"># We add a selectInput() to allow text transformation</span></span>
+<span id="cb270-11"><a href="common-app-caveats.html#cb270-11"></a>    <span class="kw">selectInput</span>(</span>
+<span id="cb270-12"><a href="common-app-caveats.html#cb270-12"></a>      <span class="st">&quot;casefolding&quot;</span>, </span>
+<span id="cb270-13"><a href="common-app-caveats.html#cb270-13"></a>      <span class="st">&quot;Casefolding&quot;</span>, </span>
+<span id="cb270-14"><a href="common-app-caveats.html#cb270-14"></a>      <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)</span>
+<span id="cb270-15"><a href="common-app-caveats.html#cb270-15"></a>    )</span>
+<span id="cb270-16"><a href="common-app-caveats.html#cb270-16"></a>    <span class="co"># A new checkbox to reverse (or not) the input text</span></span>
+<span id="cb270-17"><a href="common-app-caveats.html#cb270-17"></a>    <span class="kw">checkboxInput</span>(<span class="st">&quot;rev&quot;</span>, <span class="st">&quot;reverse&quot;</span>)</span>
+<span id="cb270-18"><a href="common-app-caveats.html#cb270-18"></a>  )</span>
+<span id="cb270-19"><a href="common-app-caveats.html#cb270-19"></a>}</span>
+<span id="cb270-20"><a href="common-app-caveats.html#cb270-20"></a></span>
+<span id="cb270-21"><a href="common-app-caveats.html#cb270-21"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb270-22"><a href="common-app-caveats.html#cb270-22"></a>  <span class="kw">observe</span>({</span>
+<span id="cb270-23"><a href="common-app-caveats.html#cb270-23"></a>    <span class="co"># Every time this reactive context </span></span>
+<span id="cb270-24"><a href="common-app-caveats.html#cb270-24"></a>    <span class="co"># is invalidated, we add 1 to the i value</span></span>
+<span id="cb270-25"><a href="common-app-caveats.html#cb270-25"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb270-26"><a href="common-app-caveats.html#cb270-26"></a>    <span class="co"># We print the i value to the console</span></span>
+<span id="cb270-27"><a href="common-app-caveats.html#cb270-27"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
+<span id="cb270-28"><a href="common-app-caveats.html#cb270-28"></a>    <span class="co"># Use input_txt as a container for our input</span></span>
+<span id="cb270-29"><a href="common-app-caveats.html#cb270-29"></a>    input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
+<span id="cb270-30"><a href="common-app-caveats.html#cb270-30"></a>    <span class="cf">if</span> (input<span class="op">$</span>rev){</span>
+<span id="cb270-31"><a href="common-app-caveats.html#cb270-31"></a>      <span class="co"># If the input$rev is select, we reverse the text</span></span>
+<span id="cb270-32"><a href="common-app-caveats.html#cb270-32"></a>      input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(input_txt)</span>
+<span id="cb270-33"><a href="common-app-caveats.html#cb270-33"></a>    }</span>
+<span id="cb270-34"><a href="common-app-caveats.html#cb270-34"></a>    <span class="co"># If the user select lower, then the text is </span></span>
+<span id="cb270-35"><a href="common-app-caveats.html#cb270-35"></a>    <span class="co"># passed through tolower, otherwise it&#39;s passed </span></span>
+<span id="cb270-36"><a href="common-app-caveats.html#cb270-36"></a>    <span class="co"># through toupper</span></span>
+<span id="cb270-37"><a href="common-app-caveats.html#cb270-37"></a>    <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
+<span id="cb270-38"><a href="common-app-caveats.html#cb270-38"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(input_txt))</span>
+<span id="cb270-39"><a href="common-app-caveats.html#cb270-39"></a>    } <span class="cf">else</span>  {</span>
+<span id="cb270-40"><a href="common-app-caveats.html#cb270-40"></a>      <span class="kw">print</span>(<span class="kw">toupper</span>(input_txt))</span>
+<span id="cb270-41"><a href="common-app-caveats.html#cb270-41"></a>    }</span>
+<span id="cb270-42"><a href="common-app-caveats.html#cb270-42"></a>  })</span>
+<span id="cb270-43"><a href="common-app-caveats.html#cb270-43"></a>}</span>
+<span id="cb270-44"><a href="common-app-caveats.html#cb270-44"></a></span>
+<span id="cb270-45"><a href="common-app-caveats.html#cb270-45"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>And it would be nice to keep the selected values in a reactive list, so that we can reuse it elsewhere.
+And maybe you would like to add a checkbox so that the logs are printed to the console only if checked.</p>
 <div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb271-1"><a href="common-app-caveats.html#cb271-1"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
 <span id="cb271-2"><a href="common-app-caveats.html#cb271-2"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb271-3"><a href="common-app-caveats.html#cb271-3"></a><span class="kw">library</span>(cli)</span>
@@ -690,80 +737,33 @@ And believe us, we have seen pieces of code where the <code>observe()</code> con
 <span id="cb271-19"><a href="common-app-caveats.html#cb271-19"></a>}</span>
 <span id="cb271-20"><a href="common-app-caveats.html#cb271-20"></a></span>
 <span id="cb271-21"><a href="common-app-caveats.html#cb271-21"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb271-22"><a href="common-app-caveats.html#cb271-22"></a>  <span class="kw">observe</span>({</span>
-<span id="cb271-23"><a href="common-app-caveats.html#cb271-23"></a>    <span class="co"># Every time this reactive context </span></span>
-<span id="cb271-24"><a href="common-app-caveats.html#cb271-24"></a>    <span class="co"># is invalidated, we add 1 to the i value</span></span>
-<span id="cb271-25"><a href="common-app-caveats.html#cb271-25"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb271-26"><a href="common-app-caveats.html#cb271-26"></a>    <span class="co"># We print the i value to the console</span></span>
-<span id="cb271-27"><a href="common-app-caveats.html#cb271-27"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb271-28"><a href="common-app-caveats.html#cb271-28"></a>    <span class="co"># Use input_txt as a container for our input</span></span>
-<span id="cb271-29"><a href="common-app-caveats.html#cb271-29"></a>    input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
+<span id="cb271-22"><a href="common-app-caveats.html#cb271-22"></a>  <span class="co"># We are using a reactiveValues to keep this input value</span></span>
+<span id="cb271-23"><a href="common-app-caveats.html#cb271-23"></a>  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>()</span>
+<span id="cb271-24"><a href="common-app-caveats.html#cb271-24"></a>  <span class="kw">observe</span>({</span>
+<span id="cb271-25"><a href="common-app-caveats.html#cb271-25"></a>    <span class="co"># Every time this reactive context </span></span>
+<span id="cb271-26"><a href="common-app-caveats.html#cb271-26"></a>    <span class="co"># is invalidated, we add 1 to the i value</span></span>
+<span id="cb271-27"><a href="common-app-caveats.html#cb271-27"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb271-28"><a href="common-app-caveats.html#cb271-28"></a>    <span class="co"># We print the i value to the console</span></span>
+<span id="cb271-29"><a href="common-app-caveats.html#cb271-29"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
 <span id="cb271-30"><a href="common-app-caveats.html#cb271-30"></a>    <span class="cf">if</span> (input<span class="op">$</span>rev){</span>
 <span id="cb271-31"><a href="common-app-caveats.html#cb271-31"></a>      <span class="co"># If the input$rev is select, we reverse the text</span></span>
-<span id="cb271-32"><a href="common-app-caveats.html#cb271-32"></a>      input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(input_txt)</span>
-<span id="cb271-33"><a href="common-app-caveats.html#cb271-33"></a>    }</span>
-<span id="cb271-34"><a href="common-app-caveats.html#cb271-34"></a>    <span class="co"># If the user select lower, then the text is </span></span>
-<span id="cb271-35"><a href="common-app-caveats.html#cb271-35"></a>    <span class="co"># passed through tolower, otherwise it&#39;s passed </span></span>
-<span id="cb271-36"><a href="common-app-caveats.html#cb271-36"></a>    <span class="co"># through toupper</span></span>
-<span id="cb271-37"><a href="common-app-caveats.html#cb271-37"></a>    <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
-<span id="cb271-38"><a href="common-app-caveats.html#cb271-38"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(input_txt))</span>
-<span id="cb271-39"><a href="common-app-caveats.html#cb271-39"></a>    } <span class="cf">else</span>  {</span>
-<span id="cb271-40"><a href="common-app-caveats.html#cb271-40"></a>      <span class="kw">print</span>(<span class="kw">toupper</span>(input_txt))</span>
-<span id="cb271-41"><a href="common-app-caveats.html#cb271-41"></a>    }</span>
-<span id="cb271-42"><a href="common-app-caveats.html#cb271-42"></a>  })</span>
-<span id="cb271-43"><a href="common-app-caveats.html#cb271-43"></a>}</span>
-<span id="cb271-44"><a href="common-app-caveats.html#cb271-44"></a></span>
-<span id="cb271-45"><a href="common-app-caveats.html#cb271-45"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>And it would be nice to keep the selected values in a reactive list, so that we can reuse it elsewhere.
-And maybe you would like to add a checkbox so that the logs are printed to the console only if checked.</p>
-<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="common-app-caveats.html#cb272-1"></a>i &lt;-<span class="st"> </span><span class="dv">0</span></span>
-<span id="cb272-2"><a href="common-app-caveats.html#cb272-2"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb272-3"><a href="common-app-caveats.html#cb272-3"></a><span class="kw">library</span>(cli)</span>
-<span id="cb272-4"><a href="common-app-caveats.html#cb272-4"></a><span class="kw">library</span>(stringi)</span>
-<span id="cb272-5"><a href="common-app-caveats.html#cb272-5"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb272-6"><a href="common-app-caveats.html#cb272-6"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb272-7"><a href="common-app-caveats.html#cb272-7"></a>    <span class="co"># We are adding a simple text input </span></span>
-<span id="cb272-8"><a href="common-app-caveats.html#cb272-8"></a>    <span class="co"># that will be printed to the console</span></span>
-<span id="cb272-9"><a href="common-app-caveats.html#cb272-9"></a>    <span class="kw">textInput</span>(<span class="st">&quot;txt&quot;</span>, <span class="st">&quot;Text&quot;</span>),</span>
-<span id="cb272-10"><a href="common-app-caveats.html#cb272-10"></a>    <span class="co"># We add a selectInput() to allow text transformation</span></span>
-<span id="cb272-11"><a href="common-app-caveats.html#cb272-11"></a>    <span class="kw">selectInput</span>(</span>
-<span id="cb272-12"><a href="common-app-caveats.html#cb272-12"></a>      <span class="st">&quot;casefolding&quot;</span>, </span>
-<span id="cb272-13"><a href="common-app-caveats.html#cb272-13"></a>      <span class="st">&quot;Casefolding&quot;</span>, </span>
-<span id="cb272-14"><a href="common-app-caveats.html#cb272-14"></a>      <span class="kw">c</span>(<span class="st">&quot;lower&quot;</span>, <span class="st">&quot;upper&quot;</span>)</span>
-<span id="cb272-15"><a href="common-app-caveats.html#cb272-15"></a>    )</span>
-<span id="cb272-16"><a href="common-app-caveats.html#cb272-16"></a>    <span class="co"># A new checkbox to reverse (or not) the input text</span></span>
-<span id="cb272-17"><a href="common-app-caveats.html#cb272-17"></a>    <span class="kw">checkboxInput</span>(<span class="st">&quot;rev&quot;</span>, <span class="st">&quot;reverse&quot;</span>)</span>
-<span id="cb272-18"><a href="common-app-caveats.html#cb272-18"></a>  )</span>
-<span id="cb272-19"><a href="common-app-caveats.html#cb272-19"></a>}</span>
-<span id="cb272-20"><a href="common-app-caveats.html#cb272-20"></a></span>
-<span id="cb272-21"><a href="common-app-caveats.html#cb272-21"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb272-22"><a href="common-app-caveats.html#cb272-22"></a>  <span class="co"># We are using a reactiveValues to keep this input value</span></span>
-<span id="cb272-23"><a href="common-app-caveats.html#cb272-23"></a>  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>()</span>
-<span id="cb272-24"><a href="common-app-caveats.html#cb272-24"></a>  <span class="kw">observe</span>({</span>
-<span id="cb272-25"><a href="common-app-caveats.html#cb272-25"></a>    <span class="co"># Every time this reactive context </span></span>
-<span id="cb272-26"><a href="common-app-caveats.html#cb272-26"></a>    <span class="co"># is invalidated, we add 1 to the i value</span></span>
-<span id="cb272-27"><a href="common-app-caveats.html#cb272-27"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb272-28"><a href="common-app-caveats.html#cb272-28"></a>    <span class="co"># We print the i value to the console</span></span>
-<span id="cb272-29"><a href="common-app-caveats.html#cb272-29"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb272-30"><a href="common-app-caveats.html#cb272-30"></a>    <span class="cf">if</span> (input<span class="op">$</span>rev){</span>
-<span id="cb272-31"><a href="common-app-caveats.html#cb272-31"></a>      <span class="co"># If the input$rev is select, we reverse the text</span></span>
-<span id="cb272-32"><a href="common-app-caveats.html#cb272-32"></a>      r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
-<span id="cb272-33"><a href="common-app-caveats.html#cb272-33"></a>    } <span class="cf">else</span> {</span>
-<span id="cb272-34"><a href="common-app-caveats.html#cb272-34"></a>      <span class="co"># Otherwise, we leave it as it is</span></span>
-<span id="cb272-35"><a href="common-app-caveats.html#cb272-35"></a>      r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
-<span id="cb272-36"><a href="common-app-caveats.html#cb272-36"></a>    }</span>
-<span id="cb272-37"><a href="common-app-caveats.html#cb272-37"></a>    <span class="co"># If the user select lower, then the text is </span></span>
-<span id="cb272-38"><a href="common-app-caveats.html#cb272-38"></a>    <span class="co"># passed through tolower, otherwise it&#39;s passed </span></span>
-<span id="cb272-39"><a href="common-app-caveats.html#cb272-39"></a>    <span class="co"># through toupper</span></span>
-<span id="cb272-40"><a href="common-app-caveats.html#cb272-40"></a>    <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
-<span id="cb272-41"><a href="common-app-caveats.html#cb272-41"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb272-42"><a href="common-app-caveats.html#cb272-42"></a>    } <span class="cf">else</span>  {</span>
-<span id="cb272-43"><a href="common-app-caveats.html#cb272-43"></a>      <span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb272-44"><a href="common-app-caveats.html#cb272-44"></a>    }</span>
-<span id="cb272-45"><a href="common-app-caveats.html#cb272-45"></a>  })</span>
-<span id="cb272-46"><a href="common-app-caveats.html#cb272-46"></a>}</span>
-<span id="cb272-47"><a href="common-app-caveats.html#cb272-47"></a></span>
-<span id="cb272-48"><a href="common-app-caveats.html#cb272-48"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<span id="cb271-32"><a href="common-app-caveats.html#cb271-32"></a>      r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
+<span id="cb271-33"><a href="common-app-caveats.html#cb271-33"></a>    } <span class="cf">else</span> {</span>
+<span id="cb271-34"><a href="common-app-caveats.html#cb271-34"></a>      <span class="co"># Otherwise, we leave it as it is</span></span>
+<span id="cb271-35"><a href="common-app-caveats.html#cb271-35"></a>      r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
+<span id="cb271-36"><a href="common-app-caveats.html#cb271-36"></a>    }</span>
+<span id="cb271-37"><a href="common-app-caveats.html#cb271-37"></a>    <span class="co"># If the user select lower, then the text is </span></span>
+<span id="cb271-38"><a href="common-app-caveats.html#cb271-38"></a>    <span class="co"># passed through tolower, otherwise it&#39;s passed </span></span>
+<span id="cb271-39"><a href="common-app-caveats.html#cb271-39"></a>    <span class="co"># through toupper</span></span>
+<span id="cb271-40"><a href="common-app-caveats.html#cb271-40"></a>    <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
+<span id="cb271-41"><a href="common-app-caveats.html#cb271-41"></a>      <span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb271-42"><a href="common-app-caveats.html#cb271-42"></a>    } <span class="cf">else</span>  {</span>
+<span id="cb271-43"><a href="common-app-caveats.html#cb271-43"></a>      <span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb271-44"><a href="common-app-caveats.html#cb271-44"></a>    }</span>
+<span id="cb271-45"><a href="common-app-caveats.html#cb271-45"></a>  })</span>
+<span id="cb271-46"><a href="common-app-caveats.html#cb271-46"></a>}</span>
+<span id="cb271-47"><a href="common-app-caveats.html#cb271-47"></a></span>
+<span id="cb271-48"><a href="common-app-caveats.html#cb271-48"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>Ok, now can you tell how many potential invalidation points we have here?
 Three: whenever <code>input$txt</code>, <code>input$rev</code> or <code>input$casefolding</code> change.
 Of course, three is not that much, but you get the idea.</p>
@@ -778,38 +778,38 @@ No, they usually try and miss, restart, change things, amplifying the reactivity
 That’s why (well, in 99% of cases), it is safer to go with <code>observeEvent</code>, as it allows you to see at a glance the condition under which the content is invalidated and re-evaluated.
 Then, if a reactive context is invalidated, <strong>you know why</strong>.
 For example, here is where the reactive invalidation can happen (lines with a <code>*</code>)<a href="#fn60" class="footnote-ref" id="fnref60"><sup>60</sup></a>:</p>
-<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb273-1"><a href="common-app-caveats.html#cb273-1"></a><span class="kw">observe</span>({</span>
-<span id="cb273-2"><a href="common-app-caveats.html#cb273-2"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb273-3"><a href="common-app-caveats.html#cb273-3"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb273-4"><a href="common-app-caveats.html#cb273-4"></a><span class="op">*</span><span class="st">   </span><span class="cf">if</span> (input<span class="op">$</span>rev){</span>
-<span id="cb273-5"><a href="common-app-caveats.html#cb273-5"></a><span class="op">*</span><span class="st">     </span>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
-<span id="cb273-6"><a href="common-app-caveats.html#cb273-6"></a>    } <span class="cf">else</span> {</span>
-<span id="cb273-7"><a href="common-app-caveats.html#cb273-7"></a><span class="op">*</span><span class="st">     </span>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
-<span id="cb273-8"><a href="common-app-caveats.html#cb273-8"></a>    }</span>
-<span id="cb273-9"><a href="common-app-caveats.html#cb273-9"></a><span class="op">*</span><span class="st">   </span><span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
-<span id="cb273-10"><a href="common-app-caveats.html#cb273-10"></a><span class="op">*</span><span class="st">     </span><span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb273-11"><a href="common-app-caveats.html#cb273-11"></a>    } <span class="cf">else</span>  {</span>
-<span id="cb273-12"><a href="common-app-caveats.html#cb273-12"></a><span class="op">*</span><span class="st">     </span><span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb273-13"><a href="common-app-caveats.html#cb273-13"></a>    }</span>
-<span id="cb273-14"><a href="common-app-caveats.html#cb273-14"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="common-app-caveats.html#cb272-1"></a><span class="kw">observe</span>({</span>
+<span id="cb272-2"><a href="common-app-caveats.html#cb272-2"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb272-3"><a href="common-app-caveats.html#cb272-3"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
+<span id="cb272-4"><a href="common-app-caveats.html#cb272-4"></a><span class="op">*</span><span class="st">   </span><span class="cf">if</span> (input<span class="op">$</span>rev){</span>
+<span id="cb272-5"><a href="common-app-caveats.html#cb272-5"></a><span class="op">*</span><span class="st">     </span>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
+<span id="cb272-6"><a href="common-app-caveats.html#cb272-6"></a>    } <span class="cf">else</span> {</span>
+<span id="cb272-7"><a href="common-app-caveats.html#cb272-7"></a><span class="op">*</span><span class="st">     </span>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
+<span id="cb272-8"><a href="common-app-caveats.html#cb272-8"></a>    }</span>
+<span id="cb272-9"><a href="common-app-caveats.html#cb272-9"></a><span class="op">*</span><span class="st">   </span><span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
+<span id="cb272-10"><a href="common-app-caveats.html#cb272-10"></a><span class="op">*</span><span class="st">     </span><span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb272-11"><a href="common-app-caveats.html#cb272-11"></a>    } <span class="cf">else</span>  {</span>
+<span id="cb272-12"><a href="common-app-caveats.html#cb272-12"></a><span class="op">*</span><span class="st">     </span><span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb272-13"><a href="common-app-caveats.html#cb272-13"></a>    }</span>
+<span id="cb272-14"><a href="common-app-caveats.html#cb272-14"></a>})</span></code></pre></div>
 <p>Whereas in this refactored code using <code>observeEvent()</code>, it is easier to identify where the invalidation can happen:</p>
-<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb274-1"><a href="common-app-caveats.html#cb274-1"></a><span class="kw">observeEvent</span>( <span class="kw">c</span>(</span>
-<span id="cb274-2"><a href="common-app-caveats.html#cb274-2"></a><span class="op">*</span><span class="st">  </span>input<span class="op">$</span>rev, </span>
-<span id="cb274-3"><a href="common-app-caveats.html#cb274-3"></a><span class="op">*</span><span class="st">  </span>input<span class="op">$</span>txt</span>
-<span id="cb274-4"><a href="common-app-caveats.html#cb274-4"></a>),{</span>
-<span id="cb274-5"><a href="common-app-caveats.html#cb274-5"></a>  i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb274-6"><a href="common-app-caveats.html#cb274-6"></a>  <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb274-7"><a href="common-app-caveats.html#cb274-7"></a>  <span class="cf">if</span> (input<span class="op">$</span>rev){</span>
-<span id="cb274-8"><a href="common-app-caveats.html#cb274-8"></a>    r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
-<span id="cb274-9"><a href="common-app-caveats.html#cb274-9"></a>  } <span class="cf">else</span> {</span>
-<span id="cb274-10"><a href="common-app-caveats.html#cb274-10"></a>    r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
-<span id="cb274-11"><a href="common-app-caveats.html#cb274-11"></a>  }</span>
-<span id="cb274-12"><a href="common-app-caveats.html#cb274-12"></a>  <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
-<span id="cb274-13"><a href="common-app-caveats.html#cb274-13"></a>    <span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb274-14"><a href="common-app-caveats.html#cb274-14"></a>  } <span class="cf">else</span>  {</span>
-<span id="cb274-15"><a href="common-app-caveats.html#cb274-15"></a>    <span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb274-16"><a href="common-app-caveats.html#cb274-16"></a>  }</span>
-<span id="cb274-17"><a href="common-app-caveats.html#cb274-17"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb273-1"><a href="common-app-caveats.html#cb273-1"></a><span class="kw">observeEvent</span>( <span class="kw">c</span>(</span>
+<span id="cb273-2"><a href="common-app-caveats.html#cb273-2"></a><span class="op">*</span><span class="st">  </span>input<span class="op">$</span>rev, </span>
+<span id="cb273-3"><a href="common-app-caveats.html#cb273-3"></a><span class="op">*</span><span class="st">  </span>input<span class="op">$</span>txt</span>
+<span id="cb273-4"><a href="common-app-caveats.html#cb273-4"></a>),{</span>
+<span id="cb273-5"><a href="common-app-caveats.html#cb273-5"></a>  i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb273-6"><a href="common-app-caveats.html#cb273-6"></a>  <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
+<span id="cb273-7"><a href="common-app-caveats.html#cb273-7"></a>  <span class="cf">if</span> (input<span class="op">$</span>rev){</span>
+<span id="cb273-8"><a href="common-app-caveats.html#cb273-8"></a>    r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
+<span id="cb273-9"><a href="common-app-caveats.html#cb273-9"></a>  } <span class="cf">else</span> {</span>
+<span id="cb273-10"><a href="common-app-caveats.html#cb273-10"></a>    r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
+<span id="cb273-11"><a href="common-app-caveats.html#cb273-11"></a>  }</span>
+<span id="cb273-12"><a href="common-app-caveats.html#cb273-12"></a>  <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> &quot;lower&quot;</span>) {</span>
+<span id="cb273-13"><a href="common-app-caveats.html#cb273-13"></a>    <span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb273-14"><a href="common-app-caveats.html#cb273-14"></a>  } <span class="cf">else</span>  {</span>
+<span id="cb273-15"><a href="common-app-caveats.html#cb273-15"></a>    <span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb273-16"><a href="common-app-caveats.html#cb273-16"></a>  }</span>
+<span id="cb273-17"><a href="common-app-caveats.html#cb273-17"></a>})</span></code></pre></div>
 </div>
 <div id="building-triggers-and-watchers" class="section level3">
 <h3><span class="header-section-number">15.1.3</span> Building triggers and watchers</h3>
@@ -817,10 +817,10 @@ For example, here is where the reactive invalidation can happen (lines with a <c
 <p>These objects are launched with an <code>init</code> function, then these flags are triggered with <code>trigger()</code>, and wherever we want these flags to invalidate a reactive context, we <code>watch()</code> these flags.</p>
 <p>The idea here is to get full control over the reactive flow: we only invalidate contexts when we want, making the general flow of the app more predictable.
 These flags are available using the <code>{gargoyle}</code> <span class="citation">(Fay <a href="#ref-R-gargoyle" role="doc-biblioref">2020</a><a href="#ref-R-gargoyle" role="doc-biblioref">e</a>)</span> package, that can be installed from GitHub with:</p>
-<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb275-1"><a href="common-app-caveats.html#cb275-1"></a><span class="co"># CRAN version </span></span>
-<span id="cb275-2"><a href="common-app-caveats.html#cb275-2"></a><span class="kw">install.pacakges</span>(<span class="st">&quot;gargoyle&quot;</span>)</span>
-<span id="cb275-3"><a href="common-app-caveats.html#cb275-3"></a><span class="co"># Dev version</span></span>
-<span id="cb275-4"><a href="common-app-caveats.html#cb275-4"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;ColinFay/gargoyle&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb274-1"><a href="common-app-caveats.html#cb274-1"></a><span class="co"># CRAN version </span></span>
+<span id="cb274-2"><a href="common-app-caveats.html#cb274-2"></a><span class="kw">install.pacakges</span>(<span class="st">&quot;gargoyle&quot;</span>)</span>
+<span id="cb274-3"><a href="common-app-caveats.html#cb274-3"></a><span class="co"># Dev version</span></span>
+<span id="cb274-4"><a href="common-app-caveats.html#cb274-4"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;ColinFay/gargoyle&quot;</span>)</span></code></pre></div>
 <ul>
 <li><p><code>gargoyle::init("this")</code> initiates a <code>"this"</code> flag: most of the time you will be generating them at the <code>app_server()</code> level.</p></li>
 <li><p><code>gargoyle::watch("this")</code> sets the flag inside a reactive context, so that it will be invalidated every time you <code>trigger("this")</code> this flag.</p></li>
@@ -833,76 +833,76 @@ The idea here is to allow complete control over when the image is recomputed: on
 That might seem like a lot of extra work, but that is definitely worth considering in the long run, as it will help in optimizing the rendering (fewer computations), and lowering the number of errors that can result from too much reactivity inside an application.</p>
 <p>Here is a small example of this implementation, using an environment to store the value.
 When using this pattern, we do not rely on any reactive value invalidating the reactive context: the second result is only displayed when the <code>"render2"</code> flag is triggered, giving us a full control on how the reactivity is propagated.</p>
-<div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb276-1"><a href="common-app-caveats.html#cb276-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb276-2"><a href="common-app-caveats.html#cb276-2"></a><span class="kw">library</span>(gargoyle)</span>
-<span id="cb276-3"><a href="common-app-caveats.html#cb276-3"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb276-4"><a href="common-app-caveats.html#cb276-4"></a>  <span class="kw">fluidPage</span>(</span>
-<span id="cb276-5"><a href="common-app-caveats.html#cb276-5"></a>    <span class="kw">tagList</span>(</span>
-<span id="cb276-6"><a href="common-app-caveats.html#cb276-6"></a>      <span class="co"># Creating an action button to launch the computation</span></span>
-<span id="cb276-7"><a href="common-app-caveats.html#cb276-7"></a>      <span class="kw">actionButton</span>(<span class="st">&quot;compute&quot;</span>, <span class="st">&quot;Compute&quot;</span>), </span>
-<span id="cb276-8"><a href="common-app-caveats.html#cb276-8"></a>      <span class="co"># Output for all runif()</span></span>
-<span id="cb276-9"><a href="common-app-caveats.html#cb276-9"></a>      <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;result&quot;</span>), </span>
-<span id="cb276-10"><a href="common-app-caveats.html#cb276-10"></a>      <span class="co"># This output will change only if runif() &gt; 0.5</span></span>
-<span id="cb276-11"><a href="common-app-caveats.html#cb276-11"></a>      <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;result2&quot;</span>),</span>
-<span id="cb276-12"><a href="common-app-caveats.html#cb276-12"></a>      <span class="co"># This button will reset x$results to 0, we use it </span></span>
-<span id="cb276-13"><a href="common-app-caveats.html#cb276-13"></a>      <span class="co"># to show that it won&#39;t launch a series of reactivity </span></span>
-<span id="cb276-14"><a href="common-app-caveats.html#cb276-14"></a>      <span class="co"># invalidation</span></span>
-<span id="cb276-15"><a href="common-app-caveats.html#cb276-15"></a>      <span class="kw">actionButton</span>(<span class="st">&quot;reset&quot;</span>, <span class="st">&quot;Reset x&quot;</span>)</span>
-<span id="cb276-16"><a href="common-app-caveats.html#cb276-16"></a>    )</span>
-<span id="cb276-17"><a href="common-app-caveats.html#cb276-17"></a>  )</span>
-<span id="cb276-18"><a href="common-app-caveats.html#cb276-18"></a>}</span>
-<span id="cb276-19"><a href="common-app-caveats.html#cb276-19"></a></span>
-<span id="cb276-20"><a href="common-app-caveats.html#cb276-20"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb276-21"><a href="common-app-caveats.html#cb276-21"></a>  input, </span>
-<span id="cb276-22"><a href="common-app-caveats.html#cb276-22"></a>  output, </span>
-<span id="cb276-23"><a href="common-app-caveats.html#cb276-23"></a>  session</span>
-<span id="cb276-24"><a href="common-app-caveats.html#cb276-24"></a>){</span>
-<span id="cb276-25"><a href="common-app-caveats.html#cb276-25"></a>  </span>
-<span id="cb276-26"><a href="common-app-caveats.html#cb276-26"></a>  <span class="co"># Mimic an R6 class, i.e. a non-reactive object</span></span>
-<span id="cb276-27"><a href="common-app-caveats.html#cb276-27"></a>  x &lt;-<span class="st"> </span><span class="kw">environment</span>()</span>
-<span id="cb276-28"><a href="common-app-caveats.html#cb276-28"></a>  </span>
-<span id="cb276-29"><a href="common-app-caveats.html#cb276-29"></a>  <span class="co"># Creating two watchers</span></span>
-<span id="cb276-30"><a href="common-app-caveats.html#cb276-30"></a>  <span class="kw">init</span>(<span class="st">&quot;render_result&quot;</span>, <span class="st">&quot;render_result2&quot;</span>)</span>
-<span id="cb276-31"><a href="common-app-caveats.html#cb276-31"></a>  </span>
-<span id="cb276-32"><a href="common-app-caveats.html#cb276-32"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>compute , {</span>
-<span id="cb276-33"><a href="common-app-caveats.html#cb276-33"></a>    <span class="co"># When the user presses compute, we launch runif()</span></span>
-<span id="cb276-34"><a href="common-app-caveats.html#cb276-34"></a>    x<span class="op">$</span>results &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>)</span>
-<span id="cb276-35"><a href="common-app-caveats.html#cb276-35"></a>    <span class="co"># Every time a new value is stored, we render result</span></span>
-<span id="cb276-36"><a href="common-app-caveats.html#cb276-36"></a>    <span class="kw">trigger</span>(<span class="st">&quot;render_result&quot;</span>)</span>
-<span id="cb276-37"><a href="common-app-caveats.html#cb276-37"></a>    <span class="co"># Only render the second result if x$results is over 0.5</span></span>
-<span id="cb276-38"><a href="common-app-caveats.html#cb276-38"></a>    <span class="cf">if</span> (x<span class="op">$</span>results <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.5</span>){</span>
-<span id="cb276-39"><a href="common-app-caveats.html#cb276-39"></a>      <span class="kw">trigger</span>(<span class="st">&quot;render_result2&quot;</span>)</span>
-<span id="cb276-40"><a href="common-app-caveats.html#cb276-40"></a>    }</span>
-<span id="cb276-41"><a href="common-app-caveats.html#cb276-41"></a>  })</span>
-<span id="cb276-42"><a href="common-app-caveats.html#cb276-42"></a>  </span>
-<span id="cb276-43"><a href="common-app-caveats.html#cb276-43"></a>  output<span class="op">$</span>result &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
-<span id="cb276-44"><a href="common-app-caveats.html#cb276-44"></a>    <span class="co"># Will be rendered every time</span></span>
-<span id="cb276-45"><a href="common-app-caveats.html#cb276-45"></a>    <span class="kw">watch</span>(<span class="st">&quot;render_result&quot;</span>)</span>
-<span id="cb276-46"><a href="common-app-caveats.html#cb276-46"></a>    <span class="co"># require x$results before rendering the output</span></span>
-<span id="cb276-47"><a href="common-app-caveats.html#cb276-47"></a>    <span class="kw">req</span>(x<span class="op">$</span>results)</span>
-<span id="cb276-48"><a href="common-app-caveats.html#cb276-48"></a>    x<span class="op">$</span>results</span>
-<span id="cb276-49"><a href="common-app-caveats.html#cb276-49"></a>  })</span>
-<span id="cb276-50"><a href="common-app-caveats.html#cb276-50"></a>  </span>
-<span id="cb276-51"><a href="common-app-caveats.html#cb276-51"></a>  </span>
-<span id="cb276-52"><a href="common-app-caveats.html#cb276-52"></a>  output<span class="op">$</span>result2 &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
-<span id="cb276-53"><a href="common-app-caveats.html#cb276-53"></a>    <span class="co"># This will only be rendered if trigger(&quot;render_result2&quot;)</span></span>
-<span id="cb276-54"><a href="common-app-caveats.html#cb276-54"></a>    <span class="co"># is called</span></span>
-<span id="cb276-55"><a href="common-app-caveats.html#cb276-55"></a>    <span class="kw">watch</span>(<span class="st">&quot;render_result2&quot;</span>)</span>
-<span id="cb276-56"><a href="common-app-caveats.html#cb276-56"></a>    <span class="kw">req</span>(x<span class="op">$</span>results)</span>
-<span id="cb276-57"><a href="common-app-caveats.html#cb276-57"></a>    x<span class="op">$</span>results</span>
-<span id="cb276-58"><a href="common-app-caveats.html#cb276-58"></a>  })</span>
-<span id="cb276-59"><a href="common-app-caveats.html#cb276-59"></a>  </span>
-<span id="cb276-60"><a href="common-app-caveats.html#cb276-60"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>reset , {</span>
-<span id="cb276-61"><a href="common-app-caveats.html#cb276-61"></a>    <span class="co"># This resets x$results. This code block is here</span></span>
-<span id="cb276-62"><a href="common-app-caveats.html#cb276-62"></a>    <span class="co"># to show that reactivity is not triggered in this app </span></span>
-<span id="cb276-63"><a href="common-app-caveats.html#cb276-63"></a>    <span class="co"># unless a trigger() is called</span></span>
-<span id="cb276-64"><a href="common-app-caveats.html#cb276-64"></a>    x<span class="op">$</span>results &lt;-<span class="st">  </span><span class="dv">0</span></span>
-<span id="cb276-65"><a href="common-app-caveats.html#cb276-65"></a>    <span class="kw">print</span>(x<span class="op">$</span>results)</span>
-<span id="cb276-66"><a href="common-app-caveats.html#cb276-66"></a>  })</span>
-<span id="cb276-67"><a href="common-app-caveats.html#cb276-67"></a>  </span>
-<span id="cb276-68"><a href="common-app-caveats.html#cb276-68"></a>}</span>
-<span id="cb276-69"><a href="common-app-caveats.html#cb276-69"></a></span>
-<span id="cb276-70"><a href="common-app-caveats.html#cb276-70"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb275-1"><a href="common-app-caveats.html#cb275-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb275-2"><a href="common-app-caveats.html#cb275-2"></a><span class="kw">library</span>(gargoyle)</span>
+<span id="cb275-3"><a href="common-app-caveats.html#cb275-3"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb275-4"><a href="common-app-caveats.html#cb275-4"></a>  <span class="kw">fluidPage</span>(</span>
+<span id="cb275-5"><a href="common-app-caveats.html#cb275-5"></a>    <span class="kw">tagList</span>(</span>
+<span id="cb275-6"><a href="common-app-caveats.html#cb275-6"></a>      <span class="co"># Creating an action button to launch the computation</span></span>
+<span id="cb275-7"><a href="common-app-caveats.html#cb275-7"></a>      <span class="kw">actionButton</span>(<span class="st">&quot;compute&quot;</span>, <span class="st">&quot;Compute&quot;</span>), </span>
+<span id="cb275-8"><a href="common-app-caveats.html#cb275-8"></a>      <span class="co"># Output for all runif()</span></span>
+<span id="cb275-9"><a href="common-app-caveats.html#cb275-9"></a>      <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;result&quot;</span>), </span>
+<span id="cb275-10"><a href="common-app-caveats.html#cb275-10"></a>      <span class="co"># This output will change only if runif() &gt; 0.5</span></span>
+<span id="cb275-11"><a href="common-app-caveats.html#cb275-11"></a>      <span class="kw">verbatimTextOutput</span>(<span class="st">&quot;result2&quot;</span>),</span>
+<span id="cb275-12"><a href="common-app-caveats.html#cb275-12"></a>      <span class="co"># This button will reset x$results to 0, we use it </span></span>
+<span id="cb275-13"><a href="common-app-caveats.html#cb275-13"></a>      <span class="co"># to show that it won&#39;t launch a series of reactivity </span></span>
+<span id="cb275-14"><a href="common-app-caveats.html#cb275-14"></a>      <span class="co"># invalidation</span></span>
+<span id="cb275-15"><a href="common-app-caveats.html#cb275-15"></a>      <span class="kw">actionButton</span>(<span class="st">&quot;reset&quot;</span>, <span class="st">&quot;Reset x&quot;</span>)</span>
+<span id="cb275-16"><a href="common-app-caveats.html#cb275-16"></a>    )</span>
+<span id="cb275-17"><a href="common-app-caveats.html#cb275-17"></a>  )</span>
+<span id="cb275-18"><a href="common-app-caveats.html#cb275-18"></a>}</span>
+<span id="cb275-19"><a href="common-app-caveats.html#cb275-19"></a></span>
+<span id="cb275-20"><a href="common-app-caveats.html#cb275-20"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb275-21"><a href="common-app-caveats.html#cb275-21"></a>  input, </span>
+<span id="cb275-22"><a href="common-app-caveats.html#cb275-22"></a>  output, </span>
+<span id="cb275-23"><a href="common-app-caveats.html#cb275-23"></a>  session</span>
+<span id="cb275-24"><a href="common-app-caveats.html#cb275-24"></a>){</span>
+<span id="cb275-25"><a href="common-app-caveats.html#cb275-25"></a>  </span>
+<span id="cb275-26"><a href="common-app-caveats.html#cb275-26"></a>  <span class="co"># Mimic an R6 class, i.e. a non-reactive object</span></span>
+<span id="cb275-27"><a href="common-app-caveats.html#cb275-27"></a>  x &lt;-<span class="st"> </span><span class="kw">environment</span>()</span>
+<span id="cb275-28"><a href="common-app-caveats.html#cb275-28"></a>  </span>
+<span id="cb275-29"><a href="common-app-caveats.html#cb275-29"></a>  <span class="co"># Creating two watchers</span></span>
+<span id="cb275-30"><a href="common-app-caveats.html#cb275-30"></a>  <span class="kw">init</span>(<span class="st">&quot;render_result&quot;</span>, <span class="st">&quot;render_result2&quot;</span>)</span>
+<span id="cb275-31"><a href="common-app-caveats.html#cb275-31"></a>  </span>
+<span id="cb275-32"><a href="common-app-caveats.html#cb275-32"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>compute , {</span>
+<span id="cb275-33"><a href="common-app-caveats.html#cb275-33"></a>    <span class="co"># When the user presses compute, we launch runif()</span></span>
+<span id="cb275-34"><a href="common-app-caveats.html#cb275-34"></a>    x<span class="op">$</span>results &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>)</span>
+<span id="cb275-35"><a href="common-app-caveats.html#cb275-35"></a>    <span class="co"># Every time a new value is stored, we render result</span></span>
+<span id="cb275-36"><a href="common-app-caveats.html#cb275-36"></a>    <span class="kw">trigger</span>(<span class="st">&quot;render_result&quot;</span>)</span>
+<span id="cb275-37"><a href="common-app-caveats.html#cb275-37"></a>    <span class="co"># Only render the second result if x$results is over 0.5</span></span>
+<span id="cb275-38"><a href="common-app-caveats.html#cb275-38"></a>    <span class="cf">if</span> (x<span class="op">$</span>results <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.5</span>){</span>
+<span id="cb275-39"><a href="common-app-caveats.html#cb275-39"></a>      <span class="kw">trigger</span>(<span class="st">&quot;render_result2&quot;</span>)</span>
+<span id="cb275-40"><a href="common-app-caveats.html#cb275-40"></a>    }</span>
+<span id="cb275-41"><a href="common-app-caveats.html#cb275-41"></a>  })</span>
+<span id="cb275-42"><a href="common-app-caveats.html#cb275-42"></a>  </span>
+<span id="cb275-43"><a href="common-app-caveats.html#cb275-43"></a>  output<span class="op">$</span>result &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb275-44"><a href="common-app-caveats.html#cb275-44"></a>    <span class="co"># Will be rendered every time</span></span>
+<span id="cb275-45"><a href="common-app-caveats.html#cb275-45"></a>    <span class="kw">watch</span>(<span class="st">&quot;render_result&quot;</span>)</span>
+<span id="cb275-46"><a href="common-app-caveats.html#cb275-46"></a>    <span class="co"># require x$results before rendering the output</span></span>
+<span id="cb275-47"><a href="common-app-caveats.html#cb275-47"></a>    <span class="kw">req</span>(x<span class="op">$</span>results)</span>
+<span id="cb275-48"><a href="common-app-caveats.html#cb275-48"></a>    x<span class="op">$</span>results</span>
+<span id="cb275-49"><a href="common-app-caveats.html#cb275-49"></a>  })</span>
+<span id="cb275-50"><a href="common-app-caveats.html#cb275-50"></a>  </span>
+<span id="cb275-51"><a href="common-app-caveats.html#cb275-51"></a>  </span>
+<span id="cb275-52"><a href="common-app-caveats.html#cb275-52"></a>  output<span class="op">$</span>result2 &lt;-<span class="st"> </span><span class="kw">renderPrint</span>({</span>
+<span id="cb275-53"><a href="common-app-caveats.html#cb275-53"></a>    <span class="co"># This will only be rendered if trigger(&quot;render_result2&quot;)</span></span>
+<span id="cb275-54"><a href="common-app-caveats.html#cb275-54"></a>    <span class="co"># is called</span></span>
+<span id="cb275-55"><a href="common-app-caveats.html#cb275-55"></a>    <span class="kw">watch</span>(<span class="st">&quot;render_result2&quot;</span>)</span>
+<span id="cb275-56"><a href="common-app-caveats.html#cb275-56"></a>    <span class="kw">req</span>(x<span class="op">$</span>results)</span>
+<span id="cb275-57"><a href="common-app-caveats.html#cb275-57"></a>    x<span class="op">$</span>results</span>
+<span id="cb275-58"><a href="common-app-caveats.html#cb275-58"></a>  })</span>
+<span id="cb275-59"><a href="common-app-caveats.html#cb275-59"></a>  </span>
+<span id="cb275-60"><a href="common-app-caveats.html#cb275-60"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>reset , {</span>
+<span id="cb275-61"><a href="common-app-caveats.html#cb275-61"></a>    <span class="co"># This resets x$results. This code block is here</span></span>
+<span id="cb275-62"><a href="common-app-caveats.html#cb275-62"></a>    <span class="co"># to show that reactivity is not triggered in this app </span></span>
+<span id="cb275-63"><a href="common-app-caveats.html#cb275-63"></a>    <span class="co"># unless a trigger() is called</span></span>
+<span id="cb275-64"><a href="common-app-caveats.html#cb275-64"></a>    x<span class="op">$</span>results &lt;-<span class="st">  </span><span class="dv">0</span></span>
+<span id="cb275-65"><a href="common-app-caveats.html#cb275-65"></a>    <span class="kw">print</span>(x<span class="op">$</span>results)</span>
+<span id="cb275-66"><a href="common-app-caveats.html#cb275-66"></a>  })</span>
+<span id="cb275-67"><a href="common-app-caveats.html#cb275-67"></a>  </span>
+<span id="cb275-68"><a href="common-app-caveats.html#cb275-68"></a>}</span>
+<span id="cb275-69"><a href="common-app-caveats.html#cb275-69"></a></span>
+<span id="cb275-70"><a href="common-app-caveats.html#cb275-70"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
 <div id="using-r6-as-data-storage" class="section level3">
 <h3><span class="header-section-number">15.1.4</span> Using R6 as data storage</h3>
@@ -914,91 +914,91 @@ Why would we want to do that?</p>
 <p>Basically, the idea is to hold the whole logic of your <strong>data</strong> <strong>reading/cleaning/processing/outputting inside an R6 class</strong>.
 An object of this class is then initiated at the top level of your application, and you can pass this object to the sub-modules.
 Of course, this makes even more sense if you are combining it with the trigger/watch pattern from before!</p>
-<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb277-1"><a href="common-app-caveats.html#cb277-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb277-2"><a href="common-app-caveats.html#cb277-2"></a>data_cleaning_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
-<span id="cb277-3"><a href="common-app-caveats.html#cb277-3"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
-<span id="cb277-4"><a href="common-app-caveats.html#cb277-4"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb277-5"><a href="common-app-caveats.html#cb277-5"></a>    <span class="co"># Defining the UI for your first module</span></span>
-<span id="cb277-6"><a href="common-app-caveats.html#cb277-6"></a>    <span class="co"># [...]</span></span>
-<span id="cb277-7"><a href="common-app-caveats.html#cb277-7"></a>  )</span>
-<span id="cb277-8"><a href="common-app-caveats.html#cb277-8"></a>}</span>
-<span id="cb277-9"><a href="common-app-caveats.html#cb277-9"></a></span>
-<span id="cb277-10"><a href="common-app-caveats.html#cb277-10"></a>data_cleaning_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, r6){</span>
-<span id="cb277-11"><a href="common-app-caveats.html#cb277-11"></a>  </span>
-<span id="cb277-12"><a href="common-app-caveats.html#cb277-12"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>launch_cleaning , {</span>
-<span id="cb277-13"><a href="common-app-caveats.html#cb277-13"></a>    <span class="co"># Once the launch_cleaning input is triggered, we </span></span>
-<span id="cb277-14"><a href="common-app-caveats.html#cb277-14"></a>    <span class="co"># use the internal method from our r6 object </span></span>
-<span id="cb277-15"><a href="common-app-caveats.html#cb277-15"></a>    r6<span class="op">$</span><span class="kw">clean</span>(<span class="dt">arg1 =</span> input<span class="op">$</span>a, <span class="dt">arg2 =</span> input<span class="op">$</span>b)</span>
-<span id="cb277-16"><a href="common-app-caveats.html#cb277-16"></a>    <span class="co"># Triggering the plot</span></span>
-<span id="cb277-17"><a href="common-app-caveats.html#cb277-17"></a>    <span class="kw">trigger</span>(<span class="st">&quot;plot&quot;</span>)</span>
-<span id="cb277-18"><a href="common-app-caveats.html#cb277-18"></a>  })</span>
-<span id="cb277-19"><a href="common-app-caveats.html#cb277-19"></a>  </span>
-<span id="cb277-20"><a href="common-app-caveats.html#cb277-20"></a>}</span>
-<span id="cb277-21"><a href="common-app-caveats.html#cb277-21"></a></span>
-<span id="cb277-22"><a href="common-app-caveats.html#cb277-22"></a>plotting_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
-<span id="cb277-23"><a href="common-app-caveats.html#cb277-23"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
-<span id="cb277-24"><a href="common-app-caveats.html#cb277-24"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb277-25"><a href="common-app-caveats.html#cb277-25"></a>    <span class="co"># Defining the UI for your second module</span></span>
-<span id="cb277-26"><a href="common-app-caveats.html#cb277-26"></a>    <span class="co"># [...]</span></span>
-<span id="cb277-27"><a href="common-app-caveats.html#cb277-27"></a>  )</span>
-<span id="cb277-28"><a href="common-app-caveats.html#cb277-28"></a>}</span>
-<span id="cb277-29"><a href="common-app-caveats.html#cb277-29"></a></span>
-<span id="cb277-30"><a href="common-app-caveats.html#cb277-30"></a>plotting_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, r6){</span>
-<span id="cb277-31"><a href="common-app-caveats.html#cb277-31"></a>  </span>
-<span id="cb277-32"><a href="common-app-caveats.html#cb277-32"></a>  <span class="co"># Rendering, inside this second module, the plot based on the </span></span>
-<span id="cb277-33"><a href="common-app-caveats.html#cb277-33"></a>  <span class="co"># cleaning done in the other module</span></span>
-<span id="cb277-34"><a href="common-app-caveats.html#cb277-34"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb277-35"><a href="common-app-caveats.html#cb277-35"></a>    <span class="co"># We use the trigger/watch pattern from before</span></span>
-<span id="cb277-36"><a href="common-app-caveats.html#cb277-36"></a>    <span class="kw">watch</span>(<span class="st">&quot;plot&quot;</span>)</span>
-<span id="cb277-37"><a href="common-app-caveats.html#cb277-37"></a>    <span class="co"># Calling the plot() method from our R6 object</span></span>
-<span id="cb277-38"><a href="common-app-caveats.html#cb277-38"></a>    r6<span class="op">$</span><span class="kw">plot</span>()</span>
-<span id="cb277-39"><a href="common-app-caveats.html#cb277-39"></a>  })</span>
-<span id="cb277-40"><a href="common-app-caveats.html#cb277-40"></a>}</span>
-<span id="cb277-41"><a href="common-app-caveats.html#cb277-41"></a></span>
-<span id="cb277-42"><a href="common-app-caveats.html#cb277-42"></a></span>
-<span id="cb277-43"><a href="common-app-caveats.html#cb277-43"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb277-44"><a href="common-app-caveats.html#cb277-44"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb277-45"><a href="common-app-caveats.html#cb277-45"></a>    <span class="co"># Putting our two module UIs here</span></span>
-<span id="cb277-46"><a href="common-app-caveats.html#cb277-46"></a>    <span class="kw">data_cleaning_ui</span>(<span class="st">&quot;data_cleaning_ui&quot;</span>),</span>
-<span id="cb277-47"><a href="common-app-caveats.html#cb277-47"></a>    <span class="kw">plotting_ui</span>(<span class="st">&quot;plotting_ui&quot;</span>)</span>
-<span id="cb277-48"><a href="common-app-caveats.html#cb277-48"></a>  )</span>
-<span id="cb277-49"><a href="common-app-caveats.html#cb277-49"></a>}</span>
-<span id="cb277-50"><a href="common-app-caveats.html#cb277-50"></a></span>
-<span id="cb277-51"><a href="common-app-caveats.html#cb277-51"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb277-52"><a href="common-app-caveats.html#cb277-52"></a>  input, </span>
-<span id="cb277-53"><a href="common-app-caveats.html#cb277-53"></a>  output, </span>
-<span id="cb277-54"><a href="common-app-caveats.html#cb277-54"></a>  session</span>
-<span id="cb277-55"><a href="common-app-caveats.html#cb277-55"></a>){</span>
-<span id="cb277-56"><a href="common-app-caveats.html#cb277-56"></a>  <span class="co"># We start by creating a new instance of th</span></span>
-<span id="cb277-57"><a href="common-app-caveats.html#cb277-57"></a>  r6 &lt;-<span class="st"> </span>MyDataProcessing<span class="op">$</span><span class="kw">new</span>()</span>
-<span id="cb277-58"><a href="common-app-caveats.html#cb277-58"></a>  <span class="co"># Passing this object to the two server functions</span></span>
-<span id="cb277-59"><a href="common-app-caveats.html#cb277-59"></a>  <span class="kw">callModule</span>(data_cleaning_server, <span class="st">&quot;data_cleaning_ui&quot;</span>, r6)</span>
-<span id="cb277-60"><a href="common-app-caveats.html#cb277-60"></a>  <span class="kw">callModule</span>(plotting_server, <span class="st">&quot;plotting_ui&quot;</span>, r6)</span>
-<span id="cb277-61"><a href="common-app-caveats.html#cb277-61"></a>}</span>
-<span id="cb277-62"><a href="common-app-caveats.html#cb277-62"></a></span>
-<span id="cb277-63"><a href="common-app-caveats.html#cb277-63"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb276-1"><a href="common-app-caveats.html#cb276-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb276-2"><a href="common-app-caveats.html#cb276-2"></a>data_cleaning_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
+<span id="cb276-3"><a href="common-app-caveats.html#cb276-3"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
+<span id="cb276-4"><a href="common-app-caveats.html#cb276-4"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb276-5"><a href="common-app-caveats.html#cb276-5"></a>    <span class="co"># Defining the UI for your first module</span></span>
+<span id="cb276-6"><a href="common-app-caveats.html#cb276-6"></a>    <span class="co"># [...]</span></span>
+<span id="cb276-7"><a href="common-app-caveats.html#cb276-7"></a>  )</span>
+<span id="cb276-8"><a href="common-app-caveats.html#cb276-8"></a>}</span>
+<span id="cb276-9"><a href="common-app-caveats.html#cb276-9"></a></span>
+<span id="cb276-10"><a href="common-app-caveats.html#cb276-10"></a>data_cleaning_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, r6){</span>
+<span id="cb276-11"><a href="common-app-caveats.html#cb276-11"></a>  </span>
+<span id="cb276-12"><a href="common-app-caveats.html#cb276-12"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>launch_cleaning , {</span>
+<span id="cb276-13"><a href="common-app-caveats.html#cb276-13"></a>    <span class="co"># Once the launch_cleaning input is triggered, we </span></span>
+<span id="cb276-14"><a href="common-app-caveats.html#cb276-14"></a>    <span class="co"># use the internal method from our r6 object </span></span>
+<span id="cb276-15"><a href="common-app-caveats.html#cb276-15"></a>    r6<span class="op">$</span><span class="kw">clean</span>(<span class="dt">arg1 =</span> input<span class="op">$</span>a, <span class="dt">arg2 =</span> input<span class="op">$</span>b)</span>
+<span id="cb276-16"><a href="common-app-caveats.html#cb276-16"></a>    <span class="co"># Triggering the plot</span></span>
+<span id="cb276-17"><a href="common-app-caveats.html#cb276-17"></a>    <span class="kw">trigger</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb276-18"><a href="common-app-caveats.html#cb276-18"></a>  })</span>
+<span id="cb276-19"><a href="common-app-caveats.html#cb276-19"></a>  </span>
+<span id="cb276-20"><a href="common-app-caveats.html#cb276-20"></a>}</span>
+<span id="cb276-21"><a href="common-app-caveats.html#cb276-21"></a></span>
+<span id="cb276-22"><a href="common-app-caveats.html#cb276-22"></a>plotting_ui &lt;-<span class="st"> </span><span class="cf">function</span>(id){</span>
+<span id="cb276-23"><a href="common-app-caveats.html#cb276-23"></a>  ns &lt;-<span class="st"> </span><span class="kw">NS</span>(id)</span>
+<span id="cb276-24"><a href="common-app-caveats.html#cb276-24"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb276-25"><a href="common-app-caveats.html#cb276-25"></a>    <span class="co"># Defining the UI for your second module</span></span>
+<span id="cb276-26"><a href="common-app-caveats.html#cb276-26"></a>    <span class="co"># [...]</span></span>
+<span id="cb276-27"><a href="common-app-caveats.html#cb276-27"></a>  )</span>
+<span id="cb276-28"><a href="common-app-caveats.html#cb276-28"></a>}</span>
+<span id="cb276-29"><a href="common-app-caveats.html#cb276-29"></a></span>
+<span id="cb276-30"><a href="common-app-caveats.html#cb276-30"></a>plotting_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session, r6){</span>
+<span id="cb276-31"><a href="common-app-caveats.html#cb276-31"></a>  </span>
+<span id="cb276-32"><a href="common-app-caveats.html#cb276-32"></a>  <span class="co"># Rendering, inside this second module, the plot based on the </span></span>
+<span id="cb276-33"><a href="common-app-caveats.html#cb276-33"></a>  <span class="co"># cleaning done in the other module</span></span>
+<span id="cb276-34"><a href="common-app-caveats.html#cb276-34"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb276-35"><a href="common-app-caveats.html#cb276-35"></a>    <span class="co"># We use the trigger/watch pattern from before</span></span>
+<span id="cb276-36"><a href="common-app-caveats.html#cb276-36"></a>    <span class="kw">watch</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb276-37"><a href="common-app-caveats.html#cb276-37"></a>    <span class="co"># Calling the plot() method from our R6 object</span></span>
+<span id="cb276-38"><a href="common-app-caveats.html#cb276-38"></a>    r6<span class="op">$</span><span class="kw">plot</span>()</span>
+<span id="cb276-39"><a href="common-app-caveats.html#cb276-39"></a>  })</span>
+<span id="cb276-40"><a href="common-app-caveats.html#cb276-40"></a>}</span>
+<span id="cb276-41"><a href="common-app-caveats.html#cb276-41"></a></span>
+<span id="cb276-42"><a href="common-app-caveats.html#cb276-42"></a></span>
+<span id="cb276-43"><a href="common-app-caveats.html#cb276-43"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb276-44"><a href="common-app-caveats.html#cb276-44"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb276-45"><a href="common-app-caveats.html#cb276-45"></a>    <span class="co"># Putting our two module UIs here</span></span>
+<span id="cb276-46"><a href="common-app-caveats.html#cb276-46"></a>    <span class="kw">data_cleaning_ui</span>(<span class="st">&quot;data_cleaning_ui&quot;</span>),</span>
+<span id="cb276-47"><a href="common-app-caveats.html#cb276-47"></a>    <span class="kw">plotting_ui</span>(<span class="st">&quot;plotting_ui&quot;</span>)</span>
+<span id="cb276-48"><a href="common-app-caveats.html#cb276-48"></a>  )</span>
+<span id="cb276-49"><a href="common-app-caveats.html#cb276-49"></a>}</span>
+<span id="cb276-50"><a href="common-app-caveats.html#cb276-50"></a></span>
+<span id="cb276-51"><a href="common-app-caveats.html#cb276-51"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb276-52"><a href="common-app-caveats.html#cb276-52"></a>  input, </span>
+<span id="cb276-53"><a href="common-app-caveats.html#cb276-53"></a>  output, </span>
+<span id="cb276-54"><a href="common-app-caveats.html#cb276-54"></a>  session</span>
+<span id="cb276-55"><a href="common-app-caveats.html#cb276-55"></a>){</span>
+<span id="cb276-56"><a href="common-app-caveats.html#cb276-56"></a>  <span class="co"># We start by creating a new instance of th</span></span>
+<span id="cb276-57"><a href="common-app-caveats.html#cb276-57"></a>  r6 &lt;-<span class="st"> </span>MyDataProcessing<span class="op">$</span><span class="kw">new</span>()</span>
+<span id="cb276-58"><a href="common-app-caveats.html#cb276-58"></a>  <span class="co"># Passing this object to the two server functions</span></span>
+<span id="cb276-59"><a href="common-app-caveats.html#cb276-59"></a>  <span class="kw">callModule</span>(data_cleaning_server, <span class="st">&quot;data_cleaning_ui&quot;</span>, r6)</span>
+<span id="cb276-60"><a href="common-app-caveats.html#cb276-60"></a>  <span class="kw">callModule</span>(plotting_server, <span class="st">&quot;plotting_ui&quot;</span>, r6)</span>
+<span id="cb276-61"><a href="common-app-caveats.html#cb276-61"></a>}</span>
+<span id="cb276-62"><a href="common-app-caveats.html#cb276-62"></a></span>
+<span id="cb276-63"><a href="common-app-caveats.html#cb276-63"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 </div>
 <div id="b.-be-sure-it-is-tested" class="section level4 unnumbered">
 <h4>B. Be sure it is tested</h4>
 <p>During the process of building a robust <code>{shiny}</code> app, we strongly suggest that you test as many things as you can.
 This is where using an R6 for the business logic of your app makes sense: this allows you to build the whole testing of your application data logic outside of any reactive context: you simply build unit tests just as any other function.</p>
 <p>For example, let’s say we have the following R6 generator:</p>
-<div class="sourceCode" id="cb278"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb278-1"><a href="common-app-caveats.html#cb278-1"></a>MyData &lt;-<span class="st"> </span>R6<span class="op">::</span><span class="kw">R6Class</span>(</span>
-<span id="cb278-2"><a href="common-app-caveats.html#cb278-2"></a>  <span class="st">&quot;MyData&quot;</span>, </span>
-<span id="cb278-3"><a href="common-app-caveats.html#cb278-3"></a>  <span class="co"># Defining our public methods, that will be </span></span>
-<span id="cb278-4"><a href="common-app-caveats.html#cb278-4"></a>  <span class="co"># the dataset container, and a summary function</span></span>
-<span id="cb278-5"><a href="common-app-caveats.html#cb278-5"></a>  <span class="dt">public =</span> <span class="kw">list</span>(</span>
-<span id="cb278-6"><a href="common-app-caveats.html#cb278-6"></a>    <span class="dt">data =</span> <span class="ot">NULL</span>,</span>
-<span id="cb278-7"><a href="common-app-caveats.html#cb278-7"></a>    <span class="dt">initialize =</span> <span class="cf">function</span>(data){</span>
-<span id="cb278-8"><a href="common-app-caveats.html#cb278-8"></a>      self<span class="op">$</span>data &lt;-<span class="st"> </span>data</span>
-<span id="cb278-9"><a href="common-app-caveats.html#cb278-9"></a>    }, </span>
-<span id="cb278-10"><a href="common-app-caveats.html#cb278-10"></a>    <span class="dt">summarize =</span> <span class="cf">function</span>(){</span>
-<span id="cb278-11"><a href="common-app-caveats.html#cb278-11"></a>      <span class="kw">summary</span>(self<span class="op">$</span>data)</span>
-<span id="cb278-12"><a href="common-app-caveats.html#cb278-12"></a>    }</span>
-<span id="cb278-13"><a href="common-app-caveats.html#cb278-13"></a>  )</span>
-<span id="cb278-14"><a href="common-app-caveats.html#cb278-14"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb277-1"><a href="common-app-caveats.html#cb277-1"></a>MyData &lt;-<span class="st"> </span>R6<span class="op">::</span><span class="kw">R6Class</span>(</span>
+<span id="cb277-2"><a href="common-app-caveats.html#cb277-2"></a>  <span class="st">&quot;MyData&quot;</span>, </span>
+<span id="cb277-3"><a href="common-app-caveats.html#cb277-3"></a>  <span class="co"># Defining our public methods, that will be </span></span>
+<span id="cb277-4"><a href="common-app-caveats.html#cb277-4"></a>  <span class="co"># the dataset container, and a summary function</span></span>
+<span id="cb277-5"><a href="common-app-caveats.html#cb277-5"></a>  <span class="dt">public =</span> <span class="kw">list</span>(</span>
+<span id="cb277-6"><a href="common-app-caveats.html#cb277-6"></a>    <span class="dt">data =</span> <span class="ot">NULL</span>,</span>
+<span id="cb277-7"><a href="common-app-caveats.html#cb277-7"></a>    <span class="dt">initialize =</span> <span class="cf">function</span>(data){</span>
+<span id="cb277-8"><a href="common-app-caveats.html#cb277-8"></a>      self<span class="op">$</span>data &lt;-<span class="st"> </span>data</span>
+<span id="cb277-9"><a href="common-app-caveats.html#cb277-9"></a>    }, </span>
+<span id="cb277-10"><a href="common-app-caveats.html#cb277-10"></a>    <span class="dt">summarize =</span> <span class="cf">function</span>(){</span>
+<span id="cb277-11"><a href="common-app-caveats.html#cb277-11"></a>      <span class="kw">summary</span>(self<span class="op">$</span>data)</span>
+<span id="cb277-12"><a href="common-app-caveats.html#cb277-12"></a>    }</span>
+<span id="cb277-13"><a href="common-app-caveats.html#cb277-13"></a>  )</span>
+<span id="cb277-14"><a href="common-app-caveats.html#cb277-14"></a>)</span></code></pre></div>
 <p>We can then build a test for this class using <code>{testthat}</code>:</p>
-<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="common-app-caveats.html#cb279-1"></a><span class="kw">library</span>(testthat)</span></code></pre></div>
+<div class="sourceCode" id="cb278"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb278-1"><a href="common-app-caveats.html#cb278-1"></a><span class="kw">library</span>(testthat)</span></code></pre></div>
 <pre><code>Warning: package &#39;testthat&#39; was built under R version
 3.6.3</code></pre>
 <pre><code>
@@ -1012,23 +1012,23 @@ Attaching package: &#39;testthat&#39;</code></pre>
 <pre><code>The following objects are masked from &#39;package:magrittr&#39;:
 
     equals, is_less_than, not</code></pre>
-<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="common-app-caveats.html#cb285-1"></a><span class="kw">test_that</span>(<span class="st">&quot;R6 Class works&quot;</span>, {</span>
-<span id="cb285-2"><a href="common-app-caveats.html#cb285-2"></a>  <span class="co"># We define a new instance of this class, that will contain </span></span>
-<span id="cb285-3"><a href="common-app-caveats.html#cb285-3"></a>  <span class="co"># the mtcars data.frame</span></span>
-<span id="cb285-4"><a href="common-app-caveats.html#cb285-4"></a>  my_data &lt;-<span class="st"> </span>MyData<span class="op">$</span><span class="kw">new</span>(mtcars)</span>
-<span id="cb285-5"><a href="common-app-caveats.html#cb285-5"></a>  <span class="co"># We will expect my_data to have two classes: </span></span>
-<span id="cb285-6"><a href="common-app-caveats.html#cb285-6"></a>  <span class="co"># &quot;MyData&quot; and &quot;R6&quot;</span></span>
-<span id="cb285-7"><a href="common-app-caveats.html#cb285-7"></a>  <span class="kw">expect_is</span>(my_data, <span class="st">&quot;MyData&quot;</span>)</span>
-<span id="cb285-8"><a href="common-app-caveats.html#cb285-8"></a>  <span class="kw">expect_is</span>(my_data, <span class="st">&quot;R6&quot;</span>)</span>
-<span id="cb285-9"><a href="common-app-caveats.html#cb285-9"></a>  <span class="co"># And the summarize method to return a table</span></span>
-<span id="cb285-10"><a href="common-app-caveats.html#cb285-10"></a>  <span class="kw">expect_is</span>(my_data<span class="op">$</span><span class="kw">summarize</span>(), <span class="st">&quot;table&quot;</span>)</span>
-<span id="cb285-11"><a href="common-app-caveats.html#cb285-11"></a>  <span class="co"># We would expect the data contained in the object </span></span>
-<span id="cb285-12"><a href="common-app-caveats.html#cb285-12"></a>  <span class="co"># to match the one taken as input to new()</span></span>
-<span id="cb285-13"><a href="common-app-caveats.html#cb285-13"></a>  <span class="kw">expect_equal</span>(my_data<span class="op">$</span>data, mtcars)</span>
-<span id="cb285-14"><a href="common-app-caveats.html#cb285-14"></a>  <span class="co"># And the summarize method to be equal to the summary()</span></span>
-<span id="cb285-15"><a href="common-app-caveats.html#cb285-15"></a>  <span class="co">#  on the input object</span></span>
-<span id="cb285-16"><a href="common-app-caveats.html#cb285-16"></a>  <span class="kw">expect_equal</span>(my_data<span class="op">$</span><span class="kw">summarize</span>(), <span class="kw">summary</span>(mtcars))</span>
-<span id="cb285-17"><a href="common-app-caveats.html#cb285-17"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="common-app-caveats.html#cb284-1"></a><span class="kw">test_that</span>(<span class="st">&quot;R6 Class works&quot;</span>, {</span>
+<span id="cb284-2"><a href="common-app-caveats.html#cb284-2"></a>  <span class="co"># We define a new instance of this class, that will contain </span></span>
+<span id="cb284-3"><a href="common-app-caveats.html#cb284-3"></a>  <span class="co"># the mtcars data.frame</span></span>
+<span id="cb284-4"><a href="common-app-caveats.html#cb284-4"></a>  my_data &lt;-<span class="st"> </span>MyData<span class="op">$</span><span class="kw">new</span>(mtcars)</span>
+<span id="cb284-5"><a href="common-app-caveats.html#cb284-5"></a>  <span class="co"># We will expect my_data to have two classes: </span></span>
+<span id="cb284-6"><a href="common-app-caveats.html#cb284-6"></a>  <span class="co"># &quot;MyData&quot; and &quot;R6&quot;</span></span>
+<span id="cb284-7"><a href="common-app-caveats.html#cb284-7"></a>  <span class="kw">expect_is</span>(my_data, <span class="st">&quot;MyData&quot;</span>)</span>
+<span id="cb284-8"><a href="common-app-caveats.html#cb284-8"></a>  <span class="kw">expect_is</span>(my_data, <span class="st">&quot;R6&quot;</span>)</span>
+<span id="cb284-9"><a href="common-app-caveats.html#cb284-9"></a>  <span class="co"># And the summarize method to return a table</span></span>
+<span id="cb284-10"><a href="common-app-caveats.html#cb284-10"></a>  <span class="kw">expect_is</span>(my_data<span class="op">$</span><span class="kw">summarize</span>(), <span class="st">&quot;table&quot;</span>)</span>
+<span id="cb284-11"><a href="common-app-caveats.html#cb284-11"></a>  <span class="co"># We would expect the data contained in the object </span></span>
+<span id="cb284-12"><a href="common-app-caveats.html#cb284-12"></a>  <span class="co"># to match the one taken as input to new()</span></span>
+<span id="cb284-13"><a href="common-app-caveats.html#cb284-13"></a>  <span class="kw">expect_equal</span>(my_data<span class="op">$</span>data, mtcars)</span>
+<span id="cb284-14"><a href="common-app-caveats.html#cb284-14"></a>  <span class="co"># And the summarize method to be equal to the summary()</span></span>
+<span id="cb284-15"><a href="common-app-caveats.html#cb284-15"></a>  <span class="co">#  on the input object</span></span>
+<span id="cb284-16"><a href="common-app-caveats.html#cb284-16"></a>  <span class="kw">expect_equal</span>(my_data<span class="op">$</span><span class="kw">summarize</span>(), <span class="kw">summary</span>(mtcars))</span>
+<span id="cb284-17"><a href="common-app-caveats.html#cb284-17"></a>})</span></code></pre></div>
 <pre><code>Test passed 🥇</code></pre>
 <p>Using R6 allows to rely on these battle-tested tools when it comes to testing functions, something which is made more complex when using other patterns like <code>reactiveValues()</code>.</p>
 </div>
@@ -1038,7 +1038,7 @@ Attaching package: &#39;testthat&#39;</code></pre>
 <p>Getting a good sense of how reactivity is actually working in your app is not an easy task: the reactivity logic is a graph, and it happens very quickly when you run the app, so it’s very hard to follow everything.</p>
 <p><code>whereami::whereami()</code>’s <span class="citation">(Sidi and Müller <a href="#ref-R-whereami" role="doc-biblioref">2019</a>)</span> goal is simple: informing you about where it is called, i.e. from what file and at which line, and how many times.
 For example, if you add the following piece of code to your <code>app_server()</code>, the location of the function call will be printed to the logs.</p>
-<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb287-1"><a href="common-app-caveats.html#cb287-1"></a>whereami<span class="op">::</span><span class="kw">cat_where</span>( whereami<span class="op">::</span><span class="kw">whereami</span>() )</span></code></pre></div>
+<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="common-app-caveats.html#cb286-1"></a>whereami<span class="op">::</span><span class="kw">cat_where</span>( whereami<span class="op">::</span><span class="kw">whereami</span>() )</span></code></pre></div>
 <pre><code>── Running server(...) at app_server.R#9 (2) ───────────────</code></pre>
 <p>Combining <code>cat_where()</code> will implement a reactive logging to your console while developing: that way, you can instantaneously know what reactive contexts are invalidated while using the application.
 Of course, you still have to implement it by hand, but that is definitely worth the effort: seeing in real time, in your console, which line is run allows you to detect unexpected behavior.
@@ -1083,116 +1083,116 @@ In this case, the smaller the message size the better!</p>
 </blockquote>
 <p>We will see in the last chapter of this book how you can integrate JS inside your <code>{shiny}</code> app, and how even basic functions can be useful for making your app server smaller.
 For example, compare:</p>
+<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="common-app-caveats.html#cb288-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb288-2"><a href="common-app-caveats.html#cb288-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb288-3"><a href="common-app-caveats.html#cb288-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb288-4"><a href="common-app-caveats.html#cb288-4"></a>    <span class="co"># Adding a button with an onclick event, </span></span>
+<span id="cb288-5"><a href="common-app-caveats.html#cb288-5"></a>    <span class="co"># that will show or hide the plot</span></span>
+<span id="cb288-6"><a href="common-app-caveats.html#cb288-6"></a>    <span class="kw">actionButton</span>(</span>
+<span id="cb288-7"><a href="common-app-caveats.html#cb288-7"></a>      <span class="st">&quot;change&quot;</span>, </span>
+<span id="cb288-8"><a href="common-app-caveats.html#cb288-8"></a>      <span class="st">&quot;show/hide graph&quot;</span>, </span>
+<span id="cb288-9"><a href="common-app-caveats.html#cb288-9"></a>      <span class="co"># The toggle() function hide or show the queried element</span></span>
+<span id="cb288-10"><a href="common-app-caveats.html#cb288-10"></a>      <span class="dt">onclick =</span> <span class="st">&quot;$(&#39;#plot&#39;).toggle()&quot;</span></span>
+<span id="cb288-11"><a href="common-app-caveats.html#cb288-11"></a>    ), </span>
+<span id="cb288-12"><a href="common-app-caveats.html#cb288-12"></a>    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb288-13"><a href="common-app-caveats.html#cb288-13"></a>  )</span>
+<span id="cb288-14"><a href="common-app-caveats.html#cb288-14"></a>}</span>
+<span id="cb288-15"><a href="common-app-caveats.html#cb288-15"></a></span>
+<span id="cb288-16"><a href="common-app-caveats.html#cb288-16"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb288-17"><a href="common-app-caveats.html#cb288-17"></a>  input, </span>
+<span id="cb288-18"><a href="common-app-caveats.html#cb288-18"></a>  output, </span>
+<span id="cb288-19"><a href="common-app-caveats.html#cb288-19"></a>  session</span>
+<span id="cb288-20"><a href="common-app-caveats.html#cb288-20"></a>){</span>
+<span id="cb288-21"><a href="common-app-caveats.html#cb288-21"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb288-22"><a href="common-app-caveats.html#cb288-22"></a>    <span class="co"># This renderPlot will only be called once</span></span>
+<span id="cb288-23"><a href="common-app-caveats.html#cb288-23"></a>    cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;Rendering plot&quot;</span>)</span>
+<span id="cb288-24"><a href="common-app-caveats.html#cb288-24"></a>    <span class="kw">plot</span>(iris)</span>
+<span id="cb288-25"><a href="common-app-caveats.html#cb288-25"></a>  })</span>
+<span id="cb288-26"><a href="common-app-caveats.html#cb288-26"></a>}</span>
+<span id="cb288-27"><a href="common-app-caveats.html#cb288-27"></a></span>
+<span id="cb288-28"><a href="common-app-caveats.html#cb288-28"></a><span class="kw">shinyApp</span>(ui, server) </span></code></pre></div>
+<p>to</p>
 <div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb289-1"><a href="common-app-caveats.html#cb289-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb289-2"><a href="common-app-caveats.html#cb289-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
 <span id="cb289-3"><a href="common-app-caveats.html#cb289-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb289-4"><a href="common-app-caveats.html#cb289-4"></a>    <span class="co"># Adding a button with an onclick event, </span></span>
-<span id="cb289-5"><a href="common-app-caveats.html#cb289-5"></a>    <span class="co"># that will show or hide the plot</span></span>
-<span id="cb289-6"><a href="common-app-caveats.html#cb289-6"></a>    <span class="kw">actionButton</span>(</span>
-<span id="cb289-7"><a href="common-app-caveats.html#cb289-7"></a>      <span class="st">&quot;change&quot;</span>, </span>
-<span id="cb289-8"><a href="common-app-caveats.html#cb289-8"></a>      <span class="st">&quot;show/hide graph&quot;</span>, </span>
-<span id="cb289-9"><a href="common-app-caveats.html#cb289-9"></a>      <span class="co"># The toggle() function hide or show the queried element</span></span>
-<span id="cb289-10"><a href="common-app-caveats.html#cb289-10"></a>      <span class="dt">onclick =</span> <span class="st">&quot;$(&#39;#plot&#39;).toggle()&quot;</span></span>
-<span id="cb289-11"><a href="common-app-caveats.html#cb289-11"></a>    ), </span>
-<span id="cb289-12"><a href="common-app-caveats.html#cb289-12"></a>    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
-<span id="cb289-13"><a href="common-app-caveats.html#cb289-13"></a>  )</span>
-<span id="cb289-14"><a href="common-app-caveats.html#cb289-14"></a>}</span>
-<span id="cb289-15"><a href="common-app-caveats.html#cb289-15"></a></span>
-<span id="cb289-16"><a href="common-app-caveats.html#cb289-16"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb289-17"><a href="common-app-caveats.html#cb289-17"></a>  input, </span>
-<span id="cb289-18"><a href="common-app-caveats.html#cb289-18"></a>  output, </span>
-<span id="cb289-19"><a href="common-app-caveats.html#cb289-19"></a>  session</span>
-<span id="cb289-20"><a href="common-app-caveats.html#cb289-20"></a>){</span>
-<span id="cb289-21"><a href="common-app-caveats.html#cb289-21"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb289-22"><a href="common-app-caveats.html#cb289-22"></a>    <span class="co"># This renderPlot will only be called once</span></span>
-<span id="cb289-23"><a href="common-app-caveats.html#cb289-23"></a>    cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;Rendering plot&quot;</span>)</span>
-<span id="cb289-24"><a href="common-app-caveats.html#cb289-24"></a>    <span class="kw">plot</span>(iris)</span>
-<span id="cb289-25"><a href="common-app-caveats.html#cb289-25"></a>  })</span>
-<span id="cb289-26"><a href="common-app-caveats.html#cb289-26"></a>}</span>
-<span id="cb289-27"><a href="common-app-caveats.html#cb289-27"></a></span>
-<span id="cb289-28"><a href="common-app-caveats.html#cb289-28"></a><span class="kw">shinyApp</span>(ui, server) </span></code></pre></div>
-<p>to</p>
-<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb290-1"><a href="common-app-caveats.html#cb290-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb290-2"><a href="common-app-caveats.html#cb290-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb290-3"><a href="common-app-caveats.html#cb290-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb290-4"><a href="common-app-caveats.html#cb290-4"></a>    <span class="co"># We use a pattern without JavaScript</span></span>
-<span id="cb290-5"><a href="common-app-caveats.html#cb290-5"></a>    <span class="kw">actionButton</span>(<span class="st">&quot;change&quot;</span>, <span class="st">&quot;show/hide graph&quot;</span>), </span>
-<span id="cb290-6"><a href="common-app-caveats.html#cb290-6"></a>    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
-<span id="cb290-7"><a href="common-app-caveats.html#cb290-7"></a>  )</span>
-<span id="cb290-8"><a href="common-app-caveats.html#cb290-8"></a>}</span>
-<span id="cb290-9"><a href="common-app-caveats.html#cb290-9"></a></span>
-<span id="cb290-10"><a href="common-app-caveats.html#cb290-10"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb290-11"><a href="common-app-caveats.html#cb290-11"></a>  input, </span>
-<span id="cb290-12"><a href="common-app-caveats.html#cb290-12"></a>  output, </span>
-<span id="cb290-13"><a href="common-app-caveats.html#cb290-13"></a>  session</span>
-<span id="cb290-14"><a href="common-app-caveats.html#cb290-14"></a>){</span>
-<span id="cb290-15"><a href="common-app-caveats.html#cb290-15"></a>  </span>
-<span id="cb290-16"><a href="common-app-caveats.html#cb290-16"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
-<span id="cb290-17"><a href="common-app-caveats.html#cb290-17"></a>    <span class="co"># Here, every time the button is clicked, this reactive </span></span>
-<span id="cb290-18"><a href="common-app-caveats.html#cb290-18"></a>    <span class="co"># context will be invalidated, and the code re-evaluated</span></span>
-<span id="cb290-19"><a href="common-app-caveats.html#cb290-19"></a>    cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;Rendering plot&quot;</span>)</span>
-<span id="cb290-20"><a href="common-app-caveats.html#cb290-20"></a>    <span class="co"># Simulate a show and hide pattern</span></span>
-<span id="cb290-21"><a href="common-app-caveats.html#cb290-21"></a>    <span class="kw">req</span>(input<span class="op">$</span>change <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)</span>
-<span id="cb290-22"><a href="common-app-caveats.html#cb290-22"></a>    <span class="kw">plot</span>(iris)</span>
-<span id="cb290-23"><a href="common-app-caveats.html#cb290-23"></a>  })</span>
-<span id="cb290-24"><a href="common-app-caveats.html#cb290-24"></a>  </span>
-<span id="cb290-25"><a href="common-app-caveats.html#cb290-25"></a>}</span>
-<span id="cb290-26"><a href="common-app-caveats.html#cb290-26"></a></span>
-<span id="cb290-27"><a href="common-app-caveats.html#cb290-27"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<span id="cb289-4"><a href="common-app-caveats.html#cb289-4"></a>    <span class="co"># We use a pattern without JavaScript</span></span>
+<span id="cb289-5"><a href="common-app-caveats.html#cb289-5"></a>    <span class="kw">actionButton</span>(<span class="st">&quot;change&quot;</span>, <span class="st">&quot;show/hide graph&quot;</span>), </span>
+<span id="cb289-6"><a href="common-app-caveats.html#cb289-6"></a>    <span class="kw">plotOutput</span>(<span class="st">&quot;plot&quot;</span>)</span>
+<span id="cb289-7"><a href="common-app-caveats.html#cb289-7"></a>  )</span>
+<span id="cb289-8"><a href="common-app-caveats.html#cb289-8"></a>}</span>
+<span id="cb289-9"><a href="common-app-caveats.html#cb289-9"></a></span>
+<span id="cb289-10"><a href="common-app-caveats.html#cb289-10"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb289-11"><a href="common-app-caveats.html#cb289-11"></a>  input, </span>
+<span id="cb289-12"><a href="common-app-caveats.html#cb289-12"></a>  output, </span>
+<span id="cb289-13"><a href="common-app-caveats.html#cb289-13"></a>  session</span>
+<span id="cb289-14"><a href="common-app-caveats.html#cb289-14"></a>){</span>
+<span id="cb289-15"><a href="common-app-caveats.html#cb289-15"></a>  </span>
+<span id="cb289-16"><a href="common-app-caveats.html#cb289-16"></a>  output<span class="op">$</span>plot &lt;-<span class="st"> </span><span class="kw">renderPlot</span>({</span>
+<span id="cb289-17"><a href="common-app-caveats.html#cb289-17"></a>    <span class="co"># Here, every time the button is clicked, this reactive </span></span>
+<span id="cb289-18"><a href="common-app-caveats.html#cb289-18"></a>    <span class="co"># context will be invalidated, and the code re-evaluated</span></span>
+<span id="cb289-19"><a href="common-app-caveats.html#cb289-19"></a>    cli<span class="op">::</span><span class="kw">cat_rule</span>(<span class="st">&quot;Rendering plot&quot;</span>)</span>
+<span id="cb289-20"><a href="common-app-caveats.html#cb289-20"></a>    <span class="co"># Simulate a show and hide pattern</span></span>
+<span id="cb289-21"><a href="common-app-caveats.html#cb289-21"></a>    <span class="kw">req</span>(input<span class="op">$</span>change <span class="op">%%</span><span class="st"> </span><span class="dv">2</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)</span>
+<span id="cb289-22"><a href="common-app-caveats.html#cb289-22"></a>    <span class="kw">plot</span>(iris)</span>
+<span id="cb289-23"><a href="common-app-caveats.html#cb289-23"></a>  })</span>
+<span id="cb289-24"><a href="common-app-caveats.html#cb289-24"></a>  </span>
+<span id="cb289-25"><a href="common-app-caveats.html#cb289-25"></a>}</span>
+<span id="cb289-26"><a href="common-app-caveats.html#cb289-26"></a></span>
+<span id="cb289-27"><a href="common-app-caveats.html#cb289-27"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>The result is the same, but the first version is shorter and easier to understand: we have one button, and the behavior of the button is self-contained.
 The second solution redraws the plot every time the <code>reactiveValues</code> is updated, making R compute way more than it should, whereas with the JavaScript-only solution, the plot is not recomputed every time you need to show it: the plot is drawn by R only once.</p>
 <p>At a local level, the improvements described in this section will not make your application way faster: for example, rendering UI elements (let’s say rendering a simple title) will not be computationally heavy.
 But at a global level, less UI computation from the server side helps the general rendering of the app: let’s say you have an output that takes 3 seconds to run, then if the whole UI + output is to be rendered on the server side, the whole UI stays blank until everything is computed.</p>
 <p>Compare:</p>
+<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb290-1"><a href="common-app-caveats.html#cb290-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb290-2"><a href="common-app-caveats.html#cb290-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb290-3"><a href="common-app-caveats.html#cb290-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb290-4"><a href="common-app-caveats.html#cb290-4"></a>    <span class="co"># We make the whole UI be generated by R</span></span>
+<span id="cb290-5"><a href="common-app-caveats.html#cb290-5"></a>    <span class="kw">uiOutput</span>(<span class="st">&quot;caption&quot;</span>)</span>
+<span id="cb290-6"><a href="common-app-caveats.html#cb290-6"></a>  )</span>
+<span id="cb290-7"><a href="common-app-caveats.html#cb290-7"></a>}</span>
+<span id="cb290-8"><a href="common-app-caveats.html#cb290-8"></a></span>
+<span id="cb290-9"><a href="common-app-caveats.html#cb290-9"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb290-10"><a href="common-app-caveats.html#cb290-10"></a>  input, </span>
+<span id="cb290-11"><a href="common-app-caveats.html#cb290-11"></a>  output, </span>
+<span id="cb290-12"><a href="common-app-caveats.html#cb290-12"></a>  session</span>
+<span id="cb290-13"><a href="common-app-caveats.html#cb290-13"></a>){</span>
+<span id="cb290-14"><a href="common-app-caveats.html#cb290-14"></a>  output<span class="op">$</span>caption &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
+<span id="cb290-15"><a href="common-app-caveats.html#cb290-15"></a>    <span class="co"># Simulate something that takes 3 seconds to run</span></span>
+<span id="cb290-16"><a href="common-app-caveats.html#cb290-16"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</span>
+<span id="cb290-17"><a href="common-app-caveats.html#cb290-17"></a>    <span class="co"># Returning the UI</span></span>
+<span id="cb290-18"><a href="common-app-caveats.html#cb290-18"></a>    <span class="kw">tagList</span>(</span>
+<span id="cb290-19"><a href="common-app-caveats.html#cb290-19"></a>      <span class="kw">h3</span>(<span class="st">&quot;test&quot;</span>), </span>
+<span id="cb290-20"><a href="common-app-caveats.html#cb290-20"></a>      shinipsum<span class="op">::</span><span class="kw">random_text</span>(<span class="dv">10</span>)</span>
+<span id="cb290-21"><a href="common-app-caveats.html#cb290-21"></a>    )</span>
+<span id="cb290-22"><a href="common-app-caveats.html#cb290-22"></a>    </span>
+<span id="cb290-23"><a href="common-app-caveats.html#cb290-23"></a>  })</span>
+<span id="cb290-24"><a href="common-app-caveats.html#cb290-24"></a>}</span>
+<span id="cb290-25"><a href="common-app-caveats.html#cb290-25"></a></span>
+<span id="cb290-26"><a href="common-app-caveats.html#cb290-26"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>to</p>
 <div class="sourceCode" id="cb291"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb291-1"><a href="common-app-caveats.html#cb291-1"></a><span class="kw">library</span>(shiny)</span>
 <span id="cb291-2"><a href="common-app-caveats.html#cb291-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
 <span id="cb291-3"><a href="common-app-caveats.html#cb291-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb291-4"><a href="common-app-caveats.html#cb291-4"></a>    <span class="co"># We make the whole UI be generated by R</span></span>
-<span id="cb291-5"><a href="common-app-caveats.html#cb291-5"></a>    <span class="kw">uiOutput</span>(<span class="st">&quot;caption&quot;</span>)</span>
-<span id="cb291-6"><a href="common-app-caveats.html#cb291-6"></a>  )</span>
-<span id="cb291-7"><a href="common-app-caveats.html#cb291-7"></a>}</span>
-<span id="cb291-8"><a href="common-app-caveats.html#cb291-8"></a></span>
-<span id="cb291-9"><a href="common-app-caveats.html#cb291-9"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb291-10"><a href="common-app-caveats.html#cb291-10"></a>  input, </span>
-<span id="cb291-11"><a href="common-app-caveats.html#cb291-11"></a>  output, </span>
-<span id="cb291-12"><a href="common-app-caveats.html#cb291-12"></a>  session</span>
-<span id="cb291-13"><a href="common-app-caveats.html#cb291-13"></a>){</span>
-<span id="cb291-14"><a href="common-app-caveats.html#cb291-14"></a>  output<span class="op">$</span>caption &lt;-<span class="st"> </span><span class="kw">renderUI</span>({</span>
-<span id="cb291-15"><a href="common-app-caveats.html#cb291-15"></a>    <span class="co"># Simulate something that takes 3 seconds to run</span></span>
-<span id="cb291-16"><a href="common-app-caveats.html#cb291-16"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</span>
-<span id="cb291-17"><a href="common-app-caveats.html#cb291-17"></a>    <span class="co"># Returning the UI</span></span>
-<span id="cb291-18"><a href="common-app-caveats.html#cb291-18"></a>    <span class="kw">tagList</span>(</span>
-<span id="cb291-19"><a href="common-app-caveats.html#cb291-19"></a>      <span class="kw">h3</span>(<span class="st">&quot;test&quot;</span>), </span>
-<span id="cb291-20"><a href="common-app-caveats.html#cb291-20"></a>      shinipsum<span class="op">::</span><span class="kw">random_text</span>(<span class="dv">10</span>)</span>
-<span id="cb291-21"><a href="common-app-caveats.html#cb291-21"></a>    )</span>
-<span id="cb291-22"><a href="common-app-caveats.html#cb291-22"></a>    </span>
-<span id="cb291-23"><a href="common-app-caveats.html#cb291-23"></a>  })</span>
-<span id="cb291-24"><a href="common-app-caveats.html#cb291-24"></a>}</span>
-<span id="cb291-25"><a href="common-app-caveats.html#cb291-25"></a></span>
-<span id="cb291-26"><a href="common-app-caveats.html#cb291-26"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
-<p>to</p>
-<div class="sourceCode" id="cb292"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb292-1"><a href="common-app-caveats.html#cb292-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb292-2"><a href="common-app-caveats.html#cb292-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb292-3"><a href="common-app-caveats.html#cb292-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb292-4"><a href="common-app-caveats.html#cb292-4"></a>    <span class="co"># Only the text input will be rendered by R</span></span>
-<span id="cb292-5"><a href="common-app-caveats.html#cb292-5"></a>    <span class="kw">h3</span>(<span class="st">&quot;test&quot;</span>), </span>
-<span id="cb292-6"><a href="common-app-caveats.html#cb292-6"></a>    <span class="kw">textOutput</span>(<span class="st">&quot;caption&quot;</span>)</span>
-<span id="cb292-7"><a href="common-app-caveats.html#cb292-7"></a>  )</span>
-<span id="cb292-8"><a href="common-app-caveats.html#cb292-8"></a>}</span>
-<span id="cb292-9"><a href="common-app-caveats.html#cb292-9"></a></span>
-<span id="cb292-10"><a href="common-app-caveats.html#cb292-10"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb292-11"><a href="common-app-caveats.html#cb292-11"></a>  input, </span>
-<span id="cb292-12"><a href="common-app-caveats.html#cb292-12"></a>  output, </span>
-<span id="cb292-13"><a href="common-app-caveats.html#cb292-13"></a>  session</span>
-<span id="cb292-14"><a href="common-app-caveats.html#cb292-14"></a>){</span>
-<span id="cb292-15"><a href="common-app-caveats.html#cb292-15"></a>  output<span class="op">$</span>caption &lt;-<span class="st"> </span><span class="kw">renderText</span>({</span>
-<span id="cb292-16"><a href="common-app-caveats.html#cb292-16"></a>    <span class="co"># Here, we only render the text, not the whole UI</span></span>
-<span id="cb292-17"><a href="common-app-caveats.html#cb292-17"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</span>
-<span id="cb292-18"><a href="common-app-caveats.html#cb292-18"></a>    shinipsum<span class="op">::</span><span class="kw">random_text</span>(<span class="dv">10</span>)</span>
-<span id="cb292-19"><a href="common-app-caveats.html#cb292-19"></a>  })</span>
-<span id="cb292-20"><a href="common-app-caveats.html#cb292-20"></a>}</span>
-<span id="cb292-21"><a href="common-app-caveats.html#cb292-21"></a></span>
-<span id="cb292-22"><a href="common-app-caveats.html#cb292-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<span id="cb291-4"><a href="common-app-caveats.html#cb291-4"></a>    <span class="co"># Only the text input will be rendered by R</span></span>
+<span id="cb291-5"><a href="common-app-caveats.html#cb291-5"></a>    <span class="kw">h3</span>(<span class="st">&quot;test&quot;</span>), </span>
+<span id="cb291-6"><a href="common-app-caveats.html#cb291-6"></a>    <span class="kw">textOutput</span>(<span class="st">&quot;caption&quot;</span>)</span>
+<span id="cb291-7"><a href="common-app-caveats.html#cb291-7"></a>  )</span>
+<span id="cb291-8"><a href="common-app-caveats.html#cb291-8"></a>}</span>
+<span id="cb291-9"><a href="common-app-caveats.html#cb291-9"></a></span>
+<span id="cb291-10"><a href="common-app-caveats.html#cb291-10"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb291-11"><a href="common-app-caveats.html#cb291-11"></a>  input, </span>
+<span id="cb291-12"><a href="common-app-caveats.html#cb291-12"></a>  output, </span>
+<span id="cb291-13"><a href="common-app-caveats.html#cb291-13"></a>  session</span>
+<span id="cb291-14"><a href="common-app-caveats.html#cb291-14"></a>){</span>
+<span id="cb291-15"><a href="common-app-caveats.html#cb291-15"></a>  output<span class="op">$</span>caption &lt;-<span class="st"> </span><span class="kw">renderText</span>({</span>
+<span id="cb291-16"><a href="common-app-caveats.html#cb291-16"></a>    <span class="co"># Here, we only render the text, not the whole UI</span></span>
+<span id="cb291-17"><a href="common-app-caveats.html#cb291-17"></a>    <span class="kw">Sys.sleep</span>(<span class="dv">3</span>)</span>
+<span id="cb291-18"><a href="common-app-caveats.html#cb291-18"></a>    shinipsum<span class="op">::</span><span class="kw">random_text</span>(<span class="dv">10</span>)</span>
+<span id="cb291-19"><a href="common-app-caveats.html#cb291-19"></a>  })</span>
+<span id="cb291-20"><a href="common-app-caveats.html#cb291-20"></a>}</span>
+<span id="cb291-21"><a href="common-app-caveats.html#cb291-21"></a></span>
+<span id="cb291-22"><a href="common-app-caveats.html#cb291-22"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>In the first example, the UI will wait for the server to have rendered, while in the second we will first see the title, then the rendered text after a few seconds.
 That approach makes the user experience better: they know that something is happening, while a completely blank page is confusing.</p>
 <p>Also, because R is single threaded, manipulating DOM elements from the server side causes R to be busy doing these DOM manipulations while it could be computing something else.
@@ -1203,36 +1203,36 @@ That is a full second for rendering four of them, while R should be busy doing s
 <h4>B. <code>update*</code> inputs</h4>
 <p>Almost every <code>{shiny}</code> input, even the custom ones from packages, come with an <code>update_</code> function that allows us to change the input values from the server side, instead of re-creating the UI entirely.
 For example, here is a way to update the content of a <code>selectInput</code> from the server side:</p>
-<div class="sourceCode" id="cb293"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb293-1"><a href="common-app-caveats.html#cb293-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb293-2"><a href="common-app-caveats.html#cb293-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb293-3"><a href="common-app-caveats.html#cb293-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb293-4"><a href="common-app-caveats.html#cb293-4"></a>    <span class="co"># We start the selectInput empty</span></span>
-<span id="cb293-5"><a href="common-app-caveats.html#cb293-5"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;species&quot;</span>, <span class="st">&quot;Species&quot;</span>, <span class="dt">choices =</span> <span class="ot">NULL</span>), </span>
-<span id="cb293-6"><a href="common-app-caveats.html#cb293-6"></a>    <span class="co"># The selectInput will be populate </span></span>
-<span id="cb293-7"><a href="common-app-caveats.html#cb293-7"></a>    <span class="co"># when the update button is pressed</span></span>
-<span id="cb293-8"><a href="common-app-caveats.html#cb293-8"></a>    <span class="kw">actionButton</span>(<span class="st">&quot;update&quot;</span>, <span class="st">&quot;Update&quot;</span>)</span>
-<span id="cb293-9"><a href="common-app-caveats.html#cb293-9"></a>  )</span>
-<span id="cb293-10"><a href="common-app-caveats.html#cb293-10"></a>}</span>
-<span id="cb293-11"><a href="common-app-caveats.html#cb293-11"></a></span>
-<span id="cb293-12"><a href="common-app-caveats.html#cb293-12"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb293-13"><a href="common-app-caveats.html#cb293-13"></a>  input, </span>
-<span id="cb293-14"><a href="common-app-caveats.html#cb293-14"></a>  output, </span>
-<span id="cb293-15"><a href="common-app-caveats.html#cb293-15"></a>  session</span>
-<span id="cb293-16"><a href="common-app-caveats.html#cb293-16"></a>){</span>
-<span id="cb293-17"><a href="common-app-caveats.html#cb293-17"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>update , {</span>
-<span id="cb293-18"><a href="common-app-caveats.html#cb293-18"></a>    <span class="co"># Update the selectInput with the species from iris</span></span>
-<span id="cb293-19"><a href="common-app-caveats.html#cb293-19"></a>    spc &lt;-<span class="st"> </span><span class="kw">unique</span>(iris<span class="op">$</span>Species)</span>
-<span id="cb293-20"><a href="common-app-caveats.html#cb293-20"></a>    <span class="kw">updateSelectInput</span>(</span>
-<span id="cb293-21"><a href="common-app-caveats.html#cb293-21"></a>      session, </span>
-<span id="cb293-22"><a href="common-app-caveats.html#cb293-22"></a>      <span class="st">&quot;species&quot;</span>, </span>
-<span id="cb293-23"><a href="common-app-caveats.html#cb293-23"></a>      <span class="dt">choices =</span> spc, </span>
-<span id="cb293-24"><a href="common-app-caveats.html#cb293-24"></a>      <span class="dt">selected =</span> spc[<span class="dv">1</span>]</span>
-<span id="cb293-25"><a href="common-app-caveats.html#cb293-25"></a>    )</span>
-<span id="cb293-26"><a href="common-app-caveats.html#cb293-26"></a>  })</span>
-<span id="cb293-27"><a href="common-app-caveats.html#cb293-27"></a>  </span>
-<span id="cb293-28"><a href="common-app-caveats.html#cb293-28"></a>}</span>
-<span id="cb293-29"><a href="common-app-caveats.html#cb293-29"></a></span>
-<span id="cb293-30"><a href="common-app-caveats.html#cb293-30"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb292"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb292-1"><a href="common-app-caveats.html#cb292-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb292-2"><a href="common-app-caveats.html#cb292-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb292-3"><a href="common-app-caveats.html#cb292-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb292-4"><a href="common-app-caveats.html#cb292-4"></a>    <span class="co"># We start the selectInput empty</span></span>
+<span id="cb292-5"><a href="common-app-caveats.html#cb292-5"></a>    <span class="kw">selectInput</span>(<span class="st">&quot;species&quot;</span>, <span class="st">&quot;Species&quot;</span>, <span class="dt">choices =</span> <span class="ot">NULL</span>), </span>
+<span id="cb292-6"><a href="common-app-caveats.html#cb292-6"></a>    <span class="co"># The selectInput will be populate </span></span>
+<span id="cb292-7"><a href="common-app-caveats.html#cb292-7"></a>    <span class="co"># when the update button is pressed</span></span>
+<span id="cb292-8"><a href="common-app-caveats.html#cb292-8"></a>    <span class="kw">actionButton</span>(<span class="st">&quot;update&quot;</span>, <span class="st">&quot;Update&quot;</span>)</span>
+<span id="cb292-9"><a href="common-app-caveats.html#cb292-9"></a>  )</span>
+<span id="cb292-10"><a href="common-app-caveats.html#cb292-10"></a>}</span>
+<span id="cb292-11"><a href="common-app-caveats.html#cb292-11"></a></span>
+<span id="cb292-12"><a href="common-app-caveats.html#cb292-12"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb292-13"><a href="common-app-caveats.html#cb292-13"></a>  input, </span>
+<span id="cb292-14"><a href="common-app-caveats.html#cb292-14"></a>  output, </span>
+<span id="cb292-15"><a href="common-app-caveats.html#cb292-15"></a>  session</span>
+<span id="cb292-16"><a href="common-app-caveats.html#cb292-16"></a>){</span>
+<span id="cb292-17"><a href="common-app-caveats.html#cb292-17"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>update , {</span>
+<span id="cb292-18"><a href="common-app-caveats.html#cb292-18"></a>    <span class="co"># Update the selectInput with the species from iris</span></span>
+<span id="cb292-19"><a href="common-app-caveats.html#cb292-19"></a>    spc &lt;-<span class="st"> </span><span class="kw">unique</span>(iris<span class="op">$</span>Species)</span>
+<span id="cb292-20"><a href="common-app-caveats.html#cb292-20"></a>    <span class="kw">updateSelectInput</span>(</span>
+<span id="cb292-21"><a href="common-app-caveats.html#cb292-21"></a>      session, </span>
+<span id="cb292-22"><a href="common-app-caveats.html#cb292-22"></a>      <span class="st">&quot;species&quot;</span>, </span>
+<span id="cb292-23"><a href="common-app-caveats.html#cb292-23"></a>      <span class="dt">choices =</span> spc, </span>
+<span id="cb292-24"><a href="common-app-caveats.html#cb292-24"></a>      <span class="dt">selected =</span> spc[<span class="dv">1</span>]</span>
+<span id="cb292-25"><a href="common-app-caveats.html#cb292-25"></a>    )</span>
+<span id="cb292-26"><a href="common-app-caveats.html#cb292-26"></a>  })</span>
+<span id="cb292-27"><a href="common-app-caveats.html#cb292-27"></a>  </span>
+<span id="cb292-28"><a href="common-app-caveats.html#cb292-28"></a>}</span>
+<span id="cb292-29"><a href="common-app-caveats.html#cb292-29"></a></span>
+<span id="cb292-30"><a href="common-app-caveats.html#cb292-30"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <p>This switch to <code>updateSelectInput</code> makes the code easier to reason about as the <code>selectInput</code> is where it should be: inside the UI, instead of another pattern where we would use <code>renderUI()</code> and <code>uiOutput()</code>.
 Plus, with the <code>update</code> method, we are only changing what is needed, not re-generating the whole input.</p>
 </div>
@@ -1246,39 +1246,39 @@ This method allows us to have a smaller DOM: <code>&lt;div&gt;</code> that are n
 <li>Removing an element from the app will not delete the input from the input list. In other words, if you have <code>selectInput("x", "x")</code>, and you remove this input using <code>removeUI()</code>, you will still have <code>input$x</code> in the server.</li>
 </ul>
 <p>For example, in the following example, the <code>input$val</code> value will not be removed once you have called <code>removeUI(selector = "#val")</code>.</p>
-<div class="sourceCode" id="cb294"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb294-1"><a href="common-app-caveats.html#cb294-1"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb294-2"><a href="common-app-caveats.html#cb294-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb294-3"><a href="common-app-caveats.html#cb294-3"></a>  <span class="kw">tagList</span>(</span>
-<span id="cb294-4"><a href="common-app-caveats.html#cb294-4"></a>    <span class="co"># Creating a text input that will be removed</span></span>
-<span id="cb294-5"><a href="common-app-caveats.html#cb294-5"></a>    <span class="co">#  from the UI whenever the remove button is pressed</span></span>
-<span id="cb294-6"><a href="common-app-caveats.html#cb294-6"></a>    <span class="kw">textInput</span>(<span class="st">&quot;value&quot;</span>, <span class="st">&quot;Value&quot;</span>, <span class="st">&quot;place&quot;</span>),</span>
-<span id="cb294-7"><a href="common-app-caveats.html#cb294-7"></a>    <span class="kw">actionButton</span>(<span class="st">&quot;remove&quot;</span>, <span class="st">&quot;Remove UI&quot;</span>)</span>
-<span id="cb294-8"><a href="common-app-caveats.html#cb294-8"></a>  )</span>
-<span id="cb294-9"><a href="common-app-caveats.html#cb294-9"></a>}</span>
-<span id="cb294-10"><a href="common-app-caveats.html#cb294-10"></a></span>
-<span id="cb294-11"><a href="common-app-caveats.html#cb294-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb294-12"><a href="common-app-caveats.html#cb294-12"></a>  input, </span>
-<span id="cb294-13"><a href="common-app-caveats.html#cb294-13"></a>  output, </span>
-<span id="cb294-14"><a href="common-app-caveats.html#cb294-14"></a>  session</span>
-<span id="cb294-15"><a href="common-app-caveats.html#cb294-15"></a>){</span>
-<span id="cb294-16"><a href="common-app-caveats.html#cb294-16"></a>  </span>
-<span id="cb294-17"><a href="common-app-caveats.html#cb294-17"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>remove , {</span>
-<span id="cb294-18"><a href="common-app-caveats.html#cb294-18"></a>    <span class="co"># When the button is pressed,</span></span>
-<span id="cb294-19"><a href="common-app-caveats.html#cb294-19"></a>    <span class="co">#  the textInput will be removed from the UI</span></span>
-<span id="cb294-20"><a href="common-app-caveats.html#cb294-20"></a>    <span class="kw">removeUI</span>(<span class="dt">selector =</span> <span class="st">&quot;#value&quot;</span>)</span>
-<span id="cb294-21"><a href="common-app-caveats.html#cb294-21"></a>  })</span>
-<span id="cb294-22"><a href="common-app-caveats.html#cb294-22"></a>  </span>
-<span id="cb294-23"><a href="common-app-caveats.html#cb294-23"></a>  <span class="kw">observe</span>({</span>
-<span id="cb294-24"><a href="common-app-caveats.html#cb294-24"></a>    <span class="co"># We observe input$value every second. </span></span>
-<span id="cb294-25"><a href="common-app-caveats.html#cb294-25"></a>    <span class="co"># You&#39;ll realize that even after the UI</span></span>
-<span id="cb294-26"><a href="common-app-caveats.html#cb294-26"></a>    <span class="co"># is removed, input$value is still available.</span></span>
-<span id="cb294-27"><a href="common-app-caveats.html#cb294-27"></a>    <span class="kw">invalidateLater</span>(<span class="dv">1000</span>)</span>
-<span id="cb294-28"><a href="common-app-caveats.html#cb294-28"></a>    <span class="kw">print</span>(input<span class="op">$</span>value)</span>
-<span id="cb294-29"><a href="common-app-caveats.html#cb294-29"></a>  })</span>
-<span id="cb294-30"><a href="common-app-caveats.html#cb294-30"></a>  </span>
-<span id="cb294-31"><a href="common-app-caveats.html#cb294-31"></a>}</span>
-<span id="cb294-32"><a href="common-app-caveats.html#cb294-32"></a></span>
-<span id="cb294-33"><a href="common-app-caveats.html#cb294-33"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
+<div class="sourceCode" id="cb293"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb293-1"><a href="common-app-caveats.html#cb293-1"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb293-2"><a href="common-app-caveats.html#cb293-2"></a>ui &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb293-3"><a href="common-app-caveats.html#cb293-3"></a>  <span class="kw">tagList</span>(</span>
+<span id="cb293-4"><a href="common-app-caveats.html#cb293-4"></a>    <span class="co"># Creating a text input that will be removed</span></span>
+<span id="cb293-5"><a href="common-app-caveats.html#cb293-5"></a>    <span class="co">#  from the UI whenever the remove button is pressed</span></span>
+<span id="cb293-6"><a href="common-app-caveats.html#cb293-6"></a>    <span class="kw">textInput</span>(<span class="st">&quot;value&quot;</span>, <span class="st">&quot;Value&quot;</span>, <span class="st">&quot;place&quot;</span>),</span>
+<span id="cb293-7"><a href="common-app-caveats.html#cb293-7"></a>    <span class="kw">actionButton</span>(<span class="st">&quot;remove&quot;</span>, <span class="st">&quot;Remove UI&quot;</span>)</span>
+<span id="cb293-8"><a href="common-app-caveats.html#cb293-8"></a>  )</span>
+<span id="cb293-9"><a href="common-app-caveats.html#cb293-9"></a>}</span>
+<span id="cb293-10"><a href="common-app-caveats.html#cb293-10"></a></span>
+<span id="cb293-11"><a href="common-app-caveats.html#cb293-11"></a>server &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb293-12"><a href="common-app-caveats.html#cb293-12"></a>  input, </span>
+<span id="cb293-13"><a href="common-app-caveats.html#cb293-13"></a>  output, </span>
+<span id="cb293-14"><a href="common-app-caveats.html#cb293-14"></a>  session</span>
+<span id="cb293-15"><a href="common-app-caveats.html#cb293-15"></a>){</span>
+<span id="cb293-16"><a href="common-app-caveats.html#cb293-16"></a>  </span>
+<span id="cb293-17"><a href="common-app-caveats.html#cb293-17"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>remove , {</span>
+<span id="cb293-18"><a href="common-app-caveats.html#cb293-18"></a>    <span class="co"># When the button is pressed,</span></span>
+<span id="cb293-19"><a href="common-app-caveats.html#cb293-19"></a>    <span class="co">#  the textInput will be removed from the UI</span></span>
+<span id="cb293-20"><a href="common-app-caveats.html#cb293-20"></a>    <span class="kw">removeUI</span>(<span class="dt">selector =</span> <span class="st">&quot;#value&quot;</span>)</span>
+<span id="cb293-21"><a href="common-app-caveats.html#cb293-21"></a>  })</span>
+<span id="cb293-22"><a href="common-app-caveats.html#cb293-22"></a>  </span>
+<span id="cb293-23"><a href="common-app-caveats.html#cb293-23"></a>  <span class="kw">observe</span>({</span>
+<span id="cb293-24"><a href="common-app-caveats.html#cb293-24"></a>    <span class="co"># We observe input$value every second. </span></span>
+<span id="cb293-25"><a href="common-app-caveats.html#cb293-25"></a>    <span class="co"># You&#39;ll realize that even after the UI</span></span>
+<span id="cb293-26"><a href="common-app-caveats.html#cb293-26"></a>    <span class="co"># is removed, input$value is still available.</span></span>
+<span id="cb293-27"><a href="common-app-caveats.html#cb293-27"></a>    <span class="kw">invalidateLater</span>(<span class="dv">1000</span>)</span>
+<span id="cb293-28"><a href="common-app-caveats.html#cb293-28"></a>    <span class="kw">print</span>(input<span class="op">$</span>value)</span>
+<span id="cb293-29"><a href="common-app-caveats.html#cb293-29"></a>  })</span>
+<span id="cb293-30"><a href="common-app-caveats.html#cb293-30"></a>  </span>
+<span id="cb293-31"><a href="common-app-caveats.html#cb293-31"></a>}</span>
+<span id="cb293-32"><a href="common-app-caveats.html#cb293-32"></a></span>
+<span id="cb293-33"><a href="common-app-caveats.html#cb293-33"></a><span class="kw">shinyApp</span>(ui, server)</span></code></pre></div>
 <ul>
 <li>Both these functions take a <code>jQuery</code> selector to select the element in the UI. We will introduce these selectors in Chapter <a href="using-javascript.html#using-javascript">17</a>.</li>
 </ul>
