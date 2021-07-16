@@ -3,6 +3,7 @@ options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/latest"))
 
 remotes::install_github("lbartnik/subprocess")
 remotes::install_github("rstudio/websocket")
+remotes::install_github("thinkr-open/bank")
 paks <- c(
   "cloc", "dplyr", "cyclocomp", "tidytuesday201942", "shiny", "packageMetrics2", 
   "remotes", "readr", "here", "tibble", "knitr", "desc", "attachment", "magrittr", 
@@ -27,7 +28,7 @@ paks <- c(
   "tidymodules", "shinyjs", "htmlwidgets", 
   "hunspell", "rhub", "spelling", "tufte", "uuid", 
   "attachment", "remotes", "usethis", "namer", "desc", "spelling", "tufte", 
-  "dockerstats", "spelling", "tidymodules"
+  "dockerstats", "spelling", "tidymodules", "bank"
 ) 
 
 paks <- unique(paks)
@@ -59,11 +60,11 @@ knitr::write_bib(c(
   unique(paks)
 ), 'packages.bib')
 
-purrr::walk(
-  list.files(path = ".", pattern = ".Rmd$"), 
-  function(x){
-    cli::cat_rule(x)
-    namer::name_chunks(x)
-  }
-)
+# purrr::walk(
+#   list.files(path = ".", pattern = ".Rmd$"), 
+#   function(x){
+#     cli::cat_rule(x)
+#     namer::name_chunks(x)
+#   }
+# )
 
