@@ -118,7 +118,7 @@ toc()
 ```
 
 ```
-0.832 sec elapsed
+1.251 sec elapsed
 ```
 
 ```{r eval = FALSE}
@@ -133,15 +133,12 @@ toc()
 ```
 
 ```
-0.093 sec elapsed
+0.005 sec elapsed
 ```
 
 ```{r eval = FALSE}
 # Let's check that the two are equal
-all.equal(
-  res_a, 
-  res_b
-)
+setequal(res_a, res_b)
 ```
 
 ```
@@ -159,7 +156,7 @@ toc()
 ```
 
 ```
-0.333 sec elapsed
+0.384 sec elapsed
 ```
 
 ```{r eval = FALSE}
@@ -223,11 +220,15 @@ res_c <- m_get_query(
 fs::dir_tree(random_dir)
 ```
 
+
+```{r echo = FALSE}
+dir.create("xawcubtjzp")
+fs::file_create("xawcubtjzp/3764a0a4950cb30b")
+fs::file_create("xawcubtjzp/c295e060ea7d77c1")
+fs::dir_tree("xawcubtjzp")
+fs::dir_delete("xawcubtjzp")
 ```
-xawcubtjzp
-├── 3764a0a4950cb30b
-└── c295e060ea7d77c1
-```
+
 
 As you can see, we now have two cache objects inside the directory we have specified as a `cache_filesystem`.
 
@@ -241,6 +242,7 @@ try(fs::dir_delete(random_dir))
 We can apply what we have just seen with `{memoise}`, for example, to render a table:
 
 ```{r 16-optimizing-shiny-code-8, eval=TRUE}
+library(memoise)
 # We create an in-memory database using SQLite
 con <- DBI::dbConnect(
   RSQLite::SQLite(), 
@@ -280,6 +282,7 @@ memoised_fct_sql <- memoise(fct_sql, cache = cache_dir)
 Then, it can be used in an app:
 
 ```{r 16-optimizing-shiny-code-8-bis, eval=FALSE}
+library(shiny)
 ui <- function(){
   tagList(
     # The user can select one of the cut from ggplot2::diamonds,  
@@ -416,7 +419,8 @@ One other thing to remember is that, just like our computer screen from our phon
 For example, from our stored cache from before:
 
 ```{r 16-optimizing-shiny-code-9 }
-fs::dir_info("cache")[, "size", drop  = FALSE]
+dir_i <- fs::dir_info("cache")[, "size", drop  = FALSE] 
+head(dir_i)
 ```
 
 Managing cache at a system level is a very vast, fascinating topic that we cannot cover here, but note that the most commonly accepted rule for deleting cache is called **LRU**, for **Least Recently Used**.
@@ -424,12 +428,11 @@ The underlying principle of this approach is that users tend to need what they h
 And this can be retrieved with:
 
 ```{r 16-optimizing-shiny-code-10 }
-fs::dir_info("cache")[, "access_time", drop  = FALSE]
+dir_at <- fs::dir_info("cache")[, "access_time", drop  = FALSE]
+head(dir_at)
 ```
 
 Hence, when using cache, it might be interesting to periodically remove the oldest used cache, so that you can regain some space on the server running the application.
-
-\newpage
 
 ## Asynchronous in `{shiny}`
 
@@ -720,11 +723,11 @@ server <- function(
         # Change the value of `rv$res` only if 
         # the current id is the same as the last_id
         if (result$id == rv$last_id){
-          rv$res <- e
+          rv$res <- result$res
         }
       }) %...!%
       (function(error){
-        warning(e)
+        warning(error)
       })
     # Note that every render() function should return
     #  something: here it will only work if the 
@@ -739,7 +742,7 @@ server <- function(
   # is available, i.e. returned from the future
   #  and the last one sent.
   output$rnorm <- renderPrint({
-    req(rv$output)
+    req(rv$res)
   })
   
   # output$plot will be drawn immediately
@@ -753,7 +756,7 @@ shinyApp(ui, server)
 
 -   We need to treat the outputs in the order they are received. In that case, instead of waiting for the very last input, you will need to build a structure that will receive the output, check if this output is the "next in line", store it if it is not, or return it if it is, and see if there is another output in the queue. This type of implementation is a little bit more complex, so we will not detail a full implementation in this chapter, but here is a small example of using `{liteq}` [@R-liteq].
 
-```{r 16-optimizing-shiny-code-17 }
+```{r 16-optimizing-shiny-code-17, eval = FALSE}
 library(promises)
 library(future)
 plan(multisession)
@@ -766,16 +769,21 @@ for (i in 1:5){
   future({
     # Faking a random computation time
     Sys.sleep( sample(1:5, 1) )
-    return(rnorm(5))
+    return(
+      list(
+        id = i,
+        res = rnorm(5)
+      )
+    )
   }) %...>% 
     # Whenever we receive an output, we add it to 
     # the queue database
     (function(results){
       publish(
         queue, 
-        title = as.character(i), 
+        title = as.character(results$i), 
         message = paste(
-          results, 
+          results$res, 
           collapse = ","
         )
       )
@@ -783,6 +791,20 @@ for (i in 1:5){
     # If ever we have an error, we return it as a warning
     warning(.)
 }
+Sys.sleep(10)
+# List the messages. As you can see, the entries in title
+# are not in numerical order because they didn't came back
+# in the same order as they were sent
+list_messages(queue)
+```
+
+```
+  id title status
+1  1     3  READY
+2  2     4  READY
+3  3     2  READY
+4  4     1  READY
+5  5     5  READY
 ```
 
 For an example of an application built using `{promise}` and `{future}`, feel free to browse [engineering-shiny.org/shinyfuture/](https://engineering-shiny.org/shinyfuture/): there you will find an example of blocking and non-blocking processes.

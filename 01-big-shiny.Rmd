@@ -191,10 +191,10 @@ remotes::install_github("hrbrmstr/cloc")
 
 For example, let's compare a rather big package (`{shiny}`) with a small one (`{attempt}` [@R-attempt]):
 
-```{r 01-big-shiny-6 }
+```{r 01-big-shiny-6, eval = FALSE }
 library(cloc)
 # Using dplyr to manipulate the results
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 
 # Computing the number of lines of code 
 # for various CRAN packages
@@ -220,7 +220,16 @@ clocs %>%
   summarise(
     loc = sum(loc)
   )
+```
 
+```{r echo = FALSE}
+structure(list(pkg = c("attempt", "shiny"), loc = c(6486L, 175376L
+)), row.names = c(NA, -2L), class = c("tbl_df", "tbl", "data.frame"
+))
+```
+
+
+```{r eval = FALSE}
 # Summarizing the number of files inside each package
 clocs %>%
   group_by(pkg) %>%
@@ -229,6 +238,14 @@ clocs %>%
   )
 
 ```
+
+```{r echo = FALSE}
+structure(list(pkg = c("attempt", "shiny"), files = c(64L, 736L
+)), row.names = c(NA, -2L), class = c("tbl_df", "tbl", "data.frame"
+))
+```
+
+
 
 Here, with these two metrics, we can safely assume that `{shiny}` is a more complex package than `{attempt}`.
 If you want to compute the same prefix for a local package/repository, the `cloc_pkg()` function can be used.
@@ -254,7 +271,7 @@ if (
 }
 ```
 
-```{r 01-big-shiny-9}
+```{r 01-big-shiny-9, eval = FALSE}
 # Calling the function on the {hexmake} 
 # application Git repository
 hexmake_cloc <- cloc_git(
@@ -262,6 +279,29 @@ hexmake_cloc <- cloc_git(
 )
 hexmake_cloc
 ```
+
+```{r echo = FALSE}
+hexmake_cloc <-  structure(list(source = c("hexmake", "hexmake", "hexmake", "hexmake", 
+"hexmake", "hexmake", "hexmake", "hexmake", "hexmake", "hexmake"
+), language = c("JSON", "R", "Markdown", "CSS", "Dockerfile", 
+"JavaScript", "Rmd", "HTML", "YAML", "SUM"), file_count = c(1L, 
+34L, 5L, 1L, 2L, 2L, 2L, 1L, 1L, 49L), file_count_pct = c(0.0102040816326531, 
+0.346938775510204, 0.0510204081632653, 0.0102040816326531, 0.0204081632653061, 
+0.0204081632653061, 0.0204081632653061, 0.0102040816326531, 0.0102040816326531, 
+0.5), loc = c(3844L, 2345L, 95L, 76L, 45L, 31L, 18L, 14L, 8L, 
+6476L), loc_pct = c(0.296788140827671, 0.181053119209389, 0.00733477455219271, 
+0.00586781964175417, 0.00347436689314392, 0.00239345274861025, 
+0.00138974675725757, 0.00108091414453366, 0.000617665225447807, 
+0.5), blank_lines = c(0L, 268L, 50L, 16L, 3L, 2L, 46L, 0L, 0L, 
+385L), blank_line_pct = c(0, 0.348051948051948, 0.0649350649350649, 
+0.0207792207792208, 0.0038961038961039, 0.0025974025974026, 0.0597402597402597, 
+0, 0, 0.5), comment_lines = c(0L, 669L, 0L, 0L, 0L, 1L, 65L, 
+0L, 0L, 735L), comment_line_pct = c(0, 0.455102040816327, 0, 
+0, 0, 0.000680272108843537, 0.0442176870748299, 0, 0, 0.5)), class = c("tbl_df", 
+"tbl", "data.frame"), row.names = c(NA, -10L))
+hexmake_cloc
+```
+
 
 One thing that this package also allows is counting the number of lines of commented code: it's usually a good sign to see that a package has comments in its code-base, as it will allow to work more safely in the future, provided that this metric doesn't reveal that large portions of the application are "commented code" (as opposed to "code comments").
 For example, here we can see that `{hemake}` has `r dplyr::filter(hexmake_cloc, language == "R") %>% dplyr::pull(loc)` lines of R code, which come with `r dplyr::filter(hexmake_cloc, language == "R") %>% dplyr::pull(comment_lines)` lines of code comments.
@@ -306,7 +346,10 @@ While developing your application, the one you will be interested in is `cycloco
 Here is, for example, the cyclomatic complexity of the default golem template (assuming it is located in a `golex/` subdirectory):
 
 ```{r 01-big-shiny-13, include = FALSE}
-#remotes::install_local("golex", upgrade = "never")
+remotes::install_local("golex", upgrade = "never")
+if (!dir.exists("golex")){
+  source("golembuild.R")
+}
 ```
 
 ```{r 01-big-shiny-14, eval=FALSE}
@@ -402,13 +445,10 @@ This package can now be used to assess the dependencies we use in our applicatio
 To do that, let's create a small function that computes this metric and returns a tibble:
 
 ```{r 01-big-shiny-25 }
-library(packageMetrics2)
-# We are building a function to turn the output of the metrics 
-# into a data.frame
+library()
+# A function to turn the output of the metrics into a data.frame
 frame_metric <- function(pkg){
-  # Get the metrics
   metrics <- package_metrics(pkg)
-  # Create the table
   tibble::tibble(
     n = names(metrics), 
     val = metrics, 
@@ -462,9 +502,15 @@ If you are building your `{shiny}` application with `{golem}`, you can use the `
 # the dependencies of your package, 
 # and compute the metric for each dep
 desc::desc_get_deps("golex/DESCRIPTION")
+```
+
+\newpage
+
+```{r}
 # See also 
 attachment::att_from_description("golex/DESCRIPTION")
 ```
+
 
 Some important metrics to watch there are as follow:
 

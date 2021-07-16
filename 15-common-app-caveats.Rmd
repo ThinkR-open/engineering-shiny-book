@@ -223,7 +223,7 @@ ui <- function(){
       "casefolding", 
       "Casefolding", 
       c("lower", "upper")
-    )
+    ),
     # A new checkbox to reverse (or not) the input text
     checkboxInput("rev", "reverse")
   )
@@ -274,7 +274,7 @@ ui <- function(){
       "casefolding", 
       "Casefolding", 
       c("lower", "upper")
-    )
+    ),
     # A new checkbox to reverse (or not) the input text
     checkboxInput("rev", "reverse")
   )
@@ -498,16 +498,17 @@ data_cleaning_ui <- function(id){
   )
 }
 
-data_cleaning_server <- function(input, output, session, r6){
-  
-  observeEvent( input$launch_cleaning , {
-    # Once the launch_cleaning input is triggered, we 
-    # use the internal method from our r6 object 
-    r6$clean(arg1 = input$a, arg2 = input$b)
-    # Triggering the plot
-    trigger("plot")
+mod_data_cleaning_server <- function(id, r6){
+  moduleServer( id, function(input, output, session){
+    ns <- session$ns
+    observeEvent( input$launch_cleaning , {
+      # Once the launch_cleaning input is triggered, we 
+      # use the internal method from our r6 object 
+      r6$clean(arg1 = input$a, arg2 = input$b)
+      # Triggering the plot
+      trigger("plot")
+    })
   })
-  
 }
 
 plotting_ui <- function(id){
@@ -518,15 +519,17 @@ plotting_ui <- function(id){
   )
 }
 
-plotting_server <- function(input, output, session, r6){
-  
-  # Rendering, inside this second module, the plot based on the 
-  # cleaning done in the other module
-  output$plot <- renderPlot({
-    # We use the trigger/watch pattern from before
-    watch("plot")
-    # Calling the plot() method from our R6 object
-    r6$plot()
+mod_plotting_server <- function(id, r6){
+  moduleServer( id, function(input, output, session){
+    ns <- session$ns
+    # Rendering, inside this second module, the plot based on the 
+    # cleaning done in the other module
+    output$plot <- renderPlot({
+      # We use the trigger/watch pattern from before
+      watch("plot")
+      # Calling the plot() method from our R6 object
+      r6$plot()
+    })
   })
 }
 
@@ -547,8 +550,9 @@ server <- function(
   # We start by creating a new instance of th
   r6 <- MyDataProcessing$new()
   # Passing this object to the two server functions
-  callModule(data_cleaning_server, "data_cleaning_ui", r6)
-  callModule(plotting_server, "plotting_ui", r6)
+  mod_data_cleaning_server("data_cleaning_ui_1", r6)
+  mod_plotting_server("plotting_ui_1", r6)
+
 }
 
 shinyApp(ui, server)
@@ -582,7 +586,7 @@ MyData <- R6::R6Class(
 We can then build a test for this class using `{testthat}`:
 
 ```{r 15-common-app-caveats-11}
-library(testthat)
+library(testthat, warn.conflicts = FALSE)
 test_that("R6 Class works", {
   # We define a new instance of this class, that will contain 
   # the mtcars data.frame
