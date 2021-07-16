@@ -90,7 +90,7 @@ computation_module_server <- function(input, output, session){
 # We can test it that way
 library(shiny)
 library(testthat)
-testModule(computation_module_server, {
+testServer(computation_module_server, {
 
   # Give input$selector a value
   session$setInputs(selector = 1)
@@ -389,7 +389,7 @@ Good news: we do not have to manually analyze these files—`{shinyloadtest}` of
 
 ```{r 11-step-by-step-secure-19, message = FALSE, warning = FALSE}
 # Bringing the runs in the R session
-shinyload_runs <- load_runs(
+shinyload_runs <- shinyloadtest::load_runs(
   "5 workers" = "shinylogs/run1"
 )
 ```
@@ -510,13 +510,24 @@ system(
 
 Let's say now we want the stats for the hexmake container:
 
-```{r 11-step-by-step-secure-28, eval = TRUE, cache=TRUE}
+```{r 11-step-by-step-secure-28, eval = FALSE, cache=TRUE}
 # Waiting for the container to be ready 
 Sys.sleep(30)
 # Showing the docker stats for hexmake
-dockerstats("hexmake") %>% 
-  tibble::as_tibble()
+tibble::as_tibble(
+  dockerstats("hexmake")
+)
 ```
+
+```{r echo = FALSE}
+structure(list(Container = "hexmake", Name = "hexmake", ID = "34cc1544556a", 
+    CPUPerc = 0.37, MemUsage = "108.5MiB", MemLimit = "5.807GiB", 
+    MemPerc = 1.82, NetI = "726B", NetO = "0B", BlockI = "0B", 
+    BlockO = "0B", PIDs = 4L, record_time = "2021-07-16 12:19:52", 
+    extra = ""), row.names = c(NA, -1L), class = c("tbl_df", 
+"tbl", "data.frame"))
+```
+
 
 Of course, right now nobody is using the app, so the usage can be pretty small.
 But let's push it a little bit by mimicking a lot of connections.
