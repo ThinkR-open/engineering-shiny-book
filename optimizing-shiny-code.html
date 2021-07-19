@@ -542,18 +542,18 @@ For example, if computing your data once takes 5 seconds with the parameter <cod
 <span id="cb297-12"><a href="optimizing-shiny-code.html#cb297-12"></a><span class="kw">tic</span>()</span>
 <span id="cb297-13"><a href="optimizing-shiny-code.html#cb297-13"></a><span class="co"># This will sleeep for 2 seconds and return the time</span></span>
 <span id="cb297-14"><a href="optimizing-shiny-code.html#cb297-14"></a><span class="kw">msleep_and_return_time</span>(<span class="dv">2</span>)</span></code></pre></div>
-<pre><code>[1] &quot;2021-07-19 05:45:14 UTC&quot;</code></pre>
+<pre><code>[1] &quot;2021-07-19 05:45:42 UTC&quot;</code></pre>
 <div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb299-1"><a href="optimizing-shiny-code.html#cb299-1"></a><span class="co"># The code should have taken around 2 seconds to run</span></span>
 <span id="cb299-2"><a href="optimizing-shiny-code.html#cb299-2"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>2.006 sec elapsed</code></pre>
+<pre><code>2.005 sec elapsed</code></pre>
 <div class="sourceCode" id="cb301"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb301-1"><a href="optimizing-shiny-code.html#cb301-1"></a><span class="co"># We launch a new recording</span></span>
 <span id="cb301-2"><a href="optimizing-shiny-code.html#cb301-2"></a><span class="kw">tic</span>()</span>
 <span id="cb301-3"><a href="optimizing-shiny-code.html#cb301-3"></a><span class="co"># This memoised function will return immediately, </span></span>
 <span id="cb301-4"><a href="optimizing-shiny-code.html#cb301-4"></a><span class="co"># without sleeping</span></span>
 <span id="cb301-5"><a href="optimizing-shiny-code.html#cb301-5"></a><span class="kw">msleep_and_return_time</span>(<span class="dv">2</span>)</span></code></pre></div>
-<pre><code>[1] &quot;2021-07-19 05:45:14 UTC&quot;</code></pre>
+<pre><code>[1] &quot;2021-07-19 05:45:42 UTC&quot;</code></pre>
 <div class="sourceCode" id="cb303"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb303-1"><a href="optimizing-shiny-code.html#cb303-1"></a><span class="kw">toc</span>()</span></code></pre></div>
-<pre><code>0.024 sec elapsed</code></pre>
+<pre><code>0.039 sec elapsed</code></pre>
 <p>Let’s try with another example that might look more like what we can find in a <code>{shiny}</code> app: connecting to a database, using the <code>{DBI}</code> <span class="citation">(R Special Interest Group on Databases (R-SIG-DB), Wickham, and Müller <a href="#ref-R-DBI" role="doc-biblioref">2019</a>)</span> and <code>{RSQLite}</code> <span class="citation">(Müller et al. <a href="#ref-R-RSQLite" role="doc-biblioref">2020</a>)</span> packages:</p>
 <div class="sourceCode" id="cb305"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb305-1"><a href="optimizing-shiny-code.html#cb305-1"></a><span class="co"># We create an in-memory database using SQLite</span></span>
 <span id="cb305-2"><a href="optimizing-shiny-code.html#cb305-2"></a>con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw">dbConnect</span>(</span>
@@ -821,12 +821,12 @@ And this can be retrieved with:</p>
 <div class="sourceCode" id="cb325"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb325-1"><a href="optimizing-shiny-code.html#cb325-1"></a>dir_at &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw">dir_info</span>(<span class="st">&quot;cache&quot;</span>)[, <span class="st">&quot;access_time&quot;</span>, drop  =<span class="st"> </span><span class="ot">FALSE</span>]</span>
 <span id="cb325-2"><a href="optimizing-shiny-code.html#cb325-2"></a><span class="kw">head</span>(dir_at)</span></code></pre></div>
 <pre><code>          access_time
-1 2021-07-19 05:37:44
-2 2021-07-19 05:37:44
-3 2021-07-19 05:37:44
-4 2021-07-19 05:37:44
-5 2021-07-19 05:37:44
-6 2021-07-19 05:37:44</code></pre>
+1 2021-07-19 05:37:28
+2 2021-07-19 05:37:28
+3 2021-07-19 05:37:28
+4 2021-07-19 05:37:28
+5 2021-07-19 05:37:28
+6 2021-07-19 05:37:28</code></pre>
 <p>Hence, when using cache, it might be interesting to periodically remove the oldest used cache, so that you can regain some space on the server running the application.</p>
 </div>
 </div>
