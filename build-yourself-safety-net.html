@@ -516,13 +516,13 @@ The general idea is to detect bugs and breaking changes at the moment they are h
 One of the most popular right now<a href="#fn46" class="footnote-ref" id="fnref46"><sup>46</sup></a> is <code>{testthat}</code> <span class="citation">(Wickham <a href="#ref-R-testthat" role="doc-biblioref">2020</a>)</span>.
 This testing framework lets you write a series of tests and expectations, which are then launched when calling <code>test()</code> from <code>{devtools}</code> <span class="citation">(Wickham, Hester, and Chang <a href="#ref-R-devtools" role="doc-biblioref">2020</a>)</span>, either locally or in your CI system.</p>
 <p>Here is an example of testing that the <code>meaning_of_life</code> will always be <code>42</code>.</p>
-<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="build-yourself-safety-net.html#cb149-1"></a><span class="co"># Creating a testing context, with one expectation</span></span>
-<span id="cb149-2"><a href="build-yourself-safety-net.html#cb149-2"></a><span class="kw">test_that</span>(<span class="st">&quot;The meaning of life is 42&quot;</span>, {</span>
-<span id="cb149-3"><a href="build-yourself-safety-net.html#cb149-3"></a>  <span class="kw">expect_equal</span>(</span>
-<span id="cb149-4"><a href="build-yourself-safety-net.html#cb149-4"></a>    <span class="kw">meaning_of_life</span>(), </span>
-<span id="cb149-5"><a href="build-yourself-safety-net.html#cb149-5"></a>    <span class="dv">42</span></span>
-<span id="cb149-6"><a href="build-yourself-safety-net.html#cb149-6"></a>  )</span>
-<span id="cb149-7"><a href="build-yourself-safety-net.html#cb149-7"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="build-yourself-safety-net.html#cb150-1"></a><span class="co"># Creating a testing context, with one expectation</span></span>
+<span id="cb150-2"><a href="build-yourself-safety-net.html#cb150-2"></a><span class="kw">test_that</span>(<span class="st">&quot;The meaning of life is 42&quot;</span>, {</span>
+<span id="cb150-3"><a href="build-yourself-safety-net.html#cb150-3"></a>  <span class="kw">expect_equal</span>(</span>
+<span id="cb150-4"><a href="build-yourself-safety-net.html#cb150-4"></a>    <span class="kw">meaning_of_life</span>(), </span>
+<span id="cb150-5"><a href="build-yourself-safety-net.html#cb150-5"></a>    <span class="dv">42</span></span>
+<span id="cb150-6"><a href="build-yourself-safety-net.html#cb150-6"></a>  )</span>
+<span id="cb150-7"><a href="build-yourself-safety-net.html#cb150-7"></a>})</span></code></pre></div>
 <p>Once you have this test skeleton set, you will be able to detect any change to this function.</p>
 <p>If you want to learn more about how to use <code>{testthat}</code>, you can refer to the following resources:</p>
 <ul>
@@ -536,35 +536,35 @@ This testing framework lets you write a series of tests and expectations, which 
 <p>At the time of writing these lines, the <code>{shiny}</code> team is actively working on a new way to test <code>{shiny}</code> server functions.
 These features are still a work in progress, and are not available in the stable version of <code>{shiny}</code> we have used in this book (1.5.0).
 Given that these features are still subject to change, we will not go into detail about these new features, but here is a preview of what it will look like:</p>
-<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="build-yourself-safety-net.html#cb150-1"></a><span class="co"># Given the following module</span></span>
-<span id="cb150-2"><a href="build-yourself-safety-net.html#cb150-2"></a>computation_module_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
-<span id="cb150-3"><a href="build-yourself-safety-net.html#cb150-3"></a>  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</span>
-<span id="cb150-4"><a href="build-yourself-safety-net.html#cb150-4"></a>  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>(</span>
-<span id="cb150-5"><a href="build-yourself-safety-net.html#cb150-5"></a>    <span class="dt">value =</span> <span class="ot">NULL</span></span>
-<span id="cb150-6"><a href="build-yourself-safety-net.html#cb150-6"></a>  )</span>
-<span id="cb150-7"><a href="build-yourself-safety-net.html#cb150-7"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>selector , {</span>
-<span id="cb150-8"><a href="build-yourself-safety-net.html#cb150-8"></a>    r<span class="op">$</span>value &lt;-<span class="st"> </span>input<span class="op">$</span>selector <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
-<span id="cb150-9"><a href="build-yourself-safety-net.html#cb150-9"></a>  })</span>
-<span id="cb150-10"><a href="build-yourself-safety-net.html#cb150-10"></a>  </span>
-<span id="cb150-11"><a href="build-yourself-safety-net.html#cb150-11"></a>}</span>
-<span id="cb150-12"><a href="build-yourself-safety-net.html#cb150-12"></a></span>
-<span id="cb150-13"><a href="build-yourself-safety-net.html#cb150-13"></a><span class="co"># We can test it that way</span></span>
-<span id="cb150-14"><a href="build-yourself-safety-net.html#cb150-14"></a><span class="kw">library</span>(shiny)</span>
-<span id="cb150-15"><a href="build-yourself-safety-net.html#cb150-15"></a><span class="kw">library</span>(testthat)</span>
-<span id="cb150-16"><a href="build-yourself-safety-net.html#cb150-16"></a><span class="kw">testServer</span>(computation_module_server, {</span>
-<span id="cb150-17"><a href="build-yourself-safety-net.html#cb150-17"></a></span>
-<span id="cb150-18"><a href="build-yourself-safety-net.html#cb150-18"></a>  <span class="co"># Give input$selector a value</span></span>
-<span id="cb150-19"><a href="build-yourself-safety-net.html#cb150-19"></a>  session<span class="op">$</span><span class="kw">setInputs</span>(<span class="dt">selector =</span> <span class="dv">1</span>)</span>
-<span id="cb150-20"><a href="build-yourself-safety-net.html#cb150-20"></a>  <span class="co"># Call {testthat} functions</span></span>
-<span id="cb150-21"><a href="build-yourself-safety-net.html#cb150-21"></a>  <span class="kw">expect_equal</span>(r<span class="op">$</span>value, <span class="dv">10</span>)</span>
-<span id="cb150-22"><a href="build-yourself-safety-net.html#cb150-22"></a></span>
-<span id="cb150-23"><a href="build-yourself-safety-net.html#cb150-23"></a>  <span class="co"># Give input$selector a value</span></span>
-<span id="cb150-24"><a href="build-yourself-safety-net.html#cb150-24"></a>  session<span class="op">$</span><span class="kw">setInputs</span>(<span class="dt">selector =</span> <span class="dv">2</span>)</span>
-<span id="cb150-25"><a href="build-yourself-safety-net.html#cb150-25"></a>  <span class="co"># Call {testthat} functions</span></span>
-<span id="cb150-26"><a href="build-yourself-safety-net.html#cb150-26"></a>  <span class="kw">expect_equal</span>(r<span class="op">$</span>value, <span class="dv">20</span>)</span>
-<span id="cb150-27"><a href="build-yourself-safety-net.html#cb150-27"></a></span>
-<span id="cb150-28"><a href="build-yourself-safety-net.html#cb150-28"></a></span>
-<span id="cb150-29"><a href="build-yourself-safety-net.html#cb150-29"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="build-yourself-safety-net.html#cb151-1"></a><span class="co"># Given the following module</span></span>
+<span id="cb151-2"><a href="build-yourself-safety-net.html#cb151-2"></a>computation_module_server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output, session){</span>
+<span id="cb151-3"><a href="build-yourself-safety-net.html#cb151-3"></a>  ns &lt;-<span class="st"> </span>session<span class="op">$</span>ns</span>
+<span id="cb151-4"><a href="build-yourself-safety-net.html#cb151-4"></a>  r &lt;-<span class="st"> </span><span class="kw">reactiveValues</span>(</span>
+<span id="cb151-5"><a href="build-yourself-safety-net.html#cb151-5"></a>    <span class="dt">value =</span> <span class="ot">NULL</span></span>
+<span id="cb151-6"><a href="build-yourself-safety-net.html#cb151-6"></a>  )</span>
+<span id="cb151-7"><a href="build-yourself-safety-net.html#cb151-7"></a>  <span class="kw">observeEvent</span>( input<span class="op">$</span>selector , {</span>
+<span id="cb151-8"><a href="build-yourself-safety-net.html#cb151-8"></a>    r<span class="op">$</span>value &lt;-<span class="st"> </span>input<span class="op">$</span>selector <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
+<span id="cb151-9"><a href="build-yourself-safety-net.html#cb151-9"></a>  })</span>
+<span id="cb151-10"><a href="build-yourself-safety-net.html#cb151-10"></a>  </span>
+<span id="cb151-11"><a href="build-yourself-safety-net.html#cb151-11"></a>}</span>
+<span id="cb151-12"><a href="build-yourself-safety-net.html#cb151-12"></a></span>
+<span id="cb151-13"><a href="build-yourself-safety-net.html#cb151-13"></a><span class="co"># We can test it that way</span></span>
+<span id="cb151-14"><a href="build-yourself-safety-net.html#cb151-14"></a><span class="kw">library</span>(shiny)</span>
+<span id="cb151-15"><a href="build-yourself-safety-net.html#cb151-15"></a><span class="kw">library</span>(testthat)</span>
+<span id="cb151-16"><a href="build-yourself-safety-net.html#cb151-16"></a><span class="kw">testServer</span>(computation_module_server, {</span>
+<span id="cb151-17"><a href="build-yourself-safety-net.html#cb151-17"></a></span>
+<span id="cb151-18"><a href="build-yourself-safety-net.html#cb151-18"></a>  <span class="co"># Give input$selector a value</span></span>
+<span id="cb151-19"><a href="build-yourself-safety-net.html#cb151-19"></a>  session<span class="op">$</span><span class="kw">setInputs</span>(<span class="dt">selector =</span> <span class="dv">1</span>)</span>
+<span id="cb151-20"><a href="build-yourself-safety-net.html#cb151-20"></a>  <span class="co"># Call {testthat} functions</span></span>
+<span id="cb151-21"><a href="build-yourself-safety-net.html#cb151-21"></a>  <span class="kw">expect_equal</span>(r<span class="op">$</span>value, <span class="dv">10</span>)</span>
+<span id="cb151-22"><a href="build-yourself-safety-net.html#cb151-22"></a></span>
+<span id="cb151-23"><a href="build-yourself-safety-net.html#cb151-23"></a>  <span class="co"># Give input$selector a value</span></span>
+<span id="cb151-24"><a href="build-yourself-safety-net.html#cb151-24"></a>  session<span class="op">$</span><span class="kw">setInputs</span>(<span class="dt">selector =</span> <span class="dv">2</span>)</span>
+<span id="cb151-25"><a href="build-yourself-safety-net.html#cb151-25"></a>  <span class="co"># Call {testthat} functions</span></span>
+<span id="cb151-26"><a href="build-yourself-safety-net.html#cb151-26"></a>  <span class="kw">expect_equal</span>(r<span class="op">$</span>value, <span class="dv">20</span>)</span>
+<span id="cb151-27"><a href="build-yourself-safety-net.html#cb151-27"></a></span>
+<span id="cb151-28"><a href="build-yourself-safety-net.html#cb151-28"></a></span>
+<span id="cb151-29"><a href="build-yourself-safety-net.html#cb151-29"></a>})</span></code></pre></div>
 <p>This methodology is still under development, so we won’t go deeper into this subject, but if you want to follow the update on this topic, please refer to the <a href="https://shiny.rstudio.com/articles/integration-testing.html">Server function testing with Shiny</a> article on the <code>{shiny}</code> website.</p>
 </div>
 <div id="testing-the-interactive-logic" class="section level3">
@@ -576,24 +576,24 @@ Given that these features are still subject to change, we will not go into detai
 <p><code>puppeteer</code> is a NodeJS module that drives a Google Chrome headless session and mimics a session on the app.</p>
 <p>And good news, there is a Google Chrome extension, called <a href="https://chrome.google.com/webstore/detail/puppeteer-recorder/djeegiggegleadkkbgopoonhjimgehda">Puppeteer Recorder</a>, that allows you to create, while visiting a web page, the <code>pupepeteer</code> script to reproduce your visit.
 Here is, for example, a very small JavaScript script for testing <code>{hexmake}</code> <span class="citation">(Fay <a href="#ref-R-hexmake" role="doc-biblioref">2020</a><a href="#ref-R-hexmake" role="doc-biblioref">g</a>)</span>, generated by this extension.</p>
-<div class="sourceCode" id="cb151"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb151-1"><a href="build-yourself-safety-net.html#cb151-1"></a><span class="co">// Require the node module</span></span>
-<span id="cb151-2"><a href="build-yourself-safety-net.html#cb151-2"></a><span class="kw">const</span> puppeteer <span class="op">=</span> <span class="at">require</span>(<span class="st">&#39;puppeteer&#39;</span>)<span class="op">;</span></span>
-<span id="cb151-3"><a href="build-yourself-safety-net.html#cb151-3"></a>(<span class="kw">async</span> () <span class="kw">=&gt;</span> <span class="op">{</span></span>
-<span id="cb151-4"><a href="build-yourself-safety-net.html#cb151-4"></a><span class="co">// launch puppeteer and connect to the page</span></span>
-<span id="cb151-5"><a href="build-yourself-safety-net.html#cb151-5"></a><span class="kw">const</span> browser <span class="op">=</span> <span class="cf">await</span> <span class="va">puppeteer</span>.<span class="at">launch</span>()</span>
-<span id="cb151-6"><a href="build-yourself-safety-net.html#cb151-6"></a><span class="kw">const</span> page <span class="op">=</span> <span class="cf">await</span> <span class="va">browser</span>.<span class="at">newPage</span>()</span>
-<span id="cb151-7"><a href="build-yourself-safety-net.html#cb151-7"></a><span class="cf">await</span> <span class="va">page</span>.<span class="at">goto</span>(<span class="st">&#39;http://localhost:2811/&#39;</span>)</span>
-<span id="cb151-8"><a href="build-yourself-safety-net.html#cb151-8"></a></span>
-<span id="cb151-9"><a href="build-yourself-safety-net.html#cb151-9"></a><span class="co">// We&#39;re waiting for a DOM element to be ready</span></span>
-<span id="cb151-10"><a href="build-yourself-safety-net.html#cb151-10"></a><span class="cf">await</span> <span class="va">page</span>.<span class="at">waitForSelector</span>(<span class="st">&#39;.row &gt; .col &gt; </span><span class="sc">\</span></span>
-<span id="cb151-11"><a href="build-yourself-safety-net.html#cb151-11"></a><span class="st">    .rounded &gt; details:nth-child(3) &gt; summary&#39;</span>)</span>
-<span id="cb151-12"><a href="build-yourself-safety-net.html#cb151-12"></a>    <span class="co">// Now it&#39;s ready, we can click on it</span></span>
-<span id="cb151-13"><a href="build-yourself-safety-net.html#cb151-13"></a>    <span class="cf">await</span> <span class="va">page</span>.<span class="at">click</span>(<span class="st">&#39;.row &gt; .col &gt; .rounded &gt; </span><span class="sc">\</span></span>
-<span id="cb151-14"><a href="build-yourself-safety-net.html#cb151-14"></a><span class="st">    details:nth-child(3) &gt; summary&#39;</span>)</span>
-<span id="cb151-15"><a href="build-yourself-safety-net.html#cb151-15"></a>    </span>
-<span id="cb151-16"><a href="build-yourself-safety-net.html#cb151-16"></a>    <span class="co">// Now our test is over, we can close the connection</span></span>
-<span id="cb151-17"><a href="build-yourself-safety-net.html#cb151-17"></a>    <span class="cf">await</span> <span class="va">browser</span>.<span class="at">close</span>()</span>
-<span id="cb151-18"><a href="build-yourself-safety-net.html#cb151-18"></a><span class="op">}</span>)()</span></code></pre></div>
+<div class="sourceCode" id="cb152"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb152-1"><a href="build-yourself-safety-net.html#cb152-1"></a><span class="co">// Require the node module</span></span>
+<span id="cb152-2"><a href="build-yourself-safety-net.html#cb152-2"></a><span class="kw">const</span> puppeteer <span class="op">=</span> <span class="at">require</span>(<span class="st">&#39;puppeteer&#39;</span>)<span class="op">;</span></span>
+<span id="cb152-3"><a href="build-yourself-safety-net.html#cb152-3"></a>(<span class="kw">async</span> () <span class="kw">=&gt;</span> <span class="op">{</span></span>
+<span id="cb152-4"><a href="build-yourself-safety-net.html#cb152-4"></a><span class="co">// launch puppeteer and connect to the page</span></span>
+<span id="cb152-5"><a href="build-yourself-safety-net.html#cb152-5"></a><span class="kw">const</span> browser <span class="op">=</span> <span class="cf">await</span> <span class="va">puppeteer</span>.<span class="at">launch</span>()</span>
+<span id="cb152-6"><a href="build-yourself-safety-net.html#cb152-6"></a><span class="kw">const</span> page <span class="op">=</span> <span class="cf">await</span> <span class="va">browser</span>.<span class="at">newPage</span>()</span>
+<span id="cb152-7"><a href="build-yourself-safety-net.html#cb152-7"></a><span class="cf">await</span> <span class="va">page</span>.<span class="at">goto</span>(<span class="st">&#39;http://localhost:2811/&#39;</span>)</span>
+<span id="cb152-8"><a href="build-yourself-safety-net.html#cb152-8"></a></span>
+<span id="cb152-9"><a href="build-yourself-safety-net.html#cb152-9"></a><span class="co">// We&#39;re waiting for a DOM element to be ready</span></span>
+<span id="cb152-10"><a href="build-yourself-safety-net.html#cb152-10"></a><span class="cf">await</span> <span class="va">page</span>.<span class="at">waitForSelector</span>(<span class="st">&#39;.row &gt; .col &gt; </span><span class="sc">\</span></span>
+<span id="cb152-11"><a href="build-yourself-safety-net.html#cb152-11"></a><span class="st">    .rounded &gt; details:nth-child(3) &gt; summary&#39;</span>)</span>
+<span id="cb152-12"><a href="build-yourself-safety-net.html#cb152-12"></a>    <span class="co">// Now it&#39;s ready, we can click on it</span></span>
+<span id="cb152-13"><a href="build-yourself-safety-net.html#cb152-13"></a>    <span class="cf">await</span> <span class="va">page</span>.<span class="at">click</span>(<span class="st">&#39;.row &gt; .col &gt; .rounded &gt; </span><span class="sc">\</span></span>
+<span id="cb152-14"><a href="build-yourself-safety-net.html#cb152-14"></a><span class="st">    details:nth-child(3) &gt; summary&#39;</span>)</span>
+<span id="cb152-15"><a href="build-yourself-safety-net.html#cb152-15"></a>    </span>
+<span id="cb152-16"><a href="build-yourself-safety-net.html#cb152-16"></a>    <span class="co">// Now our test is over, we can close the connection</span></span>
+<span id="cb152-17"><a href="build-yourself-safety-net.html#cb152-17"></a>    <span class="cf">await</span> <span class="va">browser</span>.<span class="at">close</span>()</span>
+<span id="cb152-18"><a href="build-yourself-safety-net.html#cb152-18"></a><span class="op">}</span>)()</span></code></pre></div>
 <p>Be aware, though, that this extension does not record everything, at least with the version used while writing this book (<code>0.7.1</code>).
 For example, typing inside a text input is not recorded: that is completely doable inside <code>puppeteer</code>, yet not recorded by this extension.<a href="#fn47" class="footnote-ref" id="fnref47"><sup>47</sup></a></p>
 <p>Once you have this piece of code, put it into a NodeJS script, and replay the session as many time as you need.
@@ -602,28 +602,28 @@ If ever one of the steps cannot be replayed as recorded, the script will fail, n
 These packages can be used to launch and manipulate a Google Chrome headless session, meaning that you can programmatically navigate and interact with a web page from R.
 And to do the tests in a <code>puppeteer</code> spirit, you can refer to the <code>{crrry}</code> package <span class="citation">(Fay <a href="#ref-R-crrry" role="doc-biblioref">2020</a><a href="#ref-R-crrry" role="doc-biblioref">c</a>)</span>, which contains a series of wrapper functions around <code>{crrri}</code>, specifically designed for <code>{shiny}</code>.</p>
 <p>Here is an example:</p>
-<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="build-yourself-safety-net.html#cb152-1"></a><span class="co"># Creating a new test instance</span></span>
-<span id="cb152-2"><a href="build-yourself-safety-net.html#cb152-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
-<span id="cb152-3"><a href="build-yourself-safety-net.html#cb152-3"></a>  <span class="co"># Using the `find_chrome()` function to guess where the </span></span>
-<span id="cb152-4"><a href="build-yourself-safety-net.html#cb152-4"></a>  <span class="co"># Chrome bin is on our machine</span></span>
-<span id="cb152-5"><a href="build-yourself-safety-net.html#cb152-5"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
-<span id="cb152-6"><a href="build-yourself-safety-net.html#cb152-6"></a>  <span class="co"># Launching Chrome on a random available port on our machine</span></span>
-<span id="cb152-7"><a href="build-yourself-safety-net.html#cb152-7"></a>  <span class="co"># Note that you will need httpuv &gt;= 1.5.2 if you want to use </span></span>
-<span id="cb152-8"><a href="build-yourself-safety-net.html#cb152-8"></a>  <span class="co"># this function</span></span>
-<span id="cb152-9"><a href="build-yourself-safety-net.html#cb152-9"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(), </span>
-<span id="cb152-10"><a href="build-yourself-safety-net.html#cb152-10"></a>  <span class="co"># Specifying the page we want to connect to</span></span>
-<span id="cb152-11"><a href="build-yourself-safety-net.html#cb152-11"></a>  <span class="dt">url =</span> <span class="st">&quot;https://connect.thinkr.fr/hexmake/&quot;</span>,</span>
-<span id="cb152-12"><a href="build-yourself-safety-net.html#cb152-12"></a>  <span class="co"># Do everything on the terminal, with no window open</span></span>
-<span id="cb152-13"><a href="build-yourself-safety-net.html#cb152-13"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
-<span id="cb152-14"><a href="build-yourself-safety-net.html#cb152-14"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="build-yourself-safety-net.html#cb153-1"></a><span class="co"># Creating a new test instance</span></span>
+<span id="cb153-2"><a href="build-yourself-safety-net.html#cb153-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
+<span id="cb153-3"><a href="build-yourself-safety-net.html#cb153-3"></a>  <span class="co"># Using the `find_chrome()` function to guess where the </span></span>
+<span id="cb153-4"><a href="build-yourself-safety-net.html#cb153-4"></a>  <span class="co"># Chrome bin is on our machine</span></span>
+<span id="cb153-5"><a href="build-yourself-safety-net.html#cb153-5"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
+<span id="cb153-6"><a href="build-yourself-safety-net.html#cb153-6"></a>  <span class="co"># Launching Chrome on a random available port on our machine</span></span>
+<span id="cb153-7"><a href="build-yourself-safety-net.html#cb153-7"></a>  <span class="co"># Note that you will need httpuv &gt;= 1.5.2 if you want to use </span></span>
+<span id="cb153-8"><a href="build-yourself-safety-net.html#cb153-8"></a>  <span class="co"># this function</span></span>
+<span id="cb153-9"><a href="build-yourself-safety-net.html#cb153-9"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(), </span>
+<span id="cb153-10"><a href="build-yourself-safety-net.html#cb153-10"></a>  <span class="co"># Specifying the page we want to connect to</span></span>
+<span id="cb153-11"><a href="build-yourself-safety-net.html#cb153-11"></a>  <span class="dt">url =</span> <span class="st">&quot;https://connect.thinkr.fr/hexmake/&quot;</span>,</span>
+<span id="cb153-12"><a href="build-yourself-safety-net.html#cb153-12"></a>  <span class="co"># Do everything on the terminal, with no window open</span></span>
+<span id="cb153-13"><a href="build-yourself-safety-net.html#cb153-13"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
+<span id="cb153-14"><a href="build-yourself-safety-net.html#cb153-14"></a>)</span></code></pre></div>
 <pre><code>Running \
   &#39;/Applications/Google Chrome.app/Contents/MacOS/Google Chrome&#39;
   --no-first-run --headless 
   &#39;--user-data-dir=/Users/colin/Library/Application Support/
     r-crrri/chrome-data-dir-dhutmfux&#39; 
   &#39;--remote-debugging-port=40698&#39;</code></pre>
-<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="build-yourself-safety-net.html#cb154-1"></a><span class="co"># We&#39;ll wait for the application to be ready to accept inputs</span></span>
-<span id="cb154-2"><a href="build-yourself-safety-net.html#cb154-2"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="build-yourself-safety-net.html#cb155-1"></a><span class="co"># We&#39;ll wait for the application to be ready to accept inputs</span></span>
+<span id="cb155-2"><a href="build-yourself-safety-net.html#cb155-2"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span></code></pre></div>
 <pre><code>Shiny is computing
 ✓ Shiny is still running</code></pre>
 <p>You can then call one of the <code>test</code> object methods:</p>
@@ -634,14 +634,14 @@ And to do the tests in a <code>puppeteer</code> spirit, you can refer to the <co
 <li><code>click_on_id</code> clicks on a given id</li>
 </ul>
 <p>Of course, the interesting part is doing “bulk testing” of your application, for example, by setting a series of values to an input:</p>
-<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="build-yourself-safety-net.html#cb156-1"></a><span class="cf">for</span> (i <span class="cf">in</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]){</span>
-<span id="cb156-2"><a href="build-yourself-safety-net.html#cb156-2"></a>  <span class="co"># We&#39;ll be setting a series of letters, one by one</span></span>
-<span id="cb156-3"><a href="build-yourself-safety-net.html#cb156-3"></a>  <span class="co"># for the package name input</span></span>
-<span id="cb156-4"><a href="build-yourself-safety-net.html#cb156-4"></a>  test<span class="op">$</span><span class="kw">shiny_set_input</span>(</span>
-<span id="cb156-5"><a href="build-yourself-safety-net.html#cb156-5"></a>    <span class="st">&quot;main_ui_1-left_ui_1-pkg_name_ui_1-package&quot;</span>, </span>
-<span id="cb156-6"><a href="build-yourself-safety-net.html#cb156-6"></a>    i</span>
-<span id="cb156-7"><a href="build-yourself-safety-net.html#cb156-7"></a>  )</span>
-<span id="cb156-8"><a href="build-yourself-safety-net.html#cb156-8"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="build-yourself-safety-net.html#cb157-1"></a><span class="cf">for</span> (i <span class="cf">in</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]){</span>
+<span id="cb157-2"><a href="build-yourself-safety-net.html#cb157-2"></a>  <span class="co"># We&#39;ll be setting a series of letters, one by one</span></span>
+<span id="cb157-3"><a href="build-yourself-safety-net.html#cb157-3"></a>  <span class="co"># for the package name input</span></span>
+<span id="cb157-4"><a href="build-yourself-safety-net.html#cb157-4"></a>  test<span class="op">$</span><span class="kw">shiny_set_input</span>(</span>
+<span id="cb157-5"><a href="build-yourself-safety-net.html#cb157-5"></a>    <span class="st">&quot;main_ui_1-left_ui_1-pkg_name_ui_1-package&quot;</span>, </span>
+<span id="cb157-6"><a href="build-yourself-safety-net.html#cb157-6"></a>    i</span>
+<span id="cb157-7"><a href="build-yourself-safety-net.html#cb157-7"></a>  )</span>
+<span id="cb157-8"><a href="build-yourself-safety-net.html#cb157-8"></a>}</span></code></pre></div>
 <pre><code>-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package--
 Shiny is computing
 ✓ Shiny is still running
@@ -658,8 +658,8 @@ Shiny is computing
 Shiny is computing
 ✓ Shiny is still running</code></pre>
 <p>And once your test is done, do not forget to close the connection!</p>
-<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="build-yourself-safety-net.html#cb158-1"></a><span class="co"># Closing the connection</span></span>
-<span id="cb158-2"><a href="build-yourself-safety-net.html#cb158-2"></a>test<span class="op">$</span><span class="kw">stop</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="build-yourself-safety-net.html#cb159-1"></a><span class="co"># Closing the connection</span></span>
+<span id="cb159-2"><a href="build-yourself-safety-net.html#cb159-2"></a>test<span class="op">$</span><span class="kw">stop</span>()</span></code></pre></div>
 </div>
 <div id="b.-monkey-test" class="section level4 unnumbered">
 <h4>B. Monkey test</h4>
@@ -681,41 +681,41 @@ FIGURE 11.1: Example of using <code>gremlins.js</code> on the “prenoms” <cod
 </div>
 <p>And if you want to scale this, you can also combine it with <code>{shinyloadtest}</code> <span class="citation">(Dipert, Schloerke, and Borges <a href="#ref-R-shinyloadtest" role="doc-biblioref">2020</a>)</span>: launch a session recording, run <code>gremlins</code> one or several time inside the recording, then replay it with multiple sessions.</p>
 <p>With <code>{crrry}</code>, this <code>gremlins</code> test comes for free:</p>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="build-yourself-safety-net.html#cb159-1"></a><span class="co"># Creating a new test instance</span></span>
-<span id="cb159-2"><a href="build-yourself-safety-net.html#cb159-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
-<span id="cb159-3"><a href="build-yourself-safety-net.html#cb159-3"></a>  <span class="co"># Using the `find_chrome()` function to guess where the </span></span>
-<span id="cb159-4"><a href="build-yourself-safety-net.html#cb159-4"></a>  <span class="co"># Chrome bin is on our machine</span></span>
-<span id="cb159-5"><a href="build-yourself-safety-net.html#cb159-5"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
-<span id="cb159-6"><a href="build-yourself-safety-net.html#cb159-6"></a>  <span class="co"># Launching Chrome on a random available port on our machine</span></span>
-<span id="cb159-7"><a href="build-yourself-safety-net.html#cb159-7"></a>  <span class="co"># Note that you will need httpuv &gt;= 1.5.2 if you want to use </span></span>
-<span id="cb159-8"><a href="build-yourself-safety-net.html#cb159-8"></a>  <span class="co"># this function</span></span>
-<span id="cb159-9"><a href="build-yourself-safety-net.html#cb159-9"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(), </span>
-<span id="cb159-10"><a href="build-yourself-safety-net.html#cb159-10"></a>  <span class="co"># Specifying the page we want to connect to</span></span>
-<span id="cb159-11"><a href="build-yourself-safety-net.html#cb159-11"></a>  <span class="dt">url =</span> <span class="st">&quot;https://connect.thinkr.fr/hexmake/&quot;</span>,</span>
-<span id="cb159-12"><a href="build-yourself-safety-net.html#cb159-12"></a>  <span class="co"># Do everything on the terminal, with no window open</span></span>
-<span id="cb159-13"><a href="build-yourself-safety-net.html#cb159-13"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
-<span id="cb159-14"><a href="build-yourself-safety-net.html#cb159-14"></a>)</span>
-<span id="cb159-15"><a href="build-yourself-safety-net.html#cb159-15"></a><span class="co"># We&#39;ll wait for the application to be ready to accept inputs</span></span>
-<span id="cb159-16"><a href="build-yourself-safety-net.html#cb159-16"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span>
-<span id="cb159-17"><a href="build-yourself-safety-net.html#cb159-17"></a><span class="co"># We launch the horde of gremlins</span></span>
-<span id="cb159-18"><a href="build-yourself-safety-net.html#cb159-18"></a>test<span class="op">$</span><span class="kw">gremlins_horde</span>()</span>
-<span id="cb159-19"><a href="build-yourself-safety-net.html#cb159-19"></a><span class="co"># Sleep, let the gremlins do their job</span></span>
-<span id="cb159-20"><a href="build-yourself-safety-net.html#cb159-20"></a><span class="kw">Sys.sleep</span>(<span class="dv">10</span>)</span>
-<span id="cb159-21"><a href="build-yourself-safety-net.html#cb159-21"></a><span class="co"># Check that the app is still working</span></span>
-<span id="cb159-22"><a href="build-yourself-safety-net.html#cb159-22"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span>
-<span id="cb159-23"><a href="build-yourself-safety-net.html#cb159-23"></a><span class="co"># Stop the connection</span></span>
-<span id="cb159-24"><a href="build-yourself-safety-net.html#cb159-24"></a>test<span class="op">$</span><span class="kw">stop</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="build-yourself-safety-net.html#cb160-1"></a><span class="co"># Creating a new test instance</span></span>
+<span id="cb160-2"><a href="build-yourself-safety-net.html#cb160-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
+<span id="cb160-3"><a href="build-yourself-safety-net.html#cb160-3"></a>  <span class="co"># Using the `find_chrome()` function to guess where the </span></span>
+<span id="cb160-4"><a href="build-yourself-safety-net.html#cb160-4"></a>  <span class="co"># Chrome bin is on our machine</span></span>
+<span id="cb160-5"><a href="build-yourself-safety-net.html#cb160-5"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
+<span id="cb160-6"><a href="build-yourself-safety-net.html#cb160-6"></a>  <span class="co"># Launching Chrome on a random available port on our machine</span></span>
+<span id="cb160-7"><a href="build-yourself-safety-net.html#cb160-7"></a>  <span class="co"># Note that you will need httpuv &gt;= 1.5.2 if you want to use </span></span>
+<span id="cb160-8"><a href="build-yourself-safety-net.html#cb160-8"></a>  <span class="co"># this function</span></span>
+<span id="cb160-9"><a href="build-yourself-safety-net.html#cb160-9"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(), </span>
+<span id="cb160-10"><a href="build-yourself-safety-net.html#cb160-10"></a>  <span class="co"># Specifying the page we want to connect to</span></span>
+<span id="cb160-11"><a href="build-yourself-safety-net.html#cb160-11"></a>  <span class="dt">url =</span> <span class="st">&quot;https://connect.thinkr.fr/hexmake/&quot;</span>,</span>
+<span id="cb160-12"><a href="build-yourself-safety-net.html#cb160-12"></a>  <span class="co"># Do everything on the terminal, with no window open</span></span>
+<span id="cb160-13"><a href="build-yourself-safety-net.html#cb160-13"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
+<span id="cb160-14"><a href="build-yourself-safety-net.html#cb160-14"></a>)</span>
+<span id="cb160-15"><a href="build-yourself-safety-net.html#cb160-15"></a><span class="co"># We&#39;ll wait for the application to be ready to accept inputs</span></span>
+<span id="cb160-16"><a href="build-yourself-safety-net.html#cb160-16"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span>
+<span id="cb160-17"><a href="build-yourself-safety-net.html#cb160-17"></a><span class="co"># We launch the horde of gremlins</span></span>
+<span id="cb160-18"><a href="build-yourself-safety-net.html#cb160-18"></a>test<span class="op">$</span><span class="kw">gremlins_horde</span>()</span>
+<span id="cb160-19"><a href="build-yourself-safety-net.html#cb160-19"></a><span class="co"># Sleep, let the gremlins do their job</span></span>
+<span id="cb160-20"><a href="build-yourself-safety-net.html#cb160-20"></a><span class="kw">Sys.sleep</span>(<span class="dv">10</span>)</span>
+<span id="cb160-21"><a href="build-yourself-safety-net.html#cb160-21"></a><span class="co"># Check that the app is still working</span></span>
+<span id="cb160-22"><a href="build-yourself-safety-net.html#cb160-22"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span>
+<span id="cb160-23"><a href="build-yourself-safety-net.html#cb160-23"></a><span class="co"># Stop the connection</span></span>
+<span id="cb160-24"><a href="build-yourself-safety-net.html#cb160-24"></a>test<span class="op">$</span><span class="kw">stop</span>()</span></code></pre></div>
 </div>
 <div id="c.-shinytest" class="section level4 unnumbered">
 <h4>C. <code>{shinytest}</code></h4>
 <p>Finally, if you prefer a <code>{shiny}</code> specific package, you can go for <code>{shinytest}</code> <span class="citation">(Chang and Csárdi <a href="#ref-R-shinytest" role="doc-biblioref">2019</a>)</span>.
 This package, created and maintained by RStudio, <strong>allows you to do a series of screenshots of your application, and then replays your app and compares the previously taken screenshots to the current state of your application</strong>, allowing you to detect any changes in the interface.</p>
 <p>If you are building your application with <code>{golem}</code> <span class="citation">(Fay et al. <a href="#ref-R-golem" role="doc-biblioref">2020</a>)</span>, you will need to add an <code>app.R</code> file at the root of your package, then run <code>shinytest::recordTest()</code>:</p>
-<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="build-yourself-safety-net.html#cb160-1"></a><span class="co"># Create an app.R file at the root of the package</span></span>
-<span id="cb160-2"><a href="build-yourself-safety-net.html#cb160-2"></a>golem<span class="op">::</span><span class="kw">add_rstudioconnect_file</span>()</span>
-<span id="cb160-3"><a href="build-yourself-safety-net.html#cb160-3"></a><span class="co"># Launch a test, and record a series of </span></span>
-<span id="cb160-4"><a href="build-yourself-safety-net.html#cb160-4"></a><span class="co"># snapshots of your application</span></span>
-<span id="cb160-5"><a href="build-yourself-safety-net.html#cb160-5"></a>shinytest<span class="op">::</span><span class="kw">recordTest</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="build-yourself-safety-net.html#cb161-1"></a><span class="co"># Create an app.R file at the root of the package</span></span>
+<span id="cb161-2"><a href="build-yourself-safety-net.html#cb161-2"></a>golem<span class="op">::</span><span class="kw">add_rstudioconnect_file</span>()</span>
+<span id="cb161-3"><a href="build-yourself-safety-net.html#cb161-3"></a><span class="co"># Launch a test, and record a series of </span></span>
+<span id="cb161-4"><a href="build-yourself-safety-net.html#cb161-4"></a><span class="co"># snapshots of your application</span></span>
+<span id="cb161-5"><a href="build-yourself-safety-net.html#cb161-5"></a>shinytest<span class="op">::</span><span class="kw">recordTest</span>()</span></code></pre></div>
 <p>Once this function is run, a new window opens: it contains your app, and a “Screenshot” button on the right.
 Using this button, you can take various recordings of your shiny application at different states, as shown in Figure <a href="build-yourself-safety-net.html#fig:11-step-by-step-secure-10">11.2</a>.</p>
 
@@ -726,7 +726,7 @@ FIGURE 11.2: General view of a <code>{shinytest}</code> window.
 </p>
 </div>
 <p>Then, you can do some changes in your app, and run:</p>
-<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="build-yourself-safety-net.html#cb161-1"></a>shinytest<span class="op">::</span><span class="kw">testApp</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="build-yourself-safety-net.html#cb162-1"></a>shinytest<span class="op">::</span><span class="kw">testApp</span>()</span></code></pre></div>
 <p>If the <code>{shinytest}</code> package detects a visual change in the application, you will be immediately alerted, with a report of the difference from the snapshots you took and the current state of the application.</p>
 </div>
 </div>
@@ -737,55 +737,55 @@ FIGURE 11.2: General view of a <code>{shinytest}</code> window.
 <p><code>{shinyloadtest}</code> <span class="citation">(Dipert, Schloerke, and Borges <a href="#ref-R-shinyloadtest" role="doc-biblioref">2020</a>)</span> <strong>tests how an application behaves when one, two, three, twenty, one hundred users connect to the app and use it</strong>, and gives you a visual report about the connection and response time of each session.
 The idea with <code>{shinyloadtest}</code> is to first record a session where you mimic a user behavior, then <code>shinycannon</code>, a command line tool that comes with <code>{shinyloadtest}</code>, replays the recording several times.
 Once the session has been replayed several times mimicking the session you have recorded, you have access to a report of the behavior of your app.</p>
-<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="build-yourself-safety-net.html#cb162-1"></a><span class="kw">library</span>(shinyloadtest)</span></code></pre></div>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="build-yourself-safety-net.html#cb163-1"></a><span class="kw">library</span>(shinyloadtest)</span></code></pre></div>
 <pre><code>Warning: package &#39;shinyloadtest&#39; was built under R
 version 3.6.3</code></pre>
-<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="build-yourself-safety-net.html#cb164-1"></a><span class="co"># Starting your app in another process</span></span>
-<span id="cb164-2"><a href="build-yourself-safety-net.html#cb164-2"></a>p &lt;-<span class="st"> </span>processx<span class="op">::</span>process<span class="op">$</span><span class="kw">new</span>(</span>
-<span id="cb164-3"><a href="build-yourself-safety-net.html#cb164-3"></a>  <span class="st">&quot;Rscript&quot;</span>, </span>
-<span id="cb164-4"><a href="build-yourself-safety-net.html#cb164-4"></a>  <span class="kw">c</span>( <span class="st">&quot;-e&quot;</span>,  <span class="st">&quot;options(&#39;shiny.port&#39;= 2811);hexmake::run_app()&quot;</span> )</span>
-<span id="cb164-5"><a href="build-yourself-safety-net.html#cb164-5"></a>)</span>
-<span id="cb164-6"><a href="build-yourself-safety-net.html#cb164-6"></a><span class="co"># We wait for the app to be ready</span></span>
-<span id="cb164-7"><a href="build-yourself-safety-net.html#cb164-7"></a><span class="kw">Sys.sleep</span>(<span class="dv">5</span>) </span>
-<span id="cb164-8"><a href="build-yourself-safety-net.html#cb164-8"></a><span class="co"># Check that the process is alive</span></span>
-<span id="cb164-9"><a href="build-yourself-safety-net.html#cb164-9"></a>p<span class="op">$</span><span class="kw">is_alive</span>()</span>
-<span id="cb164-10"><a href="build-yourself-safety-net.html#cb164-10"></a><span class="co"># Open the app in our browser just to be sure</span></span>
-<span id="cb164-11"><a href="build-yourself-safety-net.html#cb164-11"></a><span class="kw">browseURL</span>(<span class="st">&quot;http:://localhost:2811&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="build-yourself-safety-net.html#cb165-1"></a><span class="co"># Starting your app in another process</span></span>
+<span id="cb165-2"><a href="build-yourself-safety-net.html#cb165-2"></a>p &lt;-<span class="st"> </span>processx<span class="op">::</span>process<span class="op">$</span><span class="kw">new</span>(</span>
+<span id="cb165-3"><a href="build-yourself-safety-net.html#cb165-3"></a>  <span class="st">&quot;Rscript&quot;</span>, </span>
+<span id="cb165-4"><a href="build-yourself-safety-net.html#cb165-4"></a>  <span class="kw">c</span>( <span class="st">&quot;-e&quot;</span>,  <span class="st">&quot;options(&#39;shiny.port&#39;= 2811);hexmake::run_app()&quot;</span> )</span>
+<span id="cb165-5"><a href="build-yourself-safety-net.html#cb165-5"></a>)</span>
+<span id="cb165-6"><a href="build-yourself-safety-net.html#cb165-6"></a><span class="co"># We wait for the app to be ready</span></span>
+<span id="cb165-7"><a href="build-yourself-safety-net.html#cb165-7"></a><span class="kw">Sys.sleep</span>(<span class="dv">5</span>) </span>
+<span id="cb165-8"><a href="build-yourself-safety-net.html#cb165-8"></a><span class="co"># Check that the process is alive</span></span>
+<span id="cb165-9"><a href="build-yourself-safety-net.html#cb165-9"></a>p<span class="op">$</span><span class="kw">is_alive</span>()</span>
+<span id="cb165-10"><a href="build-yourself-safety-net.html#cb165-10"></a><span class="co"># Open the app in our browser just to be sure</span></span>
+<span id="cb165-11"><a href="build-yourself-safety-net.html#cb165-11"></a><span class="kw">browseURL</span>(<span class="st">&quot;http:://localhost:2811&quot;</span>)</span></code></pre></div>
 <p>Record the tests, potentially in a new dir:</p>
-<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="build-yourself-safety-net.html#cb165-1"></a><span class="co"># Creating a directory to receive the logs</span></span>
-<span id="cb165-2"><a href="build-yourself-safety-net.html#cb165-2"></a>fs<span class="op">::</span><span class="kw">dir_create</span>(<span class="st">&quot;shinylogs&quot;</span>)</span>
-<span id="cb165-3"><a href="build-yourself-safety-net.html#cb165-3"></a><span class="co"># Performing the session recording inside this new folder</span></span>
-<span id="cb165-4"><a href="build-yourself-safety-net.html#cb165-4"></a>withr<span class="op">::</span><span class="kw">with_dir</span>(</span>
-<span id="cb165-5"><a href="build-yourself-safety-net.html#cb165-5"></a>  <span class="st">&quot;shinylogs&quot;</span>, {</span>
-<span id="cb165-6"><a href="build-yourself-safety-net.html#cb165-6"></a>    <span class="co"># Launch the recording of an app session, using port 1234</span></span>
-<span id="cb165-7"><a href="build-yourself-safety-net.html#cb165-7"></a>    shinyloadtest<span class="op">::</span><span class="kw">record_session</span>(</span>
-<span id="cb165-8"><a href="build-yourself-safety-net.html#cb165-8"></a>      <span class="st">&quot;http://localhost:2811&quot;</span>, </span>
-<span id="cb165-9"><a href="build-yourself-safety-net.html#cb165-9"></a>      <span class="dt">port =</span> <span class="dv">1234</span></span>
-<span id="cb165-10"><a href="build-yourself-safety-net.html#cb165-10"></a>    ) </span>
-<span id="cb165-11"><a href="build-yourself-safety-net.html#cb165-11"></a>  }</span>
-<span id="cb165-12"><a href="build-yourself-safety-net.html#cb165-12"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="build-yourself-safety-net.html#cb166-1"></a><span class="co"># Creating a directory to receive the logs</span></span>
+<span id="cb166-2"><a href="build-yourself-safety-net.html#cb166-2"></a>fs<span class="op">::</span><span class="kw">dir_create</span>(<span class="st">&quot;shinylogs&quot;</span>)</span>
+<span id="cb166-3"><a href="build-yourself-safety-net.html#cb166-3"></a><span class="co"># Performing the session recording inside this new folder</span></span>
+<span id="cb166-4"><a href="build-yourself-safety-net.html#cb166-4"></a>withr<span class="op">::</span><span class="kw">with_dir</span>(</span>
+<span id="cb166-5"><a href="build-yourself-safety-net.html#cb166-5"></a>  <span class="st">&quot;shinylogs&quot;</span>, {</span>
+<span id="cb166-6"><a href="build-yourself-safety-net.html#cb166-6"></a>    <span class="co"># Launch the recording of an app session, using port 1234</span></span>
+<span id="cb166-7"><a href="build-yourself-safety-net.html#cb166-7"></a>    shinyloadtest<span class="op">::</span><span class="kw">record_session</span>(</span>
+<span id="cb166-8"><a href="build-yourself-safety-net.html#cb166-8"></a>      <span class="st">&quot;http://localhost:2811&quot;</span>, </span>
+<span id="cb166-9"><a href="build-yourself-safety-net.html#cb166-9"></a>      <span class="dt">port =</span> <span class="dv">1234</span></span>
+<span id="cb166-10"><a href="build-yourself-safety-net.html#cb166-10"></a>    ) </span>
+<span id="cb166-11"><a href="build-yourself-safety-net.html#cb166-11"></a>  }</span>
+<span id="cb166-12"><a href="build-yourself-safety-net.html#cb166-12"></a>)</span></code></pre></div>
 <p>We now have a series of one or more recording/s inside the <code>shinylogs/</code> folder:</p>
 <p>Then, let’s switch to our command line, and rerun the session with <code>shinycannon</code>.
 The <code>shinycannon</code> command line tools take several arguments: the path the <code>.log</code> file, the URL of the app, <code>--workers</code> specify the number of concurrent connections to run, and the <code>--output-dir</code> argument specifies where the report should be written.</p>
 <p>Then, go to your terminal and run:</p>
-<div class="sourceCode" id="cb166"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb166-1"><a href="build-yourself-safety-net.html#cb166-1"></a><span class="ex">shinycannon</span> shinylogs/recording.log \</span>
-<span id="cb166-2"><a href="build-yourself-safety-net.html#cb166-2"></a>  http://localhost:2811 --workers 10 \</span>
-<span id="cb166-3"><a href="build-yourself-safety-net.html#cb166-3"></a>  --output-dir shinylogs/run1</span></code></pre></div>
+<div class="sourceCode" id="cb167"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb167-1"><a href="build-yourself-safety-net.html#cb167-1"></a><span class="ex">shinycannon</span> shinylogs/recording.log \</span>
+<span id="cb167-2"><a href="build-yourself-safety-net.html#cb167-2"></a>  http://localhost:2811 --workers 10 \</span>
+<span id="cb167-3"><a href="build-yourself-safety-net.html#cb167-3"></a>  --output-dir shinylogs/run1</span></code></pre></div>
 <p>And now, we have new files inside the folder, corresponding to the session recordings.</p>
-<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="build-yourself-safety-net.html#cb167-1"></a><span class="co"># printing the structure of shinylogs</span></span>
-<span id="cb167-2"><a href="build-yourself-safety-net.html#cb167-2"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;shinylogs&quot;</span>, <span class="dt">recurse =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="build-yourself-safety-net.html#cb168-1"></a><span class="co"># printing the structure of shinylogs</span></span>
+<span id="cb168-2"><a href="build-yourself-safety-net.html#cb168-2"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;shinylogs&quot;</span>, <span class="dt">recurse =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <pre><code>shinylogs
 ├── recording.log
 ├── run1
 ├── run2
 └── run3</code></pre>
 <p>Good news: we do not have to manually analyze these files—<code>{shinyloadtest}</code> offers a series of wrapper functions to do that.</p>
-<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="build-yourself-safety-net.html#cb169-1"></a><span class="co"># Bringing the runs in the R session</span></span>
-<span id="cb169-2"><a href="build-yourself-safety-net.html#cb169-2"></a>shinyload_runs &lt;-<span class="st"> </span>shinyloadtest<span class="op">::</span><span class="kw">load_runs</span>(</span>
-<span id="cb169-3"><a href="build-yourself-safety-net.html#cb169-3"></a>  <span class="st">&quot;5 workers&quot;</span> =<span class="st"> &quot;shinylogs/run1&quot;</span></span>
-<span id="cb169-4"><a href="build-yourself-safety-net.html#cb169-4"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="build-yourself-safety-net.html#cb170-1"></a><span class="co"># Bringing the runs in the R session</span></span>
+<span id="cb170-2"><a href="build-yourself-safety-net.html#cb170-2"></a>shinyload_runs &lt;-<span class="st"> </span>shinyloadtest<span class="op">::</span><span class="kw">load_runs</span>(</span>
+<span id="cb170-3"><a href="build-yourself-safety-net.html#cb170-3"></a>  <span class="st">&quot;5 workers&quot;</span> =<span class="st"> &quot;shinylogs/run1&quot;</span></span>
+<span id="cb170-4"><a href="build-yourself-safety-net.html#cb170-4"></a>)</span></code></pre></div>
 <p>We now have a data.frame that looks like this:</p>
-<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="build-yourself-safety-net.html#cb170-1"></a>dplyr<span class="op">::</span><span class="kw">glimpse</span>(<span class="kw">head</span>(shinyload_runs))</span></code></pre></div>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="build-yourself-safety-net.html#cb171-1"></a>dplyr<span class="op">::</span><span class="kw">glimpse</span>(<span class="kw">head</span>(shinyload_runs))</span></code></pre></div>
 <pre><code>Rows: 6
 Columns: 13
 $ run               &lt;ord&gt; 5 workers, 5 workers, 5 wor…
@@ -808,7 +808,7 @@ For example:</p>
 The output is available in Figure <a href="build-yourself-safety-net.html#fig:11-step-by-step-secure-21">11.3</a>.</li>
 </ul>
 
-<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="build-yourself-safety-net.html#cb172-1"></a><span class="kw">slt_session_duration</span>(shinyload_runs)</span></code></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="build-yourself-safety-net.html#cb173-1"></a><span class="kw">slt_session_duration</span>(shinyload_runs)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-21"></span>
 <img src="engineering-production-grade-shiny-apps_files/figure-html/11-step-by-step-secure-21-1.png" alt="Session duration." width="100%" />
 <p class="caption">
@@ -821,8 +821,8 @@ FIGURE 11.3: Session duration.
 <!-- slt_waterfall(shinyload_runs) -->
 <!-- ``` -->
 <p>And if you need to bundle everything into an HTML reports, <code>shinyloadtest_report()</code> is what you are looking for.</p>
-<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="build-yourself-safety-net.html#cb173-1"></a><span class="co"># Generating the report</span></span>
-<span id="cb173-2"><a href="build-yourself-safety-net.html#cb173-2"></a><span class="kw">shinyloadtest_report</span>(shinyload_runs)</span></code></pre></div>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="build-yourself-safety-net.html#cb174-1"></a><span class="co"># Generating the report</span></span>
+<span id="cb174-2"><a href="build-yourself-safety-net.html#cb174-2"></a><span class="kw">shinyloadtest_report</span>(shinyload_runs)</span></code></pre></div>
 <p>This function will generate an HTML report of all the things computed by <code>{shinyloadtest}</code>, as shown in Figure <a href="build-yourself-safety-net.html#fig:11-step-by-step-secure-23">11.4</a>.</p>
 
 <div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-23"></span>
@@ -851,36 +851,36 @@ You should probably set a different port for <code>{shinyloadtest}</code>, so th
 <p>Another thing you might want to monitor is the memory/CPU usage of your application, which <code>{shinyloadtest}</code> does not natively provide: the package records the load from the browser point of view, not from the server one.
 That’s where <code>{dockerstats}</code> <span class="citation">(Fay <a href="#ref-R-dockerstats" role="doc-biblioref">2020</a><a href="#ref-R-dockerstats" role="doc-biblioref">d</a>)</span> can come into play: this package is a wrapper around the command line <code>docker stats</code>, and returns an R data.frame with the stats.</p>
 <p>You can get the <code>{dockerstats}</code> package from GitHub with:</p>
-<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="build-yourself-safety-net.html#cb174-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;ColinFay/dockerstats&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="build-yourself-safety-net.html#cb175-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;ColinFay/dockerstats&quot;</span>)</span></code></pre></div>
 <p>Or from NPM via:</p>
-<div class="sourceCode" id="cb175"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb175-1"><a href="build-yourself-safety-net.html#cb175-1"></a><span class="ex">npm</span> install -g r-dockerstats</span></code></pre></div>
-<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="build-yourself-safety-net.html#cb176-1"></a><span class="kw">library</span>(dockerstats)</span></code></pre></div>
+<div class="sourceCode" id="cb176"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb176-1"><a href="build-yourself-safety-net.html#cb176-1"></a><span class="ex">npm</span> install -g r-dockerstats</span></code></pre></div>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="build-yourself-safety-net.html#cb177-1"></a><span class="kw">library</span>(dockerstats)</span></code></pre></div>
 <p>With these stats, we can monitor the load on the app when it is run in a Docker container.</p>
 <p>We will start by launching the container using a <code>system()</code> call: here, we are running the <code>{hexmake}</code> application, bundled in the <code>colinfay/hexmake</code> Docker image, on port 2811.
 We also make sure we give it a name with <code>--name</code>, so that we can call it in our <code>dockerstats()</code> call later on.</p>
-<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="build-yourself-safety-net.html#cb177-1"></a><span class="co"># We are launching the docker container </span></span>
-<span id="cb177-2"><a href="build-yourself-safety-net.html#cb177-2"></a><span class="co"># using R system() command. Here, we are </span></span>
-<span id="cb177-3"><a href="build-yourself-safety-net.html#cb177-3"></a><span class="co"># running the container image called </span></span>
-<span id="cb177-4"><a href="build-yourself-safety-net.html#cb177-4"></a><span class="co"># colinfay/hexmake. We are naming the </span></span>
-<span id="cb177-5"><a href="build-yourself-safety-net.html#cb177-5"></a><span class="co"># container hexmake using the --name flag, </span></span>
-<span id="cb177-6"><a href="build-yourself-safety-net.html#cb177-6"></a><span class="co"># --rm means the container will be removed </span></span>
-<span id="cb177-7"><a href="build-yourself-safety-net.html#cb177-7"></a><span class="co"># when stopped, and finally the -p flag defines </span></span>
-<span id="cb177-8"><a href="build-yourself-safety-net.html#cb177-8"></a><span class="co"># how to bind the ports of the container</span></span>
-<span id="cb177-9"><a href="build-yourself-safety-net.html#cb177-9"></a><span class="co"># with the ports of the host (left is the host,</span></span>
-<span id="cb177-10"><a href="build-yourself-safety-net.html#cb177-10"></a><span class="co">#  right is the container): in other word, here, </span></span>
-<span id="cb177-11"><a href="build-yourself-safety-net.html#cb177-11"></a><span class="co">#  we bind port 80 of our container to the port 2811</span></span>
-<span id="cb177-12"><a href="build-yourself-safety-net.html#cb177-12"></a><span class="co"># of our machine.</span></span>
-<span id="cb177-13"><a href="build-yourself-safety-net.html#cb177-13"></a><span class="kw">system</span>(</span>
-<span id="cb177-14"><a href="build-yourself-safety-net.html#cb177-14"></a>  <span class="st">&quot;docker run --name hexmake --rm -p 2811:80 colinfay/hexmake&quot;</span>, </span>
-<span id="cb177-15"><a href="build-yourself-safety-net.html#cb177-15"></a>  <span class="dt">wait =</span> <span class="ot">FALSE</span></span>
-<span id="cb177-16"><a href="build-yourself-safety-net.html#cb177-16"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="build-yourself-safety-net.html#cb178-1"></a><span class="co"># We are launching the docker container </span></span>
+<span id="cb178-2"><a href="build-yourself-safety-net.html#cb178-2"></a><span class="co"># using R system() command. Here, we are </span></span>
+<span id="cb178-3"><a href="build-yourself-safety-net.html#cb178-3"></a><span class="co"># running the container image called </span></span>
+<span id="cb178-4"><a href="build-yourself-safety-net.html#cb178-4"></a><span class="co"># colinfay/hexmake. We are naming the </span></span>
+<span id="cb178-5"><a href="build-yourself-safety-net.html#cb178-5"></a><span class="co"># container hexmake using the --name flag, </span></span>
+<span id="cb178-6"><a href="build-yourself-safety-net.html#cb178-6"></a><span class="co"># --rm means the container will be removed </span></span>
+<span id="cb178-7"><a href="build-yourself-safety-net.html#cb178-7"></a><span class="co"># when stopped, and finally the -p flag defines </span></span>
+<span id="cb178-8"><a href="build-yourself-safety-net.html#cb178-8"></a><span class="co"># how to bind the ports of the container</span></span>
+<span id="cb178-9"><a href="build-yourself-safety-net.html#cb178-9"></a><span class="co"># with the ports of the host (left is the host,</span></span>
+<span id="cb178-10"><a href="build-yourself-safety-net.html#cb178-10"></a><span class="co">#  right is the container): in other word, here, </span></span>
+<span id="cb178-11"><a href="build-yourself-safety-net.html#cb178-11"></a><span class="co">#  we bind port 80 of our container to the port 2811</span></span>
+<span id="cb178-12"><a href="build-yourself-safety-net.html#cb178-12"></a><span class="co"># of our machine.</span></span>
+<span id="cb178-13"><a href="build-yourself-safety-net.html#cb178-13"></a><span class="kw">system</span>(</span>
+<span id="cb178-14"><a href="build-yourself-safety-net.html#cb178-14"></a>  <span class="st">&quot;docker run --name hexmake --rm -p 2811:80 colinfay/hexmake&quot;</span>, </span>
+<span id="cb178-15"><a href="build-yourself-safety-net.html#cb178-15"></a>  <span class="dt">wait =</span> <span class="ot">FALSE</span></span>
+<span id="cb178-16"><a href="build-yourself-safety-net.html#cb178-16"></a>)</span></code></pre></div>
 <p>Let’s say now we want the stats for the hexmake container:</p>
-<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="build-yourself-safety-net.html#cb178-1"></a><span class="co"># Waiting for the container to be ready </span></span>
-<span id="cb178-2"><a href="build-yourself-safety-net.html#cb178-2"></a><span class="kw">Sys.sleep</span>(<span class="dv">30</span>)</span>
-<span id="cb178-3"><a href="build-yourself-safety-net.html#cb178-3"></a><span class="co"># Showing the docker stats for hexmake</span></span>
-<span id="cb178-4"><a href="build-yourself-safety-net.html#cb178-4"></a>tibble<span class="op">::</span><span class="kw">as_tibble</span>(</span>
-<span id="cb178-5"><a href="build-yourself-safety-net.html#cb178-5"></a>  <span class="kw">dockerstats</span>(<span class="st">&quot;hexmake&quot;</span>)</span>
-<span id="cb178-6"><a href="build-yourself-safety-net.html#cb178-6"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="build-yourself-safety-net.html#cb179-1"></a><span class="co"># Waiting for the container to be ready </span></span>
+<span id="cb179-2"><a href="build-yourself-safety-net.html#cb179-2"></a><span class="kw">Sys.sleep</span>(<span class="dv">30</span>)</span>
+<span id="cb179-3"><a href="build-yourself-safety-net.html#cb179-3"></a><span class="co"># Showing the docker stats for hexmake</span></span>
+<span id="cb179-4"><a href="build-yourself-safety-net.html#cb179-4"></a>tibble<span class="op">::</span><span class="kw">as_tibble</span>(</span>
+<span id="cb179-5"><a href="build-yourself-safety-net.html#cb179-5"></a>  <span class="kw">dockerstats</span>(<span class="st">&quot;hexmake&quot;</span>)</span>
+<span id="cb179-6"><a href="build-yourself-safety-net.html#cb179-6"></a>)</span></code></pre></div>
 <pre><code>Warning: `...` is not empty.
 
 We detected these problematic arguments:
@@ -898,27 +898,27 @@ Did you misspecify an argument?</code></pre>
 <p>Of course, right now nobody is using the app, so the usage can be pretty small.
 But let’s push it a little bit by mimicking a lot of connections.</p>
 <p>To do that, we can replay our <code>shinycannon</code> call, and at the same time use the <code>dockerstats_recurse()</code> function, which will recursively call <code>dockerstats()</code> on a regular interval.</p>
-<div class="sourceCode" id="cb181"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb181-1"><a href="build-yourself-safety-net.html#cb181-1"></a><span class="co"># Replaying the recording</span></span>
-<span id="cb181-2"><a href="build-yourself-safety-net.html#cb181-2"></a><span class="ex">shinycannon</span> shinylogs/recording.log <span class="dt">\ </span></span>
-<span id="cb181-3"><a href="build-yourself-safety-net.html#cb181-3"></a><span class="co"># Specificying the host url and the number of &quot;visitors&quot;</span></span>
-<span id="cb181-4"><a href="build-yourself-safety-net.html#cb181-4"></a>  <span class="ex">http</span>://localhost:2811 --workers 10 \</span>
-<span id="cb181-5"><a href="build-yourself-safety-net.html#cb181-5"></a># Define where the recording will be outputed</span>
-<span id="cb181-6"><a href="build-yourself-safety-net.html#cb181-6"></a>  <span class="ex">--output-dir</span> shinylogs/run3</span></code></pre></div>
+<div class="sourceCode" id="cb182"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb182-1"><a href="build-yourself-safety-net.html#cb182-1"></a><span class="co"># Replaying the recording</span></span>
+<span id="cb182-2"><a href="build-yourself-safety-net.html#cb182-2"></a><span class="ex">shinycannon</span> shinylogs/recording.log <span class="dt">\ </span></span>
+<span id="cb182-3"><a href="build-yourself-safety-net.html#cb182-3"></a><span class="co"># Specificying the host url and the number of &quot;visitors&quot;</span></span>
+<span id="cb182-4"><a href="build-yourself-safety-net.html#cb182-4"></a>  <span class="ex">http</span>://localhost:2811 --workers 10 \</span>
+<span id="cb182-5"><a href="build-yourself-safety-net.html#cb182-5"></a># Define where the recording will be outputed</span>
+<span id="cb182-6"><a href="build-yourself-safety-net.html#cb182-6"></a>  <span class="ex">--output-dir</span> shinylogs/run3</span></code></pre></div>
 <p>Let’s launch at the same time a <code>dockerstats_recurse()</code>.
 For example, here, we will print, on each loop, the <code>MemUsage</code> of the container, then save the data inside a <code>dockerstats.csv</code> file.</p>
-<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="build-yourself-safety-net.html#cb182-1"></a><span class="co"># Calling recursive the dockerstats function. </span></span>
-<span id="cb182-2"><a href="build-yourself-safety-net.html#cb182-2"></a><span class="co"># The callback function takes a function, and define</span></span>
-<span id="cb182-3"><a href="build-yourself-safety-net.html#cb182-3"></a><span class="co"># what to do with the data.frame each time the </span></span>
-<span id="cb182-4"><a href="build-yourself-safety-net.html#cb182-4"></a><span class="co"># dockerstats results are computed.</span></span>
-<span id="cb182-5"><a href="build-yourself-safety-net.html#cb182-5"></a><span class="kw">dockerstats_recurse</span>(</span>
-<span id="cb182-6"><a href="build-yourself-safety-net.html#cb182-6"></a>  <span class="st">&quot;hexmake&quot;</span>,</span>
-<span id="cb182-7"><a href="build-yourself-safety-net.html#cb182-7"></a>  <span class="co"># append_csv is a {dockerstats} function that will </span></span>
-<span id="cb182-8"><a href="build-yourself-safety-net.html#cb182-8"></a>  <span class="co"># apped the output to a given csv</span></span>
-<span id="cb182-9"><a href="build-yourself-safety-net.html#cb182-9"></a>  <span class="dt">callback =</span> <span class="kw">append_csv</span>(</span>
-<span id="cb182-10"><a href="build-yourself-safety-net.html#cb182-10"></a>    <span class="dt">file =</span> <span class="st">&quot;shinylogs/dockerstats.csv&quot;</span>, </span>
-<span id="cb182-11"><a href="build-yourself-safety-net.html#cb182-11"></a>    <span class="dt">print =</span> <span class="ot">TRUE</span></span>
-<span id="cb182-12"><a href="build-yourself-safety-net.html#cb182-12"></a>  )</span>
-<span id="cb182-13"><a href="build-yourself-safety-net.html#cb182-13"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb183-1"><a href="build-yourself-safety-net.html#cb183-1"></a><span class="co"># Calling recursive the dockerstats function. </span></span>
+<span id="cb183-2"><a href="build-yourself-safety-net.html#cb183-2"></a><span class="co"># The callback function takes a function, and define</span></span>
+<span id="cb183-3"><a href="build-yourself-safety-net.html#cb183-3"></a><span class="co"># what to do with the data.frame each time the </span></span>
+<span id="cb183-4"><a href="build-yourself-safety-net.html#cb183-4"></a><span class="co"># dockerstats results are computed.</span></span>
+<span id="cb183-5"><a href="build-yourself-safety-net.html#cb183-5"></a><span class="kw">dockerstats_recurse</span>(</span>
+<span id="cb183-6"><a href="build-yourself-safety-net.html#cb183-6"></a>  <span class="st">&quot;hexmake&quot;</span>,</span>
+<span id="cb183-7"><a href="build-yourself-safety-net.html#cb183-7"></a>  <span class="co"># append_csv is a {dockerstats} function that will </span></span>
+<span id="cb183-8"><a href="build-yourself-safety-net.html#cb183-8"></a>  <span class="co"># apped the output to a given csv</span></span>
+<span id="cb183-9"><a href="build-yourself-safety-net.html#cb183-9"></a>  <span class="dt">callback =</span> <span class="kw">append_csv</span>(</span>
+<span id="cb183-10"><a href="build-yourself-safety-net.html#cb183-10"></a>    <span class="dt">file =</span> <span class="st">&quot;shinylogs/dockerstats.csv&quot;</span>, </span>
+<span id="cb183-11"><a href="build-yourself-safety-net.html#cb183-11"></a>    <span class="dt">print =</span> <span class="ot">TRUE</span></span>
+<span id="cb183-12"><a href="build-yourself-safety-net.html#cb183-12"></a>  )</span>
+<span id="cb183-13"><a href="build-yourself-safety-net.html#cb183-13"></a>)</span></code></pre></div>
 <p>Figure <a href="build-yourself-safety-net.html#fig:11-step-by-step-secure-31">11.5</a> shows these processes side to side.</p>
 
 <div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-31"></span>
@@ -929,12 +929,12 @@ FIGURE 11.5: <code>{dockerstats}</code> and <code>shinycannon</code> running sid
 </div>
 <p>As you can see, as the number of connections grow, the memory usage grows.
 And we now have a csv with the evolution of the <code>docker stats</code> records over time!</p>
-<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb183-1"><a href="build-yourself-safety-net.html#cb183-1"></a><span class="co"># read_appended_csv() allows to read a csv that has been </span></span>
-<span id="cb183-2"><a href="build-yourself-safety-net.html#cb183-2"></a><span class="co"># constructed with the append_csv() function</span></span>
-<span id="cb183-3"><a href="build-yourself-safety-net.html#cb183-3"></a>docker_stats &lt;-<span class="st"> </span><span class="kw">read_appended_csv</span>(</span>
-<span id="cb183-4"><a href="build-yourself-safety-net.html#cb183-4"></a>  <span class="st">&quot;shinylogs/dockerstats.csv&quot;</span></span>
-<span id="cb183-5"><a href="build-yourself-safety-net.html#cb183-5"></a>)</span></code></pre></div>
-<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="build-yourself-safety-net.html#cb184-1"></a>dplyr<span class="op">::</span><span class="kw">glimpse</span>(<span class="kw">head</span>(docker_stats))</span></code></pre></div>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="build-yourself-safety-net.html#cb184-1"></a><span class="co"># read_appended_csv() allows to read a csv that has been </span></span>
+<span id="cb184-2"><a href="build-yourself-safety-net.html#cb184-2"></a><span class="co"># constructed with the append_csv() function</span></span>
+<span id="cb184-3"><a href="build-yourself-safety-net.html#cb184-3"></a>docker_stats &lt;-<span class="st"> </span><span class="kw">read_appended_csv</span>(</span>
+<span id="cb184-4"><a href="build-yourself-safety-net.html#cb184-4"></a>  <span class="st">&quot;shinylogs/dockerstats.csv&quot;</span></span>
+<span id="cb184-5"><a href="build-yourself-safety-net.html#cb184-5"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb185-1"><a href="build-yourself-safety-net.html#cb185-1"></a>dplyr<span class="op">::</span><span class="kw">glimpse</span>(<span class="kw">head</span>(docker_stats))</span></code></pre></div>
 <pre><code>Rows: 6
 Columns: 14
 $ Container   &lt;chr&gt; &quot;hexmake&quot;, &quot;hexmake&quot;, &quot;hexmake&quot;, …
@@ -954,48 +954,48 @@ $ extra       &lt;lgl&gt; NA, NA, NA, NA, NA, NA</code></pre>
 <p>If you need a deeper look into the connection between application actions and the Docker stats, you can also combine <code>{dockerstats}</code> with <code>{crrry}</code>, the idea being that you can record the CPU usage at the exact moment the application performs a specific computation.</p>
 <p>Let’s record the computation of the <code>hexmake</code> container containing the same app as before.</p>
 <p>First, launch the container:</p>
-<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="build-yourself-safety-net.html#cb186-1"></a><span class="co"># Launching the container a second time, </span></span>
-<span id="cb186-2"><a href="build-yourself-safety-net.html#cb186-2"></a><span class="co"># but name it xmk2 and serve it on port 2708</span></span>
-<span id="cb186-3"><a href="build-yourself-safety-net.html#cb186-3"></a><span class="kw">system</span>(</span>
-<span id="cb186-4"><a href="build-yourself-safety-net.html#cb186-4"></a>  <span class="st">&quot;docker run -p 2708:80 --rm --name xmk2 -d colinfay/hexmake&quot;</span>, </span>
-<span id="cb186-5"><a href="build-yourself-safety-net.html#cb186-5"></a>  <span class="dt">wait =</span> <span class="ot">FALSE</span></span>
-<span id="cb186-6"><a href="build-yourself-safety-net.html#cb186-6"></a>)</span>
-<span id="cb186-7"><a href="build-yourself-safety-net.html#cb186-7"></a><span class="kw">Sys.sleep</span>(<span class="dv">60</span>) <span class="co"># Let the container launch</span></span></code></pre></div>
+<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="build-yourself-safety-net.html#cb187-1"></a><span class="co"># Launching the container a second time, </span></span>
+<span id="cb187-2"><a href="build-yourself-safety-net.html#cb187-2"></a><span class="co"># but name it xmk2 and serve it on port 2708</span></span>
+<span id="cb187-3"><a href="build-yourself-safety-net.html#cb187-3"></a><span class="kw">system</span>(</span>
+<span id="cb187-4"><a href="build-yourself-safety-net.html#cb187-4"></a>  <span class="st">&quot;docker run -p 2708:80 --rm --name xmk2 -d colinfay/hexmake&quot;</span>, </span>
+<span id="cb187-5"><a href="build-yourself-safety-net.html#cb187-5"></a>  <span class="dt">wait =</span> <span class="ot">FALSE</span></span>
+<span id="cb187-6"><a href="build-yourself-safety-net.html#cb187-6"></a>)</span>
+<span id="cb187-7"><a href="build-yourself-safety-net.html#cb187-7"></a><span class="kw">Sys.sleep</span>(<span class="dv">60</span>) <span class="co"># Let the container launch</span></span></code></pre></div>
 <p>Then, a <code>{crrry}</code> job:</p>
-<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="build-yourself-safety-net.html#cb187-1"></a><span class="co"># See previous version of this code for a commented explanation </span></span>
-<span id="cb187-2"><a href="build-yourself-safety-net.html#cb187-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
-<span id="cb187-3"><a href="build-yourself-safety-net.html#cb187-3"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
-<span id="cb187-4"><a href="build-yourself-safety-net.html#cb187-4"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(),</span>
-<span id="cb187-5"><a href="build-yourself-safety-net.html#cb187-5"></a>  <span class="dt">url =</span><span class="st">&quot;http://localhost:2708&quot;</span>,</span>
-<span id="cb187-6"><a href="build-yourself-safety-net.html#cb187-6"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
-<span id="cb187-7"><a href="build-yourself-safety-net.html#cb187-7"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="build-yourself-safety-net.html#cb188-1"></a><span class="co"># See previous version of this code for a commented explanation </span></span>
+<span id="cb188-2"><a href="build-yourself-safety-net.html#cb188-2"></a>test &lt;-<span class="st"> </span>crrry<span class="op">::</span>CrrryOnPage<span class="op">$</span><span class="kw">new</span>(</span>
+<span id="cb188-3"><a href="build-yourself-safety-net.html#cb188-3"></a>  <span class="dt">chrome_bin =</span> pagedown<span class="op">::</span><span class="kw">find_chrome</span>(),</span>
+<span id="cb188-4"><a href="build-yourself-safety-net.html#cb188-4"></a>  <span class="dt">chrome_port =</span> httpuv<span class="op">::</span><span class="kw">randomPort</span>(),</span>
+<span id="cb188-5"><a href="build-yourself-safety-net.html#cb188-5"></a>  <span class="dt">url =</span><span class="st">&quot;http://localhost:2708&quot;</span>,</span>
+<span id="cb188-6"><a href="build-yourself-safety-net.html#cb188-6"></a>  <span class="dt">headless =</span> <span class="ot">TRUE</span></span>
+<span id="cb188-7"><a href="build-yourself-safety-net.html#cb188-7"></a>)</span></code></pre></div>
 <pre><code>Running &#39;/Applications/Google 
   Chrome.app/Contents/MacOS/Google Chrome&#39; 
   --no-first-run --headless \
   &#39;--user-data-dir=/Users/colin/Library/Application     
   Support/r-crrri/chrome-data-dir-thyhpptv&#39; \
   &#39;--remote-debugging-port=48938&#39;</code></pre>
-<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb189-1"><a href="build-yourself-safety-net.html#cb189-1"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb190-1"><a href="build-yourself-safety-net.html#cb190-1"></a>test<span class="op">$</span><span class="kw">wait_for_shiny_ready</span>()</span></code></pre></div>
 <pre><code>Shiny is computing
 ✓ Shiny is still running</code></pre>
-<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb191-1"><a href="build-yourself-safety-net.html#cb191-1"></a><span class="co"># We are creating a first data.frame that records the launch </span></span>
-<span id="cb191-2"><a href="build-yourself-safety-net.html#cb191-2"></a><span class="co"># of the container.</span></span>
-<span id="cb191-3"><a href="build-yourself-safety-net.html#cb191-3"></a>results &lt;-<span class="st"> </span>dockerstats<span class="op">::</span><span class="kw">dockerstats</span>(<span class="st">&quot;xmk2&quot;</span>, <span class="dt">extra =</span> <span class="st">&quot;launch&quot;</span>)</span>
-<span id="cb191-4"><a href="build-yourself-safety-net.html#cb191-4"></a></span>
-<span id="cb191-5"><a href="build-yourself-safety-net.html#cb191-5"></a><span class="cf">for</span> (i <span class="cf">in</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>]){</span>
-<span id="cb191-6"><a href="build-yourself-safety-net.html#cb191-6"></a>  <span class="co"># We will be setting a letter for the package name input</span></span>
-<span id="cb191-7"><a href="build-yourself-safety-net.html#cb191-7"></a>  test<span class="op">$</span><span class="kw">shiny_set_input</span>(</span>
-<span id="cb191-8"><a href="build-yourself-safety-net.html#cb191-8"></a>    <span class="st">&quot;main_ui_1-left_ui_1-pkg_name_ui_1-package&quot;</span>, </span>
-<span id="cb191-9"><a href="build-yourself-safety-net.html#cb191-9"></a>    i</span>
-<span id="cb191-10"><a href="build-yourself-safety-net.html#cb191-10"></a>  )</span>
-<span id="cb191-11"><a href="build-yourself-safety-net.html#cb191-11"></a>  <span class="co"># Once the input is set, we call dockerstats() </span></span>
-<span id="cb191-12"><a href="build-yourself-safety-net.html#cb191-12"></a>  <span class="co"># for this container and bind the results to </span></span>
-<span id="cb191-13"><a href="build-yourself-safety-net.html#cb191-13"></a>  <span class="co"># the previously created data.frame</span></span>
-<span id="cb191-14"><a href="build-yourself-safety-net.html#cb191-14"></a>  results &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
-<span id="cb191-15"><a href="build-yourself-safety-net.html#cb191-15"></a>    results, </span>
-<span id="cb191-16"><a href="build-yourself-safety-net.html#cb191-16"></a>    dockerstats<span class="op">::</span><span class="kw">dockerstats</span>(<span class="st">&quot;xmk2&quot;</span>, <span class="dt">extra =</span> i)</span>
-<span id="cb191-17"><a href="build-yourself-safety-net.html#cb191-17"></a>  )</span>
-<span id="cb191-18"><a href="build-yourself-safety-net.html#cb191-18"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb192-1"><a href="build-yourself-safety-net.html#cb192-1"></a><span class="co"># We are creating a first data.frame that records the launch </span></span>
+<span id="cb192-2"><a href="build-yourself-safety-net.html#cb192-2"></a><span class="co"># of the container.</span></span>
+<span id="cb192-3"><a href="build-yourself-safety-net.html#cb192-3"></a>results &lt;-<span class="st"> </span>dockerstats<span class="op">::</span><span class="kw">dockerstats</span>(<span class="st">&quot;xmk2&quot;</span>, <span class="dt">extra =</span> <span class="st">&quot;launch&quot;</span>)</span>
+<span id="cb192-4"><a href="build-yourself-safety-net.html#cb192-4"></a></span>
+<span id="cb192-5"><a href="build-yourself-safety-net.html#cb192-5"></a><span class="cf">for</span> (i <span class="cf">in</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>]){</span>
+<span id="cb192-6"><a href="build-yourself-safety-net.html#cb192-6"></a>  <span class="co"># We will be setting a letter for the package name input</span></span>
+<span id="cb192-7"><a href="build-yourself-safety-net.html#cb192-7"></a>  test<span class="op">$</span><span class="kw">shiny_set_input</span>(</span>
+<span id="cb192-8"><a href="build-yourself-safety-net.html#cb192-8"></a>    <span class="st">&quot;main_ui_1-left_ui_1-pkg_name_ui_1-package&quot;</span>, </span>
+<span id="cb192-9"><a href="build-yourself-safety-net.html#cb192-9"></a>    i</span>
+<span id="cb192-10"><a href="build-yourself-safety-net.html#cb192-10"></a>  )</span>
+<span id="cb192-11"><a href="build-yourself-safety-net.html#cb192-11"></a>  <span class="co"># Once the input is set, we call dockerstats() </span></span>
+<span id="cb192-12"><a href="build-yourself-safety-net.html#cb192-12"></a>  <span class="co"># for this container and bind the results to </span></span>
+<span id="cb192-13"><a href="build-yourself-safety-net.html#cb192-13"></a>  <span class="co"># the previously created data.frame</span></span>
+<span id="cb192-14"><a href="build-yourself-safety-net.html#cb192-14"></a>  results &lt;-<span class="st"> </span><span class="kw">rbind</span>(</span>
+<span id="cb192-15"><a href="build-yourself-safety-net.html#cb192-15"></a>    results, </span>
+<span id="cb192-16"><a href="build-yourself-safety-net.html#cb192-16"></a>    dockerstats<span class="op">::</span><span class="kw">dockerstats</span>(<span class="st">&quot;xmk2&quot;</span>, <span class="dt">extra =</span> i)</span>
+<span id="cb192-17"><a href="build-yourself-safety-net.html#cb192-17"></a>  )</span>
+<span id="cb192-18"><a href="build-yourself-safety-net.html#cb192-18"></a>}</span></code></pre></div>
 <pre><code>-- Setting id main_ui_1-left_ui_1-pkg_name_ui_1-package --
 Shiny is computing
 ✓ Shiny is still running
@@ -1028,39 +1028,39 @@ Shiny is computing
 ✓ Shiny is still running</code></pre>
 <p>And draw a small graph of this evolution, shown in Figure <a href="build-yourself-safety-net.html#fig:11-step-by-step-secure-43">11.6</a>:</p>
 
-<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="build-yourself-safety-net.html#cb193-1"></a><span class="kw">library</span>(dplyr, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb193-2"><a href="build-yourself-safety-net.html#cb193-2"></a><span class="co"># We are converting the MemUsage and record_time columns </span></span>
-<span id="cb193-3"><a href="build-yourself-safety-net.html#cb193-3"></a><span class="co"># to a format that can be used in {ggplot2}</span></span>
-<span id="cb193-4"><a href="build-yourself-safety-net.html#cb193-4"></a>results &lt;-<span class="st"> </span>results <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb193-5"><a href="build-yourself-safety-net.html#cb193-5"></a><span class="st">  </span><span class="kw">mutate</span>(</span>
-<span id="cb193-6"><a href="build-yourself-safety-net.html#cb193-6"></a>    <span class="dt">MemUsage =</span> <span class="kw">to_mib</span>(MemUsage), </span>
-<span id="cb193-7"><a href="build-yourself-safety-net.html#cb193-7"></a>    <span class="dt">record_time =</span> <span class="kw">as.POSIXct</span>(record_time)</span>
-<span id="cb193-8"><a href="build-yourself-safety-net.html#cb193-8"></a>  )</span>
-<span id="cb193-9"><a href="build-yourself-safety-net.html#cb193-9"></a><span class="kw">library</span>(ggplot2)</span>
-<span id="cb193-10"><a href="build-yourself-safety-net.html#cb193-10"></a><span class="co"># Using the record time as an x axis, </span></span>
-<span id="cb193-11"><a href="build-yourself-safety-net.html#cb193-11"></a><span class="co"># then adding the MemUsage as a line (to watch the </span></span>
-<span id="cb193-12"><a href="build-yourself-safety-net.html#cb193-12"></a><span class="co"># evolution over time), then we add the &#39;extra&#39; column, </span></span>
-<span id="cb193-13"><a href="build-yourself-safety-net.html#cb193-13"></a><span class="co"># that contains the letters, as vertical lines + as </span></span>
-<span id="cb193-14"><a href="build-yourself-safety-net.html#cb193-14"></a><span class="co"># label</span></span>
-<span id="cb193-15"><a href="build-yourself-safety-net.html#cb193-15"></a><span class="kw">ggplot</span>(</span>
-<span id="cb193-16"><a href="build-yourself-safety-net.html#cb193-16"></a>  <span class="dt">data =</span> results, </span>
-<span id="cb193-17"><a href="build-yourself-safety-net.html#cb193-17"></a>  <span class="kw">aes</span>(<span class="dt">x =</span> record_time)</span>
-<span id="cb193-18"><a href="build-yourself-safety-net.html#cb193-18"></a>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb193-19"><a href="build-yourself-safety-net.html#cb193-19"></a><span class="st">  </span><span class="kw">geom_line</span>(</span>
-<span id="cb193-20"><a href="build-yourself-safety-net.html#cb193-20"></a>    <span class="kw">aes</span>(<span class="dt">y =</span> MemUsage)</span>
-<span id="cb193-21"><a href="build-yourself-safety-net.html#cb193-21"></a>  ) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb193-22"><a href="build-yourself-safety-net.html#cb193-22"></a><span class="st">  </span><span class="kw">geom_vline</span>(</span>
-<span id="cb193-23"><a href="build-yourself-safety-net.html#cb193-23"></a>    <span class="kw">aes</span>(<span class="dt">xintercept =</span> record_time)</span>
-<span id="cb193-24"><a href="build-yourself-safety-net.html#cb193-24"></a>  ) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb193-25"><a href="build-yourself-safety-net.html#cb193-25"></a><span class="st">  </span><span class="kw">geom_label</span>(</span>
-<span id="cb193-26"><a href="build-yourself-safety-net.html#cb193-26"></a>    <span class="kw">aes</span>(</span>
-<span id="cb193-27"><a href="build-yourself-safety-net.html#cb193-27"></a>      <span class="dt">y =</span> <span class="kw">max</span>(MemUsage), </span>
-<span id="cb193-28"><a href="build-yourself-safety-net.html#cb193-28"></a>      <span class="dt">label =</span> extra</span>
-<span id="cb193-29"><a href="build-yourself-safety-net.html#cb193-29"></a>    )</span>
-<span id="cb193-30"><a href="build-yourself-safety-net.html#cb193-30"></a>  ) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb193-31"><a href="build-yourself-safety-net.html#cb193-31"></a><span class="st">  </span><span class="kw">labs</span>(</span>
-<span id="cb193-32"><a href="build-yourself-safety-net.html#cb193-32"></a>    <span class="dt">title =</span> <span class="st">&quot;MemUsage of 10 inputs for package name&quot;</span></span>
-<span id="cb193-33"><a href="build-yourself-safety-net.html#cb193-33"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb194-1"><a href="build-yourself-safety-net.html#cb194-1"></a><span class="kw">library</span>(dplyr, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb194-2"><a href="build-yourself-safety-net.html#cb194-2"></a><span class="co"># We are converting the MemUsage and record_time columns </span></span>
+<span id="cb194-3"><a href="build-yourself-safety-net.html#cb194-3"></a><span class="co"># to a format that can be used in {ggplot2}</span></span>
+<span id="cb194-4"><a href="build-yourself-safety-net.html#cb194-4"></a>results &lt;-<span class="st"> </span>results <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb194-5"><a href="build-yourself-safety-net.html#cb194-5"></a><span class="st">  </span><span class="kw">mutate</span>(</span>
+<span id="cb194-6"><a href="build-yourself-safety-net.html#cb194-6"></a>    <span class="dt">MemUsage =</span> <span class="kw">to_mib</span>(MemUsage), </span>
+<span id="cb194-7"><a href="build-yourself-safety-net.html#cb194-7"></a>    <span class="dt">record_time =</span> <span class="kw">as.POSIXct</span>(record_time)</span>
+<span id="cb194-8"><a href="build-yourself-safety-net.html#cb194-8"></a>  )</span>
+<span id="cb194-9"><a href="build-yourself-safety-net.html#cb194-9"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb194-10"><a href="build-yourself-safety-net.html#cb194-10"></a><span class="co"># Using the record time as an x axis, </span></span>
+<span id="cb194-11"><a href="build-yourself-safety-net.html#cb194-11"></a><span class="co"># then adding the MemUsage as a line (to watch the </span></span>
+<span id="cb194-12"><a href="build-yourself-safety-net.html#cb194-12"></a><span class="co"># evolution over time), then we add the &#39;extra&#39; column, </span></span>
+<span id="cb194-13"><a href="build-yourself-safety-net.html#cb194-13"></a><span class="co"># that contains the letters, as vertical lines + as </span></span>
+<span id="cb194-14"><a href="build-yourself-safety-net.html#cb194-14"></a><span class="co"># label</span></span>
+<span id="cb194-15"><a href="build-yourself-safety-net.html#cb194-15"></a><span class="kw">ggplot</span>(</span>
+<span id="cb194-16"><a href="build-yourself-safety-net.html#cb194-16"></a>  <span class="dt">data =</span> results, </span>
+<span id="cb194-17"><a href="build-yourself-safety-net.html#cb194-17"></a>  <span class="kw">aes</span>(<span class="dt">x =</span> record_time)</span>
+<span id="cb194-18"><a href="build-yourself-safety-net.html#cb194-18"></a>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb194-19"><a href="build-yourself-safety-net.html#cb194-19"></a><span class="st">  </span><span class="kw">geom_line</span>(</span>
+<span id="cb194-20"><a href="build-yourself-safety-net.html#cb194-20"></a>    <span class="kw">aes</span>(<span class="dt">y =</span> MemUsage)</span>
+<span id="cb194-21"><a href="build-yourself-safety-net.html#cb194-21"></a>  ) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb194-22"><a href="build-yourself-safety-net.html#cb194-22"></a><span class="st">  </span><span class="kw">geom_vline</span>(</span>
+<span id="cb194-23"><a href="build-yourself-safety-net.html#cb194-23"></a>    <span class="kw">aes</span>(<span class="dt">xintercept =</span> record_time)</span>
+<span id="cb194-24"><a href="build-yourself-safety-net.html#cb194-24"></a>  ) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb194-25"><a href="build-yourself-safety-net.html#cb194-25"></a><span class="st">  </span><span class="kw">geom_label</span>(</span>
+<span id="cb194-26"><a href="build-yourself-safety-net.html#cb194-26"></a>    <span class="kw">aes</span>(</span>
+<span id="cb194-27"><a href="build-yourself-safety-net.html#cb194-27"></a>      <span class="dt">y =</span> <span class="kw">max</span>(MemUsage), </span>
+<span id="cb194-28"><a href="build-yourself-safety-net.html#cb194-28"></a>      <span class="dt">label =</span> extra</span>
+<span id="cb194-29"><a href="build-yourself-safety-net.html#cb194-29"></a>    )</span>
+<span id="cb194-30"><a href="build-yourself-safety-net.html#cb194-30"></a>  ) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb194-31"><a href="build-yourself-safety-net.html#cb194-31"></a><span class="st">  </span><span class="kw">labs</span>(</span>
+<span id="cb194-32"><a href="build-yourself-safety-net.html#cb194-32"></a>    <span class="dt">title =</span> <span class="st">&quot;MemUsage of 10 inputs for package name&quot;</span></span>
+<span id="cb194-33"><a href="build-yourself-safety-net.html#cb194-33"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:11-step-by-step-secure-43"></span>
 <img src="engineering-production-grade-shiny-apps_files/figure-html/11-step-by-step-secure-43-1.png" alt="Plot of the {dockerstats} evolution." width="672" />
 <p class="caption">
@@ -1091,34 +1091,34 @@ Most of the time, a new version means new functions and new features.
 But from time to time, a new version means breaking change<strong>s. Monitoring these changes and how they potentially break our code is a hard task: because checking versions of packages on various machines can take time</strong>, or because debugging these bugs in your application logs is not straightforward.
 And of course, the moment when we discover the error might not be the perfect time for us, as we might not have enough free time on our calendar to debug the application that has stopped running.</p>
 <p>Let’s take, for example, this traceback from the logs of an application we sent one day on a <code>Shiny Server</code>:</p>
-<div class="sourceCode" id="cb194"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb194-1"><a href="build-yourself-safety-net.html#cb194-1"></a><span class="ex">root@westeros-vm</span>:/var/log/shiny-server# cat thewall(...)<span class="ex">.log</span></span>
-<span id="cb194-2"><a href="build-yourself-safety-net.html#cb194-2"></a><span class="ex">***</span> caught segfault ***</span>
-<span id="cb194-3"><a href="build-yourself-safety-net.html#cb194-3"></a>[<span class="ex">...</span>]</span>
-<span id="cb194-4"><a href="build-yourself-safety-net.html#cb194-4"></a><span class="ex">address</span> 0x5100004d, cause <span class="st">&#39;memory not mapped&#39;</span></span>
-<span id="cb194-5"><a href="build-yourself-safety-net.html#cb194-5"></a></span>
-<span id="cb194-6"><a href="build-yourself-safety-net.html#cb194-6"></a><span class="ex">Traceback</span>:</span>
-<span id="cb194-7"><a href="build-yourself-safety-net.html#cb194-7"></a><span class="ex">1</span>: rcpp_sf_to_geojson(sf, digits, factors_as_string)</span>
-<span id="cb194-8"><a href="build-yourself-safety-net.html#cb194-8"></a><span class="ex">2</span>: sf_geojson.sf(data)</span>
-<span id="cb194-9"><a href="build-yourself-safety-net.html#cb194-9"></a><span class="ex">3</span>: geojsonsf::sf_geojson(data)</span>
-<span id="cb194-10"><a href="build-yourself-safety-net.html#cb194-10"></a><span class="ex">4</span>: addGlifyPolygons(., data = pol_V1, color = les_couleurs, </span>
-<span id="cb194-11"><a href="build-yourself-safety-net.html#cb194-11"></a><span class="ex">popup</span> = <span class="st">&quot;val&quot;</span>, opacity = 1)</span>
-<span id="cb194-12"><a href="build-yourself-safety-net.html#cb194-12"></a><span class="ex">5</span>: function_list[[i]](value)</span>
-<span id="cb194-13"><a href="build-yourself-safety-net.html#cb194-13"></a><span class="ex">6</span>: freduce(value, <span class="kw">`</span><span class="ex">_function_list</span><span class="kw">`</span>)</span>
-<span id="cb194-14"><a href="build-yourself-safety-net.html#cb194-14"></a><span class="ex">7</span>: <span class="kw">`</span><span class="ex">_fseq</span><span class="kw">`</span>(<span class="kw">`</span><span class="ex">_lhs</span><span class="kw">`</span>)</span>
-<span id="cb194-15"><a href="build-yourself-safety-net.html#cb194-15"></a><span class="ex">8</span>: eval(quote(<span class="kw">`</span><span class="ex">_fseq</span><span class="kw">`</span>(<span class="kw">`</span><span class="ex">_lhs</span><span class="kw">`</span>)), <span class="fu">env</span>, env)</span>
-<span id="cb194-16"><a href="build-yourself-safety-net.html#cb194-16"></a>[<span class="ex">...</span>]</span>
-<span id="cb194-17"><a href="build-yourself-safety-net.html#cb194-17"></a><span class="ex">105</span>: captureStackTraces({</span>
-<span id="cb194-18"><a href="build-yourself-safety-net.html#cb194-18"></a><span class="kw">while</span> <span class="kw">(</span>!<span class="ex">.globals</span><span class="va">$stopped</span><span class="kw">)</span> <span class="kw">{</span></span>
-<span id="cb194-19"><a href="build-yourself-safety-net.html#cb194-19"></a><span class="ex">..stacktracefloor..</span>(serviceApp())</span>
-<span id="cb194-20"><a href="build-yourself-safety-net.html#cb194-20"></a><span class="ex">Sys.sleep</span>(0.001)    <span class="kw">}</span>})</span>
-<span id="cb194-21"><a href="build-yourself-safety-net.html#cb194-21"></a><span class="ex">106</span>: ..stacktraceoff..(captureStackTraces({</span>
-<span id="cb194-22"><a href="build-yourself-safety-net.html#cb194-22"></a><span class="kw">while</span> <span class="kw">(</span>!<span class="ex">.globals</span><span class="va">$stopped</span><span class="kw">)</span> <span class="kw">{</span>                </span>
-<span id="cb194-23"><a href="build-yourself-safety-net.html#cb194-23"></a><span class="ex">..stacktracefloor..</span>(serviceApp())</span>
-<span id="cb194-24"><a href="build-yourself-safety-net.html#cb194-24"></a><span class="ex">Sys.sleep</span>(0.001)    <span class="kw">}</span>}))</span>
-<span id="cb194-25"><a href="build-yourself-safety-net.html#cb194-25"></a><span class="ex">107</span>: runApp(Sys.getenv(<span class="st">&quot;SHINY_APP&quot;</span>), </span>
-<span id="cb194-26"><a href="build-yourself-safety-net.html#cb194-26"></a><span class="ex">port</span> = port, </span>
-<span id="cb194-27"><a href="build-yourself-safety-net.html#cb194-27"></a><span class="ex">launch.browser</span> = FALSE)</span>
-<span id="cb194-28"><a href="build-yourself-safety-net.html#cb194-28"></a><span class="ex">An</span> irrecoverable exception occurred. R is aborting now ...</span></code></pre></div>
+<div class="sourceCode" id="cb195"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb195-1"><a href="build-yourself-safety-net.html#cb195-1"></a><span class="ex">root@westeros-vm</span>:/var/log/shiny-server# cat thewall(...)<span class="ex">.log</span></span>
+<span id="cb195-2"><a href="build-yourself-safety-net.html#cb195-2"></a><span class="ex">***</span> caught segfault ***</span>
+<span id="cb195-3"><a href="build-yourself-safety-net.html#cb195-3"></a>[<span class="ex">...</span>]</span>
+<span id="cb195-4"><a href="build-yourself-safety-net.html#cb195-4"></a><span class="ex">address</span> 0x5100004d, cause <span class="st">&#39;memory not mapped&#39;</span></span>
+<span id="cb195-5"><a href="build-yourself-safety-net.html#cb195-5"></a></span>
+<span id="cb195-6"><a href="build-yourself-safety-net.html#cb195-6"></a><span class="ex">Traceback</span>:</span>
+<span id="cb195-7"><a href="build-yourself-safety-net.html#cb195-7"></a><span class="ex">1</span>: rcpp_sf_to_geojson(sf, digits, factors_as_string)</span>
+<span id="cb195-8"><a href="build-yourself-safety-net.html#cb195-8"></a><span class="ex">2</span>: sf_geojson.sf(data)</span>
+<span id="cb195-9"><a href="build-yourself-safety-net.html#cb195-9"></a><span class="ex">3</span>: geojsonsf::sf_geojson(data)</span>
+<span id="cb195-10"><a href="build-yourself-safety-net.html#cb195-10"></a><span class="ex">4</span>: addGlifyPolygons(., data = pol_V1, color = les_couleurs, </span>
+<span id="cb195-11"><a href="build-yourself-safety-net.html#cb195-11"></a><span class="ex">popup</span> = <span class="st">&quot;val&quot;</span>, opacity = 1)</span>
+<span id="cb195-12"><a href="build-yourself-safety-net.html#cb195-12"></a><span class="ex">5</span>: function_list[[i]](value)</span>
+<span id="cb195-13"><a href="build-yourself-safety-net.html#cb195-13"></a><span class="ex">6</span>: freduce(value, <span class="kw">`</span><span class="ex">_function_list</span><span class="kw">`</span>)</span>
+<span id="cb195-14"><a href="build-yourself-safety-net.html#cb195-14"></a><span class="ex">7</span>: <span class="kw">`</span><span class="ex">_fseq</span><span class="kw">`</span>(<span class="kw">`</span><span class="ex">_lhs</span><span class="kw">`</span>)</span>
+<span id="cb195-15"><a href="build-yourself-safety-net.html#cb195-15"></a><span class="ex">8</span>: eval(quote(<span class="kw">`</span><span class="ex">_fseq</span><span class="kw">`</span>(<span class="kw">`</span><span class="ex">_lhs</span><span class="kw">`</span>)), <span class="fu">env</span>, env)</span>
+<span id="cb195-16"><a href="build-yourself-safety-net.html#cb195-16"></a>[<span class="ex">...</span>]</span>
+<span id="cb195-17"><a href="build-yourself-safety-net.html#cb195-17"></a><span class="ex">105</span>: captureStackTraces({</span>
+<span id="cb195-18"><a href="build-yourself-safety-net.html#cb195-18"></a><span class="kw">while</span> <span class="kw">(</span>!<span class="ex">.globals</span><span class="va">$stopped</span><span class="kw">)</span> <span class="kw">{</span></span>
+<span id="cb195-19"><a href="build-yourself-safety-net.html#cb195-19"></a><span class="ex">..stacktracefloor..</span>(serviceApp())</span>
+<span id="cb195-20"><a href="build-yourself-safety-net.html#cb195-20"></a><span class="ex">Sys.sleep</span>(0.001)    <span class="kw">}</span>})</span>
+<span id="cb195-21"><a href="build-yourself-safety-net.html#cb195-21"></a><span class="ex">106</span>: ..stacktraceoff..(captureStackTraces({</span>
+<span id="cb195-22"><a href="build-yourself-safety-net.html#cb195-22"></a><span class="kw">while</span> <span class="kw">(</span>!<span class="ex">.globals</span><span class="va">$stopped</span><span class="kw">)</span> <span class="kw">{</span>                </span>
+<span id="cb195-23"><a href="build-yourself-safety-net.html#cb195-23"></a><span class="ex">..stacktracefloor..</span>(serviceApp())</span>
+<span id="cb195-24"><a href="build-yourself-safety-net.html#cb195-24"></a><span class="ex">Sys.sleep</span>(0.001)    <span class="kw">}</span>}))</span>
+<span id="cb195-25"><a href="build-yourself-safety-net.html#cb195-25"></a><span class="ex">107</span>: runApp(Sys.getenv(<span class="st">&quot;SHINY_APP&quot;</span>), </span>
+<span id="cb195-26"><a href="build-yourself-safety-net.html#cb195-26"></a><span class="ex">port</span> = port, </span>
+<span id="cb195-27"><a href="build-yourself-safety-net.html#cb195-27"></a><span class="ex">launch.browser</span> = FALSE)</span>
+<span id="cb195-28"><a href="build-yourself-safety-net.html#cb195-28"></a><span class="ex">An</span> irrecoverable exception occurred. R is aborting now ...</span></code></pre></div>
 <p>Pretty hard to debug, isn’t it?
 What has actually happened?
 On that specific case, it turned out that the package version from <code>{geojsonsf}</code> <span class="citation">(Cooley <a href="#ref-R-geojsonsf" role="doc-biblioref">2020</a>)</span> was <code>1.2.1</code> on our development machine, and the one on the <code>{shiny}</code> server was updated to <code>1.3.0</code>, and there was a breaking change in the package, as shown in Figure <a href="build-yourself-safety-net.html#fig:11-step-by-step-secure-44">11.7</a>.
@@ -1143,9 +1143,9 @@ That means that you can have <code>{geojsonsf}</code> version <code>1.2.1</code>
 <p><em>Introduction to renv</em> (<a href="https://rstudio.github.io/renv/articles/renv.html" class="uri">https://rstudio.github.io/renv/articles/renv.html</a>)</p>
 </blockquote>
 <p>The first thing to do with <code>{renv}</code> is initiate it with the <code>init()</code> function.</p>
-<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="build-yourself-safety-net.html#cb195-1"></a><span class="co"># Loading and initiaing {renv}</span></span>
-<span id="cb195-2"><a href="build-yourself-safety-net.html#cb195-2"></a><span class="kw">library</span>(renv)</span>
-<span id="cb195-3"><a href="build-yourself-safety-net.html#cb195-3"></a><span class="kw">init</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="build-yourself-safety-net.html#cb196-1"></a><span class="co"># Loading and initiaing {renv}</span></span>
+<span id="cb196-2"><a href="build-yourself-safety-net.html#cb196-2"></a><span class="kw">library</span>(renv)</span>
+<span id="cb196-3"><a href="build-yourself-safety-net.html#cb196-3"></a><span class="kw">init</span>()</span></code></pre></div>
 <p>This function does several things:</p>
 <ul>
 <li>Create/modify the <code>.Rprofile</code> file at the root of your project. Here is an example of what this file may look like inside an empty project:</li>
@@ -1159,8 +1159,8 @@ That means that you can have <code>{geojsonsf}</code> version <code>1.2.1</code>
 If you run this command in a project that already has scripts and dependencies, <code>{renv}</code> will try to locate them all, and add them to this file.
 Note that these packages may come from CRAN, Bioconductor, GitHub, GitLab, Bitbucket, and even local repositories.</p>
 <p>The <code>renv/</code> folder contains a series of files that store your settings and the necessary packages, using a structure that mimics a local repository.</p>
-<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="build-yourself-safety-net.html#cb197-1"></a><span class="co"># Displaying the structure of the folder</span></span>
-<span id="cb197-2"><a href="build-yourself-safety-net.html#cb197-2"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;data-raw/renvinit/&quot;</span>, <span class="dt">recurse =</span> <span class="dv">5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="build-yourself-safety-net.html#cb198-1"></a><span class="co"># Displaying the structure of the folder</span></span>
+<span id="cb198-2"><a href="build-yourself-safety-net.html#cb198-2"></a>fs<span class="op">::</span><span class="kw">dir_tree</span>(<span class="st">&quot;data-raw/renvinit/&quot;</span>, <span class="dt">recurse =</span> <span class="dv">5</span>)</span></code></pre></div>
 <pre><code>data-raw/renvinit/
 ├── renv
 │   ├── activate.R
@@ -1173,14 +1173,14 @@ Note that these packages may come from CRAN, Bioconductor, GitHub, GitLab, Bitbu
 The fastest way to install new packages in your <code>{renv}</code>-powered project is by using the <code>install.packages</code> function, which is shimmed by <code>{renv}</code>.
 This shim will search the local cache to see if the package has already been cached, and if it is not, it will install and link it.</p>
 <p>Now, we need to install a new package, for example <code>{attempt}</code> <span class="citation">(Fay <a href="#ref-R-attempt" role="doc-biblioref">2020</a><a href="#ref-R-attempt" role="doc-biblioref">a</a>)</span>:</p>
-<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="build-yourself-safety-net.html#cb199-1"></a><span class="co"># Installing attempt</span></span>
-<span id="cb199-2"><a href="build-yourself-safety-net.html#cb199-2"></a><span class="kw">install.packages</span>(<span class="st">&quot;attempt&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="build-yourself-safety-net.html#cb200-1"></a><span class="co"># Installing attempt</span></span>
+<span id="cb200-2"><a href="build-yourself-safety-net.html#cb200-2"></a><span class="kw">install.packages</span>(<span class="st">&quot;attempt&quot;</span>)</span></code></pre></div>
 <p>We will now add a little call to this library:</p>
-<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="build-yourself-safety-net.html#cb200-1"></a><span class="co"># Create a fake script that launches {attempt}</span></span>
-<span id="cb200-2"><a href="build-yourself-safety-net.html#cb200-2"></a><span class="kw">write</span>(<span class="st">&quot;library(attempt)&quot;</span>, <span class="st">&quot;script.R&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="build-yourself-safety-net.html#cb201-1"></a><span class="co"># Create a fake script that launches {attempt}</span></span>
+<span id="cb201-2"><a href="build-yourself-safety-net.html#cb201-2"></a><span class="kw">write</span>(<span class="st">&quot;library(attempt)&quot;</span>, <span class="st">&quot;script.R&quot;</span>)</span></code></pre></div>
 <p>Once you want to update your <code>{renv}</code> <code>Lockfile</code>, call <code>snapshot()</code>.</p>
-<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="build-yourself-safety-net.html#cb201-1"></a><span class="co"># Snapshoting the current status of the environment</span></span>
-<span id="cb201-2"><a href="build-yourself-safety-net.html#cb201-2"></a>renv<span class="op">::</span><span class="kw">snapshot</span>(<span class="dt">confirm =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="build-yourself-safety-net.html#cb202-1"></a><span class="co"># Snapshoting the current status of the environment</span></span>
+<span id="cb202-2"><a href="build-yourself-safety-net.html#cb202-2"></a>renv<span class="op">::</span><span class="kw">snapshot</span>(<span class="dt">confirm =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <p>Note that if you are building an application as a package, use <code>renv::snapshot(type = "explicit")</code> (need version &gt; <code>0.9.3-99</code>): this will only capture the dependencies listed in the <code>DESCRIPTION</code> file.
 If you don’t specify this <code>type = "explicit"</code>, <code>{renv}</code> will go and look for all the packages it can find in your file, and notably in your <code>.Rhistory</code>, meaning that if you one day used a function from <code>{dplyr}</code> but your current package doesn’t use it anymore, <code>{renv}</code> will include it.</p>
 <pre><code>{
@@ -1259,7 +1259,7 @@ Same goes for your version of R.</p>
 If you are building your app with <code>{golem}</code>, the creation of the <code>Dockerfile</code> is just one function away!
 If you have a look at the <code>03_deploy.R</code> file in the <code>dev</code> folder, you will find a series of functions that can create the <code>Dockerfile</code> for your project: either as a generic Docker image, or for <code>{shiny}</code>Proxy or Heroku.</p>
 <p>For example, to create a <code>Dockerfile</code> for a <code>{golem}</code> project, you can run the following, from the root of your package:</p>
-<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb203-1"><a href="build-yourself-safety-net.html#cb203-1"></a>golem<span class="op">::</span><span class="kw">add_dockerfile</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb204-1"><a href="build-yourself-safety-net.html#cb204-1"></a>golem<span class="op">::</span><span class="kw">add_dockerfile</span>()</span></code></pre></div>
 <p>Let’s take some time to understand this file, and detail how we could be building it from scratch.</p>
 <ol style="list-style-type: decimal">
 <li><code>FROM</code></li>
@@ -1268,7 +1268,7 @@ If you have a look at the <code>03_deploy.R</code> file in the <code>dev</code> 
 <p>This line defines what version of R to use for deploying your application.
 This <code>FROM</code> line is the one that sets an image to start from: you rarely (if ever) build a Docker image from nothing, but instead you use an existing image on top of which you build your own image.
 Here, we choose one of the <a href="https://hub.docker.com/r/rocker/r-ver/">r-ver</a> Docker images, based on the output of:</p>
-<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="build-yourself-safety-net.html#cb205-1"></a><span class="kw">R.Version</span>()<span class="op">$</span>version.string</span></code></pre></div>
+<div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="build-yourself-safety-net.html#cb206-1"></a><span class="kw">R.Version</span>()<span class="op">$</span>version.string</span></code></pre></div>
 <pre><code>[1] &quot;R version 3.6.1 (2019-07-05)&quot;</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li><code>RUN</code></li>
@@ -1284,7 +1284,7 @@ For example, the second line of the <code>Dockerfile</code> installs all the sys
 <pre><code>RUN Rscript -e \
 &#39;remotes::install_version(&quot;xfun&quot;,upgrade=&quot;never&quot;,version=&quot;0.19&quot;)&#39;</code></pre>
 <p>As you can see, it matches the local version:</p>
-<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="build-yourself-safety-net.html#cb209-1"></a><span class="kw">packageVersion</span>(<span class="st">&quot;xfun&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb210-1"><a href="build-yourself-safety-net.html#cb210-1"></a><span class="kw">packageVersion</span>(<span class="st">&quot;xfun&quot;</span>)</span></code></pre></div>
 <pre><code>[1] ‘0.19’</code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li><code>ADD</code></li>
@@ -1309,21 +1309,21 @@ With a <code>{shiny}</code> app, this command is the one that launches the appli
 <h4>C. <code>{dockerfiler}</code></h4>
 <p>If you want to do everything from the R command line, the <code>{dockerfiler}</code> <span class="citation">(Fay <a href="#ref-R-dockerfiler" role="doc-biblioref">2019</a>)</span> package is here for you!
 This package allows you to generate a <code>Dockerfile</code> straight from R:</p>
-<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="build-yourself-safety-net.html#cb214-1"></a><span class="kw">library</span>(dockerfiler)</span></code></pre></div>
+<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb215-1"><a href="build-yourself-safety-net.html#cb215-1"></a><span class="kw">library</span>(dockerfiler)</span></code></pre></div>
 <pre><code>Warning: package &#39;dockerfiler&#39; was built under R
 version 3.6.3</code></pre>
-<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="build-yourself-safety-net.html#cb216-1"></a><span class="co"># Creating a new Dockerfile object</span></span>
-<span id="cb216-2"><a href="build-yourself-safety-net.html#cb216-2"></a>my_dock &lt;-<span class="st"> </span>Dockerfile<span class="op">$</span><span class="kw">new</span>()</span>
-<span id="cb216-3"><a href="build-yourself-safety-net.html#cb216-3"></a><span class="co"># Adding RUN, ADD, WORKDIR and EXPOSE commands</span></span>
-<span id="cb216-4"><a href="build-yourself-safety-net.html#cb216-4"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="st">&quot;apt-get update &amp;&amp; apt-get install -y git-core&quot;</span>)</span>
-<span id="cb216-5"><a href="build-yourself-safety-net.html#cb216-5"></a>my_dock<span class="op">$</span><span class="kw">ADD</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;/&quot;</span>)</span>
-<span id="cb216-6"><a href="build-yourself-safety-net.html#cb216-6"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="st">&quot;mkdir /build_zone&quot;</span>)</span>
-<span id="cb216-7"><a href="build-yourself-safety-net.html#cb216-7"></a>my_dock<span class="op">$</span><span class="kw">ADD</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;/build_zone&quot;</span>)</span>
-<span id="cb216-8"><a href="build-yourself-safety-net.html#cb216-8"></a>my_dock<span class="op">$</span><span class="kw">WORKDIR</span>(<span class="st">&quot;/build_zone&quot;</span>)</span>
-<span id="cb216-9"><a href="build-yourself-safety-net.html#cb216-9"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="kw">r</span>(remotes<span class="op">::</span><span class="kw">install_local</span>(<span class="dt">upgrade=</span><span class="st">&quot;never&quot;</span>)))</span>
-<span id="cb216-10"><a href="build-yourself-safety-net.html#cb216-10"></a>my_dock<span class="op">$</span><span class="kw">EXPOSE</span>(<span class="dv">80</span>)</span>
-<span id="cb216-11"><a href="build-yourself-safety-net.html#cb216-11"></a><span class="co"># Viewing the Dockerfile</span></span>
-<span id="cb216-12"><a href="build-yourself-safety-net.html#cb216-12"></a>my_dock</span></code></pre></div>
+<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="build-yourself-safety-net.html#cb217-1"></a><span class="co"># Creating a new Dockerfile object</span></span>
+<span id="cb217-2"><a href="build-yourself-safety-net.html#cb217-2"></a>my_dock &lt;-<span class="st"> </span>Dockerfile<span class="op">$</span><span class="kw">new</span>()</span>
+<span id="cb217-3"><a href="build-yourself-safety-net.html#cb217-3"></a><span class="co"># Adding RUN, ADD, WORKDIR and EXPOSE commands</span></span>
+<span id="cb217-4"><a href="build-yourself-safety-net.html#cb217-4"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="st">&quot;apt-get update &amp;&amp; apt-get install -y git-core&quot;</span>)</span>
+<span id="cb217-5"><a href="build-yourself-safety-net.html#cb217-5"></a>my_dock<span class="op">$</span><span class="kw">ADD</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;/&quot;</span>)</span>
+<span id="cb217-6"><a href="build-yourself-safety-net.html#cb217-6"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="st">&quot;mkdir /build_zone&quot;</span>)</span>
+<span id="cb217-7"><a href="build-yourself-safety-net.html#cb217-7"></a>my_dock<span class="op">$</span><span class="kw">ADD</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;/build_zone&quot;</span>)</span>
+<span id="cb217-8"><a href="build-yourself-safety-net.html#cb217-8"></a>my_dock<span class="op">$</span><span class="kw">WORKDIR</span>(<span class="st">&quot;/build_zone&quot;</span>)</span>
+<span id="cb217-9"><a href="build-yourself-safety-net.html#cb217-9"></a>my_dock<span class="op">$</span><span class="kw">RUN</span>(<span class="kw">r</span>(remotes<span class="op">::</span><span class="kw">install_local</span>(<span class="dt">upgrade=</span><span class="st">&quot;never&quot;</span>)))</span>
+<span id="cb217-10"><a href="build-yourself-safety-net.html#cb217-10"></a>my_dock<span class="op">$</span><span class="kw">EXPOSE</span>(<span class="dv">80</span>)</span>
+<span id="cb217-11"><a href="build-yourself-safety-net.html#cb217-11"></a><span class="co"># Viewing the Dockerfile</span></span>
+<span id="cb217-12"><a href="build-yourself-safety-net.html#cb217-12"></a>my_dock</span></code></pre></div>
 <pre><code>FROM rocker/r-base
 RUN apt-get update &amp;&amp; apt-get install -y git-core
 ADD . /
