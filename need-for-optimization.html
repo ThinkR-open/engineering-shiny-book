@@ -560,28 +560,28 @@ Refactoring a piece of code is better done when you keep in mind that “the pri
 Also, are the extra hours/days spent rewriting a working code-base worth the speed gain of 0.5 seconds on one function?</p>
 <p>For example, let’s compare both these implementations of the same function, one in R, and one in C++ via <code>{Rcpp}</code> <span class="citation">(Eddelbuettel et al. <a href="#ref-R-Rcpp" role="doc-biblioref">2020</a>)</span>.
 Of course, the C++ function is faster than the R one—this is the very reason for using C++ with R.</p>
-<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="need-for-optimization.html#cb220-1"></a><span class="kw">library</span>(<span class="st">&quot;Rcpp&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb219-1"><a href="need-for-optimization.html#cb219-1"></a><span class="kw">library</span>(<span class="st">&quot;Rcpp&quot;</span>)</span></code></pre></div>
 <pre><code>Warning: package &#39;Rcpp&#39; was built under R version 3.6.3</code></pre>
-<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb222-1"><a href="need-for-optimization.html#cb222-1"></a><span class="co"># A C++ function to compute the mean</span></span>
-<span id="cb222-2"><a href="need-for-optimization.html#cb222-2"></a><span class="kw">cppFunction</span>(<span class="st">&quot;</span></span>
-<span id="cb222-3"><a href="need-for-optimization.html#cb222-3"></a><span class="st">double mean_cpp(NumericVector x) {</span></span>
-<span id="cb222-4"><a href="need-for-optimization.html#cb222-4"></a><span class="st">  int j;</span></span>
-<span id="cb222-5"><a href="need-for-optimization.html#cb222-5"></a><span class="st">  int size = x.size();</span></span>
-<span id="cb222-6"><a href="need-for-optimization.html#cb222-6"></a><span class="st">  double res = 0;</span></span>
-<span id="cb222-7"><a href="need-for-optimization.html#cb222-7"></a><span class="st">  for (j = 0; j &lt; size; j++){</span></span>
-<span id="cb222-8"><a href="need-for-optimization.html#cb222-8"></a><span class="st">    res = res + x[j];</span></span>
-<span id="cb222-9"><a href="need-for-optimization.html#cb222-9"></a><span class="st">  }</span></span>
-<span id="cb222-10"><a href="need-for-optimization.html#cb222-10"></a><span class="st">  return res / size;</span></span>
-<span id="cb222-11"><a href="need-for-optimization.html#cb222-11"></a><span class="st">}&quot;</span>)</span>
-<span id="cb222-12"><a href="need-for-optimization.html#cb222-12"></a></span>
-<span id="cb222-13"><a href="need-for-optimization.html#cb222-13"></a><span class="co"># Computing the mean using base R and C++, </span></span>
-<span id="cb222-14"><a href="need-for-optimization.html#cb222-14"></a><span class="co"># and comparing the time spent on each</span></span>
-<span id="cb222-15"><a href="need-for-optimization.html#cb222-15"></a>benched &lt;-<span class="st"> </span>bench<span class="op">::</span><span class="kw">mark</span>(</span>
-<span id="cb222-16"><a href="need-for-optimization.html#cb222-16"></a>  <span class="dt">cpp =</span> <span class="kw">mean_cpp</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100000</span>),</span>
-<span id="cb222-17"><a href="need-for-optimization.html#cb222-17"></a>  <span class="dt">native =</span> <span class="kw">mean</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100000</span>), </span>
-<span id="cb222-18"><a href="need-for-optimization.html#cb222-18"></a>  <span class="dt">iterations =</span> <span class="dv">1000</span></span>
-<span id="cb222-19"><a href="need-for-optimization.html#cb222-19"></a>)</span>
-<span id="cb222-20"><a href="need-for-optimization.html#cb222-20"></a>benched</span></code></pre></div>
+<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="need-for-optimization.html#cb221-1"></a><span class="co"># A C++ function to compute the mean</span></span>
+<span id="cb221-2"><a href="need-for-optimization.html#cb221-2"></a><span class="kw">cppFunction</span>(<span class="st">&quot;</span></span>
+<span id="cb221-3"><a href="need-for-optimization.html#cb221-3"></a><span class="st">double mean_cpp(NumericVector x) {</span></span>
+<span id="cb221-4"><a href="need-for-optimization.html#cb221-4"></a><span class="st">  int j;</span></span>
+<span id="cb221-5"><a href="need-for-optimization.html#cb221-5"></a><span class="st">  int size = x.size();</span></span>
+<span id="cb221-6"><a href="need-for-optimization.html#cb221-6"></a><span class="st">  double res = 0;</span></span>
+<span id="cb221-7"><a href="need-for-optimization.html#cb221-7"></a><span class="st">  for (j = 0; j &lt; size; j++){</span></span>
+<span id="cb221-8"><a href="need-for-optimization.html#cb221-8"></a><span class="st">    res = res + x[j];</span></span>
+<span id="cb221-9"><a href="need-for-optimization.html#cb221-9"></a><span class="st">  }</span></span>
+<span id="cb221-10"><a href="need-for-optimization.html#cb221-10"></a><span class="st">  return res / size;</span></span>
+<span id="cb221-11"><a href="need-for-optimization.html#cb221-11"></a><span class="st">}&quot;</span>)</span>
+<span id="cb221-12"><a href="need-for-optimization.html#cb221-12"></a></span>
+<span id="cb221-13"><a href="need-for-optimization.html#cb221-13"></a><span class="co"># Computing the mean using base R and C++, </span></span>
+<span id="cb221-14"><a href="need-for-optimization.html#cb221-14"></a><span class="co"># and comparing the time spent on each</span></span>
+<span id="cb221-15"><a href="need-for-optimization.html#cb221-15"></a>benched &lt;-<span class="st"> </span>bench<span class="op">::</span><span class="kw">mark</span>(</span>
+<span id="cb221-16"><a href="need-for-optimization.html#cb221-16"></a>  <span class="dt">cpp =</span> <span class="kw">mean_cpp</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100000</span>),</span>
+<span id="cb221-17"><a href="need-for-optimization.html#cb221-17"></a>  <span class="dt">native =</span> <span class="kw">mean</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100000</span>), </span>
+<span id="cb221-18"><a href="need-for-optimization.html#cb221-18"></a>  <span class="dt">iterations =</span> <span class="dv">1000</span></span>
+<span id="cb221-19"><a href="need-for-optimization.html#cb221-19"></a>)</span>
+<span id="cb221-20"><a href="need-for-optimization.html#cb221-20"></a>benched</span></code></pre></div>
 <pre><code>Warning: `...` is not empty.
 
 We detected these problematic arguments:
@@ -592,11 +592,11 @@ Did you misspecify an argument?</code></pre>
 <pre><code># A tibble: 2 x 6
   expression    min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:&gt; &lt;bch:&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 cpp         180µs  225µs     2980.     784KB     12.0
-2 native      489µs  568µs     1716.        0B      0  </code></pre>
+1 cpp         198µs  271µs     2798.     784KB     11.2
+2 native      392µs  565µs     1829.        0B      0  </code></pre>
 <p>(Note: we will come back to <code>bench::mark()</code> later.)</p>
 <p>However, how much is a time gain worth if you are not sure you can get someone on your team to take over the maintenance if needed?
-In other words, given that (in our example) we are gaining around -3.43210^{-4} on the execution time of our function, is it worth switching to C++?
+In other words, given that (in our example) we are gaining around -2.940510^{-4} on the execution time of our function, is it worth switching to C++?
 Using external languages or complex data structures implies that from the start, you will need to think about who and how your codebase will be maintained over the years.</p>
 <p>Chances are that if you plan on using a <code>{shiny}</code> application during a span of several years, various R developers will be working on the project, and including C++ code inside your application means that these future developers will either be required to know C++, or they will not be able to maintain this piece of code.</p>
 <p>So, to sum up, there are three ways to optimize your application and R code, and the bad news is that you cannot optimize for all of them:</p>
@@ -625,40 +625,40 @@ Without an automated tool to do the profiling, the developers would have to prof
 <p>Instead of guessing, it is a safe bet to go for a tool like <code>{profvis}</code>, which allows you to have a detailed view of what takes a long time to run in your R code.</p>
 <p>Using this package is quite straightforward: put the code you want to benchmark inside the <code>profvis()</code> function,<a href="#fn54" class="footnote-ref" id="fnref54"><sup>54</sup></a> wait for the code to run, and that is it; you now have an analysis of your code running time.</p>
 <p>Here is an example with 3 nested functions, <code>top()</code>, <code>middle()</code> and <code>bottom()</code>, where <code>top()</code> calls <code>middle()</code> which calls <code>bottom()</code>:</p>
-<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="need-for-optimization.html#cb225-1"></a><span class="kw">library</span>(profvis)</span>
-<span id="cb225-2"><a href="need-for-optimization.html#cb225-2"></a>top &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb225-3"><a href="need-for-optimization.html#cb225-3"></a>  <span class="co"># We use profvis::pause() because Sys.sleep() doesn&#39;t </span></span>
-<span id="cb225-4"><a href="need-for-optimization.html#cb225-4"></a>  <span class="co"># show in the flame graph</span></span>
-<span id="cb225-5"><a href="need-for-optimization.html#cb225-5"></a>  <span class="kw">pause</span>(<span class="fl">0.1</span>)</span>
-<span id="cb225-6"><a href="need-for-optimization.html#cb225-6"></a>  <span class="co"># Running a series of function with lapply()</span></span>
-<span id="cb225-7"><a href="need-for-optimization.html#cb225-7"></a>  <span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="cf">function</span>(x){</span>
-<span id="cb225-8"><a href="need-for-optimization.html#cb225-8"></a>    x <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
-<span id="cb225-9"><a href="need-for-optimization.html#cb225-9"></a>  })</span>
-<span id="cb225-10"><a href="need-for-optimization.html#cb225-10"></a>  <span class="co"># Calling a lower level function</span></span>
-<span id="cb225-11"><a href="need-for-optimization.html#cb225-11"></a>  <span class="kw">middle</span>()</span>
-<span id="cb225-12"><a href="need-for-optimization.html#cb225-12"></a>}</span>
-<span id="cb225-13"><a href="need-for-optimization.html#cb225-13"></a></span>
-<span id="cb225-14"><a href="need-for-optimization.html#cb225-14"></a>middle &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb225-15"><a href="need-for-optimization.html#cb225-15"></a>  <span class="co"># Pausing before computing, and calling other functions</span></span>
-<span id="cb225-16"><a href="need-for-optimization.html#cb225-16"></a>  <span class="kw">pause</span>(<span class="fl">0.2</span>)</span>
-<span id="cb225-17"><a href="need-for-optimization.html#cb225-17"></a>  <span class="fl">1e4</span> <span class="op">*</span><span class="st"> </span><span class="dv">9</span></span>
-<span id="cb225-18"><a href="need-for-optimization.html#cb225-18"></a>  <span class="kw">bottom_a</span>()</span>
-<span id="cb225-19"><a href="need-for-optimization.html#cb225-19"></a>  <span class="kw">bottom_b</span>()</span>
-<span id="cb225-20"><a href="need-for-optimization.html#cb225-20"></a>}</span>
-<span id="cb225-21"><a href="need-for-optimization.html#cb225-21"></a></span>
-<span id="cb225-22"><a href="need-for-optimization.html#cb225-22"></a><span class="co"># Both will pause and print, _a for 0.5 seconds, </span></span>
-<span id="cb225-23"><a href="need-for-optimization.html#cb225-23"></a><span class="co"># _b for 2 seconds</span></span>
-<span id="cb225-24"><a href="need-for-optimization.html#cb225-24"></a>bottom_a &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb225-25"><a href="need-for-optimization.html#cb225-25"></a>  <span class="kw">pause</span>(<span class="fl">0.5</span>)</span>
-<span id="cb225-26"><a href="need-for-optimization.html#cb225-26"></a>  <span class="kw">print</span>(<span class="st">&quot;hey&quot;</span>)</span>
-<span id="cb225-27"><a href="need-for-optimization.html#cb225-27"></a>}</span>
-<span id="cb225-28"><a href="need-for-optimization.html#cb225-28"></a>bottom_b &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
-<span id="cb225-29"><a href="need-for-optimization.html#cb225-29"></a>  <span class="kw">pause</span>(<span class="dv">2</span>)</span>
-<span id="cb225-30"><a href="need-for-optimization.html#cb225-30"></a>  <span class="kw">print</span>(<span class="st">&quot;hey&quot;</span>)</span>
-<span id="cb225-31"><a href="need-for-optimization.html#cb225-31"></a>}</span>
-<span id="cb225-32"><a href="need-for-optimization.html#cb225-32"></a><span class="kw">profvis</span>({</span>
-<span id="cb225-33"><a href="need-for-optimization.html#cb225-33"></a>  <span class="kw">top</span>()</span>
-<span id="cb225-34"><a href="need-for-optimization.html#cb225-34"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb224-1"><a href="need-for-optimization.html#cb224-1"></a><span class="kw">library</span>(profvis)</span>
+<span id="cb224-2"><a href="need-for-optimization.html#cb224-2"></a>top &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb224-3"><a href="need-for-optimization.html#cb224-3"></a>  <span class="co"># We use profvis::pause() because Sys.sleep() doesn&#39;t </span></span>
+<span id="cb224-4"><a href="need-for-optimization.html#cb224-4"></a>  <span class="co"># show in the flame graph</span></span>
+<span id="cb224-5"><a href="need-for-optimization.html#cb224-5"></a>  <span class="kw">pause</span>(<span class="fl">0.1</span>)</span>
+<span id="cb224-6"><a href="need-for-optimization.html#cb224-6"></a>  <span class="co"># Running a series of function with lapply()</span></span>
+<span id="cb224-7"><a href="need-for-optimization.html#cb224-7"></a>  <span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="cf">function</span>(x){</span>
+<span id="cb224-8"><a href="need-for-optimization.html#cb224-8"></a>    x <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
+<span id="cb224-9"><a href="need-for-optimization.html#cb224-9"></a>  })</span>
+<span id="cb224-10"><a href="need-for-optimization.html#cb224-10"></a>  <span class="co"># Calling a lower level function</span></span>
+<span id="cb224-11"><a href="need-for-optimization.html#cb224-11"></a>  <span class="kw">middle</span>()</span>
+<span id="cb224-12"><a href="need-for-optimization.html#cb224-12"></a>}</span>
+<span id="cb224-13"><a href="need-for-optimization.html#cb224-13"></a></span>
+<span id="cb224-14"><a href="need-for-optimization.html#cb224-14"></a>middle &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb224-15"><a href="need-for-optimization.html#cb224-15"></a>  <span class="co"># Pausing before computing, and calling other functions</span></span>
+<span id="cb224-16"><a href="need-for-optimization.html#cb224-16"></a>  <span class="kw">pause</span>(<span class="fl">0.2</span>)</span>
+<span id="cb224-17"><a href="need-for-optimization.html#cb224-17"></a>  <span class="fl">1e4</span> <span class="op">*</span><span class="st"> </span><span class="dv">9</span></span>
+<span id="cb224-18"><a href="need-for-optimization.html#cb224-18"></a>  <span class="kw">bottom_a</span>()</span>
+<span id="cb224-19"><a href="need-for-optimization.html#cb224-19"></a>  <span class="kw">bottom_b</span>()</span>
+<span id="cb224-20"><a href="need-for-optimization.html#cb224-20"></a>}</span>
+<span id="cb224-21"><a href="need-for-optimization.html#cb224-21"></a></span>
+<span id="cb224-22"><a href="need-for-optimization.html#cb224-22"></a><span class="co"># Both will pause and print, _a for 0.5 seconds, </span></span>
+<span id="cb224-23"><a href="need-for-optimization.html#cb224-23"></a><span class="co"># _b for 2 seconds</span></span>
+<span id="cb224-24"><a href="need-for-optimization.html#cb224-24"></a>bottom_a &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb224-25"><a href="need-for-optimization.html#cb224-25"></a>  <span class="kw">pause</span>(<span class="fl">0.5</span>)</span>
+<span id="cb224-26"><a href="need-for-optimization.html#cb224-26"></a>  <span class="kw">print</span>(<span class="st">&quot;hey&quot;</span>)</span>
+<span id="cb224-27"><a href="need-for-optimization.html#cb224-27"></a>}</span>
+<span id="cb224-28"><a href="need-for-optimization.html#cb224-28"></a>bottom_b &lt;-<span class="st"> </span><span class="cf">function</span>(){</span>
+<span id="cb224-29"><a href="need-for-optimization.html#cb224-29"></a>  <span class="kw">pause</span>(<span class="dv">2</span>)</span>
+<span id="cb224-30"><a href="need-for-optimization.html#cb224-30"></a>  <span class="kw">print</span>(<span class="st">&quot;hey&quot;</span>)</span>
+<span id="cb224-31"><a href="need-for-optimization.html#cb224-31"></a>}</span>
+<span id="cb224-32"><a href="need-for-optimization.html#cb224-32"></a><span class="kw">profvis</span>({</span>
+<span id="cb224-33"><a href="need-for-optimization.html#cb224-33"></a>  <span class="kw">top</span>()</span>
+<span id="cb224-34"><a href="need-for-optimization.html#cb224-34"></a>})</span></code></pre></div>
 <p>What you see now is called a <code>flame graph</code>: it is a detailed timing of how your function has run, with a clear decomposition of the call stack.
 What you see in the top window is the expression evaluated, and on the bottom the details of the call stack, with what looks a little bit like a Gantt diagram.
 This result reads as follow: the wider the function call, the more time it has taken R to compute this piece of code.
@@ -687,15 +687,15 @@ FIGURE 14.3: <code>{profvis}</code> data tab.
 </p>
 </div>
 <p>If you are working on profiling the memory usage, you can also use the <code>{profmem}</code> <span class="citation">(Bengtsson <a href="#ref-R-profmem" role="doc-biblioref">2018</a>)</span> package which, instead of focusing on execution time, will record the memory usage of calls.</p>
-<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="need-for-optimization.html#cb226-1"></a><span class="kw">library</span>(profmem)</span></code></pre></div>
+<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="need-for-optimization.html#cb225-1"></a><span class="kw">library</span>(profmem)</span></code></pre></div>
 <pre><code>Warning: package &#39;profmem&#39; was built under R version
 3.6.3</code></pre>
-<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="need-for-optimization.html#cb228-1"></a><span class="co"># Computing the memory used by each c</span></span>
-<span id="cb228-2"><a href="need-for-optimization.html#cb228-2"></a>p &lt;-<span class="st"> </span><span class="kw">profmem</span>({</span>
-<span id="cb228-3"><a href="need-for-optimization.html#cb228-3"></a>  x &lt;-<span class="st"> </span><span class="kw">raw</span>(<span class="dv">1000</span>)</span>
-<span id="cb228-4"><a href="need-for-optimization.html#cb228-4"></a>  A &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>), <span class="dt">ncol =</span> <span class="dv">10</span>)</span>
-<span id="cb228-5"><a href="need-for-optimization.html#cb228-5"></a>})</span>
-<span id="cb228-6"><a href="need-for-optimization.html#cb228-6"></a>p</span></code></pre></div>
+<div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb227-1"><a href="need-for-optimization.html#cb227-1"></a><span class="co"># Computing the memory used by each c</span></span>
+<span id="cb227-2"><a href="need-for-optimization.html#cb227-2"></a>p &lt;-<span class="st"> </span><span class="kw">profmem</span>({</span>
+<span id="cb227-3"><a href="need-for-optimization.html#cb227-3"></a>  x &lt;-<span class="st"> </span><span class="kw">raw</span>(<span class="dv">1000</span>)</span>
+<span id="cb227-4"><a href="need-for-optimization.html#cb227-4"></a>  A &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>), <span class="dt">ncol =</span> <span class="dv">10</span>)</span>
+<span id="cb227-5"><a href="need-for-optimization.html#cb227-5"></a>})</span>
+<span id="cb227-6"><a href="need-for-optimization.html#cb227-6"></a>p</span></code></pre></div>
 <pre><code>Rprofmem memory profiling of:
 {
     x &lt;- raw(1000)
@@ -726,11 +726,11 @@ Memory allocations:
 20    alloc   256          &lt;internal&gt;
 total       16176                    </code></pre>
 <p>You can also get the total allocated memory with:</p>
-<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="need-for-optimization.html#cb230-1"></a><span class="kw">total</span>(p)</span></code></pre></div>
+<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="need-for-optimization.html#cb229-1"></a><span class="kw">total</span>(p)</span></code></pre></div>
 <pre><code>[1] 16176</code></pre>
 <p>And extract specific values based on the memory allocation:</p>
-<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb232-1"><a href="need-for-optimization.html#cb232-1"></a>p2 &lt;-<span class="st"> </span><span class="kw">subset</span>(p, bytes <span class="op">&gt;</span><span class="st"> </span><span class="dv">1000</span>)</span>
-<span id="cb232-2"><a href="need-for-optimization.html#cb232-2"></a><span class="kw">print</span>(p2)</span></code></pre></div>
+<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="need-for-optimization.html#cb231-1"></a>p2 &lt;-<span class="st"> </span><span class="kw">subset</span>(p, bytes <span class="op">&gt;</span><span class="st"> </span><span class="dv">1000</span>)</span>
+<span id="cb231-2"><a href="need-for-optimization.html#cb231-2"></a><span class="kw">print</span>(p2)</span></code></pre></div>
 <pre><code>Rprofmem memory profiling of:
 {
     x &lt;- raw(1000)
@@ -768,25 +768,25 @@ This will also be helpful for the future: either for you in other projects (you 
 This function takes a series of named elements, each containing an R expression that will be timed.
 Note that by default, the <code>mark()</code> function compares the output of each function,</p>
 <p>Once the timing is done, you will get a data.frame with various metrics about the benchmark.</p>
-<div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb234-1"><a href="need-for-optimization.html#cb234-1"></a><span class="co"># Multiplying each element of a vector going from 1 to size</span></span>
-<span id="cb234-2"><a href="need-for-optimization.html#cb234-2"></a><span class="co"># with a for loop </span></span>
-<span id="cb234-3"><a href="need-for-optimization.html#cb234-3"></a>for_loop &lt;-<span class="st"> </span><span class="cf">function</span>(size){</span>
-<span id="cb234-4"><a href="need-for-optimization.html#cb234-4"></a>  res &lt;-<span class="st"> </span><span class="kw">numeric</span>(size)</span>
-<span id="cb234-5"><a href="need-for-optimization.html#cb234-5"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>size){</span>
-<span id="cb234-6"><a href="need-for-optimization.html#cb234-6"></a>    res[i] &lt;-<span class="st"> </span>i <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
-<span id="cb234-7"><a href="need-for-optimization.html#cb234-7"></a>  }</span>
-<span id="cb234-8"><a href="need-for-optimization.html#cb234-8"></a>  <span class="kw">return</span>(res)</span>
-<span id="cb234-9"><a href="need-for-optimization.html#cb234-9"></a>}</span>
-<span id="cb234-10"><a href="need-for-optimization.html#cb234-10"></a><span class="co"># Doing the same thing using a vectorized function</span></span>
-<span id="cb234-11"><a href="need-for-optimization.html#cb234-11"></a>vectorized &lt;-<span class="st"> </span><span class="cf">function</span>(size){</span>
-<span id="cb234-12"><a href="need-for-optimization.html#cb234-12"></a>  (<span class="dv">1</span><span class="op">:</span>size) <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
-<span id="cb234-13"><a href="need-for-optimization.html#cb234-13"></a>}</span>
-<span id="cb234-14"><a href="need-for-optimization.html#cb234-14"></a>res &lt;-<span class="st"> </span>bench<span class="op">::</span><span class="kw">mark</span>(</span>
-<span id="cb234-15"><a href="need-for-optimization.html#cb234-15"></a>  <span class="dt">for_loop =</span> <span class="kw">for_loop</span>(<span class="dv">1000</span>), </span>
-<span id="cb234-16"><a href="need-for-optimization.html#cb234-16"></a>  <span class="dt">vectorized =</span> <span class="kw">vectorized</span>(<span class="dv">1000</span>), </span>
-<span id="cb234-17"><a href="need-for-optimization.html#cb234-17"></a>  <span class="dt">iterations =</span> <span class="dv">1000</span></span>
-<span id="cb234-18"><a href="need-for-optimization.html#cb234-18"></a>)</span>
-<span id="cb234-19"><a href="need-for-optimization.html#cb234-19"></a>res</span></code></pre></div>
+<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="need-for-optimization.html#cb233-1"></a><span class="co"># Multiplying each element of a vector going from 1 to size</span></span>
+<span id="cb233-2"><a href="need-for-optimization.html#cb233-2"></a><span class="co"># with a for loop </span></span>
+<span id="cb233-3"><a href="need-for-optimization.html#cb233-3"></a>for_loop &lt;-<span class="st"> </span><span class="cf">function</span>(size){</span>
+<span id="cb233-4"><a href="need-for-optimization.html#cb233-4"></a>  res &lt;-<span class="st"> </span><span class="kw">numeric</span>(size)</span>
+<span id="cb233-5"><a href="need-for-optimization.html#cb233-5"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>size){</span>
+<span id="cb233-6"><a href="need-for-optimization.html#cb233-6"></a>    res[i] &lt;-<span class="st"> </span>i <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
+<span id="cb233-7"><a href="need-for-optimization.html#cb233-7"></a>  }</span>
+<span id="cb233-8"><a href="need-for-optimization.html#cb233-8"></a>  <span class="kw">return</span>(res)</span>
+<span id="cb233-9"><a href="need-for-optimization.html#cb233-9"></a>}</span>
+<span id="cb233-10"><a href="need-for-optimization.html#cb233-10"></a><span class="co"># Doing the same thing using a vectorized function</span></span>
+<span id="cb233-11"><a href="need-for-optimization.html#cb233-11"></a>vectorized &lt;-<span class="st"> </span><span class="cf">function</span>(size){</span>
+<span id="cb233-12"><a href="need-for-optimization.html#cb233-12"></a>  (<span class="dv">1</span><span class="op">:</span>size) <span class="op">*</span><span class="st"> </span><span class="dv">10</span></span>
+<span id="cb233-13"><a href="need-for-optimization.html#cb233-13"></a>}</span>
+<span id="cb233-14"><a href="need-for-optimization.html#cb233-14"></a>res &lt;-<span class="st"> </span>bench<span class="op">::</span><span class="kw">mark</span>(</span>
+<span id="cb233-15"><a href="need-for-optimization.html#cb233-15"></a>  <span class="dt">for_loop =</span> <span class="kw">for_loop</span>(<span class="dv">1000</span>), </span>
+<span id="cb233-16"><a href="need-for-optimization.html#cb233-16"></a>  <span class="dt">vectorized =</span> <span class="kw">vectorized</span>(<span class="dv">1000</span>), </span>
+<span id="cb233-17"><a href="need-for-optimization.html#cb233-17"></a>  <span class="dt">iterations =</span> <span class="dv">1000</span></span>
+<span id="cb233-18"><a href="need-for-optimization.html#cb233-18"></a>)</span>
+<span id="cb233-19"><a href="need-for-optimization.html#cb233-19"></a>res</span></code></pre></div>
 <pre><code>Warning: `...` is not empty.
 
 We detected these problematic arguments:
@@ -797,12 +797,12 @@ Did you misspecify an argument?</code></pre>
 <pre><code># A tibble: 2 x 6
   expression    min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:&gt; &lt;bch:&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 for_loop   58.3µs 65.5µs    13831.    30.3KB        0
-2 vectorized    3µs  3.7µs   137924.    11.8KB        0</code></pre>
+1 for_loop   46.7µs 67.2µs    15430.    30.3KB        0
+2 vectorized  2.6µs  3.4µs   163162.    11.8KB        0</code></pre>
 <p>Here, we have an empirical evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest.</p>
 <p>If you want a graphical analysis, <code>{bench}</code> comes with an <code>autoplot</code> method for <code>{ggplot2}</code> <span class="citation">(Wickham, Chang, et al. <a href="#ref-R-ggplot2" role="doc-biblioref">2021</a>)</span>, as shown in Figure <a href="need-for-optimization.html#fig:14-when-optimize-10">14.4</a>:</p>
 
-<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="need-for-optimization.html#cb237-1"></a>ggplot2<span class="op">::</span><span class="kw">autoplot</span>(res)</span></code></pre></div>
+<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb236-1"><a href="need-for-optimization.html#cb236-1"></a>ggplot2<span class="op">::</span><span class="kw">autoplot</span>(res)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:14-when-optimize-10"></span>
 <img src="engineering-production-grade-shiny-apps_files/figure-html/14-when-optimize-10-1.png" alt="{bench} autoplot." width="100%" />
 <p class="caption">
@@ -879,30 +879,30 @@ Google audit your application to see if your application fits with this idea.</p
 <p>Profiling web page is a wide topic and a lot of things can be done to enhance the global page performance.
 That being said, if you have a limited time to invest in optimizing the front-end performance of the application, Google Lighthouse is a perfect tool, and can be your go-to audit tool for your application.</p>
 <p>And if you want to do it from R, the npm lighthouse module allows you to output the audit in JSON, which can then be brought back to R!</p>
-<div class="sourceCode" id="cb238"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb238-1"><a href="need-for-optimization.html#cb238-1"></a><span class="ex">lighthouse</span> --output json \</span>
-<span id="cb238-2"><a href="need-for-optimization.html#cb238-2"></a>  --output-path data-raw/output.json \</span>
-<span id="cb238-3"><a href="need-for-optimization.html#cb238-3"></a>  http://localhost:2811</span></code></pre></div>
+<div class="sourceCode" id="cb237"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb237-1"><a href="need-for-optimization.html#cb237-1"></a><span class="ex">lighthouse</span> --output json \</span>
+<span id="cb237-2"><a href="need-for-optimization.html#cb237-2"></a>  --output-path data-raw/output.json \</span>
+<span id="cb237-3"><a href="need-for-optimization.html#cb237-3"></a>  http://localhost:2811</span></code></pre></div>
 <p>Then, being a JSON file, you can call if from R:</p>
-<div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb239-1"><a href="need-for-optimization.html#cb239-1"></a><span class="co"># Reading the JSON output of your lighthouse audit, </span></span>
-<span id="cb239-2"><a href="need-for-optimization.html#cb239-2"></a><span class="co"># and displaying the Speed Index value</span></span>
-<span id="cb239-3"><a href="need-for-optimization.html#cb239-3"></a>lighthouse_report &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">read_json</span>(<span class="st">&quot;data-raw/output.json&quot;</span>)</span>
-<span id="cb239-4"><a href="need-for-optimization.html#cb239-4"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span><span class="op">$</span>displayValue</span></code></pre></div>
+<div class="sourceCode" id="cb238"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb238-1"><a href="need-for-optimization.html#cb238-1"></a><span class="co"># Reading the JSON output of your lighthouse audit, </span></span>
+<span id="cb238-2"><a href="need-for-optimization.html#cb238-2"></a><span class="co"># and displaying the Speed Index value</span></span>
+<span id="cb238-3"><a href="need-for-optimization.html#cb238-3"></a>lighthouse_report &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw">read_json</span>(<span class="st">&quot;data-raw/output.json&quot;</span>)</span>
+<span id="cb238-4"><a href="need-for-optimization.html#cb238-4"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span><span class="op">$</span>displayValue</span></code></pre></div>
 <pre><code>[1] &quot;5.4 s&quot;</code></pre>
 <p>The results are contained in the <code>audits</code> sections of this object, and each of these sub-elements contains a <code>description</code> field, detailing what the metric means.</p>
 <p>Here are, for example, some of the results, focused on performance, with their respective descriptions:</p>
 </div>
 <div id="first-meaningful-paint" class="section level5 unnumbered">
 <h5>“First Meaningful Paint”</h5>
-<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="need-for-optimization.html#cb241-1"></a><span class="co"># Each audit point contains a description, </span></span>
-<span id="cb241-2"><a href="need-for-optimization.html#cb241-2"></a><span class="co"># that explains what this value stands for</span></span>
-<span id="cb241-3"><a href="need-for-optimization.html#cb241-3"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">first-meaningful-paint</span><span class="st">`</span><span class="op">$</span>description</span></code></pre></div>
+<div class="sourceCode" id="cb240"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb240-1"><a href="need-for-optimization.html#cb240-1"></a><span class="co"># Each audit point contains a description, </span></span>
+<span id="cb240-2"><a href="need-for-optimization.html#cb240-2"></a><span class="co"># that explains what this value stands for</span></span>
+<span id="cb240-3"><a href="need-for-optimization.html#cb240-3"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">first-meaningful-paint</span><span class="st">`</span><span class="op">$</span>description</span></code></pre></div>
 <pre><code>[1] &quot;First Meaningful Paint measures when the primary&quot;
 [2] &quot;content of a page is visible. [Learn&quot;            
 [3] &quot;more](https://web.dev/first-meaningful-paint).&quot;  </code></pre>
-<div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="need-for-optimization.html#cb243-1"></a><span class="co"># We can turn the results into a data frame</span></span>
-<span id="cb243-2"><a href="need-for-optimization.html#cb243-2"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">first-meaningful-paint</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
-<span id="cb243-3"><a href="need-for-optimization.html#cb243-3"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
-<span id="cb243-4"><a href="need-for-optimization.html#cb243-4"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue)</span></code></pre></div>
+<div class="sourceCode" id="cb242"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb242-1"><a href="need-for-optimization.html#cb242-1"></a><span class="co"># We can turn the results into a data frame</span></span>
+<span id="cb242-2"><a href="need-for-optimization.html#cb242-2"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">first-meaningful-paint</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
+<span id="cb242-3"><a href="need-for-optimization.html#cb242-3"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
+<span id="cb242-4"><a href="need-for-optimization.html#cb242-4"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue)</span></code></pre></div>
 <pre><code>Warning: `...` is not empty.
 
 We detected these problematic arguments:
@@ -917,13 +917,13 @@ Did you misspecify an argument?</code></pre>
 </div>
 <div id="speed-index" class="section level5 unnumbered">
 <h5>“Speed Index”</h5>
-<div class="sourceCode" id="cb246"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb246-1"><a href="need-for-optimization.html#cb246-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span><span class="op">$</span>description</span></code></pre></div>
+<div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="need-for-optimization.html#cb245-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span><span class="op">$</span>description</span></code></pre></div>
 <pre><code>[1] &quot;Speed Index shows how quickly the contents of a page&quot;
 [2] &quot;are visibly populated. [Learn&quot;                       
 [3] &quot;more](https://web.dev/speed-index).&quot;                 </code></pre>
-<div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb248-1"><a href="need-for-optimization.html#cb248-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
-<span id="cb248-2"><a href="need-for-optimization.html#cb248-2"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
-<span id="cb248-3"><a href="need-for-optimization.html#cb248-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue) </span></code></pre></div>
+<div class="sourceCode" id="cb247"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb247-1"><a href="need-for-optimization.html#cb247-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">speed-index</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
+<span id="cb247-2"><a href="need-for-optimization.html#cb247-2"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
+<span id="cb247-3"><a href="need-for-optimization.html#cb247-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue) </span></code></pre></div>
 <pre><code>Warning: `...` is not empty.
 
 We detected these problematic arguments:
@@ -938,16 +938,16 @@ Did you misspecify an argument?</code></pre>
 </div>
 <div id="estimated-input-latency" class="section level5 unnumbered">
 <h5>“Estimated Input Latency”</h5>
-<div class="sourceCode" id="cb251"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb251-1"><a href="need-for-optimization.html#cb251-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">estimated-input-latency</span><span class="st">`</span><span class="op">$</span>description </span></code></pre></div>
+<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="need-for-optimization.html#cb250-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">estimated-input-latency</span><span class="st">`</span><span class="op">$</span>description </span></code></pre></div>
 <pre><code>[1] &quot;Estimated Input Latency is an estimate of how long&quot;   
 [2] &quot;your app takes to respond to user input, in&quot;          
 [3] &quot;milliseconds, during the busiest 5s window of page&quot;   
 [4] &quot;load. If your latency is higher than 50 ms, users may&quot;
 [5] &quot;perceive your app as laggy. [Learn&quot;                   
 [6] &quot;more](https://web.dev/estimated-input-latency).&quot;      </code></pre>
-<div class="sourceCode" id="cb253"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb253-1"><a href="need-for-optimization.html#cb253-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">estimated-input-latency</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
-<span id="cb253-2"><a href="need-for-optimization.html#cb253-2"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
-<span id="cb253-3"><a href="need-for-optimization.html#cb253-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue) </span></code></pre></div>
+<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb252-1"><a href="need-for-optimization.html#cb252-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">estimated-input-latency</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
+<span id="cb252-2"><a href="need-for-optimization.html#cb252-2"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
+<span id="cb252-3"><a href="need-for-optimization.html#cb252-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue) </span></code></pre></div>
 <pre><code>Warning: `...` is not empty.
 
 We detected these problematic arguments:
@@ -962,13 +962,13 @@ Did you misspecify an argument?</code></pre>
 </div>
 <div id="total-blocking-time" class="section level5 unnumbered">
 <h5>“Total Blocking Time”</h5>
-<div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb256-1"><a href="need-for-optimization.html#cb256-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">total-blocking-time</span><span class="st">`</span><span class="op">$</span>description </span></code></pre></div>
+<div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb255-1"><a href="need-for-optimization.html#cb255-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">total-blocking-time</span><span class="st">`</span><span class="op">$</span>description </span></code></pre></div>
 <pre><code>[1] &quot;Sum of all time periods between FCP and Time to&quot;       
 [2] &quot;Interactive, when task length exceeded 50ms, expressed&quot;
 [3] &quot;in milliseconds.&quot;                                      </code></pre>
-<div class="sourceCode" id="cb258"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb258-1"><a href="need-for-optimization.html#cb258-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">total-blocking-time</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
-<span id="cb258-2"><a href="need-for-optimization.html#cb258-2"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
-<span id="cb258-3"><a href="need-for-optimization.html#cb258-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue)</span></code></pre></div>
+<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb257-1"><a href="need-for-optimization.html#cb257-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">total-blocking-time</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
+<span id="cb257-2"><a href="need-for-optimization.html#cb257-2"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>()  <span class="op">%&gt;%</span></span>
+<span id="cb257-3"><a href="need-for-optimization.html#cb257-3"></a><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(title, score, displayValue)</span></code></pre></div>
 <pre><code>Warning: `...` is not empty.
 
 We detected these problematic arguments:
@@ -983,13 +983,13 @@ Did you misspecify an argument?</code></pre>
 </div>
 <div id="time-to-first-byte" class="section level5 unnumbered">
 <h5>“Time to first Byte”</h5>
-<div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb261-1"><a href="need-for-optimization.html#cb261-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">time-to-first-byte</span><span class="st">`</span><span class="op">$</span>description </span></code></pre></div>
+<div class="sourceCode" id="cb260"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb260-1"><a href="need-for-optimization.html#cb260-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">time-to-first-byte</span><span class="st">`</span><span class="op">$</span>description </span></code></pre></div>
 <pre><code>[1] &quot;Time To First Byte identifies the time at which your&quot;
 [2] &quot;server sends a response. [Learn&quot;                     
 [3] &quot;more](https://web.dev/time-to-first-byte).&quot;          </code></pre>
-<div class="sourceCode" id="cb263"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb263-1"><a href="need-for-optimization.html#cb263-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">time-to-first-byte</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
-<span id="cb263-2"><a href="need-for-optimization.html#cb263-2"></a><span class="st">  </span>.[<span class="kw">c</span>(<span class="st">&quot;title&quot;</span>, <span class="st">&quot;score&quot;</span>, <span class="st">&quot;displayValue&quot;</span>)] <span class="op">%&gt;%</span></span>
-<span id="cb263-3"><a href="need-for-optimization.html#cb263-3"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>() </span></code></pre></div>
+<div class="sourceCode" id="cb262"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb262-1"><a href="need-for-optimization.html#cb262-1"></a>lighthouse_report<span class="op">$</span>audits<span class="op">$</span><span class="st">`</span><span class="dt">time-to-first-byte</span><span class="st">`</span> <span class="op">%&gt;%</span></span>
+<span id="cb262-2"><a href="need-for-optimization.html#cb262-2"></a><span class="st">  </span>.[<span class="kw">c</span>(<span class="st">&quot;title&quot;</span>, <span class="st">&quot;score&quot;</span>, <span class="st">&quot;displayValue&quot;</span>)] <span class="op">%&gt;%</span></span>
+<span id="cb262-3"><a href="need-for-optimization.html#cb262-3"></a><span class="st">  </span>tibble<span class="op">::</span><span class="kw">as_tibble</span>() </span></code></pre></div>
 <pre><code>Warning: `...` is not empty.
 
 We detected these problematic arguments:
@@ -1012,13 +1012,13 @@ The general idea being that line breaks, spaces, and a specific set of character
 Why not remove them when they are served in a larger software?
 This is what <em>minification</em> does.</p>
 <p>Here is an example of how minification works, taken from <em>Empirical Study on Effects of Script Minification and HTTP Compression for Traffic Reduction</em> <span class="citation">(Sakamoto et al. <a href="#ref-Sakamoto2015" role="doc-biblioref">2015</a>)</span>:</p>
-<div class="sourceCode" id="cb266"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb266-1"><a href="need-for-optimization.html#cb266-1"></a><span class="kw">var</span> sum <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb266-2"><a href="need-for-optimization.html#cb266-2"></a><span class="cf">for</span> ( <span class="kw">var</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;=</span><span class="dv">10</span><span class="op">;</span> i <span class="op">++</span> ) <span class="op">{</span></span>
-<span id="cb266-3"><a href="need-for-optimization.html#cb266-3"></a>  sum <span class="op">+=</span> i <span class="op">;</span></span>
-<span id="cb266-4"><a href="need-for-optimization.html#cb266-4"></a><span class="op">}</span></span>
-<span id="cb266-5"><a href="need-for-optimization.html#cb266-5"></a><span class="at">alert</span>( sum ) <span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb265"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb265-1"><a href="need-for-optimization.html#cb265-1"></a><span class="kw">var</span> sum <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb265-2"><a href="need-for-optimization.html#cb265-2"></a><span class="cf">for</span> ( <span class="kw">var</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;=</span><span class="dv">10</span><span class="op">;</span> i <span class="op">++</span> ) <span class="op">{</span></span>
+<span id="cb265-3"><a href="need-for-optimization.html#cb265-3"></a>  sum <span class="op">+=</span> i <span class="op">;</span></span>
+<span id="cb265-4"><a href="need-for-optimization.html#cb265-4"></a><span class="op">}</span></span>
+<span id="cb265-5"><a href="need-for-optimization.html#cb265-5"></a><span class="at">alert</span>( sum ) <span class="op">;</span></span></code></pre></div>
 <p>is minified into:</p>
-<div class="sourceCode" id="cb267"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb267-1"><a href="need-for-optimization.html#cb267-1"></a><span class="kw">var</span> sum<span class="op">=</span><span class="dv">0</span><span class="op">;</span><span class="cf">for</span>(<span class="kw">var</span> i<span class="op">=</span><span class="dv">0</span><span class="op">;</span>i<span class="op">&lt;=</span><span class="dv">10</span><span class="op">;</span>i<span class="op">++</span>)<span class="op">{</span>sum<span class="op">+=</span>i<span class="op">};</span><span class="at">alert</span>(sum)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb266"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb266-1"><a href="need-for-optimization.html#cb266-1"></a><span class="kw">var</span> sum<span class="op">=</span><span class="dv">0</span><span class="op">;</span><span class="cf">for</span>(<span class="kw">var</span> i<span class="op">=</span><span class="dv">0</span><span class="op">;</span>i<span class="op">&lt;=</span><span class="dv">10</span><span class="op">;</span>i<span class="op">++</span>)<span class="op">{</span>sum<span class="op">+=</span>i<span class="op">};</span><span class="at">alert</span>(sum)<span class="op">;</span></span></code></pre></div>
 <p>Both these code blocks behave the same way, but the second one will be smaller when saved to a file: this is the very core principle of minification of files.
 It is something pretty common to do when building web applications: on the web, every byte counts, so the smaller your external resources the better.
 Minification is important as the larger your resources, the longer your application will take to launch, and:</p>
@@ -1035,19 +1035,19 @@ Especially, a network environment of mobile devices requires efficient usage of 
 </blockquote>
 <p>To minify JavaScript, HTML and CSS files from R, you can use the <code>{minifyr}</code> <span class="citation">(Fay <a href="#ref-R-minifyr" role="doc-biblioref">2020</a><a href="#ref-R-minifyr" role="doc-biblioref">h</a>)</span> package, which wraps the <code>node-minify</code> NodeJS library.
 For example, compare the size of this file from <code>{shiny}</code>:</p>
-<div class="sourceCode" id="cb268"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb268-1"><a href="need-for-optimization.html#cb268-1"></a><span class="co"># Displaying the file size of a CSS file from {shiny}</span></span>
-<span id="cb268-2"><a href="need-for-optimization.html#cb268-2"></a>fs<span class="op">::</span><span class="kw">file_size</span>(</span>
-<span id="cb268-3"><a href="need-for-optimization.html#cb268-3"></a>  <span class="kw">system.file</span>(<span class="st">&quot;www/shared/shiny.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;shiny&quot;</span>)</span>
-<span id="cb268-4"><a href="need-for-optimization.html#cb268-4"></a>) </span></code></pre></div>
+<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb267-1"><a href="need-for-optimization.html#cb267-1"></a><span class="co"># Displaying the file size of a CSS file from {shiny}</span></span>
+<span id="cb267-2"><a href="need-for-optimization.html#cb267-2"></a>fs<span class="op">::</span><span class="kw">file_size</span>(</span>
+<span id="cb267-3"><a href="need-for-optimization.html#cb267-3"></a>  <span class="kw">system.file</span>(<span class="st">&quot;www/shared/shiny.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;shiny&quot;</span>)</span>
+<span id="cb267-4"><a href="need-for-optimization.html#cb267-4"></a>) </span></code></pre></div>
 <pre><code>239K</code></pre>
 <p>To its minified version:</p>
-<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb270-1"><a href="need-for-optimization.html#cb270-1"></a><span class="co"># Using the {minifyr} package to minify the CSS file</span></span>
-<span id="cb270-2"><a href="need-for-optimization.html#cb270-2"></a>minified &lt;-<span class="st"> </span>minifyr<span class="op">::</span><span class="kw">minifyr_js_gcc</span>(</span>
-<span id="cb270-3"><a href="need-for-optimization.html#cb270-3"></a>  <span class="kw">system.file</span>(<span class="st">&quot;www/shared/shiny.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;shiny&quot;</span>), </span>
-<span id="cb270-4"><a href="need-for-optimization.html#cb270-4"></a>  <span class="st">&quot;shinymini.js&quot;</span></span>
-<span id="cb270-5"><a href="need-for-optimization.html#cb270-5"></a>) </span></code></pre></div>
-<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb271-1"><a href="need-for-optimization.html#cb271-1"></a><span class="co"># Minifying can help you gain kilobytes</span></span>
-<span id="cb271-2"><a href="need-for-optimization.html#cb271-2"></a>fs<span class="op">::</span><span class="kw">file_size</span>(minified)</span></code></pre></div>
+<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb269-1"><a href="need-for-optimization.html#cb269-1"></a><span class="co"># Using the {minifyr} package to minify the CSS file</span></span>
+<span id="cb269-2"><a href="need-for-optimization.html#cb269-2"></a>minified &lt;-<span class="st"> </span>minifyr<span class="op">::</span><span class="kw">minifyr_js_gcc</span>(</span>
+<span id="cb269-3"><a href="need-for-optimization.html#cb269-3"></a>  <span class="kw">system.file</span>(<span class="st">&quot;www/shared/shiny.js&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;shiny&quot;</span>), </span>
+<span id="cb269-4"><a href="need-for-optimization.html#cb269-4"></a>  <span class="st">&quot;shinymini.js&quot;</span></span>
+<span id="cb269-5"><a href="need-for-optimization.html#cb269-5"></a>) </span></code></pre></div>
+<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb270-1"><a href="need-for-optimization.html#cb270-1"></a><span class="co"># Minifying can help you gain kilobytes</span></span>
+<span id="cb270-2"><a href="need-for-optimization.html#cb270-2"></a>fs<span class="op">::</span><span class="kw">file_size</span>(minified)</span></code></pre></div>
 <pre><code>87.5K</code></pre>
 <p>That might not seem like much (a couple of KB) on a small scale, but as it can be done automatically, why not leverage these small performance gains when building larger applications?
 Of course, minification will not suddenly make your application blazing fast, but that’s something you should consider when deploying an application to production, notably if you use a lot of packages with interactive widgets: they might contain CSS and JavaScript files that are not minified.</p>
