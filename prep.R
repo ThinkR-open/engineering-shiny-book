@@ -1,5 +1,8 @@
 # To do locally on Colin's computer, thanks
 options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/latest"))
+renv::install("r-lib/fastmap")
+renv::install("rstudio/htmltools")
+renv::install("bookdown")
 renv::restore()
 remotes::install_local(Ncpus = 4, upgrade = "never", force = TRUE)
 if (!file.exists("packages.bib")){
