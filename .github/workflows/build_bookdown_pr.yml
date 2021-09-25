@@ -1,0 +1,50 @@
+on:
+  pull_request:
+    branches:
+      - master
+
+name: renderbookpr
+
+jobs:
+  bookdown:
+    
+    name: Render-Book
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v1
+      
+      - uses: r-lib/actions/setup-r@v1
+        with:
+          crayon.enabled: 'FALSE'
+          r-version: '3.6.1'
+          
+      - uses: actions/cache@v1
+        with:
+          path: ~/.local/share/renv
+          key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-renv-
+          
+      - uses: r-lib/actions/setup-pandoc@v1
+      
+      - name: Install tinytex
+        uses: r-lib/actions/setup-tinytex@master
+      
+      - name: Install sysreq
+        run: sudo apt update && sudo apt install -y gdal-bin git-core libcairo2-dev libgdal-dev libgeos-dev libgeos++-dev libgit2-dev libpng-dev libssh2-1-dev libssl-dev libudunits2-dev libxml2-dev make pandoc pandoc-citeproc zlib1g-dev libmagick++-dev libssl-dev libsasl2-dev
+        
+      - name: Pulling hexmake
+        run: docker pull colinfay/hexmake
+        
+      - uses: nanasess/setup-chromedriver@master
+
+      - name: Install rmarkdown, bookdown and sysfonts
+        run: Rscript -e 'install.packages(c("sysfonts", "rmarkdown","bookdown"), Ncpus = 4)'
+
+      - name: Before build
+        run: Rscript prep.R
+          
+      - name: Render Book
+        run: Rscript -e 'bookdown::render_book("index.Rmd")'
