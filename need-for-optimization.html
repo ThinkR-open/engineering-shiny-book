@@ -176,10 +176,10 @@ Refactoring a piece of code is better done when you keep in mind that “the pri
 Also, are the extra hours/days spent rewriting a working code-base worth the speed gain of 0.5 seconds on one function?</p>
 <p>For example, let’s compare both these implementations of the same function, one in R, and one in C++ via <a href="http://www.rcpp.org">Rcpp</a> <span class="citation">(Eddelbuettel et al. <a href="references.html#ref-R-Rcpp" role="doc-biblioref">2020</a>)</span>.
 Of course, the C++ function is faster than the R one—this is the very reason for using C++ with R.</p>
-<div class="sourceCode" id="cb218"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb217"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="st"><a href="http://www.rcpp.org">"Rcpp"</a></span><span class="op">)</span></code></pre></div>
 <pre><code>Warning: package 'Rcpp' was built under R version 3.6.3</code></pre>
-<div class="sourceCode" id="cb220"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb219"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># A C++ function to compute the mean</span>
 <span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html">cppFunction</a></span><span class="op">(</span><span class="st">"
 double mean_cpp(NumericVector x) {
@@ -203,11 +203,11 @@ double mean_cpp(NumericVector x) {
 <pre><code># A tibble: 2 x 6
   expression    min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:&gt; &lt;bch:&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 cpp         264µs  282µs     2754.     784KB     13.8
-2 native      565µs  566µs     1761.        0B      0  </code></pre>
+1 cpp         243µs  255µs     3050.     784KB     15.3
+2 native      471µs  472µs     2111.        0B      0  </code></pre>
 <p>(Note: we will come back to <code><a href="http://bench.r-lib.org/reference/mark.html">bench::mark()</a></code> later.)</p>
 <p>However, how much is a time gain worth if you are not sure you can get someone on your team to take over the maintenance if needed?
-In other words, given that (in our example) we are gaining around -2.838710^{-4} on the execution time of our function, is it worth switching to C++?
+In other words, given that (in our example) we are gaining around -2.17210^{-4} on the execution time of our function, is it worth switching to C++?
 Using external languages or complex data structures implies that from the start, you will need to think about who and how your codebase will be maintained over the years.</p>
 <p>Chances are that if you plan on using a <a href="http://shiny.rstudio.com">shiny</a> application during a span of several years, various R developers will be working on the project, and including C++ code inside your application means that these future developers will either be required to know C++, or they will not be able to maintain this piece of code.</p>
 <p>So, to sum up, there are three ways to optimize your application and R code, and the bad news is that you cannot optimize for all of them:</p>
@@ -241,7 +241,7 @@ Without an automated tool to do the profiling, the developers would have to prof
 <p>Instead of guessing, it is a safe bet to go for a tool like <a href="https://rstudio.github.io/profvis/">profvis</a>, which allows you to have a detailed view of what takes a long time to run in your R code.</p>
 <p>Using this package is quite straightforward: put the code you want to benchmark inside the <code><a href="https://rdrr.io/pkg/profvis/man/profvis.html">profvis()</a></code> function,<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Do not forget to add &lt;code&gt;{}&lt;/code&gt; inside &lt;code&gt;profvis({})&lt;/code&gt; if you want to write several lines of code.&lt;/p&gt;"><sup>54</sup></a> wait for the code to run, and that is it; you now have an analysis of your code running time.</p>
 <p>Here is an example with 3 nested functions, <code>top()</code>, <code>middle()</code> and <code>bottom()</code>, where <code>top()</code> calls <code>middle()</code> which calls <code>bottom()</code>:</p>
-<div class="sourceCode" id="cb222"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb221"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/profvis/">profvis</a></span><span class="op">)</span>
 <span class="va">top</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
   <span class="co"># We use profvis::pause() because Sys.sleep() doesn't </span>
@@ -303,11 +303,11 @@ FIGURE 14.3: <a href="https://rstudio.github.io/profvis/">profvis</a> data tab.
 </p>
 </div>
 <p>If you are working on profiling the memory usage, you can also use the <a href="https://github.com/HenrikBengtsson/profmem">profmem</a> <span class="citation">(Bengtsson <a href="references.html#ref-R-profmem" role="doc-biblioref">2018</a>)</span> package which, instead of focusing on execution time, will record the memory usage of calls.</p>
-<div class="sourceCode" id="cb223"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb222"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/HenrikBengtsson/profmem">profmem</a></span><span class="op">)</span></code></pre></div>
 <pre><code>Warning: package 'profmem' was built under R version
 3.6.3</code></pre>
-<div class="sourceCode" id="cb225"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb224"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Computing the memory used by each c</span>
 <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/profmem/man/profmem.html">profmem</a></span><span class="op">(</span><span class="op">{</span>
   <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/raw.html">raw</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span>
@@ -344,11 +344,11 @@ Memory allocations:
 20    alloc   256          &lt;internal&gt;
 total       16176                    </code></pre>
 <p>You can also get the total allocated memory with:</p>
-<div class="sourceCode" id="cb227"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb226"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/profmem/man/total.html">total</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></code></pre></div>
 <pre><code>[1] 16176</code></pre>
 <p>And extract specific values based on the memory allocation:</p>
-<div class="sourceCode" id="cb229"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb228"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span><span class="op">(</span><span class="va">p</span>, <span class="va">bytes</span> <span class="op">&gt;</span> <span class="fl">1000</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">p2</span><span class="op">)</span></code></pre></div>
 <pre><code>Rprofmem memory profiling of:
@@ -389,7 +389,7 @@ This will also be helpful for the future: either for you in other projects (you 
 This function takes a series of named elements, each containing an R expression that will be timed.
 Note that by default, the <code>mark()</code> function compares the output of each function,</p>
 <p>Once the timing is done, you will get a data.frame with various metrics about the benchmark.</p>
-<div class="sourceCode" id="cb231"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb230"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Multiplying each element of a vector going from 1 to size</span>
 <span class="co"># with a for loop </span>
 <span class="va">for_loop</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">size</span><span class="op">)</span><span class="op">{</span>
@@ -412,12 +412,12 @@ Note that by default, the <code>mark()</code> function compares the output of ea
 <pre><code># A tibble: 2 x 6
   expression    min median `itr/sec` mem_alloc `gc/sec`
   &lt;bch:expr&gt; &lt;bch:&gt; &lt;bch:&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-1 for_loop   66.5µs 68.3µs    14564.    30.3KB        0
-2 vectorized  3.2µs  3.8µs   112235.    11.8KB        0</code></pre>
+1 for_loop     56µs 57.3µs    17365.    30.3KB        0
+2 vectorized  2.7µs  3.9µs   154307.    11.8KB        0</code></pre>
 <p>Here, we have an empirical evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest.</p>
 <p>If you want a graphical analysis, <a href="http://bench.r-lib.org/">bench</a> comes with an <code>autoplot</code> method for <a href="https://ggplot2.tidyverse.org">ggplot2</a> <span class="citation">(Wickham, Chang, et al. <a href="references.html#ref-R-ggplot2" role="doc-biblioref">2021</a>)</span>, as shown in Figure <a href="need-for-optimization.html#fig:14-when-optimize-10">14.4</a>:</p>
 
-<div class="sourceCode" id="cb233"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb232"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html">autoplot</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:14-when-optimize-10"></span>
@@ -500,11 +500,11 @@ Google audit your application to see if your application fits with this idea.</p
 <p>Profiling web page is a wide topic and a lot of things can be done to enhance the global page performance.
 That being said, if you have a limited time to invest in optimizing the front-end performance of the application, Google Lighthouse is a perfect tool, and can be your go-to audit tool for your application.</p>
 <p>And if you want to do it from R, the npm lighthouse module allows you to output the audit in JSON, which can then be brought back to R!</p>
-<div class="sourceCode" id="cb234"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb234-1"><a href="need-for-optimization.html#cb234-1"></a><span class="ex">lighthouse</span> --output json \</span>
-<span id="cb234-2"><a href="need-for-optimization.html#cb234-2"></a>  --output-path data-raw/output.json \</span>
-<span id="cb234-3"><a href="need-for-optimization.html#cb234-3"></a>  http://localhost:2811</span></code></pre></div>
+<div class="sourceCode" id="cb233"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb233-1"><a href="need-for-optimization.html#cb233-1"></a><span class="ex">lighthouse</span> --output json \</span>
+<span id="cb233-2"><a href="need-for-optimization.html#cb233-2"></a>  --output-path data-raw/output.json \</span>
+<span id="cb233-3"><a href="need-for-optimization.html#cb233-3"></a>  http://localhost:2811</span></code></pre></div>
 <p>Then, being a JSON file, you can call if from R:</p>
-<div class="sourceCode" id="cb235"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb234"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Reading the JSON output of your lighthouse audit, </span>
 <span class="co"># and displaying the Speed Index value</span>
 <span class="va">lighthouse_report</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/read_json.html">read_json</a></span><span class="op">(</span><span class="st">"data-raw/output.json"</span><span class="op">)</span>
@@ -516,14 +516,14 @@ That being said, if you have a limited time to invest in optimizing the front-en
 <div id="first-meaningful-paint" class="section level5 unnumbered">
 <h5>“First Meaningful Paint”<a class="anchor" aria-label="anchor" href="#first-meaningful-paint"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb237"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb236"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Each audit point contains a description, </span>
 <span class="co"># that explains what this value stands for</span>
 <span class="va">lighthouse_report</span><span class="op">$</span><span class="va">audits</span><span class="op">$</span><span class="va">`first-meaningful-paint`</span><span class="op">$</span><span class="va">description</span></code></pre></div>
 <pre><code>[1] "First Meaningful Paint measures when the primary"
 [2] "content of a page is visible. [Learn"            
 [3] "more](https://web.dev/first-meaningful-paint)."  </code></pre>
-<div class="sourceCode" id="cb239"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb238"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># We can turn the results into a data frame</span>
 <span class="va">lighthouse_report</span><span class="op">$</span><span class="va">audits</span><span class="op">$</span><span class="va">`first-meaningful-paint`</span> <span class="op">%&gt;%</span>
   <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html">as_tibble</a></span><span class="op">(</span><span class="op">)</span>  <span class="op">%&gt;%</span>
@@ -536,12 +536,12 @@ That being said, if you have a limited time to invest in optimizing the front-en
 <div id="speed-index" class="section level5 unnumbered">
 <h5>“Speed Index”<a class="anchor" aria-label="anchor" href="#speed-index"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb241"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb240"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lighthouse_report</span><span class="op">$</span><span class="va">audits</span><span class="op">$</span><span class="va">`speed-index`</span><span class="op">$</span><span class="va">description</span></code></pre></div>
 <pre><code>[1] "Speed Index shows how quickly the contents of a page"
 [2] "are visibly populated. [Learn"                       
 [3] "more](https://web.dev/speed-index)."                 </code></pre>
-<div class="sourceCode" id="cb243"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb242"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lighthouse_report</span><span class="op">$</span><span class="va">audits</span><span class="op">$</span><span class="va">`speed-index`</span> <span class="op">%&gt;%</span>
   <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html">as_tibble</a></span><span class="op">(</span><span class="op">)</span>  <span class="op">%&gt;%</span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">title</span>, <span class="va">score</span>, <span class="va">displayValue</span><span class="op">)</span> </code></pre></div>
@@ -553,7 +553,7 @@ That being said, if you have a limited time to invest in optimizing the front-en
 <div id="estimated-input-latency" class="section level5 unnumbered">
 <h5>“Estimated Input Latency”<a class="anchor" aria-label="anchor" href="#estimated-input-latency"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb245"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb244"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lighthouse_report</span><span class="op">$</span><span class="va">audits</span><span class="op">$</span><span class="va">`estimated-input-latency`</span><span class="op">$</span><span class="va">description</span> </code></pre></div>
 <pre><code>[1] "Estimated Input Latency is an estimate of how long"   
 [2] "your app takes to respond to user input, in"          
@@ -561,7 +561,7 @@ That being said, if you have a limited time to invest in optimizing the front-en
 [4] "load. If your latency is higher than 50 ms, users may"
 [5] "perceive your app as laggy. [Learn"                   
 [6] "more](https://web.dev/estimated-input-latency)."      </code></pre>
-<div class="sourceCode" id="cb247"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb246"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lighthouse_report</span><span class="op">$</span><span class="va">audits</span><span class="op">$</span><span class="va">`estimated-input-latency`</span> <span class="op">%&gt;%</span>
   <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html">as_tibble</a></span><span class="op">(</span><span class="op">)</span>  <span class="op">%&gt;%</span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">title</span>, <span class="va">score</span>, <span class="va">displayValue</span><span class="op">)</span> </code></pre></div>
@@ -573,12 +573,12 @@ That being said, if you have a limited time to invest in optimizing the front-en
 <div id="total-blocking-time" class="section level5 unnumbered">
 <h5>“Total Blocking Time”<a class="anchor" aria-label="anchor" href="#total-blocking-time"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb249"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb248"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lighthouse_report</span><span class="op">$</span><span class="va">audits</span><span class="op">$</span><span class="va">`total-blocking-time`</span><span class="op">$</span><span class="va">description</span> </code></pre></div>
 <pre><code>[1] "Sum of all time periods between FCP and Time to"       
 [2] "Interactive, when task length exceeded 50ms, expressed"
 [3] "in milliseconds."                                      </code></pre>
-<div class="sourceCode" id="cb251"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb250"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lighthouse_report</span><span class="op">$</span><span class="va">audits</span><span class="op">$</span><span class="va">`total-blocking-time`</span> <span class="op">%&gt;%</span>
   <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html">as_tibble</a></span><span class="op">(</span><span class="op">)</span>  <span class="op">%&gt;%</span>
   <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">title</span>, <span class="va">score</span>, <span class="va">displayValue</span><span class="op">)</span></code></pre></div>
@@ -590,12 +590,12 @@ That being said, if you have a limited time to invest in optimizing the front-en
 <div id="time-to-first-byte" class="section level5 unnumbered">
 <h5>“Time to first Byte”<a class="anchor" aria-label="anchor" href="#time-to-first-byte"><i class="fas fa-link"></i></a>
 </h5>
-<div class="sourceCode" id="cb253"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb252"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lighthouse_report</span><span class="op">$</span><span class="va">audits</span><span class="op">$</span><span class="va">`time-to-first-byte`</span><span class="op">$</span><span class="va">description</span> </code></pre></div>
 <pre><code>[1] "Time To First Byte identifies the time at which your"
 [2] "server sends a response. [Learn"                     
 [3] "more](https://web.dev/time-to-first-byte)."          </code></pre>
-<div class="sourceCode" id="cb255"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb254"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lighthouse_report</span><span class="op">$</span><span class="va">audits</span><span class="op">$</span><span class="va">`time-to-first-byte`</span> <span class="op">%&gt;%</span>
   <span class="va">.</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"title"</span>, <span class="st">"score"</span>, <span class="st">"displayValue"</span><span class="op">)</span><span class="op">]</span> <span class="op">%&gt;%</span>
   <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html">as_tibble</a></span><span class="op">(</span><span class="op">)</span> </code></pre></div>
@@ -615,13 +615,13 @@ The general idea being that line breaks, spaces, and a specific set of character
 Why not remove them when they are served in a larger software?
 This is what <em>minification</em> does.</p>
 <p>Here is an example of how minification works, taken from <em>Empirical Study on Effects of Script Minification and HTTP Compression for Traffic Reduction</em> <span class="citation">(Sakamoto et al. <a href="references.html#ref-Sakamoto2015" role="doc-biblioref">2015</a>)</span>:</p>
-<div class="sourceCode" id="cb257"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb257-1"><a href="need-for-optimization.html#cb257-1"></a><span class="kw">var</span> sum <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb257-2"><a href="need-for-optimization.html#cb257-2"></a><span class="cf">for</span> ( <span class="kw">var</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;=</span><span class="dv">10</span><span class="op">;</span> i <span class="op">++</span> ) <span class="op">{</span></span>
-<span id="cb257-3"><a href="need-for-optimization.html#cb257-3"></a>  sum <span class="op">+=</span> i <span class="op">;</span></span>
-<span id="cb257-4"><a href="need-for-optimization.html#cb257-4"></a><span class="op">}</span></span>
-<span id="cb257-5"><a href="need-for-optimization.html#cb257-5"></a><span class="at">alert</span>( sum ) <span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb256"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb256-1"><a href="need-for-optimization.html#cb256-1"></a><span class="kw">var</span> sum <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb256-2"><a href="need-for-optimization.html#cb256-2"></a><span class="cf">for</span> ( <span class="kw">var</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;=</span><span class="dv">10</span><span class="op">;</span> i <span class="op">++</span> ) <span class="op">{</span></span>
+<span id="cb256-3"><a href="need-for-optimization.html#cb256-3"></a>  sum <span class="op">+=</span> i <span class="op">;</span></span>
+<span id="cb256-4"><a href="need-for-optimization.html#cb256-4"></a><span class="op">}</span></span>
+<span id="cb256-5"><a href="need-for-optimization.html#cb256-5"></a><span class="at">alert</span>( sum ) <span class="op">;</span></span></code></pre></div>
 <p>is minified into:</p>
-<div class="sourceCode" id="cb258"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb258-1"><a href="need-for-optimization.html#cb258-1"></a><span class="kw">var</span> sum<span class="op">=</span><span class="dv">0</span><span class="op">;</span><span class="cf">for</span>(<span class="kw">var</span> i<span class="op">=</span><span class="dv">0</span><span class="op">;</span>i<span class="op">&lt;=</span><span class="dv">10</span><span class="op">;</span>i<span class="op">++</span>)<span class="op">{</span>sum<span class="op">+=</span>i<span class="op">};</span><span class="at">alert</span>(sum)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode" id="cb257"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb257-1"><a href="need-for-optimization.html#cb257-1"></a><span class="kw">var</span> sum<span class="op">=</span><span class="dv">0</span><span class="op">;</span><span class="cf">for</span>(<span class="kw">var</span> i<span class="op">=</span><span class="dv">0</span><span class="op">;</span>i<span class="op">&lt;=</span><span class="dv">10</span><span class="op">;</span>i<span class="op">++</span>)<span class="op">{</span>sum<span class="op">+=</span>i<span class="op">};</span><span class="at">alert</span>(sum)<span class="op">;</span></span></code></pre></div>
 <p>Both these code blocks behave the same way, but the second one will be smaller when saved to a file: this is the very core principle of minification of files.
 It is something pretty common to do when building web applications: on the web, every byte counts, so the smaller your external resources the better.
 Minification is important as the larger your resources, the longer your application will take to launch, and:</p>
@@ -638,20 +638,20 @@ Especially, a network environment of mobile devices requires efficient usage of 
 </blockquote>
 <p>To minify JavaScript, HTML and CSS files from R, you can use the <code>{minifyr}</code> <span class="citation">(Fay <a href="references.html#ref-R-minifyr" role="doc-biblioref">2021</a><a href="references.html#ref-R-minifyr" role="doc-biblioref">h</a>)</span> package, which wraps the <code>node-minify</code> NodeJS library.
 For example, compare the size of this file from <a href="http://shiny.rstudio.com">shiny</a>:</p>
-<div class="sourceCode" id="cb259"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb258"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Displaying the file size of a CSS file from {shiny}</span>
 <span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="http://fs.r-lib.org/reference/file_info.html">file_size</a></span><span class="op">(</span>
   <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"www/shared/shiny.js"</span>, package <span class="op">=</span> <span class="st">"shiny"</span><span class="op">)</span>
 <span class="op">)</span> </code></pre></div>
 <pre><code>239K</code></pre>
 <p>To its minified version:</p>
-<div class="sourceCode" id="cb261"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb260"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Using the {minifyr} package to minify the CSS file</span>
 <span class="va">minified</span> <span class="op">&lt;-</span> <span class="fu">minifyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/minifyr/man/js.html">minifyr_js_gcc</a></span><span class="op">(</span>
   <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"www/shared/shiny.js"</span>, package <span class="op">=</span> <span class="st">"shiny"</span><span class="op">)</span>, 
   <span class="st">"shinymini.js"</span>
 <span class="op">)</span> </code></pre></div>
-<div class="sourceCode" id="cb262"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb261"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Minifying can help you gain kilobytes</span>
 <span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="http://fs.r-lib.org/reference/file_info.html">file_size</a></span><span class="op">(</span><span class="va">minified</span><span class="op">)</span></code></pre></div>
 <pre><code>87.5K</code></pre>
