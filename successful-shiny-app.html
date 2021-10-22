@@ -106,7 +106,7 @@ And that is probably one of the main reasons why this package has become so succ
 <p>The first version of <a href="http://shiny.rstudio.com">shiny</a> was published in 2012.
 Since then, it has been one of the top projects of the RStudio team.
 At the time of writing these lines (April 2020), there are more than 4700 commits in the master branch of the GitHub repository, made by 46 contributors.
-It is now downloaded around 400K times a month, according to <a href="https://cranlogs.r-pkg.org/badges/shiny">cranlogs</a>, and has 963 reverse dependencies (i.e. packages that depend on it), according to <code>revdep("shiny")</code> from <a href="https://devtools.r-lib.org/">devtools</a> <span class="citation">(Wickham, Hester, and Chang <a href="references.html#ref-R-devtools" role="doc-biblioref">2020</a>)</span>.</p>
+It is now downloaded around 400K times a month, according to <a href="https://cranlogs.r-pkg.org/badges/shiny">cranlogs</a>, and has 966 reverse dependencies (i.e. packages that depend on it), according to <code>revdep("shiny")</code> from <a href="https://devtools.r-lib.org/">devtools</a> <span class="citation">(Wickham, Hester, and Chang <a href="references.html#ref-R-devtools" role="doc-biblioref">2020</a>)</span>.</p>
 <p>If you are very new to <a href="http://shiny.rstudio.com">shiny</a>, this book might feel a little bit overwhelming: we will be discussing some advanced <a href="http://shiny.rstudio.com">shiny</a> and software engineering methods, best practices and structural ideas for sending <a href="http://shiny.rstudio.com">shiny</a> applications to production.
 This book relies on the assumption that you already know how to build basic <a href="http://shiny.rstudio.com">shiny</a> applications, and that you want to push your <a href="http://shiny.rstudio.com">shiny</a> skills to the next level: in other words, you are ready to move from the Proof of Concept to the production-grade application.
 If you are very new to <a href="http://shiny.rstudio.com">shiny</a>, we suggest you start with the <a href="https://mastering-shiny.org/"><em>Mastering Shiny</em> book</a> before reading the present book.</p>
@@ -396,7 +396,7 @@ But that is just at a local level, and it can be a suboptimal option: having a v
 <p>In the end of the day, splitting into smaller functions is not a magic solution because:</p>
 <ul>
 <li>the global complexity of the app is not lowered by splitting things into pieces (just local complexity) and</li>
-<li>tThe deeper the call stack, the harder it can be to debug.</li>
+<li>The deeper the call stack, the harder it can be to debug.</li>
 </ul>
 </div>
 <div id="c.-other-measures-for-code-complexity" class="section level4 unnumbered">
@@ -405,9 +405,12 @@ But that is just at a local level, and it can be a suboptimal option: having a v
 <p>Complexity can come from other sources: <strong>insufficient code coverage, dependencies that break the implementation, relying on old packages</strong>, or a lot of other things.</p>
 <p>We can use the <a href="http://git.mango.local/gcsardi/packageMetrics2">packageMetrics2</a> <span class="citation">(Csardi <a href="references.html#ref-R-packageMetrics2" role="doc-biblioref">2021</a>)</span> package to get some of these metrics: for example, the number of dependencies, the code coverage, the number of releases and the date of the last one, etc., and the number of lines of code and the cyclomatic complexity.</p>
 <p>At the time of writing these lines, the package is not on CRAN and can be installed using the following line of code:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Installing {packageMetrics2} from GitHub</span>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"MangoTheCat/packageMetrics2"</span><span class="op">)</span></code></pre></div>
 <p>This package can now be used to assess the dependencies we use in our application.
 To do that, let’s create a small function that computes this metric and returns a tibble:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://git.mango.local/gcsardi/packageMetrics2">packageMetrics2</a></span><span class="op">)</span>
 <span class="co"># A function to turn the output of the metrics into a data.frame</span>
 <span class="va">frame_metric</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">pkg</span><span class="op">)</span><span class="op">{</span>
@@ -419,7 +422,7 @@ To do that, let’s create a small function that computes this metric and return
   <span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 <p>And run the metric for <a href="https://github.com/ThinkR-open/golem">golem</a>,</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Using this function with{golem}</span>
 <span class="fu">frame_metric</span><span class="op">(</span><span class="st">"golem"</span><span class="op">)</span> </code></pre></div>
 <pre><code># A tibble: 22 x 3
@@ -437,7 +440,7 @@ To do that, let’s create a small function that computes this metric and return
 10 LLE   109               Number of code lines longer…
 # … with 12 more rows</code></pre>
 <p>And <a href="http://shiny.rstudio.com">shiny</a></p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Using this function with {shiny}</span>
 <span class="fu">frame_metric</span><span class="op">(</span><span class="st">"shiny"</span><span class="op">)</span> </code></pre></div>
 <pre><code># A tibble: 22 x 3
@@ -455,7 +458,7 @@ To do that, let’s create a small function that computes this metric and return
 10 LLE   738               Number of code lines longer…
 # … with 12 more rows</code></pre>
 <p>If you are building your <a href="http://shiny.rstudio.com">shiny</a> application with <a href="https://github.com/ThinkR-open/golem">golem</a>, you can use the <code>DESCRIPTION</code> file, which contains the list of dependencies, as a starting point to explore these metrics for your dependencies, for example, using <a href="https://github.com/r-lib/desc#readme">desc</a> <span class="citation">(Csárdi, Müller, and Hester <a href="references.html#ref-R-desc" role="doc-biblioref">2018</a>)</span> or <a href="https://github.com/Thinkr-open/attachment">attachment</a> <span class="citation">(Guyader and Rochette <a href="references.html#ref-R-attachment" role="doc-biblioref">2020</a>)</span>:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Get the dependencies from the DESCRIPTION file.</span>
 <span class="co"># You can use one of these two functions to list </span>
 <span class="co"># the dependencies of your package, </span>
@@ -466,7 +469,7 @@ To do that, let’s create a small function that computes this metric and return
 2 Imports   golem &gt;= 0.3.0
 3 Imports   shiny &gt;= 1.5.0</code></pre>
 <div style="page-break-after: always;"></div>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># See also </span>
 <span class="fu">attachment</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/attachment/man/att_from_description.html">att_from_description</a></span><span class="op">(</span><span class="st">"golex/DESCRIPTION"</span><span class="op">)</span></code></pre></div>
 <pre><code>[1] "config" "golem"  "shiny" </code></pre>
@@ -620,7 +623,7 @@ And this, again, is hard to do without effective planning and efficient engineer
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Engineering Production-Grade Shiny Apps</strong>" was written by Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard. It was last built on 2021-09-30.</p>
+    <p>"<strong>Engineering Production-Grade Shiny Apps</strong>" was written by Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard. It was last built on 2021-10-22.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
