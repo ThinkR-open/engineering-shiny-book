@@ -108,7 +108,7 @@ Most of the time, issues come from the fact that <strong>there is too much react
 <p>Of course, it is a nice feature to make everything react instantly to changes, but when building larger apps it is easy to create monsters, i.e. complicated, messy, reactive graphs where everything is updated too much and too often.
 Or worse, we generate endless reactive loops, aka “the reactive inferno” where A invalidates B which invalidates C which invalidates A which invalidates B which invalidates C, and so on.</p>
 <p>Let’s take a small example of a reactive inferno:</p>
-<div class="sourceCode" id="cb264"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb265"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://lubridate.tidyverse.org">lubridate</a></span><span class="op">)</span>
 <span class="va">ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
@@ -169,7 +169,7 @@ Or worse, we generate endless reactive loops, aka “the reactive inferno” whe
 In this section, we will deal with reactivity, how to have more control over it, and how to share data across modules without relying on passing along reactive objects.</p>
 <p>This application is in this state of infinite loop because it starts in a mutually inconsistent state: the <code><a href="https://shiny.rstudio.com/reference/shiny/latest/dateInput.html">dateInput()</a></code> year value is the current year, while the <code><a href="https://shiny.rstudio.com/reference/shiny/latest/selectInput.html">selectInput()</a></code> value is <code>2010</code>.
 One way to solve this is to add some extra logic to the app by selecting the current year for <code><a href="https://shiny.rstudio.com/reference/shiny/latest/selectInput.html">selectInput()</a></code>, and adding an <code>if</code> statement in the <code><a href="https://shiny.rstudio.com/reference/shiny/latest/observeEvent.html">observeEvent(input$year, {})</a></code>, as shown below.<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;We want to thank Hadley for his help simplifying this solution &lt;a href="https://github.com/ThinkR-open/engineering-shiny-book/issues/276" class="uri"&gt;https://github.com/ThinkR-open/engineering-shiny-book/issues/276&lt;/a&gt;.&lt;/p&gt;'><sup>59</sup></a></p>
-<div class="sourceCode" id="cb265"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb266"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/fluidPage.html">fluidPage</a></span><span class="op">(</span>
   <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/dateInput.html">dateInput</a></span><span class="op">(</span>
@@ -220,7 +220,7 @@ This function updates <strong>every time a reactive object it contains is invali
 Yes, this works well if you have a small number of reactive objects in the observer, but that gets tricky when you start adding a long list of things inside your <code><a href="https://shiny.rstudio.com/reference/shiny/latest/observe.html">observe()</a></code>, as you might be launching a computation 10 times if your reactive scope contains 10 reactive objects that are somehow invalidated in chain.
 And believe us, we have seen pieces of code where the <code><a href="https://shiny.rstudio.com/reference/shiny/latest/observe.html">observe()</a></code> contains hundreds of lines of code, with reactive objects all over the place, with one <code><a href="https://shiny.rstudio.com/reference/shiny/latest/observe.html">observe()</a></code> context being invalidated dozens of times when one input changes in the application.</p>
 <p>For example, let’s start with that:</p>
-<div class="sourceCode" id="cb266"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb267"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## DO NOT DO GLOBAL VARIABLES, IT'S JUST TO SIMPLIFY THE EXAMPLE</span>
 <span class="co"># We initiate a counter that will help to track how many times </span>
 <span class="co"># some pieces of the code are called</span>
@@ -249,7 +249,7 @@ And believe us, we have seen pieces of code where the <code><a href="https://shi
 
 <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></code></pre></div>
 <p>Oh, and then, let’s add a small <code><a href="https://shiny.rstudio.com/reference/shiny/latest/selectInput.html">selectInput()</a></code>:</p>
-<div class="sourceCode" id="cb267"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb268"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">i</span> <span class="op">&lt;-</span> <span class="fl">0</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cli.r-lib.org">cli</a></span><span class="op">)</span>
@@ -287,7 +287,7 @@ And believe us, we have seen pieces of code where the <code><a href="https://shi
 
 <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></code></pre></div>
 <p>And, as time goes by, we add another control flow to our <code><a href="https://shiny.rstudio.com/reference/shiny/latest/observe.html">observe()</a></code>:</p>
-<div class="sourceCode" id="cb268"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb269"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">i</span> <span class="op">&lt;-</span> <span class="fl">0</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cli.r-lib.org">cli</a></span><span class="op">)</span>
@@ -335,7 +335,7 @@ And believe us, we have seen pieces of code where the <code><a href="https://shi
 <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></code></pre></div>
 <p>And it would be nice to keep the selected values in a reactive list, so that we can reuse it elsewhere.
 And maybe you would like to add a checkbox so that the logs are printed to the console only if checked.</p>
-<div class="sourceCode" id="cb269"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb270"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">i</span> <span class="op">&lt;-</span> <span class="fl">0</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://cli.r-lib.org">cli</a></span><span class="op">)</span>
@@ -398,38 +398,38 @@ No, they usually try and miss, restart, change things, amplifying the reactivity
 That’s why (well, in 99% of cases), it is safer to go with <code>observeEvent</code>, as it allows you to see at a glance the condition under which the content is invalidated and re-evaluated.
 Then, if a reactive context is invalidated, <strong>you know why</strong>.
 For example, here is where the reactive invalidation can happen (lines with a <code><a href="https://rdrr.io/r/base/Arithmetic.html">*</a></code>)<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Of course it’s an over-simplification: the reactive context will not be invalidated in all of these contexts. The idea is to illustrate how &lt;code&gt;observe()&lt;/code&gt; can lead to invalidation points that are spread all across the code bloc.&lt;/p&gt;"><sup>60</sup></a>:</p>
-<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb270-1"><a href="common-app-caveats.html#cb270-1"></a><span class="kw">observe</span>({</span>
-<span id="cb270-2"><a href="common-app-caveats.html#cb270-2"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb270-3"><a href="common-app-caveats.html#cb270-3"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb270-4"><a href="common-app-caveats.html#cb270-4"></a><span class="op">*</span><span class="st">   </span><span class="cf">if</span> (input<span class="op">$</span>rev){</span>
-<span id="cb270-5"><a href="common-app-caveats.html#cb270-5"></a><span class="op">*</span><span class="st">     </span>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
-<span id="cb270-6"><a href="common-app-caveats.html#cb270-6"></a>    } <span class="cf">else</span> {</span>
-<span id="cb270-7"><a href="common-app-caveats.html#cb270-7"></a><span class="op">*</span><span class="st">     </span>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
-<span id="cb270-8"><a href="common-app-caveats.html#cb270-8"></a>    }</span>
-<span id="cb270-9"><a href="common-app-caveats.html#cb270-9"></a><span class="op">*</span><span class="st">   </span><span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> "lower"</span>) {</span>
-<span id="cb270-10"><a href="common-app-caveats.html#cb270-10"></a><span class="op">*</span><span class="st">     </span><span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb270-11"><a href="common-app-caveats.html#cb270-11"></a>    } <span class="cf">else</span>  {</span>
-<span id="cb270-12"><a href="common-app-caveats.html#cb270-12"></a><span class="op">*</span><span class="st">     </span><span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb270-13"><a href="common-app-caveats.html#cb270-13"></a>    }</span>
-<span id="cb270-14"><a href="common-app-caveats.html#cb270-14"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb271-1"><a href="common-app-caveats.html#cb271-1"></a><span class="kw">observe</span>({</span>
+<span id="cb271-2"><a href="common-app-caveats.html#cb271-2"></a>    i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb271-3"><a href="common-app-caveats.html#cb271-3"></a>    <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
+<span id="cb271-4"><a href="common-app-caveats.html#cb271-4"></a><span class="op">*</span><span class="st">   </span><span class="cf">if</span> (input<span class="op">$</span>rev){</span>
+<span id="cb271-5"><a href="common-app-caveats.html#cb271-5"></a><span class="op">*</span><span class="st">     </span>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
+<span id="cb271-6"><a href="common-app-caveats.html#cb271-6"></a>    } <span class="cf">else</span> {</span>
+<span id="cb271-7"><a href="common-app-caveats.html#cb271-7"></a><span class="op">*</span><span class="st">     </span>r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
+<span id="cb271-8"><a href="common-app-caveats.html#cb271-8"></a>    }</span>
+<span id="cb271-9"><a href="common-app-caveats.html#cb271-9"></a><span class="op">*</span><span class="st">   </span><span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> "lower"</span>) {</span>
+<span id="cb271-10"><a href="common-app-caveats.html#cb271-10"></a><span class="op">*</span><span class="st">     </span><span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb271-11"><a href="common-app-caveats.html#cb271-11"></a>    } <span class="cf">else</span>  {</span>
+<span id="cb271-12"><a href="common-app-caveats.html#cb271-12"></a><span class="op">*</span><span class="st">     </span><span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb271-13"><a href="common-app-caveats.html#cb271-13"></a>    }</span>
+<span id="cb271-14"><a href="common-app-caveats.html#cb271-14"></a>})</span></code></pre></div>
 <p>Whereas in this refactored code using <code><a href="https://shiny.rstudio.com/reference/shiny/latest/observeEvent.html">observeEvent()</a></code>, it is easier to identify where the invalidation can happen:</p>
-<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb271-1"><a href="common-app-caveats.html#cb271-1"></a><span class="kw">observeEvent</span>( <span class="kw">c</span>(</span>
-<span id="cb271-2"><a href="common-app-caveats.html#cb271-2"></a><span class="op">*</span><span class="st">  </span>input<span class="op">$</span>rev, </span>
-<span id="cb271-3"><a href="common-app-caveats.html#cb271-3"></a><span class="op">*</span><span class="st">  </span>input<span class="op">$</span>txt</span>
-<span id="cb271-4"><a href="common-app-caveats.html#cb271-4"></a>),{</span>
-<span id="cb271-5"><a href="common-app-caveats.html#cb271-5"></a>  i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb271-6"><a href="common-app-caveats.html#cb271-6"></a>  <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
-<span id="cb271-7"><a href="common-app-caveats.html#cb271-7"></a>  <span class="cf">if</span> (input<span class="op">$</span>rev){</span>
-<span id="cb271-8"><a href="common-app-caveats.html#cb271-8"></a>    r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
-<span id="cb271-9"><a href="common-app-caveats.html#cb271-9"></a>  } <span class="cf">else</span> {</span>
-<span id="cb271-10"><a href="common-app-caveats.html#cb271-10"></a>    r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
-<span id="cb271-11"><a href="common-app-caveats.html#cb271-11"></a>  }</span>
-<span id="cb271-12"><a href="common-app-caveats.html#cb271-12"></a>  <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> "lower"</span>) {</span>
-<span id="cb271-13"><a href="common-app-caveats.html#cb271-13"></a>    <span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb271-14"><a href="common-app-caveats.html#cb271-14"></a>  } <span class="cf">else</span>  {</span>
-<span id="cb271-15"><a href="common-app-caveats.html#cb271-15"></a>    <span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
-<span id="cb271-16"><a href="common-app-caveats.html#cb271-16"></a>  }</span>
-<span id="cb271-17"><a href="common-app-caveats.html#cb271-17"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb272-1"><a href="common-app-caveats.html#cb272-1"></a><span class="kw">observeEvent</span>( <span class="kw">c</span>(</span>
+<span id="cb272-2"><a href="common-app-caveats.html#cb272-2"></a><span class="op">*</span><span class="st">  </span>input<span class="op">$</span>rev, </span>
+<span id="cb272-3"><a href="common-app-caveats.html#cb272-3"></a><span class="op">*</span><span class="st">  </span>input<span class="op">$</span>txt</span>
+<span id="cb272-4"><a href="common-app-caveats.html#cb272-4"></a>),{</span>
+<span id="cb272-5"><a href="common-app-caveats.html#cb272-5"></a>  i &lt;&lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb272-6"><a href="common-app-caveats.html#cb272-6"></a>  <span class="kw">cat_rule</span>(<span class="kw">as.character</span>(i))</span>
+<span id="cb272-7"><a href="common-app-caveats.html#cb272-7"></a>  <span class="cf">if</span> (input<span class="op">$</span>rev){</span>
+<span id="cb272-8"><a href="common-app-caveats.html#cb272-8"></a>    r<span class="op">$</span>input_txt &lt;-<span class="st"> </span><span class="kw">stri_reverse</span>(r<span class="op">$</span>input_txt)</span>
+<span id="cb272-9"><a href="common-app-caveats.html#cb272-9"></a>  } <span class="cf">else</span> {</span>
+<span id="cb272-10"><a href="common-app-caveats.html#cb272-10"></a>    r<span class="op">$</span>input_txt &lt;-<span class="st"> </span>input<span class="op">$</span>txt</span>
+<span id="cb272-11"><a href="common-app-caveats.html#cb272-11"></a>  }</span>
+<span id="cb272-12"><a href="common-app-caveats.html#cb272-12"></a>  <span class="cf">if</span> (input<span class="op">$</span>casefolding <span class="op">==</span><span class="st"> "lower"</span>) {</span>
+<span id="cb272-13"><a href="common-app-caveats.html#cb272-13"></a>    <span class="kw">print</span>(<span class="kw">tolower</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb272-14"><a href="common-app-caveats.html#cb272-14"></a>  } <span class="cf">else</span>  {</span>
+<span id="cb272-15"><a href="common-app-caveats.html#cb272-15"></a>    <span class="kw">print</span>(<span class="kw">toupper</span>(r<span class="op">$</span>input_txt))</span>
+<span id="cb272-16"><a href="common-app-caveats.html#cb272-16"></a>  }</span>
+<span id="cb272-17"><a href="common-app-caveats.html#cb272-17"></a>})</span></code></pre></div>
 </div>
 <div id="building-triggers-and-watchers" class="section level3">
 <h3>
@@ -439,7 +439,7 @@ For example, here is where the reactive invalidation can happen (lines with a <c
 <p>These objects are launched with an <code>init</code> function, then these flags are triggered with <code><a href="https://rdrr.io/pkg/gargoyle/man/Event.html">trigger()</a></code>, and wherever we want these flags to invalidate a reactive context, we <code><a href="https://testthat.r-lib.org/reference/watch.html">watch()</a></code> these flags.</p>
 <p>The idea here is to get full control over the reactive flow: we only invalidate contexts when we want, making the general flow of the app more predictable.
 These flags are available using the <code>{gargoyle}</code> <span class="citation">(Fay <a href="references.html#ref-R-gargoyle" role="doc-biblioref">2021</a><a href="references.html#ref-R-gargoyle" role="doc-biblioref">e</a>)</span> package, that can be installed from GitHub with:</p>
-<div class="sourceCode" id="cb272"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb273"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># CRAN version </span>
 <span class="fu">install.pacakges</span><span class="op">(</span><span class="st">"gargoyle"</span><span class="op">)</span>
 <span class="co"># Dev version</span>
@@ -456,7 +456,7 @@ The idea here is to allow complete control over when the image is recomputed: on
 That might seem like a lot of extra work, but that is definitely worth considering in the long run, as it will help in optimizing the rendering (fewer computations), and lowering the number of errors that can result from too much reactivity inside an application.</p>
 <p>Here is a small example of this implementation, using an environment to store the value.
 When using this pattern, we do not rely on any reactive value invalidating the reactive context: the second result is only displayed when the <code>"render2"</code> flag is triggered, giving us a full control on how the reactivity is propagated.</p>
-<div class="sourceCode" id="cb273"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb274"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">gargoyle</span><span class="op">)</span>
 <span class="va">ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
@@ -541,7 +541,7 @@ Why would we want to do that?</p>
 <p>Basically, the idea is to hold the whole logic of your <strong>data</strong> <strong>reading/cleaning/processing/outputting inside an R6 class</strong>.
 An object of this class is then initiated at the top level of your application, and you can pass this object to the sub-modules.
 Of course, this makes even more sense if you are combining it with the trigger/watch pattern from before!</p>
-<div class="sourceCode" id="cb274"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb275"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="va">data_cleaning_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span><span class="op">{</span>
   <span class="va">ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/NS.html">NS</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span>
@@ -616,7 +616,7 @@ Of course, this makes even more sense if you are combining it with the trigger/w
 <p>During the process of building a robust <a href="http://shiny.rstudio.com">shiny</a> app, we strongly suggest that you test as many things as you can.
 This is where using an R6 for the business logic of your app makes sense: this allows you to build the whole testing of your application data logic outside of any reactive context: you simply build unit tests just as any other function.</p>
 <p>For example, let’s say we have the following R6 generator:</p>
-<div class="sourceCode" id="cb275"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb276"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">MyData</span> <span class="op">&lt;-</span> <span class="fu">R6</span><span class="fu">::</span><span class="kw"><a href="https://r6.r-lib.org/reference/R6Class.html">R6Class</a></span><span class="op">(</span>
   <span class="st">"MyData"</span>, 
   <span class="co"># Defining our public methods, that will be </span>
@@ -632,11 +632,11 @@ This is where using an R6 for the business logic of your app makes sense: this a
   <span class="op">)</span>
 <span class="op">)</span></code></pre></div>
 <p>We can then build a test for this class using <a href="https://testthat.r-lib.org">testthat</a>:</p>
-<div class="sourceCode" id="cb276"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb277"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://testthat.r-lib.org">testthat</a></span>, warn.conflicts <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>Warning: package 'testthat' was built under R version
 3.6.3</code></pre>
-<div class="sourceCode" id="cb278"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb279"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html">test_that</a></span><span class="op">(</span><span class="st">"R6 Class works"</span>, <span class="op">{</span>
   <span class="co"># We define a new instance of this class, that will contain </span>
   <span class="co"># the mtcars data.frame</span>
@@ -654,7 +654,7 @@ This is where using an R6 for the business logic of your app makes sense: this a
   <span class="co">#  on the input object</span>
   <span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html">expect_equal</a></span><span class="op">(</span><span class="va">my_data</span><span class="op">$</span><span class="fu">summarize</span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span><span class="op">)</span></code></pre></div>
-<pre><code>Test passed 🌈</code></pre>
+<pre><code>Test passed 🎊</code></pre>
 <p>Using R6 allows to rely on these battle-tested tools when it comes to testing functions, something which is made more complex when using other patterns like <code><a href="https://shiny.rstudio.com/reference/shiny/latest/reactiveValues.html">reactiveValues()</a></code>.</p>
 </div>
 </div>
@@ -665,7 +665,7 @@ This is where using an R6 for the business logic of your app makes sense: this a
 <p>Getting a good sense of how reactivity is actually working in your app is not an easy task: the reactivity logic is a graph, and it happens very quickly when you run the app, so it’s very hard to follow everything.</p>
 <p><code><a href="https://rdrr.io/pkg/whereami/man/whereami.html">whereami::whereami()</a></code>’s <span class="citation">(Sidi and Müller <a href="references.html#ref-R-whereami" role="doc-biblioref">2019</a>)</span> goal is simple: informing you about where it is called, i.e. from what file and at which line, and how many times.
 For example, if you add the following piece of code to your <code>app_server()</code>, the location of the function call will be printed to the logs.</p>
-<div class="sourceCode" id="cb280"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb281"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">whereami</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/whereami/man/cat_where.html">cat_where</a></span><span class="op">(</span> <span class="fu">whereami</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/whereami/man/whereami.html">whereami</a></span><span class="op">(</span><span class="op">)</span> <span class="op">)</span></code></pre></div>
 <pre><code>── Running server(...) at app_server.R#9 (2) ───────────────</code></pre>
 <p>Combining <code>cat_where()</code> will implement a reactive logging to your console while developing: that way, you can instantaneously know what reactive contexts are invalidated while using the application.
@@ -715,7 +715,7 @@ In this case, the smaller the message size the better!</p>
 </blockquote>
 <p>We will see in the last chapter of this book how you can integrate JS inside your <a href="http://shiny.rstudio.com">shiny</a> app, and how even basic functions can be useful for making your app server smaller.
 For example, compare:</p>
-<div class="sourceCode" id="cb282"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb283"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="va">ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/tagList.html">tagList</a></span><span class="op">(</span>
@@ -745,7 +745,7 @@ For example, compare:</p>
 
 <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span> </code></pre></div>
 <p>to</p>
-<div class="sourceCode" id="cb283"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb284"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="va">ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/tagList.html">tagList</a></span><span class="op">(</span>
@@ -778,7 +778,7 @@ The second solution redraws the plot every time the <code>reactiveValues</code> 
 <p>At a local level, the improvements described in this section will not make your application way faster: for example, rendering UI elements (let’s say rendering a simple title) will not be computationally heavy.
 But at a global level, less UI computation from the server side helps the general rendering of the app: let’s say you have an output that takes 3 seconds to run, then if the whole UI + output is to be rendered on the server side, the whole UI stays blank until everything is computed.</p>
 <p>Compare:</p>
-<div class="sourceCode" id="cb284"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb285"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="va">ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/tagList.html">tagList</a></span><span class="op">(</span>
@@ -806,7 +806,7 @@ But at a global level, less UI computation from the server side helps the genera
 
 <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></code></pre></div>
 <p>to</p>
-<div class="sourceCode" id="cb285"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb286"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="va">ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/tagList.html">tagList</a></span><span class="op">(</span>
@@ -840,7 +840,7 @@ That is a full second for rendering four of them, while R should be busy doing s
 </h4>
 <p>Almost every <a href="http://shiny.rstudio.com">shiny</a> input, even the custom ones from packages, come with an <code>update_</code> function that allows us to change the input values from the server side, instead of re-creating the UI entirely.
 For example, here is a way to update the content of a <code>selectInput</code> from the server side:</p>
-<div class="sourceCode" id="cb286"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb287"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="va">ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/tagList.html">tagList</a></span><span class="op">(</span>
@@ -885,7 +885,7 @@ This method allows us to have a smaller DOM: <code>&lt;div&gt;</code> that are n
 <li>Removing an element from the app will not delete the input from the input list. In other words, if you have <code><a href="https://shiny.rstudio.com/reference/shiny/latest/selectInput.html">selectInput("x", "x")</a></code>, and you remove this input using <code><a href="https://shiny.rstudio.com/reference/shiny/latest/insertUI.html">removeUI()</a></code>, you will still have <code>input$x</code> in the server.</li>
 </ul>
 <p>For example, in the following example, the <code>input$val</code> value will not be removed once you have called <code><a href="https://shiny.rstudio.com/reference/shiny/latest/insertUI.html">removeUI(selector = "#val")</a></code>.</p>
-<div class="sourceCode" id="cb287"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb288"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="va">ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
   <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/tagList.html">tagList</a></span><span class="op">(</span>
@@ -1108,7 +1108,7 @@ For more extensive coverage of using databases in R, please follow these resourc
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Engineering Production-Grade Shiny Apps</strong>" was written by Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard. It was last built on 2021-10-22.</p>
+    <p>"<strong>Engineering Production-Grade Shiny Apps</strong>" was written by Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard. It was last built on 2021-11-05.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

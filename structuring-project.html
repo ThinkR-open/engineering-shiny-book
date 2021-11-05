@@ -252,7 +252,7 @@ How have you been handling that so far?
 By creating <code>validate1</code>, <code>validate2</code>, and so on and so forth.
 But if you think about it, you are mimicking a namespacing process: a <code>validate</code> in namespace <code>1</code>, another in namespace <code>2</code>.</p>
 <p>Consider the following <a href="http://shiny.rstudio.com">shiny</a> application:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="va">ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/fluidPage.html">fluidPage</a></span><span class="op">(</span>
@@ -350,7 +350,7 @@ So, you will be better off starting on solid foundations from the very beginning
 </h4>
 <p>Let’s try to transform the above example (the one with two sliders and two action buttons) into an application with a module.
 Note that the following code will work only for <a href="http://shiny.rstudio.com">shiny</a> version 1.5.0 and after.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Re-usable module</span>
 <span class="va">choice_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span>
   <span class="co"># This ns &lt;- NS structure creates a </span>
@@ -419,7 +419,7 @@ Remember the previous version where we identified our two “validate” buttons
 Here, we create namespaces with the <code>ns()</code> function, built with <code>ns &lt;- NS(id)</code>.
 This line, <code>ns &lt;- NS(id)</code>, is added on top of all module UI functions and will allow building namespaces with the module id.</p>
 <p>To understand what it does, let us try and run it outside <a href="http://shiny.rstudio.com">shiny</a>:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Defining the id</span>
 <span class="va">id</span> <span class="op">&lt;-</span> <span class="st">"mod_ui_1"</span>
 <span class="co"># Creating the internal "namespacing" function</span>
@@ -447,7 +447,7 @@ This requires using extra arguments to generate the UI and server.
 As the UI and server are functions, you can set parameters that will be used to configure the internals of the result.</p>
 <p>As you can see, the <strong>app_ui</strong> contains a series of calls to the
 <code>mod_ui(unique_id, ...)</code> function, allowing additional arguments like any other function:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mod_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span>, <span class="va">button_label</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/NS.html">NS</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span>
   <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/tagList.html">tagList</a></span><span class="op">(</span>
@@ -479,46 +479,46 @@ FIGURE 3.1: Snapshot of the <a href="http://www.github.com/ColinFay/tidytuesday2
 </p>
 </div>
 <p>Let’s extract some pieces of this application to show how (and why) you would parametrize your module.</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="structuring-project.html#cb35-1"></a>mod_dataviz_ui &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
-<span id="cb35-2"><a href="structuring-project.html#cb35-2"></a>  id, </span>
-<span id="cb35-3"><a href="structuring-project.html#cb35-3"></a>  <span class="dt">type =</span> <span class="kw">c</span>(<span class="st">"point"</span>, <span class="st">"hist"</span>, <span class="st">"boxplot"</span>, <span class="st">"bar"</span>)</span>
-<span id="cb35-4"><a href="structuring-project.html#cb35-4"></a>) {</span>
-<span id="cb35-5"><a href="structuring-project.html#cb35-5"></a>  <span class="co"># Setting a header with the specified type of graph</span></span>
-<span id="cb35-6"><a href="structuring-project.html#cb35-6"></a>  <span class="kw">h4</span>(</span>
-<span id="cb35-7"><a href="structuring-project.html#cb35-7"></a>    <span class="kw">sprintf</span>( <span class="st">"Create a geom_%s"</span>, type )</span>
-<span id="cb35-8"><a href="structuring-project.html#cb35-8"></a>  ),</span>
-<span id="cb35-9"><a href="structuring-project.html#cb35-9"></a>  <span class="co"># [ ... ]</span></span>
-<span id="cb35-10"><a href="structuring-project.html#cb35-10"></a>  <span class="co"># We want to allow a coord_flip only with barplots</span></span>
-<span id="cb35-11"><a href="structuring-project.html#cb35-11"></a>  <span class="cf">if</span> (type <span class="op">==</span><span class="st"> "bar"</span>){</span>
-<span id="cb35-12"><a href="structuring-project.html#cb35-12"></a>    <span class="kw">checkboxInput</span>(</span>
-<span id="cb35-13"><a href="structuring-project.html#cb35-13"></a>      <span class="kw">ns</span>(<span class="st">"coord_flip"</span>),</span>
-<span id="cb35-14"><a href="structuring-project.html#cb35-14"></a>      <span class="st">"coord_flip"</span></span>
-<span id="cb35-15"><a href="structuring-project.html#cb35-15"></a>    )</span>
-<span id="cb35-16"><a href="structuring-project.html#cb35-16"></a>  }, </span>
-<span id="cb35-17"><a href="structuring-project.html#cb35-17"></a>  <span class="co"># [ ... ]</span></span>
-<span id="cb35-18"><a href="structuring-project.html#cb35-18"></a>  <span class="co"># We want to display the bins input only </span></span>
-<span id="cb35-19"><a href="structuring-project.html#cb35-19"></a>  <span class="co"># when the type is histogram</span></span>
-<span id="cb35-20"><a href="structuring-project.html#cb35-20"></a>  <span class="cf">if</span> (type <span class="op">==</span><span class="st"> "hist"</span>) {</span>
-<span id="cb35-21"><a href="structuring-project.html#cb35-21"></a>    <span class="kw">numericInput</span>(</span>
-<span id="cb35-22"><a href="structuring-project.html#cb35-22"></a>      <span class="kw">ns</span>(<span class="st">"bins"</span>), </span>
-<span id="cb35-23"><a href="structuring-project.html#cb35-23"></a>      <span class="st">"bins"</span>, </span>
-<span id="cb35-24"><a href="structuring-project.html#cb35-24"></a>      <span class="dv">30</span>, </span>
-<span id="cb35-25"><a href="structuring-project.html#cb35-25"></a>      <span class="dv">1</span>, </span>
-<span id="cb35-26"><a href="structuring-project.html#cb35-26"></a>      <span class="dv">150</span>,</span>
-<span id="cb35-27"><a href="structuring-project.html#cb35-27"></a>      <span class="dv">1</span></span>
-<span id="cb35-28"><a href="structuring-project.html#cb35-28"></a>    )</span>
-<span id="cb35-29"><a href="structuring-project.html#cb35-29"></a>  },</span>
-<span id="cb35-30"><a href="structuring-project.html#cb35-30"></a>  <span class="co"># [ ... ]</span></span>
-<span id="cb35-31"><a href="structuring-project.html#cb35-31"></a>  <span class="co"># The title input will be added to the graph </span></span>
-<span id="cb35-32"><a href="structuring-project.html#cb35-32"></a>  <span class="co"># for every type of graph</span></span>
-<span id="cb35-33"><a href="structuring-project.html#cb35-33"></a>  <span class="kw">textInput</span>(</span>
-<span id="cb35-34"><a href="structuring-project.html#cb35-34"></a>    <span class="kw">ns</span>(<span class="st">"title"</span>),</span>
-<span id="cb35-35"><a href="structuring-project.html#cb35-35"></a>    <span class="st">"Title"</span>,</span>
-<span id="cb35-36"><a href="structuring-project.html#cb35-36"></a>    <span class="dt">value =</span> <span class="st">""</span></span>
-<span id="cb35-37"><a href="structuring-project.html#cb35-37"></a>  )</span>
-<span id="cb35-38"><a href="structuring-project.html#cb35-38"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="structuring-project.html#cb36-1"></a>mod_dataviz_ui &lt;-<span class="st"> </span><span class="cf">function</span>(</span>
+<span id="cb36-2"><a href="structuring-project.html#cb36-2"></a>  id, </span>
+<span id="cb36-3"><a href="structuring-project.html#cb36-3"></a>  <span class="dt">type =</span> <span class="kw">c</span>(<span class="st">"point"</span>, <span class="st">"hist"</span>, <span class="st">"boxplot"</span>, <span class="st">"bar"</span>)</span>
+<span id="cb36-4"><a href="structuring-project.html#cb36-4"></a>) {</span>
+<span id="cb36-5"><a href="structuring-project.html#cb36-5"></a>  <span class="co"># Setting a header with the specified type of graph</span></span>
+<span id="cb36-6"><a href="structuring-project.html#cb36-6"></a>  <span class="kw">h4</span>(</span>
+<span id="cb36-7"><a href="structuring-project.html#cb36-7"></a>    <span class="kw">sprintf</span>( <span class="st">"Create a geom_%s"</span>, type )</span>
+<span id="cb36-8"><a href="structuring-project.html#cb36-8"></a>  ),</span>
+<span id="cb36-9"><a href="structuring-project.html#cb36-9"></a>  <span class="co"># [ ... ]</span></span>
+<span id="cb36-10"><a href="structuring-project.html#cb36-10"></a>  <span class="co"># We want to allow a coord_flip only with barplots</span></span>
+<span id="cb36-11"><a href="structuring-project.html#cb36-11"></a>  <span class="cf">if</span> (type <span class="op">==</span><span class="st"> "bar"</span>){</span>
+<span id="cb36-12"><a href="structuring-project.html#cb36-12"></a>    <span class="kw">checkboxInput</span>(</span>
+<span id="cb36-13"><a href="structuring-project.html#cb36-13"></a>      <span class="kw">ns</span>(<span class="st">"coord_flip"</span>),</span>
+<span id="cb36-14"><a href="structuring-project.html#cb36-14"></a>      <span class="st">"coord_flip"</span></span>
+<span id="cb36-15"><a href="structuring-project.html#cb36-15"></a>    )</span>
+<span id="cb36-16"><a href="structuring-project.html#cb36-16"></a>  }, </span>
+<span id="cb36-17"><a href="structuring-project.html#cb36-17"></a>  <span class="co"># [ ... ]</span></span>
+<span id="cb36-18"><a href="structuring-project.html#cb36-18"></a>  <span class="co"># We want to display the bins input only </span></span>
+<span id="cb36-19"><a href="structuring-project.html#cb36-19"></a>  <span class="co"># when the type is histogram</span></span>
+<span id="cb36-20"><a href="structuring-project.html#cb36-20"></a>  <span class="cf">if</span> (type <span class="op">==</span><span class="st"> "hist"</span>) {</span>
+<span id="cb36-21"><a href="structuring-project.html#cb36-21"></a>    <span class="kw">numericInput</span>(</span>
+<span id="cb36-22"><a href="structuring-project.html#cb36-22"></a>      <span class="kw">ns</span>(<span class="st">"bins"</span>), </span>
+<span id="cb36-23"><a href="structuring-project.html#cb36-23"></a>      <span class="st">"bins"</span>, </span>
+<span id="cb36-24"><a href="structuring-project.html#cb36-24"></a>      <span class="dv">30</span>, </span>
+<span id="cb36-25"><a href="structuring-project.html#cb36-25"></a>      <span class="dv">1</span>, </span>
+<span id="cb36-26"><a href="structuring-project.html#cb36-26"></a>      <span class="dv">150</span>,</span>
+<span id="cb36-27"><a href="structuring-project.html#cb36-27"></a>      <span class="dv">1</span></span>
+<span id="cb36-28"><a href="structuring-project.html#cb36-28"></a>    )</span>
+<span id="cb36-29"><a href="structuring-project.html#cb36-29"></a>  },</span>
+<span id="cb36-30"><a href="structuring-project.html#cb36-30"></a>  <span class="co"># [ ... ]</span></span>
+<span id="cb36-31"><a href="structuring-project.html#cb36-31"></a>  <span class="co"># The title input will be added to the graph </span></span>
+<span id="cb36-32"><a href="structuring-project.html#cb36-32"></a>  <span class="co"># for every type of graph</span></span>
+<span id="cb36-33"><a href="structuring-project.html#cb36-33"></a>  <span class="kw">textInput</span>(</span>
+<span id="cb36-34"><a href="structuring-project.html#cb36-34"></a>    <span class="kw">ns</span>(<span class="st">"title"</span>),</span>
+<span id="cb36-35"><a href="structuring-project.html#cb36-35"></a>    <span class="st">"Title"</span>,</span>
+<span id="cb36-36"><a href="structuring-project.html#cb36-36"></a>    <span class="dt">value =</span> <span class="st">""</span></span>
+<span id="cb36-37"><a href="structuring-project.html#cb36-37"></a>  )</span>
+<span id="cb36-38"><a href="structuring-project.html#cb36-38"></a>}</span></code></pre></div>
 <p>And in the module server:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mod_dataviz_server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span>
   <span class="va">input</span>, 
   <span class="va">output</span>, 
@@ -582,7 +582,7 @@ FIGURE 3.1: Snapshot of the <a href="http://www.github.com/ColinFay/tidytuesday2
   <span class="op">}</span> 
 <span class="op">}</span></code></pre></div>
 <p>Then, the UI of the entire application is:</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">app_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
   <span class="co"># [...]</span>
   <span class="fu"><a href="https://rdrr.io/pkg/htmltools/man/tagList.html">tagList</a></span><span class="op">(</span>
@@ -605,7 +605,7 @@ FIGURE 3.1: Snapshot of the <a href="http://www.github.com/ColinFay/tidytuesday2
   <span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 <p>And the <code>app_server()</code> of the application:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">app_server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span>
   <span class="co"># This app has been built before shiny 1.5.0, </span>
   <span class="co"># so we use the callModule structure</span>
@@ -635,7 +635,7 @@ There are at least three approaches:</p>
 </h4>
 <p>One common approach is to return a <code>reactive</code> function from one module<strong>, and pass it to another</strong> in the general <code>app_server()</code> function.</p>
 <p>Here is an example that illustrates this pattern.</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Module 1, which will allow to select a number</span>
 <span class="va">choice_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/NS.html">NS</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span>
@@ -710,7 +710,7 @@ The idea is that it allows you to be less preoccupied about what your module tak
 You can think of this approach as creating a small, internal database that is passed along through all the modules of your application.</p>
 <p>Below, we create a “global” (in the sense that it is initiated at the top of the module hierarchy) <code><a href="https://shiny.rstudio.com/reference/shiny/latest/reactiveValues.html">reactiveValues()</a></code> object in the <code>app_server()</code> function.
 It will then go through all modules, passed as a function argument.</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Module 1, which will allow to select a number</span>
 <span class="va">choice_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/NS.html">NS</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span>
@@ -833,7 +833,7 @@ If you keep all components together in the same file, you will end up having to 
 Extract the business function from the reactive functions.
 Literally.
 Compare this pattern:</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 <span class="co"># A simple app that returns a table</span>
@@ -860,7 +860,7 @@ Compare this pattern:</p>
 
 <span class="fu"><a href="https://shiny.rstudio.com/reference/shiny/latest/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></code></pre></div>
 <p>To this one:</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://shiny.rstudio.com">shiny</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 
@@ -1041,7 +1041,7 @@ But whether you have one or thousands of files, it is always a good practice to 
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Engineering Production-Grade Shiny Apps</strong>" was written by Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard. It was last built on 2021-10-22.</p>
+    <p>"<strong>Engineering Production-Grade Shiny Apps</strong>" was written by Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard. It was last built on 2021-11-05.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">
