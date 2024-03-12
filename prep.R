@@ -7,3 +7,5 @@ if (!file.exists("packages.bib")){
     desc::desc_get_deps()$package
   ), 'packages.bib')
 }
+
+minifyr::minifyr_npm_install(force=TRUE)
