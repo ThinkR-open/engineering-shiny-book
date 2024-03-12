@@ -30,25 +30,25 @@ Here is the structure of this project:
 try({
   fs::file_delete(
     fs::path(
-      here::here("golex"), 
+      here::here("golex"),
       "inst/app/www/plop.js"
     )
   )
   fs::file_delete(
     fs::path(
-      here::here("golex"), 
+      here::here("golex"),
       "inst/app/www/script.js"
     )
   )
   fs::file_delete(
     fs::path(
-      here::here("golex"), 
+      here::here("golex"),
       "inst/app/www/custom.css"
     )
   )
   fs::file_delete(
     fs::path(
-      here::here("golex"), 
+      here::here("golex"),
       "R/mod_my_first_module.R"
     )
   )
@@ -64,7 +64,14 @@ fs::dir_tree("golex")
 
 ```{r include = FALSE}
 fs::dir_delete("golex")
-golem::create_golem("golex", open = FALSE)
+testthat::with_mocked_bindings(
+  .package = "usethis",
+  allow_nested_project = function(){
+    return(TRUE)
+  },
+  code = {
+  golem::create_golem("golex", open = FALSE)
+})
 ```
 
 
@@ -92,21 +99,21 @@ First, fill the DESCRIPTION file by adding information about the package that wi
 
 ```{r 08-step-by-step-prototype-4, eval = FALSE}
 golem::fill_desc(
-  # The Name of the package containing the App 
-  pkg_name = "ipsumapp", 
-  # The Title of the package containing the App 
-  pkg_title = "PKG_TITLE", 
-  # The Description of the package containing the App 
-  pkg_description = "PKG_DESC.", 
+  # The Name of the package containing the App
+  pkg_name = "ipsumapp",
+  # The Title of the package containing the App
+  pkg_title = "PKG_TITLE",
+  # The Description of the package containing the App
+  pkg_description = "PKG_DESC.",
   # Your First Name
-  author_first_name = "AUTHOR_FIRST", 
+  author_first_name = "AUTHOR_FIRST",
   # Your Last Name
-  author_last_name = "AUTHOR_LAST", 
+  author_last_name = "AUTHOR_LAST",
   # Your Email
-  author_email = "AUTHOR@MAIL.COM", 
-  # The URL of the GitHub Repo (optional) 
-  repo_url = NULL 
-)   
+  author_email = "AUTHOR@MAIL.COM",
+  # The URL of the GitHub Repo (optional)
+  repo_url = NULL
+)
 ```
 
 Then, call the `golem::set_golem_options()` function, which will add information to the `golem-config.yml` file, and set the `{here}` [@R-here] package root sentinel.
@@ -120,8 +127,8 @@ If you want to use the MIT license, add README, a code of conduct, a lifecycle b
 
 ```{r 08-step-by-step-prototype-5, eval = FALSE}
 # You can set another license here
-usethis::use_mit_license( name = "Golem User" )  
-# Add a README, Code of Conduct, lifecycle badge and NEWS.md 
+usethis::use_mit_license( name = "Golem User" )
+# Add a README, Code of Conduct, lifecycle badge and NEWS.md
 # file to your application
 usethis::use_readme_rmd( open = FALSE )
 usethis::use_code_of_conduct()
@@ -146,7 +153,7 @@ These two functions add a file with various functions that can be used along the
 See each file in detail for a description of the functions.
 
 ```{r 08-step-by-step-prototype-7, eval = FALSE}
-# These files will create R/golem_utils_ui.R 
+# These files will create R/golem_utils_ui.R
 # and R/golem_utils_server.R
 golem::use_utils_ui()
 golem::use_utils_server()
@@ -176,17 +183,17 @@ The file and the modules will be named after the `name` parameter, by adding `mo
 
 ```{r 08-step-by-step-prototype-9, eval = FALSE}
 # Creating a module skeleton
-golem::add_module(name = "my_first_module") 
+golem::add_module(name = "my_first_module")
 ```
 
 ```{r 08-step-by-step-prototype-10, echo = FALSE}
-golem::add_module(name = "my_first_module", here::here("golex"), open = FALSE) 
+golem::add_module(name = "my_first_module", here::here("golex"), open = FALSE)
 ```
 
 The new file will contain:
 
 ```{r 08-step-by-step-prototype-11, echo = FALSE, comment=""}
-readLines("golex/R/mod_my_first_module.R") %>% 
+readLines("golex/R/mod_my_first_module.R") %>%
   cat(sep = "\n")
 ```
 
@@ -210,7 +217,7 @@ golem::add_js_file("script", here::here("golex"), open = FALSE)
 will generate the following file:
 
 ```{r 08-step-by-step-prototype-14, comment="", echo=FALSE}
-readLines("golex/inst/app/www/script.js") %>% 
+readLines("golex/inst/app/www/script.js") %>%
   cat(sep = "\n")
 ```
 
@@ -227,7 +234,7 @@ golem::add_js_handler("handlers", here::here("golex"), open = FALSE)
 will generate the following file:
 
 ```{r 08-step-by-step-prototype-17, comment="", echo=FALSE}
-readLines( "golex/inst/app/www/handlers.js" ) %>% 
+readLines( "golex/inst/app/www/handlers.js" ) %>%
   cat(sep = "\n")
 ```
 

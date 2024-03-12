@@ -1,5 +1,5 @@
 # To do locally on Colin's computer, thanks
-options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/latest"))
+options(renv.config.mran.enabled = FALSE)
 renv::restore()
 # remotes::install_local(Ncpus = 4, upgrade = "never", force = TRUE)
 if (!file.exists("packages.bib")){

@@ -90,13 +90,20 @@ fs::dir_tree("golex")
 
 ```{r include = FALSE}
 fs::dir_delete("golex")
-golem::create_golem("golex", open = FALSE)
+testthat::with_mocked_bindings(
+  .package = "usethis",
+  allow_nested_project = function(){
+    return(TRUE)
+  },
+  code = {
+  golem::create_golem("golex", open = FALSE)
+})
+
 ```
 
 
 ```{r echo = FALSE}
 fs::dir_tree("golex")
-
 ```
 
 ```{r include = FALSE}
@@ -150,16 +157,16 @@ Note also that this folder must not contain any sub-folders.
 
 ``` {.r}
 #' Access files in the current app
-#' 
-#' NOTE: If you manually change your package 
+#'
+#' NOTE: If you manually change your package
 #' name in the DESCRIPTION, don't forget to change it here too,
-#' and in the config file. For a safer name change mechanism, 
+#' and in the config file. For a safer name change mechanism,
 #' use the `golem::set_golem_name()` function.
-#' 
-#' @param ... character vectors, specifying subdirectory 
-#' and file(s) within your package. 
+#'
+#' @param ... character vectors, specifying subdirectory
+#' and file(s) within your package.
 #' The default, none, returns the root of the app.
-#' 
+#'
 #' @noRd
 app_sys <- function(...){
   system.file(..., package = "golex")
@@ -167,30 +174,30 @@ app_sys <- function(...){
 
 
 #' Read App Config
-#' 
-#' @param value Value to retrieve from the config file. 
-#' @param config GOLEM_CONFIG_ACTIVE value. 
+#'
+#' @param value Value to retrieve from the config file.
+#' @param config GOLEM_CONFIG_ACTIVE value.
 #' If unset, R_CONFIG_ACTIVE.  If unset, "default".
-#' @param use_parent Logical, 
+#' @param use_parent Logical,
 #' scan the parent directory for config file.
-#' 
+#'
 #' @noRd
 get_golem_config <- function(
-  value, 
+  value,
   config = Sys.getenv(
-    "GOLEM_CONFIG_ACTIVE", 
+    "GOLEM_CONFIG_ACTIVE",
     Sys.getenv(
-      "R_CONFIG_ACTIVE", 
+      "R_CONFIG_ACTIVE",
       "default"
     )
-  ), 
+  ),
   use_parent = TRUE
 ){
   config::get(
-    value = value, 
-    config = config, 
+    value = value,
+    config = config,
     # Modify this if your config file is somewhere else:
-    file = app_sys("golem-config.yml"), 
+    file = app_sys("golem-config.yml"),
     use_parent = use_parent
   )
 }
@@ -204,14 +211,14 @@ To make this process easier, you can use the `golem::set_golem_name()`, which wi
 
 ``` {.r}
 #' The application server-side
-#' 
-#' @param input,output,session Internal parameters for {shiny}. 
+#'
+#' @param input,output,session Internal parameters for {shiny}.
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @noRd
 app_server <- function( input, output, session ) {
-  # Your application server logic 
-  
+  # Your application server logic
+
 }
 ```
 
@@ -227,8 +234,8 @@ You will also find global elements from your server-logic: top-level `reactiveVa
 
 ``` {.r}
 #' The application User-Interface
-#' 
-#' @param request Internal parameter for `{shiny}`. 
+#'
+#' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @noRd
@@ -236,7 +243,7 @@ app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
-    # Your application UI logic 
+    # Your application UI logic
     fluidPage(
       h1("golex")
     )
@@ -257,20 +264,20 @@ If you're tempted to do that, be aware that `fluidPage()` comes with a series of
 
 ``` {.r}
 #' Add external Resources to the Application
-#' 
-#' This function is internally used to add external 
-#' resources inside the Shiny application. 
-#' 
+#'
+#' This function is internally used to add external
+#' resources inside the Shiny application.
+#'
 #' @import shiny
-#' @importFrom golem add_resource_path activate_js 
+#' @importFrom golem add_resource_path activate_js
 #' @importFrom golem favicon bundle_resources
 #' @noRd
 golem_add_external_resources <- function(){
-  
+
   add_resource_path(
     'www', app_sys('app/www')
   )
- 
+
   tags$head(
     favicon(),
     bundle_resources(
@@ -278,8 +285,8 @@ golem_add_external_resources <- function(){
       app_title = 'cloop'
     )
     # Add here other external resources
-    # for example, you can add 
-    # shinyalert::useShinyalert() 
+    # for example, you can add
+    # shinyalert::useShinyalert()
   )
 }
 ```
@@ -306,16 +313,16 @@ Note that as all these elements are inside a `tags$head()`, they are to be treat
 ``` {.r}
 #' Run the Shiny Application
 #'
-#' @param ... arguments to pass to golem_opts. 
+#' @param ... arguments to pass to golem_opts.
 #' See `?golem::get_golem_options` for more details.
 #' @inheritParams shiny::shinyApp
 #'
 #' @export
 #' @importFrom shiny shinyApp
-#' @importFrom golem with_golem_options 
+#' @importFrom golem with_golem_options
 run_app <- function(
   onStart = NULL,
-  options = list(), 
+  options = list(),
   enableBookmarking = NULL,
   uiPattern = "/",
   ...
@@ -325,10 +332,10 @@ run_app <- function(
       ui = app_ui,
       server = app_server,
       onStart = onStart,
-      options = options, 
-      enableBookmarking = enableBookmarking, 
+      options = options,
+      enableBookmarking = enableBookmarking,
       uiPattern = uiPattern
-    ), 
+    ),
     golem_opts = list(...)
   )
 }
@@ -372,7 +379,7 @@ readLines(
   )  %>%
   #strwrap(width = 55) %>%
   #grkstyle::grk_style_text() %>%
-  glue::as_glue() 
+  glue::as_glue()
 ```
 
 It is based on the `{config}` [@R-config] format, and allows you to define contexts, with values associated with these specific contexts.
@@ -392,7 +399,7 @@ set_golem_options()
 ```
 ── Setting {golem} options in `golem-config.yml` ──────
 ✓ Setting `golem_wd` to /Users/colin/golex
-You can change golem working directory with 
+You can change golem working directory with
 set_golem_wd('path/to/wd')
 ✓ Setting `golem_name` to golex
 ✓ Setting `golem_version` to 0.0.0.9000
@@ -476,13 +483,13 @@ If you are already familiar with the `{config}` package, you can use this file j
 ```{r 04-golem-19, eval = FALSE}
 # Add a key in the default configuration
 amend_golem_config(
-  key = "MONGODBURL", 
+  key = "MONGODBURL",
   value = "localhost"
 )
 # Add a key in the production configuration
 amend_golem_config(
-  key = "MONGODBURL", 
-  value = "0.0.0.0", 
+  key = "MONGODBURL",
+  value = "0.0.0.0",
   config = "production"
 )
 ```
@@ -503,7 +510,7 @@ get_golem_config(
 
 ```{r, eval = FALSE}
 get_golem_config(
-  "MONGODBURL", 
+  "MONGODBURL",
   config = "production"
 )
 ```
@@ -553,7 +560,7 @@ Note, though, that it shouldn't be used to store sensitive data (for example use
 Here is the config file that would illustrate what we just said (we have removed the other golem-related entries for the sake of clarity):
 
 ``` {.yaml}
-default: 
+default:
   url: mongo
   mongoport: 12345
   mongodb: users
