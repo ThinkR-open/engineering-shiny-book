@@ -1,633 +1,185 @@
 <!DOCTYPE html>
-<html lang="" xml:lang="">
+<html lang="en">
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 4 Introduction to {golem} | Engineering Production-Grade Shiny Apps</title>
+<meta name="author" content="Colin Fay">
+<meta name="author" content="Sébastien Rochette">
+<meta name="author" content="Vincent Guyader">
+<meta name="author" content="Cervan Girard">
+<meta name="description" content="img.left {  float: left;  margin-right: 1em; } The {golem} (Fay, Guyader, Rochette, et al. 2023) package is a framework for building production-grade {shiny} applications. Many of the patterns and...">
+<meta name="generator" content="bookdown 0.33 with bs4_book()">
+<meta property="og:title" content="Chapter 4 Introduction to {golem} | Engineering Production-Grade Shiny Apps">
+<meta property="og:type" content="book">
+<meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg">
+<meta property="og:description" content="img.left {  float: left;  margin-right: 1em; } The {golem} (Fay, Guyader, Rochette, et al. 2023) package is a framework for building production-grade {shiny} applications. Many of the patterns and...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 4 Introduction to {golem} | Engineering Production-Grade Shiny Apps">
+<meta name="twitter:description" content="img.left {  float: left;  margin-right: 1em; } The {golem} (Fay, Guyader, Rochette, et al. 2023) package is a framework for building production-grade {shiny} applications. Many of the patterns and...">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap/bootstrap.bundle.min.js"></script><script src="libs/bs3compat/transition.js"></script><script src="libs/bs3compat/tabs.js"></script><script src="libs/bs3compat/bs3compat.js"></script><link href="libs/bs4_book/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book/bs4_book.js"></script><!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=UA-149994171-1"></script><script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 4 Introduction to {golem} | Engineering Production-Grade Shiny Apps</title>
-  <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
-
-  <meta property="og:title" content="Chapter 4 Introduction to {golem} | Engineering Production-Grade Shiny Apps" />
-  <meta property="og:type" content="book" />
-  <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
-  <meta property="og:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="github-repo" content="ThinkR-open/engineering-shiny-book" />
-
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 4 Introduction to {golem} | Engineering Production-Grade Shiny Apps" />
-  
-  <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
-
-<meta name="author" content="Colin Fay" />
-<meta name="author" content="Sébastien Rochette" />
-<meta name="author" content="Vincent Guyader" />
-<meta name="author" content="Cervan Girard" />
-
-
-<meta name="date" content="2024-03-12" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-  
-  <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="structuring-project.html"/>
-<link rel="next" href="workflow.html"/>
-<script src="libs/jquery/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
-<link href="libs/gitbook/css/style.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-clipboard.css" rel="stylesheet" />
-
-
-
-
-
-
-
-
-<link href="libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
-<link href="libs/anchor-sections/anchor-sections-hash.css" rel="stylesheet" />
-<script src="libs/anchor-sections/anchor-sections.js"></script>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-149994171-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-149994171-1');
-</script>
-
-
+      gtag('config', 'UA-149994171-1');
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
 <style type="text/css">
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-</style>
-
-<style type="text/css">
-/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-  margin-bottom: 0em;
-}
-.hanging div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}
-</style>
-
-<link rel="stylesheet" href="css/style.css" type="text/css" />
-<link rel="stylesheet" href="css/thinkr.css" type="text/css" />
-<link rel="stylesheet" href="css/style_gitbook.css" type="text/css" />
+    /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+          margin-bottom: 0em;
+        }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/thinkr.css">
+<link rel="stylesheet" href="css/style_gitbook.css">
 </head>
+<body data-spy="scroll" data-target="#toc">
 
-<body>
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
 
-
-
-  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
-
-    <div class="book-summary">
-      <nav role="navigation">
-
-<ul class="summary">
-<li><a href="./">Engineering Production-Grade Shiny Apps</a></li>
-
-<li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a>
-<ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#motivation"><i class="fa fa-check"></i>Motivation</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#audience-for-this-book"><i class="fa fa-check"></i>Audience for this book</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#what-is-production"><i class="fa fa-check"></i>What is “production”?</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#book-structure"><i class="fa fa-check"></i>Book structure</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#about-the-authors"><i class="fa fa-check"></i>About the authors</a>
-<ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#colin-fay"><i class="fa fa-check"></i><a href="https://colinfay.me/">Colin Fay</a></a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#sébastien-rochette"><i class="fa fa-check"></i><a href="https://statnmap.com/">Sébastien Rochette</a></a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#vincent-guyader"><i class="fa fa-check"></i><a href="https://twitter.com/VincentGuyader">Vincent Guyader</a></a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#cervan-girard"><i class="fa fa-check"></i><a href="https://twitter.com/CervanGirard">Cervan Girard</a></a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i>Disclaimer</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information-and-conventions"><i class="fa fa-check"></i>Software information and conventions</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#want-to-help"><i class="fa fa-check"></i>Want to help?</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#other-resources"><i class="fa fa-check"></i>Other resources</a>
-<ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#getting-started-with-shiny"><i class="fa fa-check"></i>Getting started with <code>{shiny}</code></a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#putting-shiny-into-production"><i class="fa fa-check"></i>Putting <code>{shiny}</code> into production</a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a>
-<ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#special-thanks"><i class="fa fa-check"></i>Special thanks</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#contributors-to-this-book"><i class="fa fa-check"></i>Contributors to this book</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="foreword.html"><a href="foreword.html"><i class="fa fa-check"></i>Foreword</a></li>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html"><i class="fa fa-check"></i>Application presentation</a>
-<ul>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html#hexmake"><i class="fa fa-check"></i><code>{hexmake}</code></a></li>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html#tidytuesday201942"><i class="fa fa-check"></i><code>{tidytuesday201942}</code></a></li>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html#minifying"><i class="fa fa-check"></i><code>{minifying}</code></a></li>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html#other-applications"><i class="fa fa-check"></i>Other applications</a></li>
-</ul></li>
-<li class="part"><span><b>I Building Successful {shiny} Apps</b></span></li>
-<li class="chapter" data-level="1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html"><i class="fa fa-check"></i><b>1</b> About Successful <code>{shiny}</code> Apps</a>
-<ul>
-<li class="chapter" data-level="1.1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#a-very-short-introduction-to-shiny"><i class="fa fa-check"></i><b>1.1</b> A (very) short introduction to <code>{shiny}</code></a></li>
-<li class="chapter" data-level="1.2" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#complex-shiny"><i class="fa fa-check"></i><b>1.2</b> What is a complex <code>{shiny}</code> application?</a>
-<ul>
-<li class="chapter" data-level="1.2.1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#reaching-the-cliff-of-complexity"><i class="fa fa-check"></i><b>1.2.1</b> Reaching the cliff of complexity</a></li>
-<li class="chapter" data-level="1.2.2" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#balancing-complexities"><i class="fa fa-check"></i><b>1.2.2</b> Balancing complexities</a></li>
-<li class="chapter" data-level="1.2.3" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#assessing-code-complexity"><i class="fa fa-check"></i><b>1.2.3</b> Assessing code complexity</a></li>
-<li class="chapter" data-level="1.2.4" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#production-grade-software-engineering"><i class="fa fa-check"></i><b>1.2.4</b> Production-grade software engineering</a></li>
-</ul></li>
-<li class="chapter" data-level="1.3" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#what-is-a-successful-shiny-app"><i class="fa fa-check"></i><b>1.3</b> What is a successful <code>{shiny}</code> app?</a>
-<ul>
-<li class="chapter" data-level="1.3.1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-exists"><i class="fa fa-check"></i><b>1.3.1</b> It exists</a></li>
-<li class="chapter" data-level="1.3.2" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-is-accurate"><i class="fa fa-check"></i><b>1.3.2</b> It is accurate</a></li>
-<li class="chapter" data-level="1.3.3" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-is-usable"><i class="fa fa-check"></i><b>1.3.3</b> It is usable</a></li>
-<li class="chapter" data-level="1.3.4" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-is-immortal"><i class="fa fa-check"></i><b>1.3.4</b> It is immortal</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="2" data-path="planning-ahead.html"><a href="planning-ahead.html"><i class="fa fa-check"></i><b>2</b> Planning Ahead</a>
-<ul>
-<li class="chapter" data-level="2.1" data-path="planning-ahead.html"><a href="planning-ahead.html#working-with-a-long-term-mindset"><i class="fa fa-check"></i><b>2.1</b> Working with a “long-term” mindset</a>
-<ul>
-<li class="chapter" data-level="2.1.1" data-path="planning-ahead.html"><a href="planning-ahead.html#prepare-for-success"><i class="fa fa-check"></i><b>2.1.1</b> Prepare for success</a></li>
-<li class="chapter" data-level="2.1.2" data-path="planning-ahead.html"><a href="planning-ahead.html#develop-with-the-kiss-principle"><i class="fa fa-check"></i><b>2.1.2</b> Develop with the KISS principle</a></li>
-</ul></li>
-<li class="chapter" data-level="2.2" data-path="planning-ahead.html"><a href="planning-ahead.html#working-as-a-team-tools-and-structure"><i class="fa fa-check"></i><b>2.2</b> Working as a team: Tools and structure</a>
-<ul>
-<li class="chapter" data-level="2.2.1" data-path="planning-ahead.html"><a href="planning-ahead.html#from-the-tools-point-of-view"><i class="fa fa-check"></i><b>2.2.1</b> From the tools point of view</a></li>
-<li class="chapter" data-level="2.2.2" data-path="planning-ahead.html"><a href="planning-ahead.html#from-the-team-point-of-view"><i class="fa fa-check"></i><b>2.2.2</b> From the team point of view</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="3" data-path="structuring-project.html"><a href="structuring-project.html"><i class="fa fa-check"></i><b>3</b> Structuring Your Project</a>
-<ul>
-<li class="chapter" data-level="3.1" data-path="structuring-project.html"><a href="structuring-project.html#shiny-app-as-a-package"><i class="fa fa-check"></i><b>3.1</b> <code>{shiny}</code> app as a package</a>
-<ul>
-<li class="chapter" data-level="3.1.1" data-path="structuring-project.html"><a href="structuring-project.html#what-is-in-a-production-grade-shiny-app"><i class="fa fa-check"></i><b>3.1.1</b> What is in a production-grade <code>{shiny}</code> app?</a></li>
-<li class="chapter" data-level="3.1.2" data-path="structuring-project.html"><a href="structuring-project.html#resources"><i class="fa fa-check"></i><b>3.1.2</b> Resources</a></li>
-</ul></li>
-<li class="chapter" data-level="3.2" data-path="structuring-project.html"><a href="structuring-project.html#using-shiny-modules"><i class="fa fa-check"></i><b>3.2</b> Using <code>{shiny}</code> modules</a>
-<ul>
-<li class="chapter" data-level="3.2.1" data-path="structuring-project.html"><a href="structuring-project.html#why-shiny-modules"><i class="fa fa-check"></i><b>3.2.1</b> Why <code>{shiny}</code> modules?</a></li>
-<li class="chapter" data-level="3.2.2" data-path="structuring-project.html"><a href="structuring-project.html#when-to-use-shiny-modules"><i class="fa fa-check"></i><b>3.2.2</b> When to use <code>{shiny}</code> modules</a></li>
-<li class="chapter" data-level="3.2.3" data-path="structuring-project.html"><a href="structuring-project.html#a-practical-walkthrough"><i class="fa fa-check"></i><b>3.2.3</b> A practical walkthrough</a></li>
-<li class="chapter" data-level="3.2.4" data-path="structuring-project.html"><a href="structuring-project.html#communication-between-modules"><i class="fa fa-check"></i><b>3.2.4</b> Communication between modules</a></li>
-</ul></li>
-<li class="chapter" data-level="3.3" data-path="structuring-project.html"><a href="structuring-project.html#structuring-your-app"><i class="fa fa-check"></i><b>3.3</b> Structuring your app</a>
-<ul>
-<li class="chapter" data-level="3.3.1" data-path="structuring-project.html"><a href="structuring-project.html#business-logic-and-application-logic"><i class="fa fa-check"></i><b>3.3.1</b> Business logic and application logic</a></li>
-<li class="chapter" data-level="3.3.2" data-path="structuring-project.html"><a href="structuring-project.html#small-is-beautiful-bis-repetita"><i class="fa fa-check"></i><b>3.3.2</b> Small is beautiful (bis repetita)</a></li>
-<li class="chapter" data-level="3.3.3" data-path="structuring-project.html"><a href="structuring-project.html#conventions-matter"><i class="fa fa-check"></i><b>3.3.3</b> Conventions matter</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="4" data-path="golem.html"><a href="golem.html"><i class="fa fa-check"></i><b>4</b> Introduction to <code>{golem}</code></a>
-<ul>
-<li class="chapter" data-level="4.1" data-path="golem.html"><a href="golem.html#what-is-golem"><i class="fa fa-check"></i><b>4.1</b> What is <code>{golem}</code>?</a></li>
-<li class="chapter" data-level="4.2" data-path="golem.html"><a href="golem.html#understanding-golem-app-structure"><i class="fa fa-check"></i><b>4.2</b> Understanding <code>{golem}</code> app structure</a>
-<ul>
-<li class="chapter" data-level="4.2.1" data-path="golem.html"><a href="golem.html#description-and-namespace"><i class="fa fa-check"></i><b>4.2.1</b> <code>DESCRIPTION</code> and <code>NAMESPACE</code></a></li>
-<li class="chapter" data-level="4.2.2" data-path="golem.html"><a href="golem.html#r"><i class="fa fa-check"></i><b>4.2.2</b> R/</a></li>
-<li class="chapter" data-level="4.2.3" data-path="golem.html"><a href="golem.html#golem-config"><i class="fa fa-check"></i><b>4.2.3</b> <code>golem-config</code></a></li>
-<li class="chapter" data-level="4.2.4" data-path="golem.html"><a href="golem.html#instappwww"><i class="fa fa-check"></i><b>4.2.4</b> <code>inst/app/www/</code></a></li>
-<li class="chapter" data-level="4.2.5" data-path="golem.html"><a href="golem.html#dev"><i class="fa fa-check"></i><b>4.2.5</b> <code>dev/</code></a></li>
-<li class="chapter" data-level="4.2.6" data-path="golem.html"><a href="golem.html#man"><i class="fa fa-check"></i><b>4.2.6</b> <code>man/</code></a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="5" data-path="workflow.html"><a href="workflow.html"><i class="fa fa-check"></i><b>5</b> The Workflow</a>
-<ul>
-<li class="chapter" data-level="5.1" data-path="workflow.html"><a href="workflow.html#step-1-design"><i class="fa fa-check"></i><b>5.1</b> Step 1: Design</a></li>
-<li class="chapter" data-level="5.2" data-path="workflow.html"><a href="workflow.html#step-2-prototype"><i class="fa fa-check"></i><b>5.2</b> Step 2: Prototype</a></li>
-<li class="chapter" data-level="5.3" data-path="workflow.html"><a href="workflow.html#step-3-build"><i class="fa fa-check"></i><b>5.3</b> Step 3: Build</a></li>
-<li class="chapter" data-level="5.4" data-path="workflow.html"><a href="workflow.html#step-4-strengthen"><i class="fa fa-check"></i><b>5.4</b> Step 4: Strengthen</a></li>
-<li class="chapter" data-level="5.5" data-path="workflow.html"><a href="workflow.html#step-5-deploy"><i class="fa fa-check"></i><b>5.5</b> Step 5: Deploy</a></li>
-</ul></li>
-<li class="part"><span><b>II Step 1: Design</b></span></li>
-<li class="chapter" data-level="6" data-path="ux-matters.html"><a href="ux-matters.html"><i class="fa fa-check"></i><b>6</b> UX Matters</a>
-<ul>
-<li class="chapter" data-level="6.1" data-path="ux-matters.html"><a href="ux-matters.html#simplicity-is-gold"><i class="fa fa-check"></i><b>6.1</b> Simplicity is gold</a>
-<ul>
-<li class="chapter" data-level="6.1.1" data-path="ux-matters.html"><a href="ux-matters.html#how-we-read-the-web-scanning-content"><i class="fa fa-check"></i><b>6.1.1</b> How we read the web: Scanning content</a></li>
-<li class="chapter" data-level="6.1.2" data-path="ux-matters.html"><a href="ux-matters.html#building-a-self-evident-app-or-at-least-self-explanatory"><i class="fa fa-check"></i><b>6.1.2</b> Building a self-evident app (or at least self-explanatory)</a></li>
-</ul></li>
-<li class="chapter" data-level="6.2" data-path="ux-matters.html"><a href="ux-matters.html#the-danger-of-feature-creep"><i class="fa fa-check"></i><b>6.2</b> The danger of feature-creep</a>
-<ul>
-<li class="chapter" data-level="6.2.1" data-path="ux-matters.html"><a href="ux-matters.html#what-is-feature-creep"><i class="fa fa-check"></i><b>6.2.1</b> What is feature-creep?</a></li>
-<li class="chapter" data-level="6.2.2" data-path="ux-matters.html"><a href="ux-matters.html#too-much-reactivity"><i class="fa fa-check"></i><b>6.2.2</b> Too much reactivity</a></li>
-<li class="chapter" data-level="6.2.3" data-path="ux-matters.html"><a href="ux-matters.html#too-much-interactivity"><i class="fa fa-check"></i><b>6.2.3</b> Too much interactivity</a></li>
-</ul></li>
-<li class="chapter" data-level="6.3" data-path="ux-matters.html"><a href="ux-matters.html#web-accessibility"><i class="fa fa-check"></i><b>6.3</b> Web accessibility</a>
-<ul>
-<li class="chapter" data-level="6.3.1" data-path="ux-matters.html"><a href="ux-matters.html#about-accessibility"><i class="fa fa-check"></i><b>6.3.1</b> About accessibility</a></li>
-<li class="chapter" data-level="6.3.2" data-path="ux-matters.html"><a href="ux-matters.html#making-your-app-accessible"><i class="fa fa-check"></i><b>6.3.2</b> Making your app accessible</a></li>
-<li class="chapter" data-level="6.3.3" data-path="ux-matters.html"><a href="ux-matters.html#evaluating-your-app-accessibility-and-further-reading"><i class="fa fa-check"></i><b>6.3.3</b> Evaluating your app accessibility and further reading</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="7" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html"><i class="fa fa-check"></i><b>7</b> Don’t Rush into Coding</a>
-<ul>
-<li class="chapter" data-level="7.1" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#designing-before-coding"><i class="fa fa-check"></i><b>7.1</b> Designing before coding</a>
-<ul>
-<li class="chapter" data-level="7.1.1" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#the-urge-to-code"><i class="fa fa-check"></i><b>7.1.1</b> The urge to code</a></li>
-<li class="chapter" data-level="7.1.2" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#knowing-where-to-search"><i class="fa fa-check"></i><b>7.1.2</b> Knowing where to search</a></li>
-<li class="chapter" data-level="7.1.3" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#about-concept-map"><i class="fa fa-check"></i><b>7.1.3</b> About concept map</a></li>
-</ul></li>
-<li class="chapter" data-level="7.2" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#ask-questions"><i class="fa fa-check"></i><b>7.2</b> Ask questions</a>
-<ul>
-<li class="chapter" data-level="7.2.1" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#about-the-end-users"><i class="fa fa-check"></i><b>7.2.1</b> About the end users</a></li>
-<li class="chapter" data-level="7.2.2" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#building-personas"><i class="fa fa-check"></i><b>7.2.2</b> Building personas</a></li>
-<li class="chapter" data-level="7.2.3" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#pre-existing-code-base"><i class="fa fa-check"></i><b>7.2.3</b> Pre-existing code-base</a></li>
-<li class="chapter" data-level="7.2.4" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#deployment"><i class="fa fa-check"></i><b>7.2.4</b> Deployment</a></li>
-</ul></li>
-</ul></li>
-<li class="part"><span><b>III Step 2: Prototype</b></span></li>
-<li class="chapter" data-level="8" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html"><i class="fa fa-check"></i><b>8</b> Setting up for Success with <code>{golem}</code></a>
-<ul>
-<li class="chapter" data-level="8.1" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#create-a-golem"><i class="fa fa-check"></i><b>8.1</b> Create a <code>{golem}</code></a></li>
-<li class="chapter" data-level="8.2" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#setting-things-up-with-dev01_start.r"><i class="fa fa-check"></i><b>8.2</b> Setting things up with <code>dev/01_start.R</code></a>
-<ul>
-<li class="chapter" data-level="8.2.1" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#fill-the-description-and-set-options"><i class="fa fa-check"></i><b>8.2.1</b> Fill the DESCRIPTION and set options</a></li>
-<li class="chapter" data-level="8.2.2" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#set-common-files"><i class="fa fa-check"></i><b>8.2.2</b> Set common files</a></li>
-<li class="chapter" data-level="8.2.3" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#use-recommended-elements"><i class="fa fa-check"></i><b>8.2.3</b> Use recommended elements</a></li>
-<li class="chapter" data-level="8.2.4" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#add-utility-functions"><i class="fa fa-check"></i><b>8.2.4</b> Add utility functions</a></li>
-<li class="chapter" data-level="8.2.5" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#changing-the-favicon"><i class="fa fa-check"></i><b>8.2.5</b> Changing the favicon</a></li>
-</ul></li>
-<li class="chapter" data-level="8.3" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#setting-infrastructure-for-prototyping"><i class="fa fa-check"></i><b>8.3</b> Setting infrastructure for prototyping</a>
-<ul>
-<li class="chapter" data-level="8.3.1" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#add-modules-in-dev02_dev.r"><i class="fa fa-check"></i><b>8.3.1</b> Add modules in <code>dev/02_dev.R</code></a></li>
-<li class="chapter" data-level="8.3.2" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#add-css-and-js-files"><i class="fa fa-check"></i><b>8.3.2</b> Add CSS and JS files</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="9" data-path="building-ispum-app.html"><a href="building-ispum-app.html"><i class="fa fa-check"></i><b>9</b> Building an “ipsum-app”</a>
-<ul>
-<li class="chapter" data-level="9.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#prototyping-is-crucial"><i class="fa fa-check"></i><b>9.1</b> Prototyping is crucial</a>
-<ul>
-<li class="chapter" data-level="9.1.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#prototype-then-polish"><i class="fa fa-check"></i><b>9.1.1</b> Prototype, then polish</a></li>
-<li class="chapter" data-level="9.1.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#the-ui-first-approach"><i class="fa fa-check"></i><b>9.1.2</b> The “UI first” approach</a></li>
-</ul></li>
-<li class="chapter" data-level="9.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#prototyping-shiny"><i class="fa fa-check"></i><b>9.2</b> Prototyping <code>{shiny}</code></a>
-<ul>
-<li class="chapter" data-level="9.2.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#fast-ui-prototyping-with-shinipsum"><i class="fa fa-check"></i><b>9.2.1</b> Fast UI prototyping with <code>{shinipsum}</code></a></li>
-<li class="chapter" data-level="9.2.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#using-fakir-for-fake-data-generation"><i class="fa fa-check"></i><b>9.2.2</b> Using <code>{fakir}</code> for fake data generation</a></li>
-</ul></li>
-<li class="chapter" data-level="9.3" data-path="building-ispum-app.html"><a href="building-ispum-app.html#proto-rmdfirst"><i class="fa fa-check"></i><b>9.3</b> Building with RMarkdown</a>
-<ul>
-<li class="chapter" data-level="9.3.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#define-the-content-of-the-application"><i class="fa fa-check"></i><b>9.3.1</b> Define the content of the application</a></li>
-<li class="chapter" data-level="9.3.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#using-the-rmd-files-as-a-laboratory-notebook"><i class="fa fa-check"></i><b>9.3.2</b> Using the Rmd files as a laboratory notebook</a></li>
-<li class="chapter" data-level="9.3.3" data-path="building-ispum-app.html"><a href="building-ispum-app.html#rmd-vignettes-and-documentation-first"><i class="fa fa-check"></i><b>9.3.3</b> Rmd, Vignettes, and documentation first</a></li>
-</ul></li>
-</ul></li>
-<li class="part"><span><b>IV Step 3: Build</b></span></li>
-<li class="chapter" data-level="10" data-path="build-app-golem.html"><a href="build-app-golem.html"><i class="fa fa-check"></i><b>10</b> Building the App with <code>{golem}</code></a>
-<ul>
-<li class="chapter" data-level="10.1" data-path="build-app-golem.html"><a href="build-app-golem.html#add-dependencies"><i class="fa fa-check"></i><b>10.1</b> Add dependencies</a>
-<ul>
-<li class="chapter" data-level="10.1.1" data-path="build-app-golem.html"><a href="build-app-golem.html#package-dependencies"><i class="fa fa-check"></i><b>10.1.1</b> Package dependencies</a></li>
-<li class="chapter" data-level="10.1.2" data-path="build-app-golem.html"><a href="build-app-golem.html#importing-packages-and-functions"><i class="fa fa-check"></i><b>10.1.2</b> Importing packages and functions</a></li>
-</ul></li>
-<li class="chapter" data-level="10.2" data-path="build-app-golem.html"><a href="build-app-golem.html#submodules-and-utility-functions"><i class="fa fa-check"></i><b>10.2</b> Submodules and utility functions</a></li>
-<li class="chapter" data-level="10.3" data-path="build-app-golem.html"><a href="build-app-golem.html#add-tests"><i class="fa fa-check"></i><b>10.3</b> Add tests</a></li>
-<li class="chapter" data-level="10.4" data-path="build-app-golem.html"><a href="build-app-golem.html#documentation-and-code-coverage"><i class="fa fa-check"></i><b>10.4</b> Documentation and code coverage</a>
-<ul>
-<li class="chapter" data-level="10.4.1" data-path="build-app-golem.html"><a href="build-app-golem.html#vignette"><i class="fa fa-check"></i><b>10.4.1</b> Vignette</a></li>
-<li class="chapter" data-level="10.4.2" data-path="build-app-golem.html"><a href="build-app-golem.html#code-coverage-and-continuous-integration"><i class="fa fa-check"></i><b>10.4.2</b> Code coverage and continuous integration</a></li>
-</ul></li>
-<li class="chapter" data-level="10.5" data-path="build-app-golem.html"><a href="build-app-golem.html#using-golem-dev-functions"><i class="fa fa-check"></i><b>10.5</b> Using <code>{golem}</code> dev functions</a></li>
-</ul></li>
-<li class="part"><span><b>V Step 4: Strengthen</b></span></li>
-<li class="chapter" data-level="11" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html"><i class="fa fa-check"></i><b>11</b> Build Yourself a Safety Net</a>
-<ul>
-<li class="chapter" data-level="11.1" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-your-app"><i class="fa fa-check"></i><b>11.1</b> Testing your app</a>
-<ul>
-<li class="chapter" data-level="11.1.1" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-the-business-logic"><i class="fa fa-check"></i><b>11.1.1</b> Testing the business logic</a></li>
-<li class="chapter" data-level="11.1.2" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#shinytestserver"><i class="fa fa-check"></i><b>11.1.2</b> <code>shiny::testServer()</code></a></li>
-<li class="chapter" data-level="11.1.3" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-the-interactive-logic"><i class="fa fa-check"></i><b>11.1.3</b> Testing the interactive logic</a></li>
-<li class="chapter" data-level="11.1.4" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-the-app-load"><i class="fa fa-check"></i><b>11.1.4</b> Testing the app load</a></li>
-</ul></li>
-<li class="chapter" data-level="11.2" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#a-reproducible-environment"><i class="fa fa-check"></i><b>11.2</b> A reproducible environment</a>
-<ul>
-<li class="chapter" data-level="11.2.1" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#renv"><i class="fa fa-check"></i><b>11.2.1</b> <code>{renv}</code></a></li>
-<li class="chapter" data-level="11.2.2" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#docker"><i class="fa fa-check"></i><b>11.2.2</b> Docker</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="12" data-path="version-control.html"><a href="version-control.html"><i class="fa fa-check"></i><b>12</b> Version Control</a>
-<ul>
-<li class="chapter" data-level="12.1" data-path="version-control.html"><a href="version-control.html#version-control-git"><i class="fa fa-check"></i><b>12.1</b> Using version control with <code>Git</code></a>
-<ul>
-<li class="chapter" data-level="12.1.1" data-path="version-control.html"><a href="version-control.html#why-version-control"><i class="fa fa-check"></i><b>12.1.1</b> Why version control?</a></li>
-<li class="chapter" data-level="12.1.2" data-path="version-control.html"><a href="version-control.html#git-basics-add---commit---push---pull"><i class="fa fa-check"></i><b>12.1.2</b> <code>Git</code> basics: <code>add</code> - <code>commit</code> - <code>push</code> - <code>pull</code></a></li>
-<li class="chapter" data-level="12.1.3" data-path="version-control.html"><a href="version-control.html#about-branches"><i class="fa fa-check"></i><b>12.1.3</b> About branches</a></li>
-<li class="chapter" data-level="12.1.4" data-path="version-control.html"><a href="version-control.html#issues"><i class="fa fa-check"></i><b>12.1.4</b> Issues</a></li>
-</ul></li>
-<li class="chapter" data-level="12.2" data-path="version-control.html"><a href="version-control.html#git-integration"><i class="fa fa-check"></i><b>12.2</b> <code>Git</code> integration</a>
-<ul>
-<li class="chapter" data-level="12.2.1" data-path="version-control.html"><a href="version-control.html#with-rstudio"><i class="fa fa-check"></i><b>12.2.1</b> With RStudio</a></li>
-<li class="chapter" data-level="12.2.2" data-path="version-control.html"><a href="version-control.html#as-part-of-a-larger-world"><i class="fa fa-check"></i><b>12.2.2</b> As part of a larger world</a></li>
-<li class="chapter" data-level="12.2.3" data-path="version-control.html"><a href="version-control.html#about-git-flow"><i class="fa fa-check"></i><b>12.2.3</b> About <code>git-flow</code></a></li>
-<li class="chapter" data-level="12.2.4" data-path="version-control.html"><a href="version-control.html#further-readings-on-git"><i class="fa fa-check"></i><b>12.2.4</b> Further readings on <code>Git</code></a></li>
-</ul></li>
-<li class="chapter" data-level="12.3" data-path="version-control.html"><a href="version-control.html#automated-testing"><i class="fa fa-check"></i><b>12.3</b> Automated testing</a></li>
-</ul></li>
-<li class="part"><span><b>VI Step 5: Deploy</b></span></li>
-<li class="chapter" data-level="13" data-path="deploy.html"><a href="deploy.html"><i class="fa fa-check"></i><b>13</b> Deploy Your Application</a>
-<ul>
-<li class="chapter" data-level="13.1" data-path="deploy.html"><a href="deploy.html#before-deployment-checklist"><i class="fa fa-check"></i><b>13.1</b> Before deployment checklist</a></li>
-<li class="chapter" data-level="13.2" data-path="deploy.html"><a href="deploy.html#sharing-your-app-as-a-package"><i class="fa fa-check"></i><b>13.2</b> Sharing your app as a package</a>
-<ul>
-<li class="chapter" data-level="13.2.1" data-path="deploy.html"><a href="deploy.html#install-on-your-machine"><i class="fa fa-check"></i><b>13.2.1</b> Install on your machine</a></li>
-<li class="chapter" data-level="13.2.2" data-path="deploy.html"><a href="deploy.html#share-as-a-built-package"><i class="fa fa-check"></i><b>13.2.2</b> Share as a built package</a></li>
-</ul></li>
-<li class="chapter" data-level="13.3" data-path="deploy.html"><a href="deploy.html#deploying-apps-with-golem"><i class="fa fa-check"></i><b>13.3</b> Deploying apps with <code>{golem}</code></a>
-<ul>
-<li class="chapter" data-level="13.3.1" data-path="deploy.html"><a href="deploy.html#rstudio-environments"><i class="fa fa-check"></i><b>13.3.1</b> RStudio environments</a></li>
-<li class="chapter" data-level="13.3.2" data-path="deploy.html"><a href="deploy.html#docker-1"><i class="fa fa-check"></i><b>13.3.2</b> Docker</a></li>
-</ul></li>
-</ul></li>
-<li class="part"><span><b>VII Optimizing</b></span></li>
-<li class="chapter" data-level="14" data-path="need-for-optimization.html"><a href="need-for-optimization.html"><i class="fa fa-check"></i><b>14</b> The Need for Optimization</a>
-<ul>
-<li class="chapter" data-level="14.1" data-path="need-for-optimization.html"><a href="need-for-optimization.html#build-first-then-optimize"><i class="fa fa-check"></i><b>14.1</b> Build first, then optimize</a>
-<ul>
-<li class="chapter" data-level="14.1.1" data-path="need-for-optimization.html"><a href="need-for-optimization.html#identifying-bottlenecks"><i class="fa fa-check"></i><b>14.1.1</b> Identifying bottlenecks</a></li>
-<li class="chapter" data-level="14.1.2" data-path="need-for-optimization.html"><a href="need-for-optimization.html#do-you-need-faster-functions"><i class="fa fa-check"></i><b>14.1.2</b> Do you need faster functions?</a></li>
-<li class="chapter" data-level="14.1.3" data-path="need-for-optimization.html"><a href="need-for-optimization.html#dont-sacrifice-readability"><i class="fa fa-check"></i><b>14.1.3</b> Don’t sacrifice readability</a></li>
-</ul></li>
-<li class="chapter" data-level="14.2" data-path="need-for-optimization.html"><a href="need-for-optimization.html#tools-for-profiling"><i class="fa fa-check"></i><b>14.2</b> Tools for profiling</a>
-<ul>
-<li class="chapter" data-level="14.2.1" data-path="need-for-optimization.html"><a href="need-for-optimization.html#profiling-r-code"><i class="fa fa-check"></i><b>14.2.1</b> Profiling R code</a></li>
-<li class="chapter" data-level="14.2.2" data-path="need-for-optimization.html"><a href="need-for-optimization.html#profiling-shiny"><i class="fa fa-check"></i><b>14.2.2</b> Profiling <code>{shiny}</code></a></li>
-<li class="chapter" data-level="14.2.3" data-path="need-for-optimization.html"><a href="need-for-optimization.html#more-resources-about-web-page-performance"><i class="fa fa-check"></i><b>14.2.3</b> More resources about web-page performance</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="15" data-path="common-app-caveats.html"><a href="common-app-caveats.html"><i class="fa fa-check"></i><b>15</b> Common Application Caveats</a>
-<ul>
-<li class="chapter" data-level="15.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reactivity-anti-patterns"><i class="fa fa-check"></i><b>15.1</b> Reactivity anti-patterns</a>
-<ul>
-<li class="chapter" data-level="15.1.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reactivity-is-awesome-until-it-is-not"><i class="fa fa-check"></i><b>15.1.1</b> Reactivity is awesome… until it is not</a></li>
-<li class="chapter" data-level="15.1.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#observe-vs-observeevent"><i class="fa fa-check"></i><b>15.1.2</b> <code>observe</code> vs <code>observeEvent</code></a></li>
-<li class="chapter" data-level="15.1.3" data-path="common-app-caveats.html"><a href="common-app-caveats.html#building-triggers-and-watchers"><i class="fa fa-check"></i><b>15.1.3</b> Building triggers and watchers</a></li>
-<li class="chapter" data-level="15.1.4" data-path="common-app-caveats.html"><a href="common-app-caveats.html#using-r6-as-data-storage"><i class="fa fa-check"></i><b>15.1.4</b> Using R6 as data storage</a></li>
-<li class="chapter" data-level="15.1.5" data-path="common-app-caveats.html"><a href="common-app-caveats.html#logging-reactivity-with-whereami"><i class="fa fa-check"></i><b>15.1.5</b> Logging reactivity with <code>{whereami}</code></a></li>
-</ul></li>
-<li class="chapter" data-level="15.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#r-does-too-much"><i class="fa fa-check"></i><b>15.2</b> R does too much</a>
-<ul>
-<li class="chapter" data-level="15.2.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#rendering-the-ui-from-the-server-side"><i class="fa fa-check"></i><b>15.2.1</b> Rendering the UI from the server side</a></li>
-<li class="chapter" data-level="15.2.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#too-much-data-in-memory"><i class="fa fa-check"></i><b>15.2.2</b> Too much data in memory</a></li>
-</ul></li>
-<li class="chapter" data-level="15.3" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reading-data"><i class="fa fa-check"></i><b>15.3</b> Reading data</a>
-<ul>
-<li class="chapter" data-level="15.3.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#including-data-in-your-application"><i class="fa fa-check"></i><b>15.3.1</b> Including data in your application</a></li>
-<li class="chapter" data-level="15.3.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reading-external-datasets"><i class="fa fa-check"></i><b>15.3.2</b> Reading external datasets</a></li>
-<li class="chapter" data-level="15.3.3" data-path="common-app-caveats.html"><a href="common-app-caveats.html#using-external-databases"><i class="fa fa-check"></i><b>15.3.3</b> Using external databases</a></li>
-<li class="chapter" data-level="15.3.4" data-path="common-app-caveats.html"><a href="common-app-caveats.html#data-source-checklist"><i class="fa fa-check"></i><b>15.3.4</b> Data-source checklist</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="16" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html"><i class="fa fa-check"></i><b>16</b> Optimizing <code>{shiny}</code> Code</a>
-<ul>
-<li class="chapter" data-level="16.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#optimizing-r-code"><i class="fa fa-check"></i><b>16.1</b> Optimizing R code</a></li>
-<li class="chapter" data-level="16.2" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#caching-elements"><i class="fa fa-check"></i><b>16.2</b> Caching elements</a>
-<ul>
-<li class="chapter" data-level="16.2.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#what-is-caching"><i class="fa fa-check"></i><b>16.2.1</b> What is caching?</a></li>
-<li class="chapter" data-level="16.2.2" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#native-caching-in-r"><i class="fa fa-check"></i><b>16.2.2</b> Native caching in R</a></li>
-<li class="chapter" data-level="16.2.3" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#caching-in-shiny"><i class="fa fa-check"></i><b>16.2.3</b> Caching in <code>{shiny}</code></a></li>
-</ul></li>
-<li class="chapter" data-level="16.3" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#asynchronous-in-shiny"><i class="fa fa-check"></i><b>16.3</b> Asynchronous in <code>{shiny}</code></a>
-<ul>
-<li class="chapter" data-level="16.3.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#how-to"><i class="fa fa-check"></i><b>16.3.1</b> How to</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="17" data-path="using-javascript.html"><a href="using-javascript.html"><i class="fa fa-check"></i><b>17</b> Using JavaScript</a>
-<ul>
-<li class="chapter" data-level="17.1" data-path="using-javascript.html"><a href="using-javascript.html#introduction-1"><i class="fa fa-check"></i><b>17.1</b> Introduction</a></li>
-<li class="chapter" data-level="17.2" data-path="using-javascript.html"><a href="using-javascript.html#a-quick-introduction-to-javascript"><i class="fa fa-check"></i><b>17.2</b> A quick introduction to JavaScript</a>
-<ul>
-<li class="chapter" data-level="17.2.1" data-path="using-javascript.html"><a href="using-javascript.html#about-javascript"><i class="fa fa-check"></i><b>17.2.1</b> About JavaScript</a></li>
-<li class="chapter" data-level="17.2.2" data-path="using-javascript.html"><a href="using-javascript.html#including-javascript-code-in-your-app"><i class="fa fa-check"></i><b>17.2.2</b> Including JavaScript code in your app</a></li>
-<li class="chapter" data-level="17.2.3" data-path="using-javascript.html"><a href="using-javascript.html#understanding-html-class-and-id"><i class="fa fa-check"></i><b>17.2.3</b> Understanding HTML, class, and id</a></li>
-<li class="chapter" data-level="17.2.4" data-path="using-javascript.html"><a href="using-javascript.html#querying-in-vanilla-javascript"><i class="fa fa-check"></i><b>17.2.4</b> Querying in Vanilla JavaScript</a></li>
-<li class="chapter" data-level="17.2.5" data-path="using-javascript.html"><a href="using-javascript.html#about-dom-events"><i class="fa fa-check"></i><b>17.2.5</b> About DOM events</a></li>
-<li class="chapter" data-level="17.2.6" data-path="using-javascript.html"><a href="using-javascript.html#about-jquery-and-jquery-selectors"><i class="fa fa-check"></i><b>17.2.6</b> About <code>jQuery</code> and <code>jQuery</code> selectors</a></li>
-</ul></li>
-<li class="chapter" data-level="17.3" data-path="using-javascript.html"><a href="using-javascript.html#client-side-javascript"><i class="fa fa-check"></i><b>17.3</b> Client-side JavaScript</a>
-<ul>
-<li class="chapter" data-level="17.3.1" data-path="using-javascript.html"><a href="using-javascript.html#common-patterns"><i class="fa fa-check"></i><b>17.3.1</b> Common patterns</a></li>
-<li class="chapter" data-level="17.3.2" data-path="using-javascript.html"><a href="using-javascript.html#where-to-put-them-back-to-javascript-events"><i class="fa fa-check"></i><b>17.3.2</b> Where to put them: Back to JavaScript Events</a></li>
-</ul></li>
-<li class="chapter" data-level="17.4" data-path="using-javascript.html"><a href="using-javascript.html#javascript---shiny-communication"><i class="fa fa-check"></i><b>17.4</b> JavaScript &lt;-&gt; <code>{shiny}</code> communication</a>
-<ul>
-<li class="chapter" data-level="17.4.1" data-path="using-javascript.html"><a href="using-javascript.html#from-r-to-javascript"><i class="fa fa-check"></i><b>17.4.1</b> From R to JavaScript</a></li>
-<li class="chapter" data-level="17.4.2" data-path="using-javascript.html"><a href="using-javascript.html#from-javascript-to-r"><i class="fa fa-check"></i><b>17.4.2</b> From JavaScript to R</a></li>
-</ul></li>
-<li class="chapter" data-level="17.5" data-path="using-javascript.html"><a href="using-javascript.html#about-shinyjs-js-functions"><i class="fa fa-check"></i><b>17.5</b> About <code>{shinyjs}</code> JS functions</a></li>
-<li class="chapter" data-level="17.6" data-path="using-javascript.html"><a href="using-javascript.html#one-last-thing-api-calls"><i class="fa fa-check"></i><b>17.6</b> One last thing: API calls</a></li>
-<li class="chapter" data-level="17.7" data-path="using-javascript.html"><a href="using-javascript.html#learn-more-about-javascript"><i class="fa fa-check"></i><b>17.7</b> Learn more about JavaScript</a>
-<ul>
-<li class="chapter" data-level="17.7.1" data-path="using-javascript.html"><a href="using-javascript.html#shiny-and-javascript"><i class="fa fa-check"></i><b>17.7.1</b> <code>{shiny}</code> and JavaScript</a></li>
-<li class="chapter" data-level="17.7.2" data-path="using-javascript.html"><a href="using-javascript.html#javascript-basics"><i class="fa fa-check"></i><b>17.7.2</b> JavaScript basics</a></li>
-<li class="chapter" data-level="17.7.3" data-path="using-javascript.html"><a href="using-javascript.html#jquery"><i class="fa fa-check"></i><b>17.7.3</b> jQuery</a></li>
-<li class="chapter" data-level="17.7.4" data-path="using-javascript.html"><a href="using-javascript.html#intermediateadvanced-javascript"><i class="fa fa-check"></i><b>17.7.4</b> Intermediate/advanced JavaScript</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="18" data-path="css.html"><a href="css.html"><i class="fa fa-check"></i><b>18</b> A Gentle Introduction to CSS</a>
-<ul>
-<li class="chapter" data-level="18.1" data-path="css.html"><a href="css.html#what-is-css"><i class="fa fa-check"></i><b>18.1</b> What is CSS?</a>
-<ul>
-<li class="chapter" data-level="18.1.1" data-path="css.html"><a href="css.html#about-css"><i class="fa fa-check"></i><b>18.1.1</b> About CSS</a></li>
-<li class="chapter" data-level="18.1.2" data-path="css.html"><a href="css.html#shinys-default-fluidpage"><i class="fa fa-check"></i><b>18.1.2</b> <code>{shiny}</code>’s default: <code>fluidPage()</code></a></li>
-</ul></li>
-<li class="chapter" data-level="18.2" data-path="css.html"><a href="css.html#getting-started-with-css"><i class="fa fa-check"></i><b>18.2</b> Getting started with CSS</a>
-<ul>
-<li class="chapter" data-level="18.2.1" data-path="css.html"><a href="css.html#about-css-syntax"><i class="fa fa-check"></i><b>18.2.1</b> About CSS syntax</a></li>
-<li class="chapter" data-level="18.2.2" data-path="css.html"><a href="css.html#css-selectors"><i class="fa fa-check"></i><b>18.2.2</b> CSS selectors</a></li>
-<li class="chapter" data-level="18.2.3" data-path="css.html"><a href="css.html#css-properties"><i class="fa fa-check"></i><b>18.2.3</b> CSS properties</a></li>
-</ul></li>
-<li class="chapter" data-level="18.3" data-path="css.html"><a href="css.html#integrate-css-files-in-your-shiny-app"><i class="fa fa-check"></i><b>18.3</b> Integrate CSS files in your <code>{shiny}</code> app</a>
-<ul>
-<li class="chapter" data-level="18.3.1" data-path="css.html"><a href="css.html#inline-css"><i class="fa fa-check"></i><b>18.3.1</b> Inline CSS</a></li>
-<li class="chapter" data-level="18.3.2" data-path="css.html"><a href="css.html#writing-in-a-tagsstyle"><i class="fa fa-check"></i><b>18.3.2</b> Writing in a <code>tags$style()</code></a></li>
-<li class="chapter" data-level="18.3.3" data-path="css.html"><a href="css.html#including-external-files"><i class="fa fa-check"></i><b>18.3.3</b> Including external files</a></li>
-<li class="chapter" data-level="18.3.4" data-path="css.html"><a href="css.html#using-r-packages"><i class="fa fa-check"></i><b>18.3.4</b> Using R packages</a></li>
-</ul></li>
-<li class="chapter" data-level="18.4" data-path="css.html"><a href="css.html#external-resources"><i class="fa fa-check"></i><b>18.4</b> External resources</a></li>
-</ul></li>
-<li class="part"><span><b>VIII Appendix</b></span></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html"><i class="fa fa-check"></i>Appendix A - Use Case: Building an App from Start to Finish</a>
-<ul>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#about-the-application"><i class="fa fa-check"></i>About the application</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-1-design-1"><i class="fa fa-check"></i>Step 1: Design</a>
-<ul>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deciphering-the-specifications"><i class="fa fa-check"></i>Deciphering the specifications</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#building-a-concept-map"><i class="fa fa-check"></i>Building a concept map</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#asking-questions"><i class="fa fa-check"></i>Asking questions</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#building-personas-1"><i class="fa fa-check"></i>Building personas</a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-2-prototyping"><i class="fa fa-check"></i>Step 2: Prototyping</a>
-<ul>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#back-end-in-rmd"><i class="fa fa-check"></i>Back-end in Rmd</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#ui-prototyping"><i class="fa fa-check"></i>UI prototyping</a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-3-build-1"><i class="fa fa-check"></i>Step 3: Build</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-4-strengthen-1"><i class="fa fa-check"></i>Step 4: Strengthen</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-5-deploy-1"><i class="fa fa-check"></i>Step 5: Deploy</a>
-<ul>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#before-deployment-checklist-1"><i class="fa fa-check"></i>Before deployment checklist</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deploy-as-a-tar.gz"><i class="fa fa-check"></i>Deploy as a tar.gz</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deploy-on-rstudio-connect"><i class="fa fa-check"></i>Deploy on RStudio Connect</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deploy-with-docker"><i class="fa fa-check"></i>Deploy with Docker</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="appendix-b---session-info.html"><a href="appendix-b---session-info.html"><i class="fa fa-check"></i>Appendix B - Session Info</a></li>
-<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
-<li class="divider"></li>
-<li><a href="https://rtask.thinkr.fr">A book by the ThinkR team</a></li>
-
-</ul>
-
-      </nav>
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Engineering Production-Grade Shiny Apps</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
     </div>
 
-    <div class="book-body">
-      <div class="body-inner">
-        <div class="book-header" role="navigation">
-          <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Engineering Production-Grade Shiny Apps</a>
-          </h1>
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Introduction</a></li>
+<li><a class="" href="foreword.html">Foreword</a></li>
+<li><a class="" href="application-presentation.html">Application presentation</a></li>
+<li class="book-part">Building Successful {shiny} Apps</li>
+<li><a class="" href="successful-shiny-app.html"><span class="header-section-number">1</span> About Successful {shiny} Apps</a></li>
+<li><a class="" href="planning-ahead.html"><span class="header-section-number">2</span> Planning Ahead</a></li>
+<li><a class="" href="structuring-project.html"><span class="header-section-number">3</span> Structuring Your Project</a></li>
+<li><a class="active" href="golem.html"><span class="header-section-number">4</span> Introduction to {golem}</a></li>
+<li><a class="" href="workflow.html"><span class="header-section-number">5</span> The Workflow</a></li>
+<li class="book-part">Step 1: Design</li>
+<li><a class="" href="ux-matters.html"><span class="header-section-number">6</span> UX Matters</a></li>
+<li><a class="" href="dont-rush-into-coding.html"><span class="header-section-number">7</span> Don’t Rush into Coding</a></li>
+<li class="book-part">Step 2: Prototype</li>
+<li><a class="" href="setting-up-for-success.html"><span class="header-section-number">8</span> Setting up for Success with {golem}</a></li>
+<li><a class="" href="building-ispum-app.html"><span class="header-section-number">9</span> Building an “ipsum-app”</a></li>
+<li class="book-part">Step 3: Build</li>
+<li><a class="" href="build-app-golem.html"><span class="header-section-number">10</span> Building the App with {golem}</a></li>
+<li class="book-part">Step 4: Strengthen</li>
+<li><a class="" href="build-yourself-safety-net.html"><span class="header-section-number">11</span> Build Yourself a Safety Net</a></li>
+<li><a class="" href="version-control.html"><span class="header-section-number">12</span> Version Control</a></li>
+<li class="book-part">Step 5: Deploy</li>
+<li><a class="" href="deploy.html"><span class="header-section-number">13</span> Deploy Your Application</a></li>
+<li class="book-part">Optimizing</li>
+<li><a class="" href="need-for-optimization.html"><span class="header-section-number">14</span> The Need for Optimization</a></li>
+<li><a class="" href="common-app-caveats.html"><span class="header-section-number">15</span> Common Application Caveats</a></li>
+<li><a class="" href="optimizing-shiny-code.html"><span class="header-section-number">16</span> Optimizing {shiny} Code</a></li>
+<li><a class="" href="using-javascript.html"><span class="header-section-number">17</span> Using JavaScript</a></li>
+<li><a class="" href="css.html"><span class="header-section-number">18</span> A Gentle Introduction to CSS</a></li>
+<li class="book-part">Appendix</li>
+<li><a class="" href="appendix-a---use-case-building-an-app-from-start-to-finish.html">Appendix A - Use Case: Building an App from Start to Finish</a></li>
+<li><a class="" href="appendix-b---session-info.html">Appendix B - Session Info</a></li>
+<li><a class="" href="references.html">References</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/ThinkR-open/engineering-shiny-book">View book source <i class="fab fa-github"></i></a></p>
         </div>
-
-        <div class="page-wrapper" tabindex="-1" role="main">
-          <div class="page-inner">
-
-            <section class="normal" id="section-">
-<div id="golem" class="section level1 hasAnchor" number="4">
-<h1><span class="header-section-number">Chapter 4</span> Introduction to <code>{golem}</code><a href="golem.html#golem" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="golem" class="section level1" number="4">
+<h1>
+<span class="header-section-number">4</span> Introduction to <code>{golem}</code><a class="anchor" aria-label="anchor" href="#golem"><i class="fas fa-link"></i></a>
+</h1>
 <style>
 img.left {
   float: left;
   margin-right: 1em;
 }
 </style>
-<p><img src="img/thinkr-hex-golem2.png" class="left" width="20%"/></p>
-<p>The <code>{golem}</code> <span class="citation">(<a href="#ref-R-golem">Fay, Guyader, Rochette, et al. 2023</a>)</span> package is a framework for building production-grade <code>{shiny}</code> applications.
-Many of the patterns and methodologies described in this book are linked to <code>{golem}</code> and packages from the <a href="http://golemverse.org/">golemverse</a>.
-Of course, all the advice developed in this book will still be valid even if you do not plan to use <code>{golem}</code>.</p>
-<p>We have quickly introduced <code>{golem}</code> in the last chapter, and we will come back to this package many times in the following chapters.
+<div class="inline-figure"><img src="img/thinkr-hex-golem2.png" class="left" width="20%"></div>
+<p>The <a href="https://github.com/ThinkR-open/golem">golem</a> <span class="citation">(<a href="references.html#ref-R-golem">Fay, Guyader, Rochette, et al. 2023</a>)</span> package is a framework for building production-grade <a href="https://shiny.rstudio.com/">shiny</a> applications.
+Many of the patterns and methodologies described in this book are linked to <a href="https://github.com/ThinkR-open/golem">golem</a> and packages from the <a href="http://golemverse.org/">golemverse</a>.
+Of course, all the advice developed in this book will still be valid even if you do not plan to use <a href="https://github.com/ThinkR-open/golem">golem</a>.</p>
+<p>We have quickly introduced <a href="https://github.com/ThinkR-open/golem">golem</a> in the last chapter, and we will come back to this package many times in the following chapters.
 Let’s start with an introduction to this package.
 Note that the version used at the time of writing this book is 0.4.0.</p>
-<div id="what-is-golem" class="section level2 hasAnchor" number="4.1">
-<h2><span class="header-section-number">4.1</span> What is <code>{golem}</code>?<a href="golem.html#what-is-golem" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p><em>Note: The current version of <code>{golem}</code> used when writing this book is 0.4.0, and some of the features presented in this book might not be available if you are using an older version, or be a little bit different if you have a newer version. Feel free to browse the package NEWS.</em></p>
-<p><code>{golem}</code> is a <strong>toolkit for simplifying the creation, development and deployment of a <code>{shiny}</code> application</strong>.
-It focuses on building applications that will be sent to production, but of course starting with <code>{golem}</code> from the very beginning is also possible, even recommended: it is easier to start with <code>{golem}</code> than to refactor your codebase to fit into the framework.</p>
+<div id="what-is-golem" class="section level2" number="4.1">
+<h2>
+<span class="header-section-number">4.1</span> What is <code>{golem}</code>?<a class="anchor" aria-label="anchor" href="#what-is-golem"><i class="fas fa-link"></i></a>
+</h2>
+<p><em>Note: The current version of <a href="https://github.com/ThinkR-open/golem">golem</a> used when writing this book is 0.4.0, and some of the features presented in this book might not be available if you are using an older version, or be a little bit different if you have a newer version. Feel free to browse the package NEWS.</em></p>
+<p><a href="https://github.com/ThinkR-open/golem">golem</a> is a <strong>toolkit for simplifying the creation, development and deployment of a <a href="https://shiny.rstudio.com/">shiny</a> application</strong>.
+It focuses on building applications that will be sent to production, but of course starting with <a href="https://github.com/ThinkR-open/golem">golem</a> from the very beginning is also possible, even recommended: it is easier to start with <a href="https://github.com/ThinkR-open/golem">golem</a> than to refactor your codebase to fit into the framework.</p>
 <p>The stable release can be found on CRAN and installed with:</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="golem.html#cb45-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;golem&quot;</span>)</span></code></pre></div>
-<p>The <code>{golem}</code> development version can be found on GitHub and installed with:</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="golem.html#cb46-1" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;Thinkr-open/golem&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"golem"</span><span class="op">)</span></span></code></pre></div>
+<p>The <a href="https://github.com/ThinkR-open/golem">golem</a> development version can be found on GitHub and installed with:</p>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"Thinkr-open/golem"</span><span class="op">)</span></span></code></pre></div>
 <p>The version of the package used while writing this book is:</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="golem.html#cb47-1" tabindex="-1"></a><span class="fu">packageVersion</span>(<span class="st">&quot;golem&quot;</span>)</span></code></pre></div>
-<pre><code>[1] &#39;0.4.0&#39;</code></pre>
-<p>The motivation behind <code>{golem}</code> is that building a proof-of-concept application is easy, but <strong>things change when the application becomes larger and more complex, and especially when you need to send that app to production</strong>.
-Until recently there has not been any real framework for building and deploying production-grade <code>{shiny}</code> apps.
-This is where <code>{golem}</code> comes into play: <strong>offering <code>{shiny}</code> developers a toolkit for making a stable, easy-to-maintain, and robust production web application with R</strong>.
-<code>{golem}</code> has been developed to abstract away the most common engineering tasks (for example, module creation, addition and linking of an external CSS or JavaScript file, etc.), so you can focus on what matters: building the application.
-Once your application is ready to be deployed, <code>{golem}</code> guides you through testing and brings tools for deploying to common platforms.</p>
-<p>Some things to keep in mind before using <code>{golem}</code>:</p>
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html">packageVersion</a></span><span class="op">(</span><span class="st">"golem"</span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] '0.4.0'</code></pre>
+<p>The motivation behind <a href="https://github.com/ThinkR-open/golem">golem</a> is that building a proof-of-concept application is easy, but <strong>things change when the application becomes larger and more complex, and especially when you need to send that app to production</strong>.
+Until recently there has not been any real framework for building and deploying production-grade <a href="https://shiny.rstudio.com/">shiny</a> apps.
+This is where <a href="https://github.com/ThinkR-open/golem">golem</a> comes into play: <strong>offering <a href="https://shiny.rstudio.com/">shiny</a> developers a toolkit for making a stable, easy-to-maintain, and robust production web application with R</strong>.
+<a href="https://github.com/ThinkR-open/golem">golem</a> has been developed to abstract away the most common engineering tasks (for example, module creation, addition and linking of an external CSS or JavaScript file, etc.), so you can focus on what matters: building the application.
+Once your application is ready to be deployed, <a href="https://github.com/ThinkR-open/golem">golem</a> guides you through testing and brings tools for deploying to common platforms.</p>
+<p>Some things to keep in mind before using <a href="https://github.com/ThinkR-open/golem">golem</a>:</p>
 <ul>
-<li><p>A <code>{golem}</code> application is contained inside a package.
+<li><p>A <a href="https://github.com/ThinkR-open/golem">golem</a> application is contained inside a package.
 Knowing how to build a package is heavily recommended.
-The good news is also that everything you know about package development can be applied to <code>{golem}</code>.</p></li>
-<li><p>A <code>{golem}</code> app works better if you are working with <code>shiny modules</code>.
+The good news is also that everything you know about package development can be applied to <a href="https://github.com/ThinkR-open/golem">golem</a>.</p></li>
+<li><p>A <a href="https://github.com/ThinkR-open/golem">golem</a> app works better if you are working with <code>shiny modules</code>.
 Knowing how modules work is also recommended but not necessary.</p></li>
 </ul>
 </div>
-<div id="understanding-golem-app-structure" class="section level2 hasAnchor" number="4.2">
-<h2><span class="header-section-number">4.2</span> Understanding <code>{golem}</code> app structure<a href="golem.html#understanding-golem-app-structure" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p><strong>A <code>{golem}</code> application is an R package</strong>.
+<div id="understanding-golem-app-structure" class="section level2" number="4.2">
+<h2>
+<span class="header-section-number">4.2</span> Understanding <code>{golem}</code> app structure<a class="anchor" aria-label="anchor" href="#understanding-golem-app-structure"><i class="fas fa-link"></i></a>
+</h2>
+<p><strong>A <a href="https://github.com/ThinkR-open/golem">golem</a> application is an R package</strong>.
 Having an R package architecture is perfectly suited for production-ready programs, as we developed in the previous chapter.</p>
-<p>Let’s focus on the architecture of the default <code>{golem}</code> app, and present the role that each file plays and how you can use (or not use) each of them.</p>
-<p>You can create a <code>{golem}</code> project, here called <code>golex</code>, with RStudio “New project” creation or with command line.</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="golem.html#cb49-1" tabindex="-1"></a>golem<span class="sc">::</span><span class="fu">create_golem</span>(<span class="st">&quot;golex&quot;</span>)</span></code></pre></div>
+<p>Let’s focus on the architecture of the default <a href="https://github.com/ThinkR-open/golem">golem</a> app, and present the role that each file plays and how you can use (or not use) each of them.</p>
+<p>You can create a <a href="https://github.com/ThinkR-open/golem">golem</a> project, here called <code>golex</code>, with RStudio “New project” creation or with command line.</p>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">golem</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/golem/man/create_golem.html">create_golem</a></span><span class="op">(</span><span class="st">"golex"</span><span class="op">)</span></span></code></pre></div>
 <p>The project will start with this specific architecture:</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="golem.html#cb50-1" tabindex="-1"></a><span class="co"># Listing the files from the `golex` project using {fs}</span></span>
-<span id="cb50-2"><a href="golem.html#cb50-2" tabindex="-1"></a>fs<span class="sc">::</span><span class="fu">dir_tree</span>(<span class="st">&quot;golex&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Listing the files from the `golex` project using {fs}</span></span>
+<span><span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="https://fs.r-lib.org/reference/dir_tree.html">dir_tree</a></span><span class="op">(</span><span class="st">"golex"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>golex
 ├── DESCRIPTION
 ├── NAMESPACE
@@ -649,16 +201,18 @@ Having an R package architecture is perfectly suited for production-ready progra
 └── man
     └── run_app.Rd</code></pre>
 <p>If you are familiar with building R packages, this structure will look familiar to you.
-And for a good reason: a <code>{golem}</code> app IS a package.</p>
-<div id="description-and-namespace" class="section level3 hasAnchor" number="4.2.1">
-<h3><span class="header-section-number">4.2.1</span> <code>DESCRIPTION</code> and <code>NAMESPACE</code><a href="golem.html#description-and-namespace" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The <code>DESCRIPTION</code> and <code>NAMESPACE</code> are <strong>standard package files</strong> (<em>i.e.</em> they are not <code>{golem}</code>-specific).
+And for a good reason: a <a href="https://github.com/ThinkR-open/golem">golem</a> app IS a package.</p>
+<div id="description-and-namespace" class="section level3" number="4.2.1">
+<h3>
+<span class="header-section-number">4.2.1</span> <code>DESCRIPTION</code> and <code>NAMESPACE</code><a class="anchor" aria-label="anchor" href="#description-and-namespace"><i class="fas fa-link"></i></a>
+</h3>
+<p>The <code>DESCRIPTION</code> and <code>NAMESPACE</code> are <strong>standard package files</strong> (<em>i.e.</em> they are not <a href="https://github.com/ThinkR-open/golem">golem</a>-specific).
 In <code>DESCRIPTION</code>, you will add a series of metadata about your package, for example, who wrote the package, what is the package version, what is its goal, who to complain to if things go wrong, and also information about external dependencies, the license, the encoding, and so forth.</p>
 <p>This <code>DESCRIPTION</code> file will be filled automatically by the first function you will run in <code>dev/01_start.R</code>, and by other functions from the <code>dev/</code> scripts.
-In other words, most of the time you will not interact with it directly, but through wrappers from <code>{golem}</code> and <code>{usethis}</code> <span class="citation">(<a href="#ref-R-usethis">Wickham, Bryan, and Barrett 2022</a>)</span> which are listed in the <code>dev</code> scripts.</p>
+In other words, most of the time you will not interact with it directly, but through wrappers from <a href="https://github.com/ThinkR-open/golem">golem</a> and <a href="https://usethis.r-lib.org">usethis</a> <span class="citation">(<a href="references.html#ref-R-usethis">Wickham, Bryan, and Barrett 2022</a>)</span> which are listed in the <code>dev</code> scripts.</p>
 <p>The <code>NAMESPACE</code> file is the file you will NEVER edit by hand!
-<strong>It defines how to interact with the rest of the package</strong>: what functions to import and from which package and what functions to export, <em>i.e.</em> what functions are available to the user when you do <code>library(golex)</code>.
-This file will be built when running the documenting process in your R package, i.e. when doing <code>devtools::document()</code>, or more specifically in our case <code>golem::document_and_reload()</code>.
+<strong>It defines how to interact with the rest of the package</strong>: what functions to import and from which package and what functions to export, <em>i.e.</em> what functions are available to the user when you do <code><a href="https://rdrr.io/r/base/library.html">library(golex)</a></code>.
+This file will be built when running the documenting process in your R package, i.e. when doing <code><a href="https://devtools.r-lib.org/reference/document.html">devtools::document()</a></code>, or more specifically in our case <code><a href="https://rdrr.io/pkg/golem/man/document_and_reload.html">golem::document_and_reload()</a></code>.
 This process will build the <code>man/</code> files and fill the <code>NAMESPACE</code>, by scanning the <code>{roxygen}</code> tags in your <code>.R</code> files.</p>
 <p>If you want to learn more about these files, here are some resources you can refer to:</p>
 <ul>
@@ -669,195 +223,209 @@ This process will build the <code>man/</code> files and fill the <code>NAMESPACE
 <li><a href="https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop">Building a package that lasts—eRum 2018 workshop</a></li>
 </ul>
 </div>
-<div id="r" class="section level3 hasAnchor" number="4.2.2">
-<h3><span class="header-section-number">4.2.2</span> R/<a href="golem.html#r" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="r" class="section level3" number="4.2.2">
+<h3>
+<span class="header-section-number">4.2.2</span> R/<a class="anchor" aria-label="anchor" href="#r"><i class="fas fa-link"></i></a>
+</h3>
 <p>The <code>R/</code> folder is <strong>the standard folder where you will store all your app functions</strong>.
-When you start your project with <code>{golem}</code>, this folder is pre-populated with four <code>.R</code> files: <code>app_config.R</code>, <code>app_server.R</code>, <code>app_ui.R</code> and <code>run_app.R</code>.</p>
+When you start your project with <a href="https://github.com/ThinkR-open/golem">golem</a>, this folder is pre-populated with four <code>.R</code> files: <code>app_config.R</code>, <code>app_server.R</code>, <code>app_ui.R</code> and <code>run_app.R</code>.</p>
 <p>During the process of building your application, all the core functionalities of your app will be stored in this <code>R/</code> directory, which is the standard way to store functions when using the R package framework.
 Note that these files are the “core” features of your application itself, and that other .R files also exists.
-For example, when you will need to deploy your application on RStudio platforms, <code>{golem}</code> will create an <code>app.R</code> at the root of your directory.<a href="#fn21" class="footnote-ref" id="fnref21"><sup>21</sup></a>
+For example, when you will need to deploy your application on RStudio platforms, <a href="https://github.com/ThinkR-open/golem">golem</a> will create an <code>app.R</code> at the root of your directory.<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;&lt;code&gt;{golem}&lt;/code&gt; will automatically add this file to the &lt;code&gt;.Rbuildignore&lt;/code&gt; file, i.e. make it be ignored by the package build process.&lt;/p&gt;"><sup>21</sup></a>
 The <code>dev/</code> folder also contains <code>.R</code> scripts, and they are inside this folder as they should not live inside the <code>R/</code> folder: they are utilitarian files used during development, not core functionalities of your application.</p>
-<p>Inside these <code>.R</code> files, contained inside the <code>R/</code> folder, you will find the content of your modules (the one added with <code>golem::add_modules()</code>) and the utilitarian/business logic functions, built with <code>golem::add_utils()</code> and <code>golem::add_fct()</code>.</p>
+<p>Inside these <code>.R</code> files, contained inside the <code>R/</code> folder, you will find the content of your modules (the one added with <code>golem::add_modules()</code>) and the utilitarian/business logic functions, built with <code><a href="https://rdrr.io/pkg/golem/man/file_creation.html">golem::add_utils()</a></code> and <code><a href="https://rdrr.io/pkg/golem/man/file_creation.html">golem::add_fct()</a></code>.</p>
 <p>Note also that this folder must not contain any sub-folders.</p>
-<div id="app_config.r" class="section level4 unnumbered hasAnchor">
-<h4>app_config.R<a href="golem.html#app_config.r" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="golem.html#cb52-1" tabindex="-1"></a><span class="co">#&#39; Access files in the current app</span></span>
-<span id="cb52-2"><a href="golem.html#cb52-2" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb52-3"><a href="golem.html#cb52-3" tabindex="-1"></a><span class="co">#&#39; </span><span class="al">NOTE</span><span class="co">: If you manually change your package</span></span>
-<span id="cb52-4"><a href="golem.html#cb52-4" tabindex="-1"></a><span class="co">#&#39; name in the DESCRIPTION, don&#39;t forget to change it here too,</span></span>
-<span id="cb52-5"><a href="golem.html#cb52-5" tabindex="-1"></a><span class="co">#&#39; and in the config file. For a safer name change mechanism,</span></span>
-<span id="cb52-6"><a href="golem.html#cb52-6" tabindex="-1"></a><span class="co">#&#39; use the `golem::set_golem_name()` function.</span></span>
-<span id="cb52-7"><a href="golem.html#cb52-7" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb52-8"><a href="golem.html#cb52-8" tabindex="-1"></a><span class="co">#&#39; @param ... character vectors, specifying subdirectory</span></span>
-<span id="cb52-9"><a href="golem.html#cb52-9" tabindex="-1"></a><span class="co">#&#39; and file(s) within your package.</span></span>
-<span id="cb52-10"><a href="golem.html#cb52-10" tabindex="-1"></a><span class="co">#&#39; The default, none, returns the root of the app.</span></span>
-<span id="cb52-11"><a href="golem.html#cb52-11" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb52-12"><a href="golem.html#cb52-12" tabindex="-1"></a><span class="co">#&#39; @noRd</span></span>
-<span id="cb52-13"><a href="golem.html#cb52-13" tabindex="-1"></a>app_sys <span class="ot">&lt;-</span> <span class="cf">function</span>(...){</span>
-<span id="cb52-14"><a href="golem.html#cb52-14" tabindex="-1"></a>  <span class="fu">system.file</span>(..., <span class="at">package =</span> <span class="st">&quot;golex&quot;</span>)</span>
-<span id="cb52-15"><a href="golem.html#cb52-15" tabindex="-1"></a>}</span>
-<span id="cb52-16"><a href="golem.html#cb52-16" tabindex="-1"></a></span>
-<span id="cb52-17"><a href="golem.html#cb52-17" tabindex="-1"></a></span>
-<span id="cb52-18"><a href="golem.html#cb52-18" tabindex="-1"></a><span class="co">#&#39; Read App Config</span></span>
-<span id="cb52-19"><a href="golem.html#cb52-19" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb52-20"><a href="golem.html#cb52-20" tabindex="-1"></a><span class="co">#&#39; @param value Value to retrieve from the config file.</span></span>
-<span id="cb52-21"><a href="golem.html#cb52-21" tabindex="-1"></a><span class="co">#&#39; @param config GOLEM_CONFIG_ACTIVE value.</span></span>
-<span id="cb52-22"><a href="golem.html#cb52-22" tabindex="-1"></a><span class="co">#&#39; If unset, R_CONFIG_ACTIVE.  If unset, &quot;default&quot;.</span></span>
-<span id="cb52-23"><a href="golem.html#cb52-23" tabindex="-1"></a><span class="co">#&#39; @param use_parent Logical,</span></span>
-<span id="cb52-24"><a href="golem.html#cb52-24" tabindex="-1"></a><span class="co">#&#39; scan the parent directory for config file.</span></span>
-<span id="cb52-25"><a href="golem.html#cb52-25" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb52-26"><a href="golem.html#cb52-26" tabindex="-1"></a><span class="co">#&#39; @noRd</span></span>
-<span id="cb52-27"><a href="golem.html#cb52-27" tabindex="-1"></a>get_golem_config <span class="ot">&lt;-</span> <span class="cf">function</span>(</span>
-<span id="cb52-28"><a href="golem.html#cb52-28" tabindex="-1"></a>  value,</span>
-<span id="cb52-29"><a href="golem.html#cb52-29" tabindex="-1"></a>  <span class="at">config =</span> <span class="fu">Sys.getenv</span>(</span>
-<span id="cb52-30"><a href="golem.html#cb52-30" tabindex="-1"></a>    <span class="st">&quot;GOLEM_CONFIG_ACTIVE&quot;</span>,</span>
-<span id="cb52-31"><a href="golem.html#cb52-31" tabindex="-1"></a>    <span class="fu">Sys.getenv</span>(</span>
-<span id="cb52-32"><a href="golem.html#cb52-32" tabindex="-1"></a>      <span class="st">&quot;R_CONFIG_ACTIVE&quot;</span>,</span>
-<span id="cb52-33"><a href="golem.html#cb52-33" tabindex="-1"></a>      <span class="st">&quot;default&quot;</span></span>
-<span id="cb52-34"><a href="golem.html#cb52-34" tabindex="-1"></a>    )</span>
-<span id="cb52-35"><a href="golem.html#cb52-35" tabindex="-1"></a>  ),</span>
-<span id="cb52-36"><a href="golem.html#cb52-36" tabindex="-1"></a>  <span class="at">use_parent =</span> <span class="cn">TRUE</span></span>
-<span id="cb52-37"><a href="golem.html#cb52-37" tabindex="-1"></a>){</span>
-<span id="cb52-38"><a href="golem.html#cb52-38" tabindex="-1"></a>  config<span class="sc">::</span><span class="fu">get</span>(</span>
-<span id="cb52-39"><a href="golem.html#cb52-39" tabindex="-1"></a>    <span class="at">value =</span> value,</span>
-<span id="cb52-40"><a href="golem.html#cb52-40" tabindex="-1"></a>    <span class="at">config =</span> config,</span>
-<span id="cb52-41"><a href="golem.html#cb52-41" tabindex="-1"></a>    <span class="co"># Modify this if your config file is somewhere else:</span></span>
-<span id="cb52-42"><a href="golem.html#cb52-42" tabindex="-1"></a>    <span class="at">file =</span> <span class="fu">app_sys</span>(<span class="st">&quot;golem-config.yml&quot;</span>),</span>
-<span id="cb52-43"><a href="golem.html#cb52-43" tabindex="-1"></a>    <span class="at">use_parent =</span> use_parent</span>
-<span id="cb52-44"><a href="golem.html#cb52-44" tabindex="-1"></a>  )</span>
-<span id="cb52-45"><a href="golem.html#cb52-45" tabindex="-1"></a>}</span></code></pre></div>
-<p>The <code>app_config.R</code> file contains internal mechanics for <code>{golem}</code>, notably for referring to values in the <code>inst/</code> folder, and to get values from the config file in the <code>inst/</code> folder.
+<div id="app_config.r" class="section level4 unnumbered">
+<h4>app_config.R<a class="anchor" aria-label="anchor" href="#app_config.r"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#' Access files in the current app</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' NOTE: If you manually change your package</span></span>
+<span><span class="co">#' name in the DESCRIPTION, don't forget to change it here too,</span></span>
+<span><span class="co">#' and in the config file. For a safer name change mechanism,</span></span>
+<span><span class="co">#' use the `golem::set_golem_name()` function.</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' @param ... character vectors, specifying subdirectory</span></span>
+<span><span class="co">#' and file(s) within your package.</span></span>
+<span><span class="co">#' The default, none, returns the root of the app.</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' @noRd</span></span>
+<span><span class="va">app_sys</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="va">...</span>, package <span class="op">=</span> <span class="st">"golex"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span></span>
+<span><span class="co">#' Read App Config</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' @param value Value to retrieve from the config file.</span></span>
+<span><span class="co">#' @param config GOLEM_CONFIG_ACTIVE value.</span></span>
+<span><span class="co">#' If unset, R_CONFIG_ACTIVE.  If unset, "default".</span></span>
+<span><span class="co">#' @param use_parent Logical,</span></span>
+<span><span class="co">#' scan the parent directory for config file.</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' @noRd</span></span>
+<span><span class="va">get_golem_config</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
+<span>  <span class="va">value</span>,</span>
+<span>  <span class="va">config</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span></span>
+<span>    <span class="st">"GOLEM_CONFIG_ACTIVE"</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span></span>
+<span>      <span class="st">"R_CONFIG_ACTIVE"</span>,</span>
+<span>      <span class="st">"default"</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  <span class="va">use_parent</span> <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="fu">config</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/config/man/get.html">get</a></span><span class="op">(</span></span>
+<span>    value <span class="op">=</span> <span class="va">value</span>,</span>
+<span>    config <span class="op">=</span> <span class="va">config</span>,</span>
+<span>    <span class="co"># Modify this if your config file is somewhere else:</span></span>
+<span>    file <span class="op">=</span> <span class="fu">app_sys</span><span class="op">(</span><span class="st">"golem-config.yml"</span><span class="op">)</span>,</span>
+<span>    use_parent <span class="op">=</span> <span class="va">use_parent</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>The <code>app_config.R</code> file contains internal mechanics for <a href="https://github.com/ThinkR-open/golem">golem</a>, notably for referring to values in the <code>inst/</code> folder, and to get values from the config file in the <code>inst/</code> folder.
 Keep in mind that if ever you need to change the name of your application, you will need to change it inside the <code>DESCRIPTION</code>, but also inside the <code>app_sys()</code> function.
-To make this process easier, you can use the <code>golem::set_golem_name()</code>, which will perform both these actions, plus setting the name inside the config file.</p>
+To make this process easier, you can use the <code><a href="https://rdrr.io/pkg/golem/man/golem_opts.html">golem::set_golem_name()</a></code>, which will perform both these actions, plus setting the name inside the config file.</p>
 </div>
-<div id="app_server.r" class="section level4 unnumbered hasAnchor">
-<h4>app_server.R<a href="golem.html#app_server.r" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="golem.html#cb53-1" tabindex="-1"></a><span class="co">#&#39; The application server-side</span></span>
-<span id="cb53-2"><a href="golem.html#cb53-2" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb53-3"><a href="golem.html#cb53-3" tabindex="-1"></a><span class="co">#&#39; @param input,output,session Internal parameters for {shiny}.</span></span>
-<span id="cb53-4"><a href="golem.html#cb53-4" tabindex="-1"></a><span class="co">#&#39;     DO NOT REMOVE.</span></span>
-<span id="cb53-5"><a href="golem.html#cb53-5" tabindex="-1"></a><span class="co">#&#39; @import shiny</span></span>
-<span id="cb53-6"><a href="golem.html#cb53-6" tabindex="-1"></a><span class="co">#&#39; @noRd</span></span>
-<span id="cb53-7"><a href="golem.html#cb53-7" tabindex="-1"></a>app_server <span class="ot">&lt;-</span> <span class="cf">function</span>( input, output, session ) {</span>
-<span id="cb53-8"><a href="golem.html#cb53-8" tabindex="-1"></a>  <span class="co"># Your application server logic</span></span>
-<span id="cb53-9"><a href="golem.html#cb53-9" tabindex="-1"></a></span>
-<span id="cb53-10"><a href="golem.html#cb53-10" tabindex="-1"></a>}</span></code></pre></div>
+<div id="app_server.r" class="section level4 unnumbered">
+<h4>app_server.R<a class="anchor" aria-label="anchor" href="#app_server.r"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#' The application server-side</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' @param input,output,session Internal parameters for {shiny}.</span></span>
+<span><span class="co">#'     DO NOT REMOVE.</span></span>
+<span><span class="co">#' @import shiny</span></span>
+<span><span class="co">#' @noRd</span></span>
+<span><span class="va">app_server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span> <span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span> <span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Your application server logic</span></span>
+<span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <p>The <code>app_server.R</code> file <strong>contains the function for the server logic</strong>.
 If you are familiar with the classic “ui.R/server.R” approach, this function can be seen as a replacement for the content of the function you have in your <code>server.R</code>.</p>
-<p>Building a complex <code>{shiny}</code> application commonly implies using <code>{shiny}</code> modules.
-If so, you will be adding there a series of <code>callModule()</code>, the ones you will get on the very bottom of the file created with <code>golem::add_module()</code>.</p>
-<p>You will also find global elements from your server-logic: top-level <code>reactiveValues()</code>, connections to databases, setting options, and so forth.</p>
+<p>Building a complex <a href="https://shiny.rstudio.com/">shiny</a> application commonly implies using <a href="https://shiny.rstudio.com/">shiny</a> modules.
+If so, you will be adding there a series of <code><a href="https://rdrr.io/pkg/shiny/man/callModule.html">callModule()</a></code>, the ones you will get on the very bottom of the file created with <code><a href="https://rdrr.io/pkg/golem/man/add_module.html">golem::add_module()</a></code>.</p>
+<p>You will also find global elements from your server-logic: top-level <code><a href="https://rdrr.io/pkg/shiny/man/reactiveValues.html">reactiveValues()</a></code>, connections to databases, setting options, and so forth.</p>
 </div>
-<div id="app_ui.r" class="section level4 unnumbered hasAnchor">
-<h4>app_ui.R<a href="golem.html#app_ui.r" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="golem.html#cb54-1" tabindex="-1"></a><span class="co">#&#39; The application User-Interface</span></span>
-<span id="cb54-2"><a href="golem.html#cb54-2" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb54-3"><a href="golem.html#cb54-3" tabindex="-1"></a><span class="co">#&#39; @param request Internal parameter for `{shiny}`.</span></span>
-<span id="cb54-4"><a href="golem.html#cb54-4" tabindex="-1"></a><span class="co">#&#39;     DO NOT REMOVE.</span></span>
-<span id="cb54-5"><a href="golem.html#cb54-5" tabindex="-1"></a><span class="co">#&#39; @import shiny</span></span>
-<span id="cb54-6"><a href="golem.html#cb54-6" tabindex="-1"></a><span class="co">#&#39; @noRd</span></span>
-<span id="cb54-7"><a href="golem.html#cb54-7" tabindex="-1"></a>app_ui <span class="ot">&lt;-</span> <span class="cf">function</span>(request) {</span>
-<span id="cb54-8"><a href="golem.html#cb54-8" tabindex="-1"></a>  <span class="fu">tagList</span>(</span>
-<span id="cb54-9"><a href="golem.html#cb54-9" tabindex="-1"></a>    <span class="co"># Leave this function for adding external resources</span></span>
-<span id="cb54-10"><a href="golem.html#cb54-10" tabindex="-1"></a>    <span class="fu">golem_add_external_resources</span>(),</span>
-<span id="cb54-11"><a href="golem.html#cb54-11" tabindex="-1"></a>    <span class="co"># Your application UI logic</span></span>
-<span id="cb54-12"><a href="golem.html#cb54-12" tabindex="-1"></a>    <span class="fu">fluidPage</span>(</span>
-<span id="cb54-13"><a href="golem.html#cb54-13" tabindex="-1"></a>      <span class="fu">h1</span>(<span class="st">&quot;golex&quot;</span>)</span>
-<span id="cb54-14"><a href="golem.html#cb54-14" tabindex="-1"></a>    )</span>
-<span id="cb54-15"><a href="golem.html#cb54-15" tabindex="-1"></a>  )</span>
-<span id="cb54-16"><a href="golem.html#cb54-16" tabindex="-1"></a>}</span></code></pre></div>
+<div id="app_ui.r" class="section level4 unnumbered">
+<h4>app_ui.R<a class="anchor" aria-label="anchor" href="#app_ui.r"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#' The application User-Interface</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' @param request Internal parameter for `{shiny}`.</span></span>
+<span><span class="co">#'     DO NOT REMOVE.</span></span>
+<span><span class="co">#' @import shiny</span></span>
+<span><span class="co">#' @noRd</span></span>
+<span><span class="va">app_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">request</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rstudio.github.io/htmltools/reference/tagList.html">tagList</a></span><span class="op">(</span></span>
+<span>    <span class="co"># Leave this function for adding external resources</span></span>
+<span>    <span class="fu">golem_add_external_resources</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    <span class="co"># Your application UI logic</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/fluidPage.html">fluidPage</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rstudio.github.io/htmltools/reference/builder.html">h1</a></span><span class="op">(</span><span class="st">"golex"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <p>This piece of the <code>app_ui.R</code> is designed to <strong>receive the counterpart of what you put in your server</strong>.
 Everything here is to be put after the # Your application UI logic line.
-Just as with their server counterparts, the UI side of these elements are the ones from the bottom of the file you are creating with <code>golem::add_module()</code>.</p>
-<p>By default, <code>{golem}</code> uses a <code>fluidPage()</code>, which is the most commonly used <code>{shiny}</code> <span class="citation">(<a href="#ref-R-shiny">Chang et al. 2022</a>)</span> template.
+Just as with their server counterparts, the UI side of these elements are the ones from the bottom of the file you are creating with <code><a href="https://rdrr.io/pkg/golem/man/add_module.html">golem::add_module()</a></code>.</p>
+<p>By default, <a href="https://github.com/ThinkR-open/golem">golem</a> uses a <code><a href="https://rdrr.io/pkg/shiny/man/fluidPage.html">fluidPage()</a></code>, which is the most commonly used <a href="https://shiny.rstudio.com/">shiny</a> <span class="citation">(<a href="references.html#ref-R-shiny">Chang et al. 2022</a>)</span> template.
 If ever you want to use <code>navBarPage()</code>, this is where you will define it: replace one with the other, and you will be good to go.
-You can also define any other template page, for example with an <code>htmlTemplate()</code>.
+You can also define any other template page, for example with an <code><a href="https://rstudio.github.io/htmltools/reference/htmlTemplate.html">htmlTemplate()</a></code>.
 For an example of an application built using an <code>htmlTemplate</code>, please visit <a href="https://engineering-shiny.org/grayscale/">engineering-shiny.org/grayscale/</a>, or <a href="https://engineering-shiny.org/golemhtmltemplate/">engineering-shiny.org/golemhtmltemplate/</a>: both these applications are built on top of an external html template.</p>
-<p>If you’re tempted to do that, be aware that <code>fluidPage()</code> comes with a series of CSS/JS elements, and if you plan on not using a default <code>{shiny}</code> <code>*Page()</code> function, you will need to add your own CSS.</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="golem.html#cb55-1" tabindex="-1"></a><span class="co">#&#39; Add external Resources to the Application</span></span>
-<span id="cb55-2"><a href="golem.html#cb55-2" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb55-3"><a href="golem.html#cb55-3" tabindex="-1"></a><span class="co">#&#39; This function is internally used to add external</span></span>
-<span id="cb55-4"><a href="golem.html#cb55-4" tabindex="-1"></a><span class="co">#&#39; resources inside the Shiny application.</span></span>
-<span id="cb55-5"><a href="golem.html#cb55-5" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb55-6"><a href="golem.html#cb55-6" tabindex="-1"></a><span class="co">#&#39; @import shiny</span></span>
-<span id="cb55-7"><a href="golem.html#cb55-7" tabindex="-1"></a><span class="co">#&#39; @importFrom golem add_resource_path activate_js</span></span>
-<span id="cb55-8"><a href="golem.html#cb55-8" tabindex="-1"></a><span class="co">#&#39; @importFrom golem favicon bundle_resources</span></span>
-<span id="cb55-9"><a href="golem.html#cb55-9" tabindex="-1"></a><span class="co">#&#39; @noRd</span></span>
-<span id="cb55-10"><a href="golem.html#cb55-10" tabindex="-1"></a>golem_add_external_resources <span class="ot">&lt;-</span> <span class="cf">function</span>(){</span>
-<span id="cb55-11"><a href="golem.html#cb55-11" tabindex="-1"></a></span>
-<span id="cb55-12"><a href="golem.html#cb55-12" tabindex="-1"></a>  <span class="fu">add_resource_path</span>(</span>
-<span id="cb55-13"><a href="golem.html#cb55-13" tabindex="-1"></a>    <span class="st">&#39;www&#39;</span>, <span class="fu">app_sys</span>(<span class="st">&#39;app/www&#39;</span>)</span>
-<span id="cb55-14"><a href="golem.html#cb55-14" tabindex="-1"></a>  )</span>
-<span id="cb55-15"><a href="golem.html#cb55-15" tabindex="-1"></a></span>
-<span id="cb55-16"><a href="golem.html#cb55-16" tabindex="-1"></a>  tags<span class="sc">$</span><span class="fu">head</span>(</span>
-<span id="cb55-17"><a href="golem.html#cb55-17" tabindex="-1"></a>    <span class="fu">favicon</span>(),</span>
-<span id="cb55-18"><a href="golem.html#cb55-18" tabindex="-1"></a>    <span class="fu">bundle_resources</span>(</span>
-<span id="cb55-19"><a href="golem.html#cb55-19" tabindex="-1"></a>      <span class="at">path =</span> <span class="fu">app_sys</span>(<span class="st">&#39;app/www&#39;</span>),</span>
-<span id="cb55-20"><a href="golem.html#cb55-20" tabindex="-1"></a>      <span class="at">app_title =</span> <span class="st">&#39;cloop&#39;</span></span>
-<span id="cb55-21"><a href="golem.html#cb55-21" tabindex="-1"></a>    )</span>
-<span id="cb55-22"><a href="golem.html#cb55-22" tabindex="-1"></a>    <span class="co"># Add here other external resources</span></span>
-<span id="cb55-23"><a href="golem.html#cb55-23" tabindex="-1"></a>    <span class="co"># for example, you can add</span></span>
-<span id="cb55-24"><a href="golem.html#cb55-24" tabindex="-1"></a>    <span class="co"># shinyalert::useShinyalert()</span></span>
-<span id="cb55-25"><a href="golem.html#cb55-25" tabindex="-1"></a>  )</span>
-<span id="cb55-26"><a href="golem.html#cb55-26" tabindex="-1"></a>}</span></code></pre></div>
+<p>If you’re tempted to do that, be aware that <code><a href="https://rdrr.io/pkg/shiny/man/fluidPage.html">fluidPage()</a></code> comes with a series of CSS/JS elements, and if you plan on not using a default <a href="https://shiny.rstudio.com/">shiny</a> <code>*Page()</code> function, you will need to add your own CSS.</p>
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#' Add external Resources to the Application</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' This function is internally used to add external</span></span>
+<span><span class="co">#' resources inside the Shiny application.</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' @import shiny</span></span>
+<span><span class="co">#' @importFrom golem add_resource_path activate_js</span></span>
+<span><span class="co">#' @importFrom golem favicon bundle_resources</span></span>
+<span><span class="co">#' @noRd</span></span>
+<span><span class="va">golem_add_external_resources</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span></span>
+<span></span>
+<span>  <span class="fu">add_resource_path</span><span class="op">(</span></span>
+<span>    <span class="st">'www'</span>, <span class="fu">app_sys</span><span class="op">(</span><span class="st">'app/www'</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">tags</span><span class="op">$</span><span class="fu">head</span><span class="op">(</span></span>
+<span>    <span class="fu">favicon</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    <span class="fu">bundle_resources</span><span class="op">(</span></span>
+<span>      path <span class="op">=</span> <span class="fu">app_sys</span><span class="op">(</span><span class="st">'app/www'</span><span class="op">)</span>,</span>
+<span>      app_title <span class="op">=</span> <span class="st">'cloop'</span></span>
+<span>    <span class="op">)</span></span>
+<span>    <span class="co"># Add here other external resources</span></span>
+<span>    <span class="co"># for example, you can add</span></span>
+<span>    <span class="co"># shinyalert::useShinyalert()</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <p>The second part of this file contains the <code>golem_add_external_resources()</code> function, which is used to add, well, external resources.
 You may have noticed that this function is to be found above in the file, in the <code>app_ui()</code> function.
-This function is used for <strong>linking to external files inside your applications</strong>: notably the files you will create with <code>golem::add_css_file()</code> and friends.</p>
+This function is used for <strong>linking to external files inside your applications</strong>: notably the files you will create with <code><a href="https://rdrr.io/pkg/golem/man/add_files.html">golem::add_css_file()</a></code> and friends.</p>
 <p>In <code>golem_add_external_resources()</code>, you can also define a custom <code>resourcesPath</code>.
 The first line (the one with <code>add_resource_path()</code>) is the one allowing the <code>inst/app/www</code> folder to be mounted and be available at <code>www</code> with your app when you launch it.
-That link makes it possible for <code>{golem}</code> to bundle the CSS and JavaScript files automatically.</p>
+That link makes it possible for <a href="https://github.com/ThinkR-open/golem">golem</a> to bundle the CSS and JavaScript files automatically.</p>
 <p>The other part of this function, starting with <code>tags$head</code>, creates a <code>&lt;head&gt;</code> tag for your application.
 This <code>&lt;head&gt;</code> tag is a pretty standard tag, which is used in HTML to define a series of metadata about your app.
 <strong>The last part of this function, the one with <code>bundle_resources()</code>, links all the CSS and JavaScript files contained in <code>inst/app/www</code> to your application, so you don’t have to link them manually</strong>.</p>
-<p>And finally, if you want to add other elements to the <code>&lt;head&gt;</code> of your application (for example, by calling <code>shinyalert::useShinyalert()</code> or <code>cicerone::use_cicerone()</code> as in <code>{hexmake}</code>),<a href="#fn22" class="footnote-ref" id="fnref22"><sup>22</sup></a> you can add these calls after the <code>bundle_resources()</code> function.
+<p>And finally, if you want to add other elements to the <code>&lt;head&gt;</code> of your application (for example, by calling <code><a href="https://rdrr.io/pkg/shinyalert/man/useShinyalert.html">shinyalert::useShinyalert()</a></code> or <code><a href="https://rdrr.io/pkg/cicerone/man/use_cicerone.html">cicerone::use_cicerone()</a></code> as in <a href="https://github.com/colinfay/hexmake">hexmake</a>),<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content='&lt;p&gt;See &lt;a href="https://github.com/ColinFay/hexmake/blob/master/R/app_ui.R#L35" class="uri"&gt;https://github.com/ColinFay/hexmake/blob/master/R/app_ui.R#L35&lt;/a&gt;&lt;/p&gt;'><sup>22</sup></a> you can add these calls after the <code>bundle_resources()</code> function.
 Note that as all these elements are inside a <code>tags$head()</code>, they are to be treated as a list, so separated by commas.</p>
 </div>
-<div id="run_app.r" class="section level4 unnumbered hasAnchor">
-<h4>run_app.R<a href="golem.html#run_app.r" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="golem.html#cb56-1" tabindex="-1"></a><span class="co">#&#39; Run the Shiny Application</span></span>
-<span id="cb56-2"><a href="golem.html#cb56-2" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb56-3"><a href="golem.html#cb56-3" tabindex="-1"></a><span class="co">#&#39; @param ... arguments to pass to golem_opts.</span></span>
-<span id="cb56-4"><a href="golem.html#cb56-4" tabindex="-1"></a><span class="co">#&#39; See `?golem::get_golem_options` for more details.</span></span>
-<span id="cb56-5"><a href="golem.html#cb56-5" tabindex="-1"></a><span class="co">#&#39; @inheritParams shiny::shinyApp</span></span>
-<span id="cb56-6"><a href="golem.html#cb56-6" tabindex="-1"></a><span class="co">#&#39;</span></span>
-<span id="cb56-7"><a href="golem.html#cb56-7" tabindex="-1"></a><span class="co">#&#39; @export</span></span>
-<span id="cb56-8"><a href="golem.html#cb56-8" tabindex="-1"></a><span class="co">#&#39; @importFrom shiny shinyApp</span></span>
-<span id="cb56-9"><a href="golem.html#cb56-9" tabindex="-1"></a><span class="co">#&#39; @importFrom golem with_golem_options</span></span>
-<span id="cb56-10"><a href="golem.html#cb56-10" tabindex="-1"></a>run_app <span class="ot">&lt;-</span> <span class="cf">function</span>(</span>
-<span id="cb56-11"><a href="golem.html#cb56-11" tabindex="-1"></a>  <span class="at">onStart =</span> <span class="cn">NULL</span>,</span>
-<span id="cb56-12"><a href="golem.html#cb56-12" tabindex="-1"></a>  <span class="at">options =</span> <span class="fu">list</span>(),</span>
-<span id="cb56-13"><a href="golem.html#cb56-13" tabindex="-1"></a>  <span class="at">enableBookmarking =</span> <span class="cn">NULL</span>,</span>
-<span id="cb56-14"><a href="golem.html#cb56-14" tabindex="-1"></a>  <span class="at">uiPattern =</span> <span class="st">&quot;/&quot;</span>,</span>
-<span id="cb56-15"><a href="golem.html#cb56-15" tabindex="-1"></a>  ...</span>
-<span id="cb56-16"><a href="golem.html#cb56-16" tabindex="-1"></a>) {</span>
-<span id="cb56-17"><a href="golem.html#cb56-17" tabindex="-1"></a>  <span class="fu">with_golem_options</span>(</span>
-<span id="cb56-18"><a href="golem.html#cb56-18" tabindex="-1"></a>    <span class="at">app =</span> <span class="fu">shinyApp</span>(</span>
-<span id="cb56-19"><a href="golem.html#cb56-19" tabindex="-1"></a>      <span class="at">ui =</span> app_ui,</span>
-<span id="cb56-20"><a href="golem.html#cb56-20" tabindex="-1"></a>      <span class="at">server =</span> app_server,</span>
-<span id="cb56-21"><a href="golem.html#cb56-21" tabindex="-1"></a>      <span class="at">onStart =</span> onStart,</span>
-<span id="cb56-22"><a href="golem.html#cb56-22" tabindex="-1"></a>      <span class="at">options =</span> options,</span>
-<span id="cb56-23"><a href="golem.html#cb56-23" tabindex="-1"></a>      <span class="at">enableBookmarking =</span> enableBookmarking,</span>
-<span id="cb56-24"><a href="golem.html#cb56-24" tabindex="-1"></a>      <span class="at">uiPattern =</span> uiPattern</span>
-<span id="cb56-25"><a href="golem.html#cb56-25" tabindex="-1"></a>    ),</span>
-<span id="cb56-26"><a href="golem.html#cb56-26" tabindex="-1"></a>    <span class="at">golem_opts =</span> <span class="fu">list</span>(...)</span>
-<span id="cb56-27"><a href="golem.html#cb56-27" tabindex="-1"></a>  )</span>
-<span id="cb56-28"><a href="golem.html#cb56-28" tabindex="-1"></a>}</span></code></pre></div>
-<p>The <code>run_app()</code> function is the one that you will use to launch the app.<a href="#fn23" class="footnote-ref" id="fnref23"><sup>23</sup></a></p>
-<p>The body of this function is wrapped inside <code>with_golem_options()</code>, which allows you to pass arguments to the <code>run_app()</code> function, which can be called later on with <code>golem::get_golem_options()</code>.
+<div id="run_app.r" class="section level4 unnumbered">
+<h4>run_app.R<a class="anchor" aria-label="anchor" href="#run_app.r"><i class="fas fa-link"></i></a>
+</h4>
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#' Run the Shiny Application</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' @param ... arguments to pass to golem_opts.</span></span>
+<span><span class="co">#' See `?golem::get_golem_options` for more details.</span></span>
+<span><span class="co">#' @inheritParams shiny::shinyApp</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' @export</span></span>
+<span><span class="co">#' @importFrom shiny shinyApp</span></span>
+<span><span class="co">#' @importFrom golem with_golem_options</span></span>
+<span><span class="va">run_app</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
+<span>  <span class="va">onStart</span> <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">options</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">enableBookmarking</span> <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">uiPattern</span> <span class="op">=</span> <span class="st">"/"</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">with_golem_options</span><span class="op">(</span></span>
+<span>    app <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html">shinyApp</a></span><span class="op">(</span></span>
+<span>      ui <span class="op">=</span> <span class="va">app_ui</span>,</span>
+<span>      server <span class="op">=</span> <span class="va">app_server</span>,</span>
+<span>      onStart <span class="op">=</span> <span class="va">onStart</span>,</span>
+<span>      options <span class="op">=</span> <span class="va">options</span>,</span>
+<span>      enableBookmarking <span class="op">=</span> <span class="va">enableBookmarking</span>,</span>
+<span>      uiPattern <span class="op">=</span> <span class="va">uiPattern</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    golem_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>The <code>run_app()</code> function is the one that you will use to launch the app.<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Very technically speaking, it is the &lt;code&gt;print()&lt;/code&gt; from the object outputed by &lt;code&gt;run_app()&lt;/code&gt; that launches the app, but this is another story.&lt;/p&gt;"><sup>23</sup></a></p>
+<p>The body of this function is wrapped inside <code>with_golem_options()</code>, which allows you to pass arguments to the <code>run_app()</code> function, which can be called later on with <code><a href="https://rdrr.io/pkg/golem/man/get_golem_options.html">golem::get_golem_options()</a></code>.
 <strong>The idea here is that you can pass arguments to this function, and that arguments will be later used inside your application to display a specific version of the application</strong>.
-Using this <code>with_golem_options()</code> function simplifies the parameterization of <code>{shiny}</code> applications, be it during development, when deployed on a server, or when shared as a package.</p>
+Using this <code>with_golem_options()</code> function simplifies the parameterization of <a href="https://shiny.rstudio.com/">shiny</a> applications, be it during development, when deployed on a server, or when shared as a package.</p>
 <p>Here are some examples of what you can pass to your shiny application using this pattern:</p>
 <ul>
 <li><p><code>run_app(user_country = "france")</code> and <code>run_app(user_country = "germany")</code> to launch the application and show the data for a specific country.</p></li>
-<li><p><code>run_app(with_mongo = TRUE)</code> to launch the application with or without a MongoDB back-end (example taken from <code>{hexmake}</code>).</p></li>
+<li><p><code>run_app(with_mongo = TRUE)</code> to launch the application with or without a MongoDB back-end (example taken from <a href="https://github.com/colinfay/hexmake">hexmake</a>).</p></li>
 <li><p><code>run_app(dataset = iris)</code> will make the dataset available with <code>golem::get_golem_options("dataset")</code>, so your user can launch the function from their package using a dataset they have created/loaded</p></li>
 </ul>
 </div>
 </div>
-<div id="golem-config" class="section level3 hasAnchor" number="4.2.3">
-<h3><span class="header-section-number">4.2.3</span> <code>golem-config</code><a href="golem.html#golem-config" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div id="app_config.r-1" class="section level4 unnumbered hasAnchor">
-<h4>app_config.R<a href="golem.html#app_config.r-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="golem-config" class="section level3" number="4.2.3">
+<h3>
+<span class="header-section-number">4.2.3</span> <code>golem-config</code><a class="anchor" aria-label="anchor" href="#golem-config"><i class="fas fa-link"></i></a>
+</h3>
+<div id="app_config.r-1" class="section level4 unnumbered">
+<h4>app_config.R<a class="anchor" aria-label="anchor" href="#app_config.r-1"><i class="fas fa-link"></i></a>
+</h4>
 <p>Inside the <code>R/</code> folder is the <code>app_config.R</code> file.
 This file is designed to handle two things:</p>
 <ul>
@@ -866,8 +434,9 @@ For example, <code>app_sys("x.txt")</code> points to the <code>inst/x.txt</code>
 <li><p><code>get_golem_config()</code> helps you manipulate the config file located at <code>inst/golem-config.yml</code>.</p></li>
 </ul>
 </div>
-<div id="manipulating-golem-config.yml" class="section level4 unnumbered hasAnchor">
-<h4>Manipulating <code>golem-config.yml</code><a href="golem.html#manipulating-golem-config.yml" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="manipulating-golem-config.yml" class="section level4 unnumbered">
+<h4>Manipulating <code>golem-config.yml</code><a class="anchor" aria-label="anchor" href="#manipulating-golem-config.yml"><i class="fas fa-link"></i></a>
+</h4>
 <p>Here is what the default config file looks like:</p>
 <pre><code>default:
   golem_name: golex
@@ -879,77 +448,94 @@ production:
 
 dev:
   golem_wd: !expr golem::pkg_path()</code></pre>
-<p>It is based on the <code>{config}</code> <span class="citation">(<a href="#ref-R-config">Allaire 2020</a>)</span> format, and allows you to define contexts, with values associated with these specific contexts.
+<p>It is based on the <a href="https://github.com/rstudio/config">config</a> <span class="citation">(<a href="references.html#ref-R-config">Allaire 2020</a>)</span> format, and allows you to define contexts, with values associated with these specific contexts.
 For example, in the default example:</p>
 <ul>
-<li><code>default.golem_name</code>, <code>default.golem_version</code>, and <code>default.app_prod</code> are usable across the whole life of your golem app: while developing, and also when in production.</li>
-<li><code>production.app_prod</code> might be used for adding elements that are to be used once the app is in production.</li>
-<li><code>dev.golem_wd</code> is in a <code>dev</code> config because <strong>the only moment you might reliably use this config is while developing your app</strong>. Use the <code>app_sys()</code> function if you want to rely on the package path once the app is deployed.</li>
+<li>
+<code>default.golem_name</code>, <code>default.golem_version</code>, and <code>default.app_prod</code> are usable across the whole life of your golem app: while developing, and also when in production.</li>
+<li>
+<code>production.app_prod</code> might be used for adding elements that are to be used once the app is in production.</li>
+<li>
+<code>dev.golem_wd</code> is in a <code>dev</code> config because <strong>the only moment you might reliably use this config is while developing your app</strong>. Use the <code>app_sys()</code> function if you want to rely on the package path once the app is deployed.</li>
 </ul>
 <p>These options are globally set with:</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="golem.html#cb58-1" tabindex="-1"></a><span class="co"># This functions sets all the default options for your project</span></span>
-<span id="cb58-2"><a href="golem.html#cb58-2" tabindex="-1"></a><span class="fu">set_golem_options</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># This functions sets all the default options for your project</span></span>
+<span><span class="fu">set_golem_options</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code>── Setting {golem} options in `golem-config.yml` ──────
 ✓ Setting `golem_wd` to /Users/colin/golex
 You can change golem working directory with
-set_golem_wd(&#39;path/to/wd&#39;)
+set_golem_wd('path/to/wd')
 ✓ Setting `golem_name` to golex
 ✓ Setting `golem_version` to 0.0.0.9000
 ✓ Setting `app_prod` to FALSE
 ── Setting {usethis} project as `golem_wd` ────────────</code></pre>
 <p>The functions reading the options in this config file are:</p>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="golem.html#cb60-1" tabindex="-1"></a><span class="co"># Get the values from the config file</span></span>
-<span id="cb60-2"><a href="golem.html#cb60-2" tabindex="-1"></a><span class="fu">get_golem_name</span>()</span></code></pre></div>
-<pre><code>[1] &quot;golex&quot;</code></pre>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="golem.html#cb62-1" tabindex="-1"></a><span class="fu">get_golem_wd</span>()</span></code></pre></div>
-<pre><code>[1] &quot;/Users/colin/golex&quot;</code></pre>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="golem.html#cb64-1" tabindex="-1"></a><span class="fu">get_golem_version</span>()</span></code></pre></div>
-<pre><code>[1] &quot;0.0.0.9000&quot;</code></pre>
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get the values from the config file</span></span>
+<span><span class="fu">get_golem_name</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] "golex"</code></pre>
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">get_golem_wd</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] "/Users/colin/golex"</code></pre>
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">get_golem_version</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] "0.0.0.9000"</code></pre>
 <p>You can set these with:</p>
-<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="golem.html#cb66-1" tabindex="-1"></a><span class="co"># Get the values in the config file</span></span>
-<span id="cb66-2"><a href="golem.html#cb66-2" tabindex="-1"></a><span class="fu">set_golem_name</span>(<span class="st">&quot;this&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get the values in the config file</span></span>
+<span><span class="fu">set_golem_name</span><span class="op">(</span><span class="st">"this"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>✓ Setting `golem_name` to this</code></pre>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="golem.html#cb68-1" tabindex="-1"></a><span class="fu">set_golem_version</span>(<span class="st">&quot;0.0.1&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">set_golem_version</span><span class="op">(</span><span class="st">"0.0.1"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>✓ Setting `golem_version` to 0.0.1</code></pre>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="golem.html#cb70-1" tabindex="-1"></a><span class="co"># Get the values from the config file</span></span>
-<span id="cb70-2"><a href="golem.html#cb70-2" tabindex="-1"></a><span class="fu">get_golem_name</span>()</span></code></pre></div>
-<pre><code>[1] &quot;this&quot;</code></pre>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="golem.html#cb72-1" tabindex="-1"></a><span class="fu">get_golem_version</span>()</span></code></pre></div>
-<pre><code>[1] &quot;0.0.1&quot;</code></pre>
-<p>If you are already familiar with the <code>{config}</code> package, you can use this file just as any config file.</p>
-<p><code>{golem}</code> comes with an <code>amend_golem_config()</code> function to add elements to it.</p>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="golem.html#cb74-1" tabindex="-1"></a><span class="co"># Add a key in the default configuration</span></span>
-<span id="cb74-2"><a href="golem.html#cb74-2" tabindex="-1"></a><span class="fu">amend_golem_config</span>(</span>
-<span id="cb74-3"><a href="golem.html#cb74-3" tabindex="-1"></a>  <span class="at">key =</span> <span class="st">&quot;MONGODBURL&quot;</span>,</span>
-<span id="cb74-4"><a href="golem.html#cb74-4" tabindex="-1"></a>  <span class="at">value =</span> <span class="st">&quot;localhost&quot;</span></span>
-<span id="cb74-5"><a href="golem.html#cb74-5" tabindex="-1"></a>)</span>
-<span id="cb74-6"><a href="golem.html#cb74-6" tabindex="-1"></a><span class="co"># Add a key in the production configuration</span></span>
-<span id="cb74-7"><a href="golem.html#cb74-7" tabindex="-1"></a><span class="fu">amend_golem_config</span>(</span>
-<span id="cb74-8"><a href="golem.html#cb74-8" tabindex="-1"></a>  <span class="at">key =</span> <span class="st">&quot;MONGODBURL&quot;</span>,</span>
-<span id="cb74-9"><a href="golem.html#cb74-9" tabindex="-1"></a>  <span class="at">value =</span> <span class="st">&quot;0.0.0.0&quot;</span>,</span>
-<span id="cb74-10"><a href="golem.html#cb74-10" tabindex="-1"></a>  <span class="at">config =</span> <span class="st">&quot;production&quot;</span></span>
-<span id="cb74-11"><a href="golem.html#cb74-11" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get the values from the config file</span></span>
+<span><span class="fu">get_golem_name</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] "this"</code></pre>
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">get_golem_version</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] "0.0.1"</code></pre>
+<p>If you are already familiar with the <a href="https://github.com/rstudio/config">config</a> package, you can use this file just as any config file.</p>
+<p><a href="https://github.com/ThinkR-open/golem">golem</a> comes with an <code>amend_golem_config()</code> function to add elements to it.</p>
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Add a key in the default configuration</span></span>
+<span><span class="fu">amend_golem_config</span><span class="op">(</span></span>
+<span>  key <span class="op">=</span> <span class="st">"MONGODBURL"</span>,</span>
+<span>  value <span class="op">=</span> <span class="st">"localhost"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co"># Add a key in the production configuration</span></span>
+<span><span class="fu">amend_golem_config</span><span class="op">(</span></span>
+<span>  key <span class="op">=</span> <span class="st">"MONGODBURL"</span>,</span>
+<span>  value <span class="op">=</span> <span class="st">"0.0.0.0"</span>,</span>
+<span>  config <span class="op">=</span> <span class="st">"production"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>In <code>R/app_config.R</code>, you will find a <code>get_golem_config()</code> function that allows you to retrieve config from this config file:</p>
-<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="golem.html#cb75-1" tabindex="-1"></a><span class="co"># Retrieve the value of `where`</span></span>
-<span id="cb75-2"><a href="golem.html#cb75-2" tabindex="-1"></a><span class="fu">get_golem_config</span>(</span>
-<span id="cb75-3"><a href="golem.html#cb75-3" tabindex="-1"></a>  <span class="st">&quot;MONGODBURL&quot;</span></span>
-<span id="cb75-4"><a href="golem.html#cb75-4" tabindex="-1"></a>)</span></code></pre></div>
-<pre><code>[1] &quot;localhost&quot;</code></pre>
-<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="golem.html#cb77-1" tabindex="-1"></a><span class="fu">get_golem_config</span>(</span>
-<span id="cb77-2"><a href="golem.html#cb77-2" tabindex="-1"></a>  <span class="st">&quot;MONGODBURL&quot;</span>,</span>
-<span id="cb77-3"><a href="golem.html#cb77-3" tabindex="-1"></a>  <span class="at">config =</span> <span class="st">&quot;production&quot;</span></span>
-<span id="cb77-4"><a href="golem.html#cb77-4" tabindex="-1"></a>)</span></code></pre></div>
-<pre><code>[1] &quot;0.0.0.0&quot;</code></pre>
-<p>You can also use an environment variable (default <code>{config}</code> behavior):</p>
-<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="golem.html#cb79-1" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="st">&quot;GOLEM_CONFIG_ACTIVE&quot;</span> <span class="ot">=</span> <span class="st">&quot;production&quot;</span>)</span>
-<span id="cb79-2"><a href="golem.html#cb79-2" tabindex="-1"></a><span class="fu">get_golem_config</span>(</span>
-<span id="cb79-3"><a href="golem.html#cb79-3" tabindex="-1"></a>  <span class="st">&quot;MONGODBURL&quot;</span></span>
-<span id="cb79-4"><a href="golem.html#cb79-4" tabindex="-1"></a>)</span></code></pre></div>
-<pre><code>[1] &quot;0.0.0.0&quot;</code></pre>
-<p>The good news is that if you don’t want/need to use <code>{config}</code>, you can safely ignore this file, just leave it where it is: it is used internally by the <code>{golem}</code> functions.</p>
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Retrieve the value of `where`</span></span>
+<span><span class="fu">get_golem_config</span><span class="op">(</span></span>
+<span>  <span class="st">"MONGODBURL"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] "localhost"</code></pre>
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">get_golem_config</span><span class="op">(</span></span>
+<span>  <span class="st">"MONGODBURL"</span>,</span>
+<span>  config <span class="op">=</span> <span class="st">"production"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] "0.0.0.0"</code></pre>
+<p>You can also use an environment variable (default <a href="https://github.com/rstudio/config">config</a> behavior):</p>
+<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html">Sys.setenv</a></span><span class="op">(</span><span class="st">"GOLEM_CONFIG_ACTIVE"</span> <span class="op">=</span> <span class="st">"production"</span><span class="op">)</span></span>
+<span><span class="fu">get_golem_config</span><span class="op">(</span></span>
+<span>  <span class="st">"MONGODBURL"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] "0.0.0.0"</code></pre>
+<p>The good news is that if you don’t want/need to use <a href="https://github.com/rstudio/config">config</a>, you can safely ignore this file, just leave it where it is: it is used internally by the <a href="https://github.com/ThinkR-open/golem">golem</a> functions.</p>
 </div>
-<div id="golem_config-vs-golem_options" class="section level4 unnumbered hasAnchor">
-<h4><code>golem_config</code> vs <code>golem_options</code><a href="golem.html#golem_config-vs-golem_options" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="golem_config-vs-golem_options" class="section level4 unnumbered">
+<h4>
+<code>golem_config</code> vs <code>golem_options</code><a class="anchor" aria-label="anchor" href="#golem_config-vs-golem_options"><i class="fas fa-link"></i></a>
+</h4>
 <p>There are two ways to configure golem apps:</p>
 <ul>
 <li>The <code>golem_opts</code> in the <code>run_app()</code> function</li>
@@ -957,8 +543,8 @@ set_golem_wd(&#39;path/to/wd&#39;)
 </ul>
 <p>The big difference between these two is that the golem options from <code>run_app()</code> are meant to be configured during runtime: you will be doing <code>run_app(val = "this")</code>, whereas the <code>golem-config</code> is meant to be used in the back-end, and will not be linked to the parameters passed to <code>run_app()</code> (even if this is technically possible, this is not the main objective).</p>
 <p>It is also linked to the <code>GOLEM_CONFIG_ACTIVE</code> and <code>R_CONFIG_ACTIVE</code> environment variables.</p>
-<p>The idea is also that the <code>golem-config.yml</code> file is shareable across <code>{golem}</code> projects (<code>golem_opts</code> are application specific), and will be tracked by version control systems.</p>
-<p>For example, let’s imagine we want to deploy the <code>{hexmake}</code> application on two RStudio Connect instances, but that both need a different MongoDB configuration when it comes to port, db, and collection name.
+<p>The idea is also that the <code>golem-config.yml</code> file is shareable across <a href="https://github.com/ThinkR-open/golem">golem</a> projects (<code>golem_opts</code> are application specific), and will be tracked by version control systems.</p>
+<p>For example, let’s imagine we want to deploy the <a href="https://github.com/colinfay/hexmake">hexmake</a> application on two RStudio Connect instances, but that both need a different MongoDB configuration when it comes to port, db, and collection name.
 To do that, you can take several approaches:</p>
 <ul>
 <li>Set these values as <code>run_app()</code> parameters, but that means that you have to maintain one <code>app.R</code> for each server to which you will deploy.</li>
@@ -990,29 +576,31 @@ Note, though, that it shouldn’t be used to store sensitive data (for example u
 <span id="cb81-20"><a href="golem.html#cb81-20" tabindex="-1"></a><span class="at">  </span><span class="fu">mongocollecton</span><span class="kw">:</span><span class="at"> app1</span></span></code></pre></div>
 <p>Using this configuration file, you can then deploy the very same app on the two servers, and configure what is going to be read by the application by setting an environment variable inside the RStudio Connect interface, as shown in Figure <a href="golem.html#fig:04-golem-22">4.1</a>.</p>
 
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:04-golem-22"></span>
-<img src="img/GOLEM_CONFIG_ACTIVE.png" alt="Setting an environment variable in RStudio Connect." width="100%" />
-<p class="caption">
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:04-golem-22"></span>
+<img src="img/GOLEM_CONFIG_ACTIVE.png" alt="Setting an environment variable in RStudio Connect." width="100%"><p class="caption">
 FIGURE 4.1: Setting an environment variable in RStudio Connect.
 </p>
 </div>
 </div>
 </div>
-<div id="instappwww" class="section level3 hasAnchor" number="4.2.4">
-<h3><span class="header-section-number">4.2.4</span> <code>inst/app/www/</code><a href="golem.html#instappwww" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="instappwww" class="section level3" number="4.2.4">
+<h3>
+<span class="header-section-number">4.2.4</span> <code>inst/app/www/</code><a class="anchor" aria-label="anchor" href="#instappwww"><i class="fas fa-link"></i></a>
+</h3>
 <p>The <code>inst/app/www/</code> folder contains all files that are made available <strong>at application run time</strong>.
-Any web application has external files that allow it to run.<a href="#fn24" class="footnote-ref" id="fnref24"><sup>24</sup></a>
-For example, <code>{shiny}</code> and its <code>fluidPage()</code> function bundles a series of CSS and JavaScript files, notably the <code>Bootstrap</code> library, or <code>jQuery</code>. These external files enhance your app: CSS for the design part and JavaScript for the interactive part (more or less).
+Any web application has external files that allow it to run.<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Some web pages do not need any external sources, as they do not have any design and are plain HTML, but generally speaking we will not call this format a web application.&lt;/p&gt;"><sup>24</sup></a>
+For example, <a href="https://shiny.rstudio.com/">shiny</a> and its <code><a href="https://rdrr.io/pkg/shiny/man/fluidPage.html">fluidPage()</a></code> function bundles a series of CSS and JavaScript files, notably the <code>Bootstrap</code> library, or <code>jQuery</code>. These external files enhance your app: CSS for the design part and JavaScript for the interactive part (more or less).
 On top of that, you can add your own files: your own design with CSS, or your own JavaScript content (as we will see in the last chapters of this book).
 In order to work, you have to include a link to these files somewhere in the UI.
 This is what <code>golem_add_external_resources()</code> is made for: linking the external resources that you will build with the following functions.</p>
 <ul>
-<li><code>golem::add_css_file()</code></li>
-<li><code>golem::add_js_file()</code></li>
-<li><code>golem::add_js_handler()</code></li>
-<li><code>golem::use_external_css_file()</code></li>
-<li><code>golem::use_external_js_file()</code></li>
-<li><code>golem::use_favicon()</code></li>
+<li><code><a href="https://rdrr.io/pkg/golem/man/add_files.html">golem::add_css_file()</a></code></li>
+<li><code><a href="https://rdrr.io/pkg/golem/man/add_files.html">golem::add_js_file()</a></code></li>
+<li><code><a href="https://rdrr.io/pkg/golem/man/add_files.html">golem::add_js_handler()</a></code></li>
+<li><code><a href="https://rdrr.io/pkg/golem/man/use_files.html">golem::use_external_css_file()</a></code></li>
+<li><code><a href="https://rdrr.io/pkg/golem/man/use_files.html">golem::use_external_js_file()</a></code></li>
+<li><code><a href="https://rdrr.io/pkg/golem/man/favicon.html">golem::use_favicon()</a></code></li>
 </ul>
 <p>Be aware that these files are available under <code>www/</code> at <strong>application run time</strong>, <em>i.e.</em> the <code>www/</code> folder is available via your browser, not via R when it runs/generates your application.
 In other words, you can use the <code>www</code> prefix in the HTML generated in your UI, which is read by your browser, not from the R/server side.
@@ -1020,22 +608,29 @@ If you want to link to a file that is read during <strong>application generation
 <p>We encourage you to add any new external file (e.g. pictures) in the <code>inst/app/www</code> folder, so that you can later use it in the UI with the common <code>www</code> prefix.
 Another common pattern would be:</p>
 <ul>
-<li>Adding images in <code>inst/app/img</code></li>
-<li>Calling <code>addResourcePath( 'img', system.file('app/img', package = 'golex') )</code></li>
-<li>Adding elements to your UI with <code>tags$img(src = "img/name.png")</code></li>
+<li>Adding images in <code>inst/app/img</code>
+</li>
+<li>Calling <code>addResourcePath( 'img', system.file('app/img', package = 'golex') )</code>
+</li>
+<li>Adding elements to your UI with <code>tags$img(src = "img/name.png")</code>
+</li>
 </ul>
 </div>
-<div id="dev" class="section level3 hasAnchor" number="4.2.5">
-<h3><span class="header-section-number">4.2.5</span> <code>dev/</code><a href="golem.html#dev" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="dev" class="section level3" number="4.2.5">
+<h3>
+<span class="header-section-number">4.2.5</span> <code>dev/</code><a class="anchor" aria-label="anchor" href="#dev"><i class="fas fa-link"></i></a>
+</h3>
 <p>The <code>dev/</code> folder is to be used as a <strong>notebook for your development process: you will find here a series of functions that can be used throughout your project</strong>.</p>
-<p>The content of these files are specific to <code>{golem}</code> here, but the concept of using a script to store all development steps is not restricted to a <code>{shiny}</code> application: it could easily be done for any package, and this is something we recommend that you do.
-The functions inside these files are the ones used to do some setup, like <code>usethis::use_mit_license()</code> or <code>usethis::use_vignette("my-analysis")</code>, and add testing infrastructure, like <code>usethis::use_test("my-function")</code> or <code>devtools::check()</code>.
+<p>The content of these files are specific to <a href="https://github.com/ThinkR-open/golem">golem</a> here, but the concept of using a script to store all development steps is not restricted to a <a href="https://shiny.rstudio.com/">shiny</a> application: it could easily be done for any package, and this is something we recommend that you do.
+The functions inside these files are the ones used to do some setup, like <code><a href="https://usethis.r-lib.org/reference/licenses.html">usethis::use_mit_license()</a></code> or <code>usethis::use_vignette("my-analysis")</code>, and add testing infrastructure, like <code>usethis::use_test("my-function")</code> or <code><a href="https://devtools.r-lib.org/reference/check.html">devtools::check()</a></code>.
 You will also find functions to populate the application like <code>golem::add_module("my-module")</code> or <code>golem::add_js_file("my-script")</code>.
-And finally, there are functions you will need once your application is ready: <code>pkgdown::build_site()</code>, <code>rhub::check_for_cran()</code> or <code>golem::add_dockerfile()</code>.</p>
-<p>We will come back to these files later in this book when we describe in more depth the <code>{golem}</code> workflow.</p>
+And finally, there are functions you will need once your application is ready: <code><a href="https://pkgdown.r-lib.org/reference/build_site.html">pkgdown::build_site()</a></code>, <code><a href="https://r-hub.github.io/rhub/reference/check_for_cran.html">rhub::check_for_cran()</a></code> or <code><a href="https://rdrr.io/pkg/golem/man/dockerfiles.html">golem::add_dockerfile()</a></code>.</p>
+<p>We will come back to these files later in this book when we describe in more depth the <a href="https://github.com/ThinkR-open/golem">golem</a> workflow.</p>
 </div>
-<div id="man" class="section level3 hasAnchor" number="4.2.6">
-<h3><span class="header-section-number">4.2.6</span> <code>man/</code><a href="golem.html#man" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="man" class="section level3" number="4.2.6">
+<h3>
+<span class="header-section-number">4.2.6</span> <code>man/</code><a class="anchor" aria-label="anchor" href="#man"><i class="fas fa-link"></i></a>
+</h3>
 <p>The <code>man/</code> folder includes <strong>the package documentation</strong>.
 It is a common folder automatically filled when you document your app, notably when running the <code>dev/run_dev.R</code> script and the <code>document_and_reload()</code> function.</p>
 <p>Building documentation for a package is a widely documented subject, and if you want to know more about documentation and how to build it, here are some external links:</p>
@@ -1044,37 +639,12 @@ It is a common folder automatically filled when you document your app, notably w
 <li><a href="https://cran.r-project.org/web/packages/roxygen2/vignettes/roxygen2.html">Introduction to roxygen2</a></li>
 <li><a href="https://speakerdeck.com/colinfay/building-a-package-that-lasts-erum-2018-workshop">Building a package that lasts—eRum 2018 workshop</a></li>
 </ul>
+</div>
+</div>
+</div>
 
-</div>
-</div>
-</div>
-<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-R-config" class="csl-entry">
-Allaire, JJ. 2020. <em>Config: Manage Environment Specific Configuration Values</em>. <a href="https://github.com/rstudio/config">https://github.com/rstudio/config</a>.
-</div>
-<div id="ref-R-shiny" class="csl-entry">
-Chang, Winston, Joe Cheng, JJ Allaire, Carson Sievert, Barret Schloerke, Yihui Xie, Jeff Allen, Jonathan McPherson, Alan Dipert, and Barbara Borges. 2022. <em>Shiny: Web Application Framework for r</em>. <a href="https://shiny.rstudio.com/">https://shiny.rstudio.com/</a>.
-</div>
-<div id="ref-R-golem" class="csl-entry">
-Fay, Colin, Vincent Guyader, Sébastien Rochette, and Cervan Girard. 2023. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.
-</div>
-<div id="ref-R-usethis" class="csl-entry">
-Wickham, Hadley, Jennifer Bryan, and Malcolm Barrett. 2022. <em>Usethis: Automate Package and Project Setup</em>.
-</div>
-</div>
-<div class="footnotes">
-<hr />
-<ol start="21">
-<li id="fn21"><p><code>{golem}</code> will automatically add this file to the <code>.Rbuildignore</code> file, i.e. make it be ignored by the package build process.<a href="golem.html#fnref21" class="footnote-back">↩︎</a></p></li>
-<li id="fn22"><p>See <a href="https://github.com/ColinFay/hexmake/blob/master/R/app_ui.R#L35" class="uri">https://github.com/ColinFay/hexmake/blob/master/R/app_ui.R#L35</a><a href="golem.html#fnref22" class="footnote-back">↩︎</a></p></li>
-<li id="fn23"><p>Very technically speaking, it is the <code>print()</code> from the object outputed by <code>run_app()</code> that launches the app, but this is another story.<a href="golem.html#fnref23" class="footnote-back">↩︎</a></p></li>
-<li id="fn24"><p>Some web pages do not need any external sources, as they do not have any design and are plain HTML, but generally speaking we will not call this format a web application.<a href="golem.html#fnref24" class="footnote-back">↩︎</a></p></li>
-</ol>
-</div>
-<hr/>
-<footer>
-<a href="https://rtask.thinkr.fr"><img src="img/logo400_129.png" alt="ThinkR Website"/></a>
+<hr>
+<footer><a href="https://rtask.thinkr.fr"><img src="img/logo400_129.png" alt="ThinkR Website"></a>
 <!--https://yihui.org/en/2018/09/target-blank/-->
 <script>
   (function() {
@@ -1085,70 +655,50 @@ Wickham, Hadley, Jennifer Bryan, and Malcolm Barrett. 2022. <em>Usethis: Automat
     }
   }
 })();
-</script>
-</footer>
-            </section>
+</script></footer><div class="chapter-nav">
+<div class="prev"><a href="structuring-project.html"><span class="header-section-number">3</span> Structuring Your Project</a></div>
+<div class="next"><a href="workflow.html"><span class="header-section-number">5</span> The Workflow</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#golem"><span class="header-section-number">4</span> Introduction to {golem}</a></li>
+<li><a class="nav-link" href="#what-is-golem"><span class="header-section-number">4.1</span> What is {golem}?</a></li>
+<li>
+<a class="nav-link" href="#understanding-golem-app-structure"><span class="header-section-number">4.2</span> Understanding {golem} app structure</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#description-and-namespace"><span class="header-section-number">4.2.1</span> DESCRIPTION and NAMESPACE</a></li>
+<li><a class="nav-link" href="#r"><span class="header-section-number">4.2.2</span> R/</a></li>
+<li><a class="nav-link" href="#golem-config"><span class="header-section-number">4.2.3</span> golem-config</a></li>
+<li><a class="nav-link" href="#instappwww"><span class="header-section-number">4.2.4</span> inst/app/www/</a></li>
+<li><a class="nav-link" href="#dev"><span class="header-section-number">4.2.5</span> dev/</a></li>
+<li><a class="nav-link" href="#man"><span class="header-section-number">4.2.6</span> man/</a></li>
+</ul>
+</li>
+</ul>
 
-          </div>
-        </div>
-      </div>
-<a href="structuring-project.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="workflow.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
-    </div>
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/ThinkR-open/engineering-shiny-book/blob/master/04-golem.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/ThinkR-open/engineering-shiny-book/edit/master/04-golem.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Engineering Production-Grade Shiny Apps</strong>" was written by Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard. It was last built on 2024-03-12.</p>
   </div>
-<script src="libs/gitbook/js/app.min.js"></script>
-<script src="libs/gitbook/js/clipboard.min.js"></script>
-<script src="libs/gitbook/js/plugin-search.js"></script>
-<script src="libs/gitbook/js/plugin-sharing.js"></script>
-<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
-<script src="libs/gitbook/js/plugin-bookdown.js"></script>
-<script src="libs/gitbook/js/jquery.highlight.js"></script>
-<script src="libs/gitbook/js/plugin-clipboard.js"></script>
-<script>
-gitbook.require(["gitbook"], function(gitbook) {
-gitbook.start({
-"sharing": {
-"github": true,
-"facebook": false,
-"twitter": true,
-"linkedin": false,
-"weibo": false,
-"instapaper": false,
-"vk": false,
-"whatsapp": false,
-"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
-},
-"fontsettings": {
-"theme": "white",
-"family": "sans",
-"size": 2
-},
-"edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/04-golem.Rmd",
-"text": "Edit"
-},
-"history": {
-"link": null,
-"text": null
-},
-"view": {
-"link": null,
-"text": null
-},
-"download": null,
-"search": {
-"engine": "fuse",
-"options": null
-},
-"toc": {
-"collapse": "section"
-}
-});
-});
-</script>
 
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
@@ -1160,7 +710,22 @@ gitbook.start({
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
 </script>
 </body>
-
 </html>

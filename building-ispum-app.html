@@ -1,621 +1,170 @@
 <!DOCTYPE html>
-<html lang="" xml:lang="">
+<html lang="en">
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 9 Building an “ipsum-app” | Engineering Production-Grade Shiny Apps</title>
+<meta name="author" content="Colin Fay">
+<meta name="author" content="Sébastien Rochette">
+<meta name="author" content="Vincent Guyader">
+<meta name="author" content="Cervan Girard">
+<meta name="description" content="9.1 Prototyping is crucial  9.1.1 Prototype, then polish  Prototyping first may help keep you from investing far too much time for marginal gains. The Art of UNIX Programming (Raymond 2003) And...">
+<meta name="generator" content="bookdown 0.33 with bs4_book()">
+<meta property="og:title" content="Chapter 9 Building an “ipsum-app” | Engineering Production-Grade Shiny Apps">
+<meta property="og:type" content="book">
+<meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg">
+<meta property="og:description" content="9.1 Prototyping is crucial  9.1.1 Prototype, then polish  Prototyping first may help keep you from investing far too much time for marginal gains. The Art of UNIX Programming (Raymond 2003) And...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 9 Building an “ipsum-app” | Engineering Production-Grade Shiny Apps">
+<meta name="twitter:description" content="9.1 Prototyping is crucial  9.1.1 Prototype, then polish  Prototyping first may help keep you from investing far too much time for marginal gains. The Art of UNIX Programming (Raymond 2003) And...">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap/bootstrap.bundle.min.js"></script><script src="libs/bs3compat/transition.js"></script><script src="libs/bs3compat/tabs.js"></script><script src="libs/bs3compat/bs3compat.js"></script><link href="libs/bs4_book/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book/bs4_book.js"></script><!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=UA-149994171-1"></script><script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 9 Building an “ipsum-app” | Engineering Production-Grade Shiny Apps</title>
-  <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
-
-  <meta property="og:title" content="Chapter 9 Building an “ipsum-app” | Engineering Production-Grade Shiny Apps" />
-  <meta property="og:type" content="book" />
-  <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
-  <meta property="og:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="github-repo" content="ThinkR-open/engineering-shiny-book" />
-
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 9 Building an “ipsum-app” | Engineering Production-Grade Shiny Apps" />
-  
-  <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
-
-<meta name="author" content="Colin Fay" />
-<meta name="author" content="Sébastien Rochette" />
-<meta name="author" content="Vincent Guyader" />
-<meta name="author" content="Cervan Girard" />
-
-
-<meta name="date" content="2024-03-12" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-  
-  <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="setting-up-for-success.html"/>
-<link rel="next" href="build-app-golem.html"/>
-<script src="libs/jquery/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
-<link href="libs/gitbook/css/style.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-clipboard.css" rel="stylesheet" />
-
-
-
-
-
-
-
-
-<link href="libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
-<link href="libs/anchor-sections/anchor-sections-hash.css" rel="stylesheet" />
-<script src="libs/anchor-sections/anchor-sections.js"></script>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-149994171-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-149994171-1');
-</script>
-
-
+      gtag('config', 'UA-149994171-1');
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
 <style type="text/css">
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-</style>
-
-<style type="text/css">
-/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-  margin-bottom: 0em;
-}
-.hanging div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}
-</style>
-
-<link rel="stylesheet" href="css/style.css" type="text/css" />
-<link rel="stylesheet" href="css/thinkr.css" type="text/css" />
-<link rel="stylesheet" href="css/style_gitbook.css" type="text/css" />
+    /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+          margin-bottom: 0em;
+        }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/thinkr.css">
+<link rel="stylesheet" href="css/style_gitbook.css">
 </head>
+<body data-spy="scroll" data-target="#toc">
 
-<body>
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
 
-
-
-  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
-
-    <div class="book-summary">
-      <nav role="navigation">
-
-<ul class="summary">
-<li><a href="./">Engineering Production-Grade Shiny Apps</a></li>
-
-<li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a>
-<ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#motivation"><i class="fa fa-check"></i>Motivation</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#audience-for-this-book"><i class="fa fa-check"></i>Audience for this book</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#what-is-production"><i class="fa fa-check"></i>What is “production”?</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#book-structure"><i class="fa fa-check"></i>Book structure</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#about-the-authors"><i class="fa fa-check"></i>About the authors</a>
-<ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#colin-fay"><i class="fa fa-check"></i><a href="https://colinfay.me/">Colin Fay</a></a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#sébastien-rochette"><i class="fa fa-check"></i><a href="https://statnmap.com/">Sébastien Rochette</a></a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#vincent-guyader"><i class="fa fa-check"></i><a href="https://twitter.com/VincentGuyader">Vincent Guyader</a></a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#cervan-girard"><i class="fa fa-check"></i><a href="https://twitter.com/CervanGirard">Cervan Girard</a></a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i>Disclaimer</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information-and-conventions"><i class="fa fa-check"></i>Software information and conventions</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#want-to-help"><i class="fa fa-check"></i>Want to help?</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#other-resources"><i class="fa fa-check"></i>Other resources</a>
-<ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#getting-started-with-shiny"><i class="fa fa-check"></i>Getting started with <code>{shiny}</code></a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#putting-shiny-into-production"><i class="fa fa-check"></i>Putting <code>{shiny}</code> into production</a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a>
-<ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#special-thanks"><i class="fa fa-check"></i>Special thanks</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#contributors-to-this-book"><i class="fa fa-check"></i>Contributors to this book</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="foreword.html"><a href="foreword.html"><i class="fa fa-check"></i>Foreword</a></li>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html"><i class="fa fa-check"></i>Application presentation</a>
-<ul>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html#hexmake"><i class="fa fa-check"></i><code>{hexmake}</code></a></li>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html#tidytuesday201942"><i class="fa fa-check"></i><code>{tidytuesday201942}</code></a></li>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html#minifying"><i class="fa fa-check"></i><code>{minifying}</code></a></li>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html#other-applications"><i class="fa fa-check"></i>Other applications</a></li>
-</ul></li>
-<li class="part"><span><b>I Building Successful {shiny} Apps</b></span></li>
-<li class="chapter" data-level="1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html"><i class="fa fa-check"></i><b>1</b> About Successful <code>{shiny}</code> Apps</a>
-<ul>
-<li class="chapter" data-level="1.1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#a-very-short-introduction-to-shiny"><i class="fa fa-check"></i><b>1.1</b> A (very) short introduction to <code>{shiny}</code></a></li>
-<li class="chapter" data-level="1.2" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#complex-shiny"><i class="fa fa-check"></i><b>1.2</b> What is a complex <code>{shiny}</code> application?</a>
-<ul>
-<li class="chapter" data-level="1.2.1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#reaching-the-cliff-of-complexity"><i class="fa fa-check"></i><b>1.2.1</b> Reaching the cliff of complexity</a></li>
-<li class="chapter" data-level="1.2.2" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#balancing-complexities"><i class="fa fa-check"></i><b>1.2.2</b> Balancing complexities</a></li>
-<li class="chapter" data-level="1.2.3" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#assessing-code-complexity"><i class="fa fa-check"></i><b>1.2.3</b> Assessing code complexity</a></li>
-<li class="chapter" data-level="1.2.4" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#production-grade-software-engineering"><i class="fa fa-check"></i><b>1.2.4</b> Production-grade software engineering</a></li>
-</ul></li>
-<li class="chapter" data-level="1.3" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#what-is-a-successful-shiny-app"><i class="fa fa-check"></i><b>1.3</b> What is a successful <code>{shiny}</code> app?</a>
-<ul>
-<li class="chapter" data-level="1.3.1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-exists"><i class="fa fa-check"></i><b>1.3.1</b> It exists</a></li>
-<li class="chapter" data-level="1.3.2" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-is-accurate"><i class="fa fa-check"></i><b>1.3.2</b> It is accurate</a></li>
-<li class="chapter" data-level="1.3.3" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-is-usable"><i class="fa fa-check"></i><b>1.3.3</b> It is usable</a></li>
-<li class="chapter" data-level="1.3.4" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-is-immortal"><i class="fa fa-check"></i><b>1.3.4</b> It is immortal</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="2" data-path="planning-ahead.html"><a href="planning-ahead.html"><i class="fa fa-check"></i><b>2</b> Planning Ahead</a>
-<ul>
-<li class="chapter" data-level="2.1" data-path="planning-ahead.html"><a href="planning-ahead.html#working-with-a-long-term-mindset"><i class="fa fa-check"></i><b>2.1</b> Working with a “long-term” mindset</a>
-<ul>
-<li class="chapter" data-level="2.1.1" data-path="planning-ahead.html"><a href="planning-ahead.html#prepare-for-success"><i class="fa fa-check"></i><b>2.1.1</b> Prepare for success</a></li>
-<li class="chapter" data-level="2.1.2" data-path="planning-ahead.html"><a href="planning-ahead.html#develop-with-the-kiss-principle"><i class="fa fa-check"></i><b>2.1.2</b> Develop with the KISS principle</a></li>
-</ul></li>
-<li class="chapter" data-level="2.2" data-path="planning-ahead.html"><a href="planning-ahead.html#working-as-a-team-tools-and-structure"><i class="fa fa-check"></i><b>2.2</b> Working as a team: Tools and structure</a>
-<ul>
-<li class="chapter" data-level="2.2.1" data-path="planning-ahead.html"><a href="planning-ahead.html#from-the-tools-point-of-view"><i class="fa fa-check"></i><b>2.2.1</b> From the tools point of view</a></li>
-<li class="chapter" data-level="2.2.2" data-path="planning-ahead.html"><a href="planning-ahead.html#from-the-team-point-of-view"><i class="fa fa-check"></i><b>2.2.2</b> From the team point of view</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="3" data-path="structuring-project.html"><a href="structuring-project.html"><i class="fa fa-check"></i><b>3</b> Structuring Your Project</a>
-<ul>
-<li class="chapter" data-level="3.1" data-path="structuring-project.html"><a href="structuring-project.html#shiny-app-as-a-package"><i class="fa fa-check"></i><b>3.1</b> <code>{shiny}</code> app as a package</a>
-<ul>
-<li class="chapter" data-level="3.1.1" data-path="structuring-project.html"><a href="structuring-project.html#what-is-in-a-production-grade-shiny-app"><i class="fa fa-check"></i><b>3.1.1</b> What is in a production-grade <code>{shiny}</code> app?</a></li>
-<li class="chapter" data-level="3.1.2" data-path="structuring-project.html"><a href="structuring-project.html#resources"><i class="fa fa-check"></i><b>3.1.2</b> Resources</a></li>
-</ul></li>
-<li class="chapter" data-level="3.2" data-path="structuring-project.html"><a href="structuring-project.html#using-shiny-modules"><i class="fa fa-check"></i><b>3.2</b> Using <code>{shiny}</code> modules</a>
-<ul>
-<li class="chapter" data-level="3.2.1" data-path="structuring-project.html"><a href="structuring-project.html#why-shiny-modules"><i class="fa fa-check"></i><b>3.2.1</b> Why <code>{shiny}</code> modules?</a></li>
-<li class="chapter" data-level="3.2.2" data-path="structuring-project.html"><a href="structuring-project.html#when-to-use-shiny-modules"><i class="fa fa-check"></i><b>3.2.2</b> When to use <code>{shiny}</code> modules</a></li>
-<li class="chapter" data-level="3.2.3" data-path="structuring-project.html"><a href="structuring-project.html#a-practical-walkthrough"><i class="fa fa-check"></i><b>3.2.3</b> A practical walkthrough</a></li>
-<li class="chapter" data-level="3.2.4" data-path="structuring-project.html"><a href="structuring-project.html#communication-between-modules"><i class="fa fa-check"></i><b>3.2.4</b> Communication between modules</a></li>
-</ul></li>
-<li class="chapter" data-level="3.3" data-path="structuring-project.html"><a href="structuring-project.html#structuring-your-app"><i class="fa fa-check"></i><b>3.3</b> Structuring your app</a>
-<ul>
-<li class="chapter" data-level="3.3.1" data-path="structuring-project.html"><a href="structuring-project.html#business-logic-and-application-logic"><i class="fa fa-check"></i><b>3.3.1</b> Business logic and application logic</a></li>
-<li class="chapter" data-level="3.3.2" data-path="structuring-project.html"><a href="structuring-project.html#small-is-beautiful-bis-repetita"><i class="fa fa-check"></i><b>3.3.2</b> Small is beautiful (bis repetita)</a></li>
-<li class="chapter" data-level="3.3.3" data-path="structuring-project.html"><a href="structuring-project.html#conventions-matter"><i class="fa fa-check"></i><b>3.3.3</b> Conventions matter</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="4" data-path="golem.html"><a href="golem.html"><i class="fa fa-check"></i><b>4</b> Introduction to <code>{golem}</code></a>
-<ul>
-<li class="chapter" data-level="4.1" data-path="golem.html"><a href="golem.html#what-is-golem"><i class="fa fa-check"></i><b>4.1</b> What is <code>{golem}</code>?</a></li>
-<li class="chapter" data-level="4.2" data-path="golem.html"><a href="golem.html#understanding-golem-app-structure"><i class="fa fa-check"></i><b>4.2</b> Understanding <code>{golem}</code> app structure</a>
-<ul>
-<li class="chapter" data-level="4.2.1" data-path="golem.html"><a href="golem.html#description-and-namespace"><i class="fa fa-check"></i><b>4.2.1</b> <code>DESCRIPTION</code> and <code>NAMESPACE</code></a></li>
-<li class="chapter" data-level="4.2.2" data-path="golem.html"><a href="golem.html#r"><i class="fa fa-check"></i><b>4.2.2</b> R/</a></li>
-<li class="chapter" data-level="4.2.3" data-path="golem.html"><a href="golem.html#golem-config"><i class="fa fa-check"></i><b>4.2.3</b> <code>golem-config</code></a></li>
-<li class="chapter" data-level="4.2.4" data-path="golem.html"><a href="golem.html#instappwww"><i class="fa fa-check"></i><b>4.2.4</b> <code>inst/app/www/</code></a></li>
-<li class="chapter" data-level="4.2.5" data-path="golem.html"><a href="golem.html#dev"><i class="fa fa-check"></i><b>4.2.5</b> <code>dev/</code></a></li>
-<li class="chapter" data-level="4.2.6" data-path="golem.html"><a href="golem.html#man"><i class="fa fa-check"></i><b>4.2.6</b> <code>man/</code></a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="5" data-path="workflow.html"><a href="workflow.html"><i class="fa fa-check"></i><b>5</b> The Workflow</a>
-<ul>
-<li class="chapter" data-level="5.1" data-path="workflow.html"><a href="workflow.html#step-1-design"><i class="fa fa-check"></i><b>5.1</b> Step 1: Design</a></li>
-<li class="chapter" data-level="5.2" data-path="workflow.html"><a href="workflow.html#step-2-prototype"><i class="fa fa-check"></i><b>5.2</b> Step 2: Prototype</a></li>
-<li class="chapter" data-level="5.3" data-path="workflow.html"><a href="workflow.html#step-3-build"><i class="fa fa-check"></i><b>5.3</b> Step 3: Build</a></li>
-<li class="chapter" data-level="5.4" data-path="workflow.html"><a href="workflow.html#step-4-strengthen"><i class="fa fa-check"></i><b>5.4</b> Step 4: Strengthen</a></li>
-<li class="chapter" data-level="5.5" data-path="workflow.html"><a href="workflow.html#step-5-deploy"><i class="fa fa-check"></i><b>5.5</b> Step 5: Deploy</a></li>
-</ul></li>
-<li class="part"><span><b>II Step 1: Design</b></span></li>
-<li class="chapter" data-level="6" data-path="ux-matters.html"><a href="ux-matters.html"><i class="fa fa-check"></i><b>6</b> UX Matters</a>
-<ul>
-<li class="chapter" data-level="6.1" data-path="ux-matters.html"><a href="ux-matters.html#simplicity-is-gold"><i class="fa fa-check"></i><b>6.1</b> Simplicity is gold</a>
-<ul>
-<li class="chapter" data-level="6.1.1" data-path="ux-matters.html"><a href="ux-matters.html#how-we-read-the-web-scanning-content"><i class="fa fa-check"></i><b>6.1.1</b> How we read the web: Scanning content</a></li>
-<li class="chapter" data-level="6.1.2" data-path="ux-matters.html"><a href="ux-matters.html#building-a-self-evident-app-or-at-least-self-explanatory"><i class="fa fa-check"></i><b>6.1.2</b> Building a self-evident app (or at least self-explanatory)</a></li>
-</ul></li>
-<li class="chapter" data-level="6.2" data-path="ux-matters.html"><a href="ux-matters.html#the-danger-of-feature-creep"><i class="fa fa-check"></i><b>6.2</b> The danger of feature-creep</a>
-<ul>
-<li class="chapter" data-level="6.2.1" data-path="ux-matters.html"><a href="ux-matters.html#what-is-feature-creep"><i class="fa fa-check"></i><b>6.2.1</b> What is feature-creep?</a></li>
-<li class="chapter" data-level="6.2.2" data-path="ux-matters.html"><a href="ux-matters.html#too-much-reactivity"><i class="fa fa-check"></i><b>6.2.2</b> Too much reactivity</a></li>
-<li class="chapter" data-level="6.2.3" data-path="ux-matters.html"><a href="ux-matters.html#too-much-interactivity"><i class="fa fa-check"></i><b>6.2.3</b> Too much interactivity</a></li>
-</ul></li>
-<li class="chapter" data-level="6.3" data-path="ux-matters.html"><a href="ux-matters.html#web-accessibility"><i class="fa fa-check"></i><b>6.3</b> Web accessibility</a>
-<ul>
-<li class="chapter" data-level="6.3.1" data-path="ux-matters.html"><a href="ux-matters.html#about-accessibility"><i class="fa fa-check"></i><b>6.3.1</b> About accessibility</a></li>
-<li class="chapter" data-level="6.3.2" data-path="ux-matters.html"><a href="ux-matters.html#making-your-app-accessible"><i class="fa fa-check"></i><b>6.3.2</b> Making your app accessible</a></li>
-<li class="chapter" data-level="6.3.3" data-path="ux-matters.html"><a href="ux-matters.html#evaluating-your-app-accessibility-and-further-reading"><i class="fa fa-check"></i><b>6.3.3</b> Evaluating your app accessibility and further reading</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="7" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html"><i class="fa fa-check"></i><b>7</b> Don’t Rush into Coding</a>
-<ul>
-<li class="chapter" data-level="7.1" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#designing-before-coding"><i class="fa fa-check"></i><b>7.1</b> Designing before coding</a>
-<ul>
-<li class="chapter" data-level="7.1.1" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#the-urge-to-code"><i class="fa fa-check"></i><b>7.1.1</b> The urge to code</a></li>
-<li class="chapter" data-level="7.1.2" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#knowing-where-to-search"><i class="fa fa-check"></i><b>7.1.2</b> Knowing where to search</a></li>
-<li class="chapter" data-level="7.1.3" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#about-concept-map"><i class="fa fa-check"></i><b>7.1.3</b> About concept map</a></li>
-</ul></li>
-<li class="chapter" data-level="7.2" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#ask-questions"><i class="fa fa-check"></i><b>7.2</b> Ask questions</a>
-<ul>
-<li class="chapter" data-level="7.2.1" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#about-the-end-users"><i class="fa fa-check"></i><b>7.2.1</b> About the end users</a></li>
-<li class="chapter" data-level="7.2.2" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#building-personas"><i class="fa fa-check"></i><b>7.2.2</b> Building personas</a></li>
-<li class="chapter" data-level="7.2.3" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#pre-existing-code-base"><i class="fa fa-check"></i><b>7.2.3</b> Pre-existing code-base</a></li>
-<li class="chapter" data-level="7.2.4" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#deployment"><i class="fa fa-check"></i><b>7.2.4</b> Deployment</a></li>
-</ul></li>
-</ul></li>
-<li class="part"><span><b>III Step 2: Prototype</b></span></li>
-<li class="chapter" data-level="8" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html"><i class="fa fa-check"></i><b>8</b> Setting up for Success with <code>{golem}</code></a>
-<ul>
-<li class="chapter" data-level="8.1" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#create-a-golem"><i class="fa fa-check"></i><b>8.1</b> Create a <code>{golem}</code></a></li>
-<li class="chapter" data-level="8.2" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#setting-things-up-with-dev01_start.r"><i class="fa fa-check"></i><b>8.2</b> Setting things up with <code>dev/01_start.R</code></a>
-<ul>
-<li class="chapter" data-level="8.2.1" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#fill-the-description-and-set-options"><i class="fa fa-check"></i><b>8.2.1</b> Fill the DESCRIPTION and set options</a></li>
-<li class="chapter" data-level="8.2.2" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#set-common-files"><i class="fa fa-check"></i><b>8.2.2</b> Set common files</a></li>
-<li class="chapter" data-level="8.2.3" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#use-recommended-elements"><i class="fa fa-check"></i><b>8.2.3</b> Use recommended elements</a></li>
-<li class="chapter" data-level="8.2.4" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#add-utility-functions"><i class="fa fa-check"></i><b>8.2.4</b> Add utility functions</a></li>
-<li class="chapter" data-level="8.2.5" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#changing-the-favicon"><i class="fa fa-check"></i><b>8.2.5</b> Changing the favicon</a></li>
-</ul></li>
-<li class="chapter" data-level="8.3" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#setting-infrastructure-for-prototyping"><i class="fa fa-check"></i><b>8.3</b> Setting infrastructure for prototyping</a>
-<ul>
-<li class="chapter" data-level="8.3.1" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#add-modules-in-dev02_dev.r"><i class="fa fa-check"></i><b>8.3.1</b> Add modules in <code>dev/02_dev.R</code></a></li>
-<li class="chapter" data-level="8.3.2" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#add-css-and-js-files"><i class="fa fa-check"></i><b>8.3.2</b> Add CSS and JS files</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="9" data-path="building-ispum-app.html"><a href="building-ispum-app.html"><i class="fa fa-check"></i><b>9</b> Building an “ipsum-app”</a>
-<ul>
-<li class="chapter" data-level="9.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#prototyping-is-crucial"><i class="fa fa-check"></i><b>9.1</b> Prototyping is crucial</a>
-<ul>
-<li class="chapter" data-level="9.1.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#prototype-then-polish"><i class="fa fa-check"></i><b>9.1.1</b> Prototype, then polish</a></li>
-<li class="chapter" data-level="9.1.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#the-ui-first-approach"><i class="fa fa-check"></i><b>9.1.2</b> The “UI first” approach</a></li>
-</ul></li>
-<li class="chapter" data-level="9.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#prototyping-shiny"><i class="fa fa-check"></i><b>9.2</b> Prototyping <code>{shiny}</code></a>
-<ul>
-<li class="chapter" data-level="9.2.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#fast-ui-prototyping-with-shinipsum"><i class="fa fa-check"></i><b>9.2.1</b> Fast UI prototyping with <code>{shinipsum}</code></a></li>
-<li class="chapter" data-level="9.2.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#using-fakir-for-fake-data-generation"><i class="fa fa-check"></i><b>9.2.2</b> Using <code>{fakir}</code> for fake data generation</a></li>
-</ul></li>
-<li class="chapter" data-level="9.3" data-path="building-ispum-app.html"><a href="building-ispum-app.html#proto-rmdfirst"><i class="fa fa-check"></i><b>9.3</b> Building with RMarkdown</a>
-<ul>
-<li class="chapter" data-level="9.3.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#define-the-content-of-the-application"><i class="fa fa-check"></i><b>9.3.1</b> Define the content of the application</a></li>
-<li class="chapter" data-level="9.3.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#using-the-rmd-files-as-a-laboratory-notebook"><i class="fa fa-check"></i><b>9.3.2</b> Using the Rmd files as a laboratory notebook</a></li>
-<li class="chapter" data-level="9.3.3" data-path="building-ispum-app.html"><a href="building-ispum-app.html#rmd-vignettes-and-documentation-first"><i class="fa fa-check"></i><b>9.3.3</b> Rmd, Vignettes, and documentation first</a></li>
-</ul></li>
-</ul></li>
-<li class="part"><span><b>IV Step 3: Build</b></span></li>
-<li class="chapter" data-level="10" data-path="build-app-golem.html"><a href="build-app-golem.html"><i class="fa fa-check"></i><b>10</b> Building the App with <code>{golem}</code></a>
-<ul>
-<li class="chapter" data-level="10.1" data-path="build-app-golem.html"><a href="build-app-golem.html#add-dependencies"><i class="fa fa-check"></i><b>10.1</b> Add dependencies</a>
-<ul>
-<li class="chapter" data-level="10.1.1" data-path="build-app-golem.html"><a href="build-app-golem.html#package-dependencies"><i class="fa fa-check"></i><b>10.1.1</b> Package dependencies</a></li>
-<li class="chapter" data-level="10.1.2" data-path="build-app-golem.html"><a href="build-app-golem.html#importing-packages-and-functions"><i class="fa fa-check"></i><b>10.1.2</b> Importing packages and functions</a></li>
-</ul></li>
-<li class="chapter" data-level="10.2" data-path="build-app-golem.html"><a href="build-app-golem.html#submodules-and-utility-functions"><i class="fa fa-check"></i><b>10.2</b> Submodules and utility functions</a></li>
-<li class="chapter" data-level="10.3" data-path="build-app-golem.html"><a href="build-app-golem.html#add-tests"><i class="fa fa-check"></i><b>10.3</b> Add tests</a></li>
-<li class="chapter" data-level="10.4" data-path="build-app-golem.html"><a href="build-app-golem.html#documentation-and-code-coverage"><i class="fa fa-check"></i><b>10.4</b> Documentation and code coverage</a>
-<ul>
-<li class="chapter" data-level="10.4.1" data-path="build-app-golem.html"><a href="build-app-golem.html#vignette"><i class="fa fa-check"></i><b>10.4.1</b> Vignette</a></li>
-<li class="chapter" data-level="10.4.2" data-path="build-app-golem.html"><a href="build-app-golem.html#code-coverage-and-continuous-integration"><i class="fa fa-check"></i><b>10.4.2</b> Code coverage and continuous integration</a></li>
-</ul></li>
-<li class="chapter" data-level="10.5" data-path="build-app-golem.html"><a href="build-app-golem.html#using-golem-dev-functions"><i class="fa fa-check"></i><b>10.5</b> Using <code>{golem}</code> dev functions</a></li>
-</ul></li>
-<li class="part"><span><b>V Step 4: Strengthen</b></span></li>
-<li class="chapter" data-level="11" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html"><i class="fa fa-check"></i><b>11</b> Build Yourself a Safety Net</a>
-<ul>
-<li class="chapter" data-level="11.1" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-your-app"><i class="fa fa-check"></i><b>11.1</b> Testing your app</a>
-<ul>
-<li class="chapter" data-level="11.1.1" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-the-business-logic"><i class="fa fa-check"></i><b>11.1.1</b> Testing the business logic</a></li>
-<li class="chapter" data-level="11.1.2" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#shinytestserver"><i class="fa fa-check"></i><b>11.1.2</b> <code>shiny::testServer()</code></a></li>
-<li class="chapter" data-level="11.1.3" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-the-interactive-logic"><i class="fa fa-check"></i><b>11.1.3</b> Testing the interactive logic</a></li>
-<li class="chapter" data-level="11.1.4" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-the-app-load"><i class="fa fa-check"></i><b>11.1.4</b> Testing the app load</a></li>
-</ul></li>
-<li class="chapter" data-level="11.2" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#a-reproducible-environment"><i class="fa fa-check"></i><b>11.2</b> A reproducible environment</a>
-<ul>
-<li class="chapter" data-level="11.2.1" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#renv"><i class="fa fa-check"></i><b>11.2.1</b> <code>{renv}</code></a></li>
-<li class="chapter" data-level="11.2.2" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#docker"><i class="fa fa-check"></i><b>11.2.2</b> Docker</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="12" data-path="version-control.html"><a href="version-control.html"><i class="fa fa-check"></i><b>12</b> Version Control</a>
-<ul>
-<li class="chapter" data-level="12.1" data-path="version-control.html"><a href="version-control.html#version-control-git"><i class="fa fa-check"></i><b>12.1</b> Using version control with <code>Git</code></a>
-<ul>
-<li class="chapter" data-level="12.1.1" data-path="version-control.html"><a href="version-control.html#why-version-control"><i class="fa fa-check"></i><b>12.1.1</b> Why version control?</a></li>
-<li class="chapter" data-level="12.1.2" data-path="version-control.html"><a href="version-control.html#git-basics-add---commit---push---pull"><i class="fa fa-check"></i><b>12.1.2</b> <code>Git</code> basics: <code>add</code> - <code>commit</code> - <code>push</code> - <code>pull</code></a></li>
-<li class="chapter" data-level="12.1.3" data-path="version-control.html"><a href="version-control.html#about-branches"><i class="fa fa-check"></i><b>12.1.3</b> About branches</a></li>
-<li class="chapter" data-level="12.1.4" data-path="version-control.html"><a href="version-control.html#issues"><i class="fa fa-check"></i><b>12.1.4</b> Issues</a></li>
-</ul></li>
-<li class="chapter" data-level="12.2" data-path="version-control.html"><a href="version-control.html#git-integration"><i class="fa fa-check"></i><b>12.2</b> <code>Git</code> integration</a>
-<ul>
-<li class="chapter" data-level="12.2.1" data-path="version-control.html"><a href="version-control.html#with-rstudio"><i class="fa fa-check"></i><b>12.2.1</b> With RStudio</a></li>
-<li class="chapter" data-level="12.2.2" data-path="version-control.html"><a href="version-control.html#as-part-of-a-larger-world"><i class="fa fa-check"></i><b>12.2.2</b> As part of a larger world</a></li>
-<li class="chapter" data-level="12.2.3" data-path="version-control.html"><a href="version-control.html#about-git-flow"><i class="fa fa-check"></i><b>12.2.3</b> About <code>git-flow</code></a></li>
-<li class="chapter" data-level="12.2.4" data-path="version-control.html"><a href="version-control.html#further-readings-on-git"><i class="fa fa-check"></i><b>12.2.4</b> Further readings on <code>Git</code></a></li>
-</ul></li>
-<li class="chapter" data-level="12.3" data-path="version-control.html"><a href="version-control.html#automated-testing"><i class="fa fa-check"></i><b>12.3</b> Automated testing</a></li>
-</ul></li>
-<li class="part"><span><b>VI Step 5: Deploy</b></span></li>
-<li class="chapter" data-level="13" data-path="deploy.html"><a href="deploy.html"><i class="fa fa-check"></i><b>13</b> Deploy Your Application</a>
-<ul>
-<li class="chapter" data-level="13.1" data-path="deploy.html"><a href="deploy.html#before-deployment-checklist"><i class="fa fa-check"></i><b>13.1</b> Before deployment checklist</a></li>
-<li class="chapter" data-level="13.2" data-path="deploy.html"><a href="deploy.html#sharing-your-app-as-a-package"><i class="fa fa-check"></i><b>13.2</b> Sharing your app as a package</a>
-<ul>
-<li class="chapter" data-level="13.2.1" data-path="deploy.html"><a href="deploy.html#install-on-your-machine"><i class="fa fa-check"></i><b>13.2.1</b> Install on your machine</a></li>
-<li class="chapter" data-level="13.2.2" data-path="deploy.html"><a href="deploy.html#share-as-a-built-package"><i class="fa fa-check"></i><b>13.2.2</b> Share as a built package</a></li>
-</ul></li>
-<li class="chapter" data-level="13.3" data-path="deploy.html"><a href="deploy.html#deploying-apps-with-golem"><i class="fa fa-check"></i><b>13.3</b> Deploying apps with <code>{golem}</code></a>
-<ul>
-<li class="chapter" data-level="13.3.1" data-path="deploy.html"><a href="deploy.html#rstudio-environments"><i class="fa fa-check"></i><b>13.3.1</b> RStudio environments</a></li>
-<li class="chapter" data-level="13.3.2" data-path="deploy.html"><a href="deploy.html#docker-1"><i class="fa fa-check"></i><b>13.3.2</b> Docker</a></li>
-</ul></li>
-</ul></li>
-<li class="part"><span><b>VII Optimizing</b></span></li>
-<li class="chapter" data-level="14" data-path="need-for-optimization.html"><a href="need-for-optimization.html"><i class="fa fa-check"></i><b>14</b> The Need for Optimization</a>
-<ul>
-<li class="chapter" data-level="14.1" data-path="need-for-optimization.html"><a href="need-for-optimization.html#build-first-then-optimize"><i class="fa fa-check"></i><b>14.1</b> Build first, then optimize</a>
-<ul>
-<li class="chapter" data-level="14.1.1" data-path="need-for-optimization.html"><a href="need-for-optimization.html#identifying-bottlenecks"><i class="fa fa-check"></i><b>14.1.1</b> Identifying bottlenecks</a></li>
-<li class="chapter" data-level="14.1.2" data-path="need-for-optimization.html"><a href="need-for-optimization.html#do-you-need-faster-functions"><i class="fa fa-check"></i><b>14.1.2</b> Do you need faster functions?</a></li>
-<li class="chapter" data-level="14.1.3" data-path="need-for-optimization.html"><a href="need-for-optimization.html#dont-sacrifice-readability"><i class="fa fa-check"></i><b>14.1.3</b> Don’t sacrifice readability</a></li>
-</ul></li>
-<li class="chapter" data-level="14.2" data-path="need-for-optimization.html"><a href="need-for-optimization.html#tools-for-profiling"><i class="fa fa-check"></i><b>14.2</b> Tools for profiling</a>
-<ul>
-<li class="chapter" data-level="14.2.1" data-path="need-for-optimization.html"><a href="need-for-optimization.html#profiling-r-code"><i class="fa fa-check"></i><b>14.2.1</b> Profiling R code</a></li>
-<li class="chapter" data-level="14.2.2" data-path="need-for-optimization.html"><a href="need-for-optimization.html#profiling-shiny"><i class="fa fa-check"></i><b>14.2.2</b> Profiling <code>{shiny}</code></a></li>
-<li class="chapter" data-level="14.2.3" data-path="need-for-optimization.html"><a href="need-for-optimization.html#more-resources-about-web-page-performance"><i class="fa fa-check"></i><b>14.2.3</b> More resources about web-page performance</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="15" data-path="common-app-caveats.html"><a href="common-app-caveats.html"><i class="fa fa-check"></i><b>15</b> Common Application Caveats</a>
-<ul>
-<li class="chapter" data-level="15.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reactivity-anti-patterns"><i class="fa fa-check"></i><b>15.1</b> Reactivity anti-patterns</a>
-<ul>
-<li class="chapter" data-level="15.1.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reactivity-is-awesome-until-it-is-not"><i class="fa fa-check"></i><b>15.1.1</b> Reactivity is awesome… until it is not</a></li>
-<li class="chapter" data-level="15.1.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#observe-vs-observeevent"><i class="fa fa-check"></i><b>15.1.2</b> <code>observe</code> vs <code>observeEvent</code></a></li>
-<li class="chapter" data-level="15.1.3" data-path="common-app-caveats.html"><a href="common-app-caveats.html#building-triggers-and-watchers"><i class="fa fa-check"></i><b>15.1.3</b> Building triggers and watchers</a></li>
-<li class="chapter" data-level="15.1.4" data-path="common-app-caveats.html"><a href="common-app-caveats.html#using-r6-as-data-storage"><i class="fa fa-check"></i><b>15.1.4</b> Using R6 as data storage</a></li>
-<li class="chapter" data-level="15.1.5" data-path="common-app-caveats.html"><a href="common-app-caveats.html#logging-reactivity-with-whereami"><i class="fa fa-check"></i><b>15.1.5</b> Logging reactivity with <code>{whereami}</code></a></li>
-</ul></li>
-<li class="chapter" data-level="15.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#r-does-too-much"><i class="fa fa-check"></i><b>15.2</b> R does too much</a>
-<ul>
-<li class="chapter" data-level="15.2.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#rendering-the-ui-from-the-server-side"><i class="fa fa-check"></i><b>15.2.1</b> Rendering the UI from the server side</a></li>
-<li class="chapter" data-level="15.2.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#too-much-data-in-memory"><i class="fa fa-check"></i><b>15.2.2</b> Too much data in memory</a></li>
-</ul></li>
-<li class="chapter" data-level="15.3" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reading-data"><i class="fa fa-check"></i><b>15.3</b> Reading data</a>
-<ul>
-<li class="chapter" data-level="15.3.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#including-data-in-your-application"><i class="fa fa-check"></i><b>15.3.1</b> Including data in your application</a></li>
-<li class="chapter" data-level="15.3.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reading-external-datasets"><i class="fa fa-check"></i><b>15.3.2</b> Reading external datasets</a></li>
-<li class="chapter" data-level="15.3.3" data-path="common-app-caveats.html"><a href="common-app-caveats.html#using-external-databases"><i class="fa fa-check"></i><b>15.3.3</b> Using external databases</a></li>
-<li class="chapter" data-level="15.3.4" data-path="common-app-caveats.html"><a href="common-app-caveats.html#data-source-checklist"><i class="fa fa-check"></i><b>15.3.4</b> Data-source checklist</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="16" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html"><i class="fa fa-check"></i><b>16</b> Optimizing <code>{shiny}</code> Code</a>
-<ul>
-<li class="chapter" data-level="16.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#optimizing-r-code"><i class="fa fa-check"></i><b>16.1</b> Optimizing R code</a></li>
-<li class="chapter" data-level="16.2" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#caching-elements"><i class="fa fa-check"></i><b>16.2</b> Caching elements</a>
-<ul>
-<li class="chapter" data-level="16.2.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#what-is-caching"><i class="fa fa-check"></i><b>16.2.1</b> What is caching?</a></li>
-<li class="chapter" data-level="16.2.2" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#native-caching-in-r"><i class="fa fa-check"></i><b>16.2.2</b> Native caching in R</a></li>
-<li class="chapter" data-level="16.2.3" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#caching-in-shiny"><i class="fa fa-check"></i><b>16.2.3</b> Caching in <code>{shiny}</code></a></li>
-</ul></li>
-<li class="chapter" data-level="16.3" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#asynchronous-in-shiny"><i class="fa fa-check"></i><b>16.3</b> Asynchronous in <code>{shiny}</code></a>
-<ul>
-<li class="chapter" data-level="16.3.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#how-to"><i class="fa fa-check"></i><b>16.3.1</b> How to</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="17" data-path="using-javascript.html"><a href="using-javascript.html"><i class="fa fa-check"></i><b>17</b> Using JavaScript</a>
-<ul>
-<li class="chapter" data-level="17.1" data-path="using-javascript.html"><a href="using-javascript.html#introduction-1"><i class="fa fa-check"></i><b>17.1</b> Introduction</a></li>
-<li class="chapter" data-level="17.2" data-path="using-javascript.html"><a href="using-javascript.html#a-quick-introduction-to-javascript"><i class="fa fa-check"></i><b>17.2</b> A quick introduction to JavaScript</a>
-<ul>
-<li class="chapter" data-level="17.2.1" data-path="using-javascript.html"><a href="using-javascript.html#about-javascript"><i class="fa fa-check"></i><b>17.2.1</b> About JavaScript</a></li>
-<li class="chapter" data-level="17.2.2" data-path="using-javascript.html"><a href="using-javascript.html#including-javascript-code-in-your-app"><i class="fa fa-check"></i><b>17.2.2</b> Including JavaScript code in your app</a></li>
-<li class="chapter" data-level="17.2.3" data-path="using-javascript.html"><a href="using-javascript.html#understanding-html-class-and-id"><i class="fa fa-check"></i><b>17.2.3</b> Understanding HTML, class, and id</a></li>
-<li class="chapter" data-level="17.2.4" data-path="using-javascript.html"><a href="using-javascript.html#querying-in-vanilla-javascript"><i class="fa fa-check"></i><b>17.2.4</b> Querying in Vanilla JavaScript</a></li>
-<li class="chapter" data-level="17.2.5" data-path="using-javascript.html"><a href="using-javascript.html#about-dom-events"><i class="fa fa-check"></i><b>17.2.5</b> About DOM events</a></li>
-<li class="chapter" data-level="17.2.6" data-path="using-javascript.html"><a href="using-javascript.html#about-jquery-and-jquery-selectors"><i class="fa fa-check"></i><b>17.2.6</b> About <code>jQuery</code> and <code>jQuery</code> selectors</a></li>
-</ul></li>
-<li class="chapter" data-level="17.3" data-path="using-javascript.html"><a href="using-javascript.html#client-side-javascript"><i class="fa fa-check"></i><b>17.3</b> Client-side JavaScript</a>
-<ul>
-<li class="chapter" data-level="17.3.1" data-path="using-javascript.html"><a href="using-javascript.html#common-patterns"><i class="fa fa-check"></i><b>17.3.1</b> Common patterns</a></li>
-<li class="chapter" data-level="17.3.2" data-path="using-javascript.html"><a href="using-javascript.html#where-to-put-them-back-to-javascript-events"><i class="fa fa-check"></i><b>17.3.2</b> Where to put them: Back to JavaScript Events</a></li>
-</ul></li>
-<li class="chapter" data-level="17.4" data-path="using-javascript.html"><a href="using-javascript.html#javascript---shiny-communication"><i class="fa fa-check"></i><b>17.4</b> JavaScript &lt;-&gt; <code>{shiny}</code> communication</a>
-<ul>
-<li class="chapter" data-level="17.4.1" data-path="using-javascript.html"><a href="using-javascript.html#from-r-to-javascript"><i class="fa fa-check"></i><b>17.4.1</b> From R to JavaScript</a></li>
-<li class="chapter" data-level="17.4.2" data-path="using-javascript.html"><a href="using-javascript.html#from-javascript-to-r"><i class="fa fa-check"></i><b>17.4.2</b> From JavaScript to R</a></li>
-</ul></li>
-<li class="chapter" data-level="17.5" data-path="using-javascript.html"><a href="using-javascript.html#about-shinyjs-js-functions"><i class="fa fa-check"></i><b>17.5</b> About <code>{shinyjs}</code> JS functions</a></li>
-<li class="chapter" data-level="17.6" data-path="using-javascript.html"><a href="using-javascript.html#one-last-thing-api-calls"><i class="fa fa-check"></i><b>17.6</b> One last thing: API calls</a></li>
-<li class="chapter" data-level="17.7" data-path="using-javascript.html"><a href="using-javascript.html#learn-more-about-javascript"><i class="fa fa-check"></i><b>17.7</b> Learn more about JavaScript</a>
-<ul>
-<li class="chapter" data-level="17.7.1" data-path="using-javascript.html"><a href="using-javascript.html#shiny-and-javascript"><i class="fa fa-check"></i><b>17.7.1</b> <code>{shiny}</code> and JavaScript</a></li>
-<li class="chapter" data-level="17.7.2" data-path="using-javascript.html"><a href="using-javascript.html#javascript-basics"><i class="fa fa-check"></i><b>17.7.2</b> JavaScript basics</a></li>
-<li class="chapter" data-level="17.7.3" data-path="using-javascript.html"><a href="using-javascript.html#jquery"><i class="fa fa-check"></i><b>17.7.3</b> jQuery</a></li>
-<li class="chapter" data-level="17.7.4" data-path="using-javascript.html"><a href="using-javascript.html#intermediateadvanced-javascript"><i class="fa fa-check"></i><b>17.7.4</b> Intermediate/advanced JavaScript</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="18" data-path="css.html"><a href="css.html"><i class="fa fa-check"></i><b>18</b> A Gentle Introduction to CSS</a>
-<ul>
-<li class="chapter" data-level="18.1" data-path="css.html"><a href="css.html#what-is-css"><i class="fa fa-check"></i><b>18.1</b> What is CSS?</a>
-<ul>
-<li class="chapter" data-level="18.1.1" data-path="css.html"><a href="css.html#about-css"><i class="fa fa-check"></i><b>18.1.1</b> About CSS</a></li>
-<li class="chapter" data-level="18.1.2" data-path="css.html"><a href="css.html#shinys-default-fluidpage"><i class="fa fa-check"></i><b>18.1.2</b> <code>{shiny}</code>’s default: <code>fluidPage()</code></a></li>
-</ul></li>
-<li class="chapter" data-level="18.2" data-path="css.html"><a href="css.html#getting-started-with-css"><i class="fa fa-check"></i><b>18.2</b> Getting started with CSS</a>
-<ul>
-<li class="chapter" data-level="18.2.1" data-path="css.html"><a href="css.html#about-css-syntax"><i class="fa fa-check"></i><b>18.2.1</b> About CSS syntax</a></li>
-<li class="chapter" data-level="18.2.2" data-path="css.html"><a href="css.html#css-selectors"><i class="fa fa-check"></i><b>18.2.2</b> CSS selectors</a></li>
-<li class="chapter" data-level="18.2.3" data-path="css.html"><a href="css.html#css-properties"><i class="fa fa-check"></i><b>18.2.3</b> CSS properties</a></li>
-</ul></li>
-<li class="chapter" data-level="18.3" data-path="css.html"><a href="css.html#integrate-css-files-in-your-shiny-app"><i class="fa fa-check"></i><b>18.3</b> Integrate CSS files in your <code>{shiny}</code> app</a>
-<ul>
-<li class="chapter" data-level="18.3.1" data-path="css.html"><a href="css.html#inline-css"><i class="fa fa-check"></i><b>18.3.1</b> Inline CSS</a></li>
-<li class="chapter" data-level="18.3.2" data-path="css.html"><a href="css.html#writing-in-a-tagsstyle"><i class="fa fa-check"></i><b>18.3.2</b> Writing in a <code>tags$style()</code></a></li>
-<li class="chapter" data-level="18.3.3" data-path="css.html"><a href="css.html#including-external-files"><i class="fa fa-check"></i><b>18.3.3</b> Including external files</a></li>
-<li class="chapter" data-level="18.3.4" data-path="css.html"><a href="css.html#using-r-packages"><i class="fa fa-check"></i><b>18.3.4</b> Using R packages</a></li>
-</ul></li>
-<li class="chapter" data-level="18.4" data-path="css.html"><a href="css.html#external-resources"><i class="fa fa-check"></i><b>18.4</b> External resources</a></li>
-</ul></li>
-<li class="part"><span><b>VIII Appendix</b></span></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html"><i class="fa fa-check"></i>Appendix A - Use Case: Building an App from Start to Finish</a>
-<ul>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#about-the-application"><i class="fa fa-check"></i>About the application</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-1-design-1"><i class="fa fa-check"></i>Step 1: Design</a>
-<ul>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deciphering-the-specifications"><i class="fa fa-check"></i>Deciphering the specifications</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#building-a-concept-map"><i class="fa fa-check"></i>Building a concept map</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#asking-questions"><i class="fa fa-check"></i>Asking questions</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#building-personas-1"><i class="fa fa-check"></i>Building personas</a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-2-prototyping"><i class="fa fa-check"></i>Step 2: Prototyping</a>
-<ul>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#back-end-in-rmd"><i class="fa fa-check"></i>Back-end in Rmd</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#ui-prototyping"><i class="fa fa-check"></i>UI prototyping</a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-3-build-1"><i class="fa fa-check"></i>Step 3: Build</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-4-strengthen-1"><i class="fa fa-check"></i>Step 4: Strengthen</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-5-deploy-1"><i class="fa fa-check"></i>Step 5: Deploy</a>
-<ul>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#before-deployment-checklist-1"><i class="fa fa-check"></i>Before deployment checklist</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deploy-as-a-tar.gz"><i class="fa fa-check"></i>Deploy as a tar.gz</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deploy-on-rstudio-connect"><i class="fa fa-check"></i>Deploy on RStudio Connect</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deploy-with-docker"><i class="fa fa-check"></i>Deploy with Docker</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="appendix-b---session-info.html"><a href="appendix-b---session-info.html"><i class="fa fa-check"></i>Appendix B - Session Info</a></li>
-<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
-<li class="divider"></li>
-<li><a href="https://rtask.thinkr.fr">A book by the ThinkR team</a></li>
-
-</ul>
-
-      </nav>
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Engineering Production-Grade Shiny Apps</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
     </div>
 
-    <div class="book-body">
-      <div class="body-inner">
-        <div class="book-header" role="navigation">
-          <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Engineering Production-Grade Shiny Apps</a>
-          </h1>
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Introduction</a></li>
+<li><a class="" href="foreword.html">Foreword</a></li>
+<li><a class="" href="application-presentation.html">Application presentation</a></li>
+<li class="book-part">Building Successful {shiny} Apps</li>
+<li><a class="" href="successful-shiny-app.html"><span class="header-section-number">1</span> About Successful {shiny} Apps</a></li>
+<li><a class="" href="planning-ahead.html"><span class="header-section-number">2</span> Planning Ahead</a></li>
+<li><a class="" href="structuring-project.html"><span class="header-section-number">3</span> Structuring Your Project</a></li>
+<li><a class="" href="golem.html"><span class="header-section-number">4</span> Introduction to {golem}</a></li>
+<li><a class="" href="workflow.html"><span class="header-section-number">5</span> The Workflow</a></li>
+<li class="book-part">Step 1: Design</li>
+<li><a class="" href="ux-matters.html"><span class="header-section-number">6</span> UX Matters</a></li>
+<li><a class="" href="dont-rush-into-coding.html"><span class="header-section-number">7</span> Don’t Rush into Coding</a></li>
+<li class="book-part">Step 2: Prototype</li>
+<li><a class="" href="setting-up-for-success.html"><span class="header-section-number">8</span> Setting up for Success with {golem}</a></li>
+<li><a class="active" href="building-ispum-app.html"><span class="header-section-number">9</span> Building an “ipsum-app”</a></li>
+<li class="book-part">Step 3: Build</li>
+<li><a class="" href="build-app-golem.html"><span class="header-section-number">10</span> Building the App with {golem}</a></li>
+<li class="book-part">Step 4: Strengthen</li>
+<li><a class="" href="build-yourself-safety-net.html"><span class="header-section-number">11</span> Build Yourself a Safety Net</a></li>
+<li><a class="" href="version-control.html"><span class="header-section-number">12</span> Version Control</a></li>
+<li class="book-part">Step 5: Deploy</li>
+<li><a class="" href="deploy.html"><span class="header-section-number">13</span> Deploy Your Application</a></li>
+<li class="book-part">Optimizing</li>
+<li><a class="" href="need-for-optimization.html"><span class="header-section-number">14</span> The Need for Optimization</a></li>
+<li><a class="" href="common-app-caveats.html"><span class="header-section-number">15</span> Common Application Caveats</a></li>
+<li><a class="" href="optimizing-shiny-code.html"><span class="header-section-number">16</span> Optimizing {shiny} Code</a></li>
+<li><a class="" href="using-javascript.html"><span class="header-section-number">17</span> Using JavaScript</a></li>
+<li><a class="" href="css.html"><span class="header-section-number">18</span> A Gentle Introduction to CSS</a></li>
+<li class="book-part">Appendix</li>
+<li><a class="" href="appendix-a---use-case-building-an-app-from-start-to-finish.html">Appendix A - Use Case: Building an App from Start to Finish</a></li>
+<li><a class="" href="appendix-b---session-info.html">Appendix B - Session Info</a></li>
+<li><a class="" href="references.html">References</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/ThinkR-open/engineering-shiny-book">View book source <i class="fab fa-github"></i></a></p>
         </div>
-
-        <div class="page-wrapper" tabindex="-1" role="main">
-          <div class="page-inner">
-
-            <section class="normal" id="section-">
-<div id="building-ispum-app" class="section level1 hasAnchor" number="9">
-<h1><span class="header-section-number">Chapter 9</span> Building an “ipsum-app”<a href="building-ispum-app.html#building-ispum-app" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<div id="prototyping-is-crucial" class="section level2 hasAnchor" number="9.1">
-<h2><span class="header-section-number">9.1</span> Prototyping is crucial<a href="building-ispum-app.html#prototyping-is-crucial" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="prototype-then-polish" class="section level3 hasAnchor" number="9.1.1">
-<h3><span class="header-section-number">9.1.1</span> Prototype, then polish<a href="building-ispum-app.html#prototype-then-polish" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="building-ispum-app" class="section level1" number="9">
+<h1>
+<span class="header-section-number">9</span> Building an “ipsum-app”<a class="anchor" aria-label="anchor" href="#building-ispum-app"><i class="fas fa-link"></i></a>
+</h1>
+<div id="prototyping-is-crucial" class="section level2" number="9.1">
+<h2>
+<span class="header-section-number">9.1</span> Prototyping is crucial<a class="anchor" aria-label="anchor" href="#prototyping-is-crucial"><i class="fas fa-link"></i></a>
+</h2>
+<div id="prototype-then-polish" class="section level3" number="9.1.1">
+<h3>
+<span class="header-section-number">9.1.1</span> Prototype, then polish<a class="anchor" aria-label="anchor" href="#prototype-then-polish"><i class="fas fa-link"></i></a>
+</h3>
 <blockquote>
 <p>Prototyping first may help keep you from investing far too much time for marginal gains.</p>
-<p><em>The Art of UNIX Programming</em> <span class="citation">(<a href="#ref-ericraymond2003">Raymond 2003</a>)</span></p>
+<p><em>The Art of UNIX Programming</em> <span class="citation">(<a href="references.html#ref-ericraymond2003">Raymond 2003</a>)</span></p>
 </blockquote>
 <p>And yet another rule from <em>The Art of Unix Programming</em>: “Rule of Optimization: Prototype before polishing. <strong>Get it working before you optimize it</strong>.”
 Getting things to work before trying to optimize the app is always a good approach:</p>
 <ul>
-<li><strong>Making things work before working on low-level optimization makes the whole engineering process easier</strong>: having a “minimal viable product” that works, even if slowly and not perfectly, gives a stronger sense of success to the project. For example if you are building a vehicle, it feels more of a success to start with a skateboard than with a wheel: you quickly have a product that can be used to move, not waiting for the end of the project before finally having something useful. Building a skateboard helps the developer maintain a sense of accomplishment throughout the life of the project: the quicker you can have a running program, a MVP (Minimum Viable Product, as seen on Figure <a href="building-ispum-app.html#fig:09-prototyping-1">9.1</a>), the better.</li>
+<li>
+<strong>Making things work before working on low-level optimization makes the whole engineering process easier</strong>: having a “minimal viable product” that works, even if slowly and not perfectly, gives a stronger sense of success to the project. For example if you are building a vehicle, it feels more of a success to start with a skateboard than with a wheel: you quickly have a product that can be used to move, not waiting for the end of the project before finally having something useful. Building a skateboard helps the developer maintain a sense of accomplishment throughout the life of the project: the quicker you can have a running program, a MVP (Minimum Viable Product, as seen on Figure <a href="building-ispum-app.html#fig:09-prototyping-1">9.1</a>), the better.</li>
 </ul>
 <div style="page-break-after: always;"></div>
 <blockquote>
 <p>One of the really nice things about running your program frequently is that you get to see it running, which is fun, and that’s what programming is all about.</p>
-<p><em>The Unicorn Project</em> <span class="citation">(<a href="#ref-genekim2019">Kim 2019</a>)</span></p>
+<p><em>The Unicorn Project</em> <span class="citation">(<a href="references.html#ref-genekim2019">Kim 2019</a>)</span></p>
 </blockquote>
 
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:09-prototyping-1"></span>
-<img src="img/mvp.png" alt="Building a minimum viable product (MVP)." width="100%" />
-<p class="caption">
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:09-prototyping-1"></span>
+<img src="img/mvp.png" alt="Building a minimum viable product (MVP)." width="100%"><p class="caption">
 FIGURE 9.1: Building a minimum viable product (MVP).
 </p>
 </div>
 <div style="page-break-after: always;"></div>
 <ul>
-<li><strong>Abstraction is hard, and makes the codebase harder to work with</strong>. You have heard a lot that if you are copying and pasting something more than twice, you should write a function. And with <code>{shiny}</code>, if you are writing a piece of the app more than twice, you should write modules. But while these kinds of abstractions are elegant and optimized, they can make the software harder to work on while building it. So before focusing on turning something into a function, make it work first. As said in <em>R for Data Science</em> <span class="citation">(<a href="#ref-hadleywickham2017">Wickham and Grolemund 2017</a>)</span> about abstraction with <code>{purrr}</code> <span class="citation">(<a href="#ref-R-purrr">Wickham and Henry 2023</a>)</span>:</li>
+<li>
+<strong>Abstraction is hard, and makes the codebase harder to work with</strong>. You have heard a lot that if you are copying and pasting something more than twice, you should write a function. And with <a href="https://shiny.rstudio.com/">shiny</a>, if you are writing a piece of the app more than twice, you should write modules. But while these kinds of abstractions are elegant and optimized, they can make the software harder to work on while building it. So before focusing on turning something into a function, make it work first. As said in <em>R for Data Science</em> <span class="citation">(<a href="references.html#ref-hadleywickham2017">Wickham and Grolemund 2017</a>)</span> about abstraction with <a href="https://purrr.tidyverse.org/">purrr</a> <span class="citation">(<a href="references.html#ref-R-purrr">Wickham and Henry 2023</a>)</span>:</li>
 </ul>
 <blockquote>
 <p>Once you master these functions, you’ll find it takes much less time to solve iteration problems.
 But you should never feel bad about using a for loop instead of a map function.
 The map functions are a step up a tower of abstraction, and it can take a long time to get your head around how they work.
 The important thing is that you solve the problem that you’re working on, not write the most concise and elegant code (although that’s definitely something you want to strive towards!).</p>
-<p><em>R for Data Science - 21.5 The map functions</em> <span class="citation">(<a href="#ref-hadleywickham2017">Wickham and Grolemund 2017</a>)</span></p>
+<p><em>R for Data Science - 21.5 The map functions</em> <span class="citation">(<a href="references.html#ref-hadleywickham2017">Wickham and Grolemund 2017</a>)</span></p>
 </blockquote>
-<p>As a small example, we can refer to the binding module from <code>{hexmake}</code> <span class="citation">(<a href="#ref-R-hexmake"><strong>R-hexmake?</strong></a>)</span>: this module manipulates namespaces, inputs, and <code>session</code> to automatically bind inputs to the R6 object containing the image (see implementation <a href="https://github.com/ColinFay/hexmake/blob/master/R/mod_binder.R#L29">here</a>, <a href="https://github.com/ColinFay/hexmake/blob/master/R/utils_server.R#L2">here</a> and <a href="https://github.com/ColinFay/hexmake/blob/master/R/mod_left.R#L60">here</a>).
+<p>As a small example, we can refer to the binding module from <a href="https://github.com/colinfay/hexmake">hexmake</a> <span class="citation">(<a href="references.html#ref-R-hexmake">Fay 2023g</a>)</span>: this module manipulates namespaces, inputs, and <code>session</code> to automatically bind inputs to the R6 object containing the image (see implementation <a href="https://github.com/ColinFay/hexmake/blob/master/R/mod_binder.R#L29">here</a>, <a href="https://github.com/ColinFay/hexmake/blob/master/R/utils_server.R#L2">here</a> and <a href="https://github.com/ColinFay/hexmake/blob/master/R/mod_left.R#L60">here</a>).
 That’s an elegant solution: instead of duplicating content, we use functions to automatically bind events.
 But that is a higher level of abstraction: we manipulate different levels of namespacing and inputs, making it harder to reason about when you have to change the codebase.</p>
 <ul>
@@ -628,12 +177,15 @@ In other words, “Make It Work. Make It Right. Make It Fast”, (<a href="https
 If a piece of software runs, it is straightforward to check if a change in the codebase breaks the software or not: it either still runs or not.</p></li>
 </ul>
 </div>
-<div id="the-ui-first-approach" class="section level3 hasAnchor" number="9.1.2">
-<h3><span class="header-section-number">9.1.2</span> The “UI first” approach<a href="building-ispum-app.html#the-ui-first-approach" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="the-ui-first-approach" class="section level3" number="9.1.2">
+<h3>
+<span class="header-section-number">9.1.2</span> The “UI first” approach<a class="anchor" aria-label="anchor" href="#the-ui-first-approach"><i class="fas fa-link"></i></a>
+</h3>
 <p>Using what can be called a “UI first” approach when building an app is in most cases the safest way to go.
 And for two main reasons.</p>
-<div id="a.-agreeing-on-specifications" class="section level4 unnumbered hasAnchor">
-<h4>A. Agreeing on specifications<a href="building-ispum-app.html#a.-agreeing-on-specifications" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="a.-agreeing-on-specifications" class="section level4 unnumbered">
+<h4>A. Agreeing on specifications<a class="anchor" aria-label="anchor" href="#a.-agreeing-on-specifications"><i class="fas fa-link"></i></a>
+</h4>
 <p>First of all, it <strong>helps everybody involved in the application to agree on what the app is supposed to do, and once the UI is set, there should be no “surprise implementation”</strong>.
 Well, at least, this is the best way to reduce the number of changes in the app, as the sooner we have a global idea of the app, the better.
 It is hard to implement a core new feature once the app is 90% finished, while it would have been way easier to implement it if it had been detected from the very start.
@@ -647,8 +199,9 @@ You focus on the appearance of the app: buttons, figures, tables, and graphs, an
 At that point, the idea is to get the people who are ordering the app to think about what they actually need, and there might be a question like “oh, where is the button to download the results in a pdf?”.
 And at that precise moment is the perfect time for a change in specification.</p>
 </div>
-<div id="b.-organizing-work" class="section level4 unnumbered hasAnchor">
-<h4>B. Organizing work<a href="building-ispum-app.html#b.-organizing-work" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="b.-organizing-work" class="section level4 unnumbered">
+<h4>B. Organizing work<a class="anchor" aria-label="anchor" href="#b.-organizing-work"><i class="fas fa-link"></i></a>
+</h4>
 <p>A pre-defined UI allows every person involved in the coding process to know which part of the app they are working on, and to be sure that you do not forget anything.
 As you might be working on the app as a team, you will need to find a strategy for efficiently splitting the work among coders.
 <strong>It’s much easier to work on a piece of the app you can visually identify and integrate in a complete app scenario</strong>.
@@ -656,118 +209,130 @@ In other words, it is easier to be told “you will be working on the ‘Summary
 </div>
 </div>
 </div>
-<div id="prototyping-shiny" class="section level2 hasAnchor" number="9.2">
-<h2><span class="header-section-number">9.2</span> Prototyping <code>{shiny}</code><a href="building-ispum-app.html#prototyping-shiny" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>In the next section, you will be introduced to two packages that can be used when prototyping a user interface: <code>{shinipsum}</code> <span class="citation">(<a href="#ref-R-shinipsum">Fay and Rochette 2023b</a>)</span> and <code>{fakir}</code> <span class="citation">(<a href="#ref-R-fakir">Fay and Rochette 2023a</a>)</span>.</p>
-<div id="fast-ui-prototyping-with-shinipsum" class="section level3 hasAnchor" number="9.2.1">
-<h3><span class="header-section-number">9.2.1</span> Fast UI prototyping with <code>{shinipsum}</code><a href="building-ispum-app.html#fast-ui-prototyping-with-shinipsum" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="prototyping-shiny" class="section level2" number="9.2">
+<h2>
+<span class="header-section-number">9.2</span> Prototyping <code>{shiny}</code><a class="anchor" aria-label="anchor" href="#prototyping-shiny"><i class="fas fa-link"></i></a>
+</h2>
+<p>In the next section, you will be introduced to two packages that can be used when prototyping a user interface: <a href="https://github.com/Thinkr-open/shinipsum">shinipsum</a> <span class="citation">(<a href="references.html#ref-R-shinipsum">Fay and Rochette 2023b</a>)</span> and <a href="https://github.com/Thinkr-open/fakir">fakir</a> <span class="citation">(<a href="references.html#ref-R-fakir">Fay and Rochette 2023a</a>)</span>.</p>
+<div id="fast-ui-prototyping-with-shinipsum" class="section level3" number="9.2.1">
+<h3>
+<span class="header-section-number">9.2.1</span> Fast UI prototyping with <code>{shinipsum}</code><a class="anchor" aria-label="anchor" href="#fast-ui-prototyping-with-shinipsum"><i class="fas fa-link"></i></a>
+</h3>
 <p>When prototyping the UI for an application, we will not be focusing on building the actual computation: <strong>what we need is to create a draft with visual components, so that we can have visual clues about the end result</strong>.
-To do that, you can use the <code>{shinipsum}</code> package, which has been designed to generate random <code>{shiny}</code> <span class="citation">(<a href="#ref-R-shiny">Chang et al. 2022</a>)</span> elements.
-If you are familiar with “lorem ipsum”, the fake text generator that is used in software design as a placeholder for text, the idea is the same: generating placeholders for <code>{shiny}</code> outputs.
-For an example of an application built with <code>{shinipsum}</code>, please visit <a href="https://engineering-shiny.org/shinipsum/">engineering-shiny.org/shinipsum/</a>, or <a href="https://engineering-shiny.org/golemhtmltemplate/">engineering-shiny.org/golemhtmltemplate/</a>: both these applications should look a little bit different every time you open them!</p>
-<p><code>{shinipsum}</code> can be installed from CRAN with:</p>
-<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="building-ispum-app.html#cb115-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;shinipsum&quot;</span>)</span></code></pre></div>
+To do that, you can use the <a href="https://github.com/Thinkr-open/shinipsum">shinipsum</a> package, which has been designed to generate random <a href="https://shiny.rstudio.com/">shiny</a> <span class="citation">(<a href="references.html#ref-R-shiny">Chang et al. 2022</a>)</span> elements.
+If you are familiar with “lorem ipsum”, the fake text generator that is used in software design as a placeholder for text, the idea is the same: generating placeholders for <a href="https://shiny.rstudio.com/">shiny</a> outputs.
+For an example of an application built with <a href="https://github.com/Thinkr-open/shinipsum">shinipsum</a>, please visit <a href="https://engineering-shiny.org/shinipsum/">engineering-shiny.org/shinipsum/</a>, or <a href="https://engineering-shiny.org/golemhtmltemplate/">engineering-shiny.org/golemhtmltemplate/</a>: both these applications should look a little bit different every time you open them!</p>
+<p><a href="https://github.com/Thinkr-open/shinipsum">shinipsum</a> can be installed from CRAN with:</p>
+<div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"shinipsum"</span><span class="op">)</span></span></code></pre></div>
 <p>You can install this package from GitHub with:</p>
-<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="building-ispum-app.html#cb116-1" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;Thinkr-open/shinipsum&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb116"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"Thinkr-open/shinipsum"</span><span class="op">)</span></span></code></pre></div>
 <p>This package includes a series of functions that generates random placeholders.
-For example, <code>random_ggplot()</code> generates random <code>{ggplot2}</code> <span class="citation">(<a href="#ref-R-ggplot2">Wickham, Chang, et al. 2023</a>)</span> elements.
-If we run this code two times, we should get different results, as seen on Figure <a href="building-ispum-app.html#fig:09-prototyping-5">9.2</a> and Figure <a href="building-ispum-app.html#fig:09-prototyping-6">9.3</a>.<a href="#fn37" class="footnote-ref" id="fnref37"><sup>37</sup></a></p>
-<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="building-ispum-app.html#cb117-1" tabindex="-1"></a><span class="fu">library</span>(shinipsum)</span>
-<span id="cb117-2"><a href="building-ispum-app.html#cb117-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div>
+For example, <code><a href="https://rdrr.io/pkg/shinipsum/man/random_ggplot.html">random_ggplot()</a></code> generates random <a href="https://ggplot2.tidyverse.org">ggplot2</a> <span class="citation">(<a href="references.html#ref-R-ggplot2">Wickham, Chang, et al. 2023</a>)</span> elements.
+If we run this code two times, we should get different results, as seen on Figure <a href="building-ispum-app.html#fig:09-prototyping-5">9.2</a> and Figure <a href="building-ispum-app.html#fig:09-prototyping-6">9.3</a>.<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Well, there is a probability that we will get the same plot twice, but that is the beauty of randomness.&lt;/p&gt;"><sup>37</sup></a></p>
+<div class="sourceCode" id="cb117"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Thinkr-open/shinipsum">shinipsum</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 
-<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="building-ispum-app.html#cb118-1" tabindex="-1"></a><span class="fu">random_ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb118-2"><a href="building-ispum-app.html#cb118-2" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Random plot&quot;</span>) </span></code></pre></div>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:09-prototyping-5"></span>
-<img src="engineering-production-grade-shiny-apps_files/figure-html/09-prototyping-5-1.png" alt="A random plot." width="100%" />
-<p class="caption">
+<div class="sourceCode" id="cb118"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/shinipsum/man/random_ggplot.html">random_ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Random plot"</span><span class="op">)</span> </span></code></pre></div>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:09-prototyping-5"></span>
+<img src="engineering-production-grade-shiny-apps_files/figure-html/09-prototyping-5-1.png" alt="A random plot." width="100%"><p class="caption">
 FIGURE 9.2: A random plot.
 </p>
 </div>
 
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="building-ispum-app.html#cb119-1" tabindex="-1"></a><span class="fu">random_ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb119-2"><a href="building-ispum-app.html#cb119-2" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Random plot&quot;</span>) </span></code></pre></div>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:09-prototyping-6"></span>
-<img src="engineering-production-grade-shiny-apps_files/figure-html/09-prototyping-6-1.png" alt="Another random plot." width="100%" />
-<p class="caption">
+<div class="sourceCode" id="cb119"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/shinipsum/man/random_ggplot.html">random_ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Random plot"</span><span class="op">)</span> </span></code></pre></div>
+<pre><code>Bin width defaults to 1/30 of the range of the data.
+Pick better value with `binwidth`.</code></pre>
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:09-prototyping-6"></span>
+<img src="engineering-production-grade-shiny-apps_files/figure-html/09-prototyping-6-1.png" alt="Another random plot." width="100%"><p class="caption">
 FIGURE 9.3: Another random plot.
 </p>
 </div>
-<p>Of course, the idea is to combine this with a <code>{shiny}</code> interface, for example, <code>random_ggplot()</code> will be used with a <code>renderPlot()</code> and <code>plotOutput()</code>.
-And as we want to prototype but still be close to what the app might look like, these functions take arguments that can shape the output: for example, <code>random_ggplot()</code> has a <code>type</code> parameter that can help you select a specific <code>{ggplot2}</code> geom.</p>
-<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="building-ispum-app.html#cb120-1" tabindex="-1"></a><span class="fu">library</span>(shiny)</span>
-<span id="cb120-2"><a href="building-ispum-app.html#cb120-2" tabindex="-1"></a><span class="fu">library</span>(shinipsum)</span>
-<span id="cb120-3"><a href="building-ispum-app.html#cb120-3" tabindex="-1"></a><span class="fu">library</span>(DT)</span>
-<span id="cb120-4"><a href="building-ispum-app.html#cb120-4" tabindex="-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">fluidPage</span>(</span>
-<span id="cb120-5"><a href="building-ispum-app.html#cb120-5" tabindex="-1"></a>  <span class="fu">h2</span>(<span class="st">&quot;A Random DT&quot;</span>),</span>
-<span id="cb120-6"><a href="building-ispum-app.html#cb120-6" tabindex="-1"></a>  <span class="fu">DTOutput</span>(<span class="st">&quot;data_table&quot;</span>),</span>
-<span id="cb120-7"><a href="building-ispum-app.html#cb120-7" tabindex="-1"></a>  <span class="fu">h2</span>(<span class="st">&quot;A Random Plot&quot;</span>),</span>
-<span id="cb120-8"><a href="building-ispum-app.html#cb120-8" tabindex="-1"></a>  <span class="fu">plotOutput</span>(<span class="st">&quot;plot&quot;</span>),</span>
-<span id="cb120-9"><a href="building-ispum-app.html#cb120-9" tabindex="-1"></a>  <span class="fu">h2</span>(<span class="st">&quot;A Random Text&quot;</span>),</span>
-<span id="cb120-10"><a href="building-ispum-app.html#cb120-10" tabindex="-1"></a>  <span class="fu">tableOutput</span>(<span class="st">&quot;text&quot;</span>)</span>
-<span id="cb120-11"><a href="building-ispum-app.html#cb120-11" tabindex="-1"></a>)</span>
-<span id="cb120-12"><a href="building-ispum-app.html#cb120-12" tabindex="-1"></a></span>
-<span id="cb120-13"><a href="building-ispum-app.html#cb120-13" tabindex="-1"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
-<span id="cb120-14"><a href="building-ispum-app.html#cb120-14" tabindex="-1"></a>  output<span class="sc">$</span>data_table <span class="ot">&lt;-</span> DT<span class="sc">::</span><span class="fu">renderDT</span>({</span>
-<span id="cb120-15"><a href="building-ispum-app.html#cb120-15" tabindex="-1"></a>    <span class="fu">random_DT</span>(<span class="dv">5</span>, <span class="dv">5</span>)</span>
-<span id="cb120-16"><a href="building-ispum-app.html#cb120-16" tabindex="-1"></a>  })</span>
-<span id="cb120-17"><a href="building-ispum-app.html#cb120-17" tabindex="-1"></a>  output<span class="sc">$</span>plot <span class="ot">&lt;-</span> <span class="fu">renderPlot</span>({</span>
-<span id="cb120-18"><a href="building-ispum-app.html#cb120-18" tabindex="-1"></a>    <span class="fu">random_ggplot</span>()</span>
-<span id="cb120-19"><a href="building-ispum-app.html#cb120-19" tabindex="-1"></a>  })</span>
-<span id="cb120-20"><a href="building-ispum-app.html#cb120-20" tabindex="-1"></a>  output<span class="sc">$</span>text <span class="ot">&lt;-</span> <span class="fu">renderText</span>({</span>
-<span id="cb120-21"><a href="building-ispum-app.html#cb120-21" tabindex="-1"></a>    <span class="fu">random_text</span>(<span class="at">nwords =</span> <span class="dv">50</span>)</span>
-<span id="cb120-22"><a href="building-ispum-app.html#cb120-22" tabindex="-1"></a>  })</span>
-<span id="cb120-23"><a href="building-ispum-app.html#cb120-23" tabindex="-1"></a>}</span>
-<span id="cb120-24"><a href="building-ispum-app.html#cb120-24" tabindex="-1"></a><span class="fu">shinyApp</span>(ui, server)</span></code></pre></div>
+<p>Of course, the idea is to combine this with a <a href="https://shiny.rstudio.com/">shiny</a> interface, for example, <code><a href="https://rdrr.io/pkg/shinipsum/man/random_ggplot.html">random_ggplot()</a></code> will be used with a <code><a href="https://rdrr.io/pkg/shiny/man/renderPlot.html">renderPlot()</a></code> and <code><a href="https://rdrr.io/pkg/shiny/man/plotOutput.html">plotOutput()</a></code>.
+And as we want to prototype but still be close to what the app might look like, these functions take arguments that can shape the output: for example, <code><a href="https://rdrr.io/pkg/shinipsum/man/random_ggplot.html">random_ggplot()</a></code> has a <code>type</code> parameter that can help you select a specific <a href="https://ggplot2.tidyverse.org">ggplot2</a> geom.</p>
+<div class="sourceCode" id="cb121"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.rstudio.com/">shiny</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Thinkr-open/shinipsum">shinipsum</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rstudio/DT">DT</a></span><span class="op">)</span></span>
+<span><span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/fluidPage.html">fluidPage</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rstudio.github.io/htmltools/reference/builder.html">h2</a></span><span class="op">(</span><span class="st">"A Random DT"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/DT/man/dataTableOutput.html">DTOutput</a></span><span class="op">(</span><span class="st">"data_table"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rstudio.github.io/htmltools/reference/builder.html">h2</a></span><span class="op">(</span><span class="st">"A Random Plot"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/plotOutput.html">plotOutput</a></span><span class="op">(</span><span class="st">"plot"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rstudio.github.io/htmltools/reference/builder.html">h2</a></span><span class="op">(</span><span class="st">"A Random Text"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/renderTable.html">tableOutput</a></span><span class="op">(</span><span class="st">"text"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span>, <span class="va">session</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">output</span><span class="op">$</span><span class="va">data_table</span> <span class="op">&lt;-</span> <span class="fu">DT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DT/man/dataTableOutput.html">renderDT</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/shinipsum/man/random_DT.html">random_DT</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
+<span>  <span class="va">output</span><span class="op">$</span><span class="va">plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/renderPlot.html">renderPlot</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/shinipsum/man/random_ggplot.html">random_ggplot</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
+<span>  <span class="va">output</span><span class="op">$</span><span class="va">text</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/shiny/man/renderPrint.html">renderText</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/shinipsum/man/random_text.html">random_text</a></span><span class="op">(</span>nwords <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html">shinyApp</a></span><span class="op">(</span><span class="va">ui</span>, <span class="va">server</span><span class="op">)</span></span></code></pre></div>
 <p>Figure <a href="building-ispum-app.html#fig:09-prototyping-8">9.4</a> is a screenshot of this application.</p>
 
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:09-prototyping-8"></span>
-<img src="img/shinipsumapp.png" alt="An app built with {shinipsum}." width="100%" />
-<p class="caption">
-FIGURE 9.4: An app built with <code>{shinipsum}</code>.
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:09-prototyping-8"></span>
+<img src="img/shinipsumapp.png" alt="An app built with {shinipsum}." width="100%"><p class="caption">
+FIGURE 9.4: An app built with <a href="https://github.com/Thinkr-open/shinipsum">shinipsum</a>.
 </p>
 </div>
-<p>Other <code>{shinipsum}</code> functions include:</p>
+<p>Other <a href="https://github.com/Thinkr-open/shinipsum">shinipsum</a> functions include:</p>
 <ul>
 <li>tables:</li>
 </ul>
-<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="building-ispum-app.html#cb121-1" tabindex="-1"></a><span class="fu">random_table</span>(<span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">ncol =</span> <span class="dv">3</span>)</span></code></pre></div>
-<pre><code>  x1 x2 x3
-1 10 10 10
-2  8  8  8
-3 13 13 13</code></pre>
+<div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/shinipsum/man/random_table.html">random_table</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">3</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<pre><code>  day time  temp
+1 346  840 36.33
+2 346  850 36.34
+3 346  900 36.35</code></pre>
 <ul>
 <li>print outputs:</li>
 </ul>
-<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="building-ispum-app.html#cb123-1" tabindex="-1"></a><span class="fu">random_print</span>(<span class="at">type =</span> <span class="st">&quot;model&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/shinipsum/man/random_print.html">random_print</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"model"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>
-    Pearson&#39;s product-moment correlation
+    Shapiro-Wilk normality test
 
-data:  datasets::mtcars$mpg and datasets::mtcars$cyl
-t = -8.9, df = 30, p-value = 6e-10
-alternative hypothesis: true correlation is not equal to 0
-95 percent confidence interval:
- -0.9258 -0.7163
-sample estimates:
-    cor 
--0.8522 </code></pre>
+data:  datasets::airquality$Ozone
+W = 0.88, p-value = 3e-08</code></pre>
 <p>and text, image, <code>ggplotly</code>, <code>dygraph</code>, and <code>DT</code>.</p>
-<p><code>{shinipsum}</code> is also a good tool if you want to demonstrate what a given UI framework will look like if used in <code>{shiny}</code>.
-This is, for example, what you find with <code>{golemhtmltemplate}</code>, available at <a href="https://engineering-shiny.org/golemhtmltemplate/">engineering-shiny.org/golemhtmltemplate/</a>, which uses a W3 web page template.<a href="#fn38" class="footnote-ref" id="fnref38"><sup>38</sup></a></p>
+<p><a href="https://github.com/Thinkr-open/shinipsum">shinipsum</a> is also a good tool if you want to demonstrate what a given UI framework will look like if used in <a href="https://shiny.rstudio.com/">shiny</a>.
+This is, for example, what you find with <code>{golemhtmltemplate}</code>, available at <a href="https://engineering-shiny.org/golemhtmltemplate/">engineering-shiny.org/golemhtmltemplate/</a>, which uses a W3 web page template.<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;This application is also a demonstration of how to build a &lt;code&gt;{golem}&lt;/code&gt; application using &lt;code&gt;htmltemplate()&lt;/code&gt;.&lt;/p&gt;"><sup>38</sup></a></p>
 </div>
-<div id="using-fakir-for-fake-data-generation" class="section level3 hasAnchor" number="9.2.2">
-<h3><span class="header-section-number">9.2.2</span> Using <code>{fakir}</code> for fake data generation<a href="building-ispum-app.html#using-fakir-for-fake-data-generation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Generating random placeholders for <code>{shiny}</code> might not be enough: maybe you also need example datasets.</p>
-<p>This can be accomplished using the <code>{fakir}</code> package, which was primarily created to provide fake datasets for R tutorials and exercises, but that can easily be used inside a <code>{shiny}</code> application.</p>
+<div id="using-fakir-for-fake-data-generation" class="section level3" number="9.2.2">
+<h3>
+<span class="header-section-number">9.2.2</span> Using <code>{fakir}</code> for fake data generation<a class="anchor" aria-label="anchor" href="#using-fakir-for-fake-data-generation"><i class="fas fa-link"></i></a>
+</h3>
+<p>Generating random placeholders for <a href="https://shiny.rstudio.com/">shiny</a> might not be enough: maybe you also need example datasets.</p>
+<p>This can be accomplished using the <a href="https://github.com/Thinkr-open/fakir">fakir</a> package, which was primarily created to provide fake datasets for R tutorials and exercises, but that can easily be used inside a <a href="https://shiny.rstudio.com/">shiny</a> application.</p>
 <p>At the time of writing these lines, the package is only available on GitHub, and can be installed with:</p>
-<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="building-ispum-app.html#cb125-1" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;Thinkr-open/fakir&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb126"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"Thinkr-open/fakir"</span><span class="op">)</span></span></code></pre></div>
 <p>This package contains three datasets that are randomly generated when you call the corresponding functions:</p>
 <ul>
-<li><p><code>fake_base_clients()</code> generates a fake dataset for a ticketing service.</p></li>
-<li><p><code>fake_sondage_answers()</code> is a fake survey about transportation.</p></li>
-<li><p><code>fake_visits()</code> is a fake dataset for the visits on a website.</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/fakir/man/fake_base_clients.html">fake_base_clients()</a></code> generates a fake dataset for a ticketing service.</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/fakir/man/fake_sondage_answers.html">fake_sondage_answers()</a></code> is a fake survey about transportation.</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/fakir/man/fake_visits.html">fake_visits()</a></code> is a fake dataset for the visits on a website.</p></li>
 </ul>
-<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="building-ispum-app.html#cb126-1" tabindex="-1"></a><span class="fu">library</span>(fakir)</span>
-<span id="cb126-2"><a href="building-ispum-app.html#cb126-2" tabindex="-1"></a><span class="fu">fake_visits</span>(<span class="at">from =</span> <span class="st">&quot;2017-01-01&quot;</span>, <span class="at">to =</span> <span class="st">&quot;2017-01-31&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb127"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Thinkr-open/fakir">fakir</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/fakir/man/fake_visits.html">fake_visits</a></span><span class="op">(</span>from <span class="op">=</span> <span class="st">"2017-01-01"</span>, to <span class="op">=</span> <span class="st">"2017-01-31"</span><span class="op">)</span></span></code></pre></div>
 <pre><code># A tibble: 31 × 8
    timestamp   year month   day  home about  blog
  * &lt;date&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
@@ -784,22 +349,26 @@ This is, for example, what you find with <code>{golemhtmltemplate}</code>, avail
 # ℹ 21 more rows
 # ℹ 1 more variable: contact &lt;int&gt;</code></pre>
 <p>The idea with these datasets is to combine various formats that can reflect “real-life” datasets: they contain dates, numeric and character variables, and have missing values.
-They can also be manipulated with the included <code>{sf}</code> <span class="citation">(<a href="#ref-R-sf"><strong>R-sf?</strong></a>)</span> geographical dataset <code>fra_sf</code> allowing for map creation.</p>
-<p>Fake datasets created with <code>{fakir}</code> can be used to build light examples on the use of the inputs, for filters or interactive maps, or as examples for the internal functions and their corresponding documentation.</p>
+They can also be manipulated with the included <a href="https://r-spatial.github.io/sf/">sf</a> <span class="citation">(<a href="#ref-R-sf"><strong>R-sf?</strong></a>)</span> geographical dataset <code>fra_sf</code> allowing for map creation.</p>
+<p>Fake datasets created with <a href="https://github.com/Thinkr-open/fakir">fakir</a> can be used to build light examples on the use of the inputs, for filters or interactive maps, or as examples for the internal functions and their corresponding documentation.</p>
 </div>
 </div>
-<div id="proto-rmdfirst" class="section level2 hasAnchor" number="9.3">
-<h2><span class="header-section-number">9.3</span> Building with RMarkdown<a href="building-ispum-app.html#proto-rmdfirst" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="proto-rmdfirst" class="section level2" number="9.3">
+<h2>
+<span class="header-section-number">9.3</span> Building with RMarkdown<a class="anchor" aria-label="anchor" href="#proto-rmdfirst"><i class="fas fa-link"></i></a>
+</h2>
 <p>While on one side you are building the user interface, you (or someone from your team) can start working on the back-end implementation.
 This implementation should be done out of any reactive logic: the back-end should not depend on any reactive context.
 And because documentation is gold, you should start with writing the back-end documentation directly as package documentation:</p>
 <ul>
-<li><p>Inside your Vignettes folder: call <code>usethis::use_vignette()</code> to create the skeleton for a Vignette, which will then be used as package documentation.</p></li>
+<li><p>Inside your Vignettes folder: call <code><a href="https://usethis.r-lib.org/reference/use_vignette.html">usethis::use_vignette()</a></code> to create the skeleton for a Vignette, which will then be used as package documentation.</p></li>
 <li><p>In the <code>inst/</code> folder, if you prefer not including these RMarkdown files as documentation for the end package.</p></li>
 </ul>
 <p>Or what we call “Rmd-first”.</p>
-<div id="define-the-content-of-the-application" class="section level3 hasAnchor" number="9.3.1">
-<h3><span class="header-section-number">9.3.1</span> Define the content of the application<a href="building-ispum-app.html#define-the-content-of-the-application" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="define-the-content-of-the-application" class="section level3" number="9.3.1">
+<h3>
+<span class="header-section-number">9.3.1</span> Define the content of the application<a class="anchor" aria-label="anchor" href="#define-the-content-of-the-application"><i class="fas fa-link"></i></a>
+</h3>
 <p><strong>Rmarkdown files are the perfect spot to sandbox the back-end of your application: inside the file, you don’t have to think about any reactive behavior</strong>, as you are just working with plain old R code: data wrangling operations, multi-parameter-based models, summary tables outputs, graphical outputs, etc.</p>
 <p>And the nice thing is that you can share the output of the rendered file as an HTML or PDF to either your client or boss, or anyone involved in the project.
 That way, <strong>you can focus on the core algorithm</strong>, not some UI implementation like “I want the button to be blue” when what you need to know is if the output of the model is correct.
@@ -811,19 +380,23 @@ Again, this will help everybody focus on what matters: be it you, your team, or 
 In many cases, when you are building an application, you are creating functions that contain business logic/domain expertise, and that can, in fact, be used outside of the application.
 <strong>Writing these functions and how they work together forces you to think about these functions, and also gives a good starting point for anybody familiar with R that would want to start using this back-end toolkit</strong>.
 Of course, as you are building your application as a package, it is way easier now: you can share a package with the application inside it, along with a function to launch the app, but also functions that can be used outside.</p>
-<p>And if you need some data to use as an example, feel free to pick one from <code>{fakir}</code>!</p>
+<p>And if you need some data to use as an example, feel free to pick one from <a href="https://github.com/Thinkr-open/fakir">fakir</a>!</p>
 </div>
-<div id="using-the-rmd-files-as-a-laboratory-notebook" class="section level3 hasAnchor" number="9.3.2">
-<h3><span class="header-section-number">9.3.2</span> Using the Rmd files as a laboratory notebook<a href="building-ispum-app.html#using-the-rmd-files-as-a-laboratory-notebook" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="using-the-rmd-files-as-a-laboratory-notebook" class="section level3" number="9.3.2">
+<h3>
+<span class="header-section-number">9.3.2</span> Using the Rmd files as a laboratory notebook<a class="anchor" aria-label="anchor" href="#using-the-rmd-files-as-a-laboratory-notebook"><i class="fas fa-link"></i></a>
+</h3>
 <p>Rmd can also be used as the place to keep track of what you have in mind while creating the application: most of the time, you will create the functions inside the <code>R/</code> folder, but it might not be the perfect place to document your thought process.
 On the other hand, using Markdown as a kind of “software laboratory notebook” to keep track of your idea is a good way to document all the choices you have made about your data wrangling, models, visualization, so that you can use it as a common knowledge-base throughout the application life: you can share this with your client, with the rest of your team, or with anybody involved in the project.</p>
 <p>And also, developing in multiple Rmd files helps the separation of work between multiple developers, and will reduce code conflicts during development.</p>
 </div>
-<div id="rmd-vignettes-and-documentation-first" class="section level3 hasAnchor" number="9.3.3">
-<h3><span class="header-section-number">9.3.3</span> Rmd, Vignettes, and documentation first<a href="building-ispum-app.html#rmd-vignettes-and-documentation-first" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Working with the <code>{golem}</code> <span class="citation">(<a href="#ref-R-golem">Fay, Guyader, Rochette, et al. 2023</a>)</span> framework implies that you will build the application as an R package.
+<div id="rmd-vignettes-and-documentation-first" class="section level3" number="9.3.3">
+<h3>
+<span class="header-section-number">9.3.3</span> Rmd, Vignettes, and documentation first<a class="anchor" aria-label="anchor" href="#rmd-vignettes-and-documentation-first"><i class="fas fa-link"></i></a>
+</h3>
+<p>Working with the <a href="https://github.com/ThinkR-open/golem">golem</a> <span class="citation">(<a href="references.html#ref-R-golem">Fay, Guyader, Rochette, et al. 2023</a>)</span> framework implies that you will build the application as an R package.
 And of course, an R package implies writing documentation: one of the main goals of the Vignettes, in an R package, is to document how to use the package.
-And the good news is that when checking a package, i.e. when running <code>check()</code> from <code>{devtools}</code> <span class="citation">(<a href="#ref-R-devtools">Wickham, Hester, et al. 2022</a>)</span> or <code>R CMD check</code>, the Vignettes are going to be built, and the process will fail if at least one of the Vignettes fails to render.
+And the good news is that when checking a package, i.e. when running <code>check()</code> from <a href="https://devtools.r-lib.org/">devtools</a> <span class="citation">(<a href="references.html#ref-R-devtools">Wickham, Hester, et al. 2022</a>)</span> or <code>R CMD check</code>, the Vignettes are going to be built, and the process will fail if at least one of the Vignettes fails to render.
 That way, you can use the documentation of the back-end as an extra tool for doing unit testing!</p>
 <p>One radical approach to the “Rmd first” philosophy is to write <strong>everything</strong> in an Rmd from the very beginning of your project: write the function code, their roxygen tags, their tests, etc., then move everything to the correct spot in the package infrastructure once you are happy with everything.
 And of course, when you need to add another feature to your app, open a new markdown and start the process of development and documentation again.</p>
@@ -834,49 +407,9 @@ And of course, when you need to add another feature to your app, open a new mark
 
 
 
-<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-R-shiny" class="csl-entry">
-Chang, Winston, Joe Cheng, JJ Allaire, Carson Sievert, Barret Schloerke, Yihui Xie, Jeff Allen, Jonathan McPherson, Alan Dipert, and Barbara Borges. 2022. <em>Shiny: Web Application Framework for r</em>. <a href="https://shiny.rstudio.com/">https://shiny.rstudio.com/</a>.
-</div>
-<div id="ref-R-golem" class="csl-entry">
-Fay, Colin, Vincent Guyader, Sébastien Rochette, and Cervan Girard. 2023. <em>Golem: A Framework for Robust Shiny Applications</em>. <a href="https://github.com/ThinkR-open/golem">https://github.com/ThinkR-open/golem</a>.
-</div>
-<div id="ref-R-fakir" class="csl-entry">
-Fay, Colin, and Sebastien Rochette. 2023a. <em>Fakir: Create Fake Data in r for Tutorials</em>. <a href="https://github.com/Thinkr-open/fakir">https://github.com/Thinkr-open/fakir</a>.
-</div>
-<div id="ref-R-shinipsum" class="csl-entry">
-———. 2023b. <em>Shinipsum: Lorem-Ipsum-Like Helpers for Fast Shiny Prototyping</em>. <a href="https://github.com/Thinkr-open/shinipsum">https://github.com/Thinkr-open/shinipsum</a>.
-</div>
-<div id="ref-genekim2019" class="csl-entry">
-———. 2019. <em>The Unicorn Project: A Novel about Developers, Digital Disruption, and Thriving in the Age of Data</em>. IT Revolution Press. <a href="https://itrevolution.com/the-unicorn-project/">https://itrevolution.com/the-unicorn-project/</a>.
-</div>
-<div id="ref-ericraymond2003" class="csl-entry">
-Raymond, Eric S. 2003. <em>The Art of UNIX Programming (the Addison-Wesley Professional Computng Series)</em>. Addison-Wesley.
-</div>
-<div id="ref-R-ggplot2" class="csl-entry">
-Wickham, Hadley, Winston Chang, Lionel Henry, Thomas Lin Pedersen, Kohske Takahashi, Claus Wilke, Kara Woo, Hiroaki Yutani, and Dewey Dunnington. 2023. <em>Ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics</em>.
-</div>
-<div id="ref-hadleywickham2017" class="csl-entry">
-Wickham, Hadley, and Garrett Grolemund. 2017. <em>R for Data Science: Import, Tidy, Transform, Visualize, and Model Data</em>. O’Reilly Media. <a href="https://www.xarg.org/ref/a/1491910399/">https://www.xarg.org/ref/a/1491910399/</a>.
-</div>
-<div id="ref-R-purrr" class="csl-entry">
-Wickham, Hadley, and Lionel Henry. 2023. <em>Purrr: Functional Programming Tools</em>.
-</div>
-<div id="ref-R-devtools" class="csl-entry">
-Wickham, Hadley, Jim Hester, Winston Chang, and Jennifer Bryan. 2022. <em>Devtools: Tools to Make Developing r Packages Easier</em>.
-</div>
-</div>
-<div class="footnotes">
-<hr />
-<ol start="37">
-<li id="fn37"><p>Well, there is a probability that we will get the same plot twice, but that is the beauty of randomness.<a href="building-ispum-app.html#fnref37" class="footnote-back">↩︎</a></p></li>
-<li id="fn38"><p>This application is also a demonstration of how to build a <code>{golem}</code> application using <code>htmltemplate()</code>.<a href="building-ispum-app.html#fnref38" class="footnote-back">↩︎</a></p></li>
-</ol>
-</div>
-<hr/>
-<footer>
-<a href="https://rtask.thinkr.fr"><img src="img/logo400_129.png" alt="ThinkR Website"/></a>
+
+<hr>
+<footer><a href="https://rtask.thinkr.fr"><img src="img/logo400_129.png" alt="ThinkR Website"></a>
 <!--https://yihui.org/en/2018/09/target-blank/-->
 <script>
   (function() {
@@ -887,70 +420,58 @@ Wickham, Hadley, Jim Hester, Winston Chang, and Jennifer Bryan. 2022. <em>Devtoo
     }
   }
 })();
-</script>
-</footer>
-            </section>
+</script></footer><div class="chapter-nav">
+<div class="prev"><a href="setting-up-for-success.html"><span class="header-section-number">8</span> Setting up for Success with {golem}</a></div>
+<div class="next"><a href="build-app-golem.html"><span class="header-section-number">10</span> Building the App with {golem}</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#building-ispum-app"><span class="header-section-number">9</span> Building an “ipsum-app”</a></li>
+<li>
+<a class="nav-link" href="#prototyping-is-crucial"><span class="header-section-number">9.1</span> Prototyping is crucial</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#prototype-then-polish"><span class="header-section-number">9.1.1</span> Prototype, then polish</a></li>
+<li><a class="nav-link" href="#the-ui-first-approach"><span class="header-section-number">9.1.2</span> The “UI first” approach</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#prototyping-shiny"><span class="header-section-number">9.2</span> Prototyping {shiny}</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#fast-ui-prototyping-with-shinipsum"><span class="header-section-number">9.2.1</span> Fast UI prototyping with {shinipsum}</a></li>
+<li><a class="nav-link" href="#using-fakir-for-fake-data-generation"><span class="header-section-number">9.2.2</span> Using {fakir} for fake data generation</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#proto-rmdfirst"><span class="header-section-number">9.3</span> Building with RMarkdown</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#define-the-content-of-the-application"><span class="header-section-number">9.3.1</span> Define the content of the application</a></li>
+<li><a class="nav-link" href="#using-the-rmd-files-as-a-laboratory-notebook"><span class="header-section-number">9.3.2</span> Using the Rmd files as a laboratory notebook</a></li>
+<li><a class="nav-link" href="#rmd-vignettes-and-documentation-first"><span class="header-section-number">9.3.3</span> Rmd, Vignettes, and documentation first</a></li>
+</ul>
+</li>
+</ul>
 
-          </div>
-        </div>
-      </div>
-<a href="setting-up-for-success.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="build-app-golem.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
-    </div>
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/ThinkR-open/engineering-shiny-book/blob/master/09-prototyping.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/ThinkR-open/engineering-shiny-book/edit/master/09-prototyping.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Engineering Production-Grade Shiny Apps</strong>" was written by Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard. It was last built on 2024-03-12.</p>
   </div>
-<script src="libs/gitbook/js/app.min.js"></script>
-<script src="libs/gitbook/js/clipboard.min.js"></script>
-<script src="libs/gitbook/js/plugin-search.js"></script>
-<script src="libs/gitbook/js/plugin-sharing.js"></script>
-<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
-<script src="libs/gitbook/js/plugin-bookdown.js"></script>
-<script src="libs/gitbook/js/jquery.highlight.js"></script>
-<script src="libs/gitbook/js/plugin-clipboard.js"></script>
-<script>
-gitbook.require(["gitbook"], function(gitbook) {
-gitbook.start({
-"sharing": {
-"github": true,
-"facebook": false,
-"twitter": true,
-"linkedin": false,
-"weibo": false,
-"instapaper": false,
-"vk": false,
-"whatsapp": false,
-"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
-},
-"fontsettings": {
-"theme": "white",
-"family": "sans",
-"size": 2
-},
-"edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/09-prototyping.Rmd",
-"text": "Edit"
-},
-"history": {
-"link": null,
-"text": null
-},
-"view": {
-"link": null,
-"text": null
-},
-"download": null,
-"search": {
-"engine": "fuse",
-"options": null
-},
-"toc": {
-"collapse": "section"
-}
-});
-});
-</script>
 
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
@@ -962,7 +483,22 @@ gitbook.start({
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
 </script>
 </body>
-
 </html>

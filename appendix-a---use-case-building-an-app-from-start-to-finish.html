@@ -1,622 +1,169 @@
 <!DOCTYPE html>
-<html lang="" xml:lang="">
+<html lang="en">
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Appendix A - Use Case: Building an App from Start to Finish | Engineering Production-Grade Shiny Apps</title>
+<meta name="author" content="Colin Fay">
+<meta name="author" content="Sébastien Rochette">
+<meta name="author" content="Vincent Guyader">
+<meta name="author" content="Cervan Girard">
+<meta name="description" content="This chapter aims at exemplifying the workflow developed in this book using a “real-life” example. In this appendix, we will be building a {shiny} application from start to finish. We’ve chosen to...">
+<meta name="generator" content="bookdown 0.33 with bs4_book()">
+<meta property="og:title" content="Appendix A - Use Case: Building an App from Start to Finish | Engineering Production-Grade Shiny Apps">
+<meta property="og:type" content="book">
+<meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg">
+<meta property="og:description" content="This chapter aims at exemplifying the workflow developed in this book using a “real-life” example. In this appendix, we will be building a {shiny} application from start to finish. We’ve chosen to...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Appendix A - Use Case: Building an App from Start to Finish | Engineering Production-Grade Shiny Apps">
+<meta name="twitter:description" content="This chapter aims at exemplifying the workflow developed in this book using a “real-life” example. In this appendix, we will be building a {shiny} application from start to finish. We’ve chosen to...">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap/bootstrap.bundle.min.js"></script><script src="libs/bs3compat/transition.js"></script><script src="libs/bs3compat/tabs.js"></script><script src="libs/bs3compat/bs3compat.js"></script><link href="libs/bs4_book/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book/bs4_book.js"></script><!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=UA-149994171-1"></script><script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Appendix A - Use Case: Building an App from Start to Finish | Engineering Production-Grade Shiny Apps</title>
-  <meta name="description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
-
-  <meta property="og:title" content="Appendix A - Use Case: Building an App from Start to Finish | Engineering Production-Grade Shiny Apps" />
-  <meta property="og:type" content="book" />
-  <meta property="og:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
-  <meta property="og:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="github-repo" content="ThinkR-open/engineering-shiny-book" />
-
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Appendix A - Use Case: Building an App from Start to Finish | Engineering Production-Grade Shiny Apps" />
-  
-  <meta name="twitter:description" content="A book about engineering shiny application that will later be sent to production. This book cover project management, structuring your project, building a solid testing suite, and optimizing your codebase. We describe in this book a specific workflow: design, prototype, build, strengthen and deploy." />
-  <meta name="twitter:image" content="https://raw.githubusercontent.com/ThinkR-open/engineering-shiny-book/master/img/engineering-shiny.jpg" />
-
-<meta name="author" content="Colin Fay" />
-<meta name="author" content="Sébastien Rochette" />
-<meta name="author" content="Vincent Guyader" />
-<meta name="author" content="Cervan Girard" />
-
-
-<meta name="date" content="2024-03-12" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-  
-  <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-<link rel="prev" href="css.html"/>
-<link rel="next" href="appendix-b---session-info.html"/>
-<script src="libs/jquery/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
-<link href="libs/gitbook/css/style.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
-<link href="libs/gitbook/css/plugin-clipboard.css" rel="stylesheet" />
-
-
-
-
-
-
-
-
-<link href="libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
-<link href="libs/anchor-sections/anchor-sections-hash.css" rel="stylesheet" />
-<script src="libs/anchor-sections/anchor-sections.js"></script>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-149994171-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-149994171-1');
-</script>
-
-
+      gtag('config', 'UA-149994171-1');
+    </script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
 <style type="text/css">
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-</style>
-
-<style type="text/css">
-/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-  margin-bottom: 0em;
-}
-.hanging div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}
-</style>
-
-<link rel="stylesheet" href="css/style.css" type="text/css" />
-<link rel="stylesheet" href="css/thinkr.css" type="text/css" />
-<link rel="stylesheet" href="css/style_gitbook.css" type="text/css" />
+    /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+          margin-bottom: 0em;
+        }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/thinkr.css">
+<link rel="stylesheet" href="css/style_gitbook.css">
 </head>
+<body data-spy="scroll" data-target="#toc">
 
-<body>
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
 
-
-
-  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
-
-    <div class="book-summary">
-      <nav role="navigation">
-
-<ul class="summary">
-<li><a href="./">Engineering Production-Grade Shiny Apps</a></li>
-
-<li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a>
-<ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#motivation"><i class="fa fa-check"></i>Motivation</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#audience-for-this-book"><i class="fa fa-check"></i>Audience for this book</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#what-is-production"><i class="fa fa-check"></i>What is “production”?</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#book-structure"><i class="fa fa-check"></i>Book structure</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#about-the-authors"><i class="fa fa-check"></i>About the authors</a>
-<ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#colin-fay"><i class="fa fa-check"></i><a href="https://colinfay.me/">Colin Fay</a></a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#sébastien-rochette"><i class="fa fa-check"></i><a href="https://statnmap.com/">Sébastien Rochette</a></a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#vincent-guyader"><i class="fa fa-check"></i><a href="https://twitter.com/VincentGuyader">Vincent Guyader</a></a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#cervan-girard"><i class="fa fa-check"></i><a href="https://twitter.com/CervanGirard">Cervan Girard</a></a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#disclaimer"><i class="fa fa-check"></i>Disclaimer</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information-and-conventions"><i class="fa fa-check"></i>Software information and conventions</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#want-to-help"><i class="fa fa-check"></i>Want to help?</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#other-resources"><i class="fa fa-check"></i>Other resources</a>
-<ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#getting-started-with-shiny"><i class="fa fa-check"></i>Getting started with <code>{shiny}</code></a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#putting-shiny-into-production"><i class="fa fa-check"></i>Putting <code>{shiny}</code> into production</a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a>
-<ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#special-thanks"><i class="fa fa-check"></i>Special thanks</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#contributors-to-this-book"><i class="fa fa-check"></i>Contributors to this book</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="foreword.html"><a href="foreword.html"><i class="fa fa-check"></i>Foreword</a></li>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html"><i class="fa fa-check"></i>Application presentation</a>
-<ul>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html#hexmake"><i class="fa fa-check"></i><code>{hexmake}</code></a></li>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html#tidytuesday201942"><i class="fa fa-check"></i><code>{tidytuesday201942}</code></a></li>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html#minifying"><i class="fa fa-check"></i><code>{minifying}</code></a></li>
-<li class="chapter" data-level="" data-path="application-presentation.html"><a href="application-presentation.html#other-applications"><i class="fa fa-check"></i>Other applications</a></li>
-</ul></li>
-<li class="part"><span><b>I Building Successful {shiny} Apps</b></span></li>
-<li class="chapter" data-level="1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html"><i class="fa fa-check"></i><b>1</b> About Successful <code>{shiny}</code> Apps</a>
-<ul>
-<li class="chapter" data-level="1.1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#a-very-short-introduction-to-shiny"><i class="fa fa-check"></i><b>1.1</b> A (very) short introduction to <code>{shiny}</code></a></li>
-<li class="chapter" data-level="1.2" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#complex-shiny"><i class="fa fa-check"></i><b>1.2</b> What is a complex <code>{shiny}</code> application?</a>
-<ul>
-<li class="chapter" data-level="1.2.1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#reaching-the-cliff-of-complexity"><i class="fa fa-check"></i><b>1.2.1</b> Reaching the cliff of complexity</a></li>
-<li class="chapter" data-level="1.2.2" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#balancing-complexities"><i class="fa fa-check"></i><b>1.2.2</b> Balancing complexities</a></li>
-<li class="chapter" data-level="1.2.3" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#assessing-code-complexity"><i class="fa fa-check"></i><b>1.2.3</b> Assessing code complexity</a></li>
-<li class="chapter" data-level="1.2.4" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#production-grade-software-engineering"><i class="fa fa-check"></i><b>1.2.4</b> Production-grade software engineering</a></li>
-</ul></li>
-<li class="chapter" data-level="1.3" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#what-is-a-successful-shiny-app"><i class="fa fa-check"></i><b>1.3</b> What is a successful <code>{shiny}</code> app?</a>
-<ul>
-<li class="chapter" data-level="1.3.1" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-exists"><i class="fa fa-check"></i><b>1.3.1</b> It exists</a></li>
-<li class="chapter" data-level="1.3.2" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-is-accurate"><i class="fa fa-check"></i><b>1.3.2</b> It is accurate</a></li>
-<li class="chapter" data-level="1.3.3" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-is-usable"><i class="fa fa-check"></i><b>1.3.3</b> It is usable</a></li>
-<li class="chapter" data-level="1.3.4" data-path="successful-shiny-app.html"><a href="successful-shiny-app.html#it-is-immortal"><i class="fa fa-check"></i><b>1.3.4</b> It is immortal</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="2" data-path="planning-ahead.html"><a href="planning-ahead.html"><i class="fa fa-check"></i><b>2</b> Planning Ahead</a>
-<ul>
-<li class="chapter" data-level="2.1" data-path="planning-ahead.html"><a href="planning-ahead.html#working-with-a-long-term-mindset"><i class="fa fa-check"></i><b>2.1</b> Working with a “long-term” mindset</a>
-<ul>
-<li class="chapter" data-level="2.1.1" data-path="planning-ahead.html"><a href="planning-ahead.html#prepare-for-success"><i class="fa fa-check"></i><b>2.1.1</b> Prepare for success</a></li>
-<li class="chapter" data-level="2.1.2" data-path="planning-ahead.html"><a href="planning-ahead.html#develop-with-the-kiss-principle"><i class="fa fa-check"></i><b>2.1.2</b> Develop with the KISS principle</a></li>
-</ul></li>
-<li class="chapter" data-level="2.2" data-path="planning-ahead.html"><a href="planning-ahead.html#working-as-a-team-tools-and-structure"><i class="fa fa-check"></i><b>2.2</b> Working as a team: Tools and structure</a>
-<ul>
-<li class="chapter" data-level="2.2.1" data-path="planning-ahead.html"><a href="planning-ahead.html#from-the-tools-point-of-view"><i class="fa fa-check"></i><b>2.2.1</b> From the tools point of view</a></li>
-<li class="chapter" data-level="2.2.2" data-path="planning-ahead.html"><a href="planning-ahead.html#from-the-team-point-of-view"><i class="fa fa-check"></i><b>2.2.2</b> From the team point of view</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="3" data-path="structuring-project.html"><a href="structuring-project.html"><i class="fa fa-check"></i><b>3</b> Structuring Your Project</a>
-<ul>
-<li class="chapter" data-level="3.1" data-path="structuring-project.html"><a href="structuring-project.html#shiny-app-as-a-package"><i class="fa fa-check"></i><b>3.1</b> <code>{shiny}</code> app as a package</a>
-<ul>
-<li class="chapter" data-level="3.1.1" data-path="structuring-project.html"><a href="structuring-project.html#what-is-in-a-production-grade-shiny-app"><i class="fa fa-check"></i><b>3.1.1</b> What is in a production-grade <code>{shiny}</code> app?</a></li>
-<li class="chapter" data-level="3.1.2" data-path="structuring-project.html"><a href="structuring-project.html#resources"><i class="fa fa-check"></i><b>3.1.2</b> Resources</a></li>
-</ul></li>
-<li class="chapter" data-level="3.2" data-path="structuring-project.html"><a href="structuring-project.html#using-shiny-modules"><i class="fa fa-check"></i><b>3.2</b> Using <code>{shiny}</code> modules</a>
-<ul>
-<li class="chapter" data-level="3.2.1" data-path="structuring-project.html"><a href="structuring-project.html#why-shiny-modules"><i class="fa fa-check"></i><b>3.2.1</b> Why <code>{shiny}</code> modules?</a></li>
-<li class="chapter" data-level="3.2.2" data-path="structuring-project.html"><a href="structuring-project.html#when-to-use-shiny-modules"><i class="fa fa-check"></i><b>3.2.2</b> When to use <code>{shiny}</code> modules</a></li>
-<li class="chapter" data-level="3.2.3" data-path="structuring-project.html"><a href="structuring-project.html#a-practical-walkthrough"><i class="fa fa-check"></i><b>3.2.3</b> A practical walkthrough</a></li>
-<li class="chapter" data-level="3.2.4" data-path="structuring-project.html"><a href="structuring-project.html#communication-between-modules"><i class="fa fa-check"></i><b>3.2.4</b> Communication between modules</a></li>
-</ul></li>
-<li class="chapter" data-level="3.3" data-path="structuring-project.html"><a href="structuring-project.html#structuring-your-app"><i class="fa fa-check"></i><b>3.3</b> Structuring your app</a>
-<ul>
-<li class="chapter" data-level="3.3.1" data-path="structuring-project.html"><a href="structuring-project.html#business-logic-and-application-logic"><i class="fa fa-check"></i><b>3.3.1</b> Business logic and application logic</a></li>
-<li class="chapter" data-level="3.3.2" data-path="structuring-project.html"><a href="structuring-project.html#small-is-beautiful-bis-repetita"><i class="fa fa-check"></i><b>3.3.2</b> Small is beautiful (bis repetita)</a></li>
-<li class="chapter" data-level="3.3.3" data-path="structuring-project.html"><a href="structuring-project.html#conventions-matter"><i class="fa fa-check"></i><b>3.3.3</b> Conventions matter</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="4" data-path="golem.html"><a href="golem.html"><i class="fa fa-check"></i><b>4</b> Introduction to <code>{golem}</code></a>
-<ul>
-<li class="chapter" data-level="4.1" data-path="golem.html"><a href="golem.html#what-is-golem"><i class="fa fa-check"></i><b>4.1</b> What is <code>{golem}</code>?</a></li>
-<li class="chapter" data-level="4.2" data-path="golem.html"><a href="golem.html#understanding-golem-app-structure"><i class="fa fa-check"></i><b>4.2</b> Understanding <code>{golem}</code> app structure</a>
-<ul>
-<li class="chapter" data-level="4.2.1" data-path="golem.html"><a href="golem.html#description-and-namespace"><i class="fa fa-check"></i><b>4.2.1</b> <code>DESCRIPTION</code> and <code>NAMESPACE</code></a></li>
-<li class="chapter" data-level="4.2.2" data-path="golem.html"><a href="golem.html#r"><i class="fa fa-check"></i><b>4.2.2</b> R/</a></li>
-<li class="chapter" data-level="4.2.3" data-path="golem.html"><a href="golem.html#golem-config"><i class="fa fa-check"></i><b>4.2.3</b> <code>golem-config</code></a></li>
-<li class="chapter" data-level="4.2.4" data-path="golem.html"><a href="golem.html#instappwww"><i class="fa fa-check"></i><b>4.2.4</b> <code>inst/app/www/</code></a></li>
-<li class="chapter" data-level="4.2.5" data-path="golem.html"><a href="golem.html#dev"><i class="fa fa-check"></i><b>4.2.5</b> <code>dev/</code></a></li>
-<li class="chapter" data-level="4.2.6" data-path="golem.html"><a href="golem.html#man"><i class="fa fa-check"></i><b>4.2.6</b> <code>man/</code></a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="5" data-path="workflow.html"><a href="workflow.html"><i class="fa fa-check"></i><b>5</b> The Workflow</a>
-<ul>
-<li class="chapter" data-level="5.1" data-path="workflow.html"><a href="workflow.html#step-1-design"><i class="fa fa-check"></i><b>5.1</b> Step 1: Design</a></li>
-<li class="chapter" data-level="5.2" data-path="workflow.html"><a href="workflow.html#step-2-prototype"><i class="fa fa-check"></i><b>5.2</b> Step 2: Prototype</a></li>
-<li class="chapter" data-level="5.3" data-path="workflow.html"><a href="workflow.html#step-3-build"><i class="fa fa-check"></i><b>5.3</b> Step 3: Build</a></li>
-<li class="chapter" data-level="5.4" data-path="workflow.html"><a href="workflow.html#step-4-strengthen"><i class="fa fa-check"></i><b>5.4</b> Step 4: Strengthen</a></li>
-<li class="chapter" data-level="5.5" data-path="workflow.html"><a href="workflow.html#step-5-deploy"><i class="fa fa-check"></i><b>5.5</b> Step 5: Deploy</a></li>
-</ul></li>
-<li class="part"><span><b>II Step 1: Design</b></span></li>
-<li class="chapter" data-level="6" data-path="ux-matters.html"><a href="ux-matters.html"><i class="fa fa-check"></i><b>6</b> UX Matters</a>
-<ul>
-<li class="chapter" data-level="6.1" data-path="ux-matters.html"><a href="ux-matters.html#simplicity-is-gold"><i class="fa fa-check"></i><b>6.1</b> Simplicity is gold</a>
-<ul>
-<li class="chapter" data-level="6.1.1" data-path="ux-matters.html"><a href="ux-matters.html#how-we-read-the-web-scanning-content"><i class="fa fa-check"></i><b>6.1.1</b> How we read the web: Scanning content</a></li>
-<li class="chapter" data-level="6.1.2" data-path="ux-matters.html"><a href="ux-matters.html#building-a-self-evident-app-or-at-least-self-explanatory"><i class="fa fa-check"></i><b>6.1.2</b> Building a self-evident app (or at least self-explanatory)</a></li>
-</ul></li>
-<li class="chapter" data-level="6.2" data-path="ux-matters.html"><a href="ux-matters.html#the-danger-of-feature-creep"><i class="fa fa-check"></i><b>6.2</b> The danger of feature-creep</a>
-<ul>
-<li class="chapter" data-level="6.2.1" data-path="ux-matters.html"><a href="ux-matters.html#what-is-feature-creep"><i class="fa fa-check"></i><b>6.2.1</b> What is feature-creep?</a></li>
-<li class="chapter" data-level="6.2.2" data-path="ux-matters.html"><a href="ux-matters.html#too-much-reactivity"><i class="fa fa-check"></i><b>6.2.2</b> Too much reactivity</a></li>
-<li class="chapter" data-level="6.2.3" data-path="ux-matters.html"><a href="ux-matters.html#too-much-interactivity"><i class="fa fa-check"></i><b>6.2.3</b> Too much interactivity</a></li>
-</ul></li>
-<li class="chapter" data-level="6.3" data-path="ux-matters.html"><a href="ux-matters.html#web-accessibility"><i class="fa fa-check"></i><b>6.3</b> Web accessibility</a>
-<ul>
-<li class="chapter" data-level="6.3.1" data-path="ux-matters.html"><a href="ux-matters.html#about-accessibility"><i class="fa fa-check"></i><b>6.3.1</b> About accessibility</a></li>
-<li class="chapter" data-level="6.3.2" data-path="ux-matters.html"><a href="ux-matters.html#making-your-app-accessible"><i class="fa fa-check"></i><b>6.3.2</b> Making your app accessible</a></li>
-<li class="chapter" data-level="6.3.3" data-path="ux-matters.html"><a href="ux-matters.html#evaluating-your-app-accessibility-and-further-reading"><i class="fa fa-check"></i><b>6.3.3</b> Evaluating your app accessibility and further reading</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="7" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html"><i class="fa fa-check"></i><b>7</b> Don’t Rush into Coding</a>
-<ul>
-<li class="chapter" data-level="7.1" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#designing-before-coding"><i class="fa fa-check"></i><b>7.1</b> Designing before coding</a>
-<ul>
-<li class="chapter" data-level="7.1.1" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#the-urge-to-code"><i class="fa fa-check"></i><b>7.1.1</b> The urge to code</a></li>
-<li class="chapter" data-level="7.1.2" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#knowing-where-to-search"><i class="fa fa-check"></i><b>7.1.2</b> Knowing where to search</a></li>
-<li class="chapter" data-level="7.1.3" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#about-concept-map"><i class="fa fa-check"></i><b>7.1.3</b> About concept map</a></li>
-</ul></li>
-<li class="chapter" data-level="7.2" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#ask-questions"><i class="fa fa-check"></i><b>7.2</b> Ask questions</a>
-<ul>
-<li class="chapter" data-level="7.2.1" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#about-the-end-users"><i class="fa fa-check"></i><b>7.2.1</b> About the end users</a></li>
-<li class="chapter" data-level="7.2.2" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#building-personas"><i class="fa fa-check"></i><b>7.2.2</b> Building personas</a></li>
-<li class="chapter" data-level="7.2.3" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#pre-existing-code-base"><i class="fa fa-check"></i><b>7.2.3</b> Pre-existing code-base</a></li>
-<li class="chapter" data-level="7.2.4" data-path="dont-rush-into-coding.html"><a href="dont-rush-into-coding.html#deployment"><i class="fa fa-check"></i><b>7.2.4</b> Deployment</a></li>
-</ul></li>
-</ul></li>
-<li class="part"><span><b>III Step 2: Prototype</b></span></li>
-<li class="chapter" data-level="8" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html"><i class="fa fa-check"></i><b>8</b> Setting up for Success with <code>{golem}</code></a>
-<ul>
-<li class="chapter" data-level="8.1" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#create-a-golem"><i class="fa fa-check"></i><b>8.1</b> Create a <code>{golem}</code></a></li>
-<li class="chapter" data-level="8.2" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#setting-things-up-with-dev01_start.r"><i class="fa fa-check"></i><b>8.2</b> Setting things up with <code>dev/01_start.R</code></a>
-<ul>
-<li class="chapter" data-level="8.2.1" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#fill-the-description-and-set-options"><i class="fa fa-check"></i><b>8.2.1</b> Fill the DESCRIPTION and set options</a></li>
-<li class="chapter" data-level="8.2.2" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#set-common-files"><i class="fa fa-check"></i><b>8.2.2</b> Set common files</a></li>
-<li class="chapter" data-level="8.2.3" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#use-recommended-elements"><i class="fa fa-check"></i><b>8.2.3</b> Use recommended elements</a></li>
-<li class="chapter" data-level="8.2.4" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#add-utility-functions"><i class="fa fa-check"></i><b>8.2.4</b> Add utility functions</a></li>
-<li class="chapter" data-level="8.2.5" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#changing-the-favicon"><i class="fa fa-check"></i><b>8.2.5</b> Changing the favicon</a></li>
-</ul></li>
-<li class="chapter" data-level="8.3" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#setting-infrastructure-for-prototyping"><i class="fa fa-check"></i><b>8.3</b> Setting infrastructure for prototyping</a>
-<ul>
-<li class="chapter" data-level="8.3.1" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#add-modules-in-dev02_dev.r"><i class="fa fa-check"></i><b>8.3.1</b> Add modules in <code>dev/02_dev.R</code></a></li>
-<li class="chapter" data-level="8.3.2" data-path="setting-up-for-success.html"><a href="setting-up-for-success.html#add-css-and-js-files"><i class="fa fa-check"></i><b>8.3.2</b> Add CSS and JS files</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="9" data-path="building-ispum-app.html"><a href="building-ispum-app.html"><i class="fa fa-check"></i><b>9</b> Building an “ipsum-app”</a>
-<ul>
-<li class="chapter" data-level="9.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#prototyping-is-crucial"><i class="fa fa-check"></i><b>9.1</b> Prototyping is crucial</a>
-<ul>
-<li class="chapter" data-level="9.1.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#prototype-then-polish"><i class="fa fa-check"></i><b>9.1.1</b> Prototype, then polish</a></li>
-<li class="chapter" data-level="9.1.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#the-ui-first-approach"><i class="fa fa-check"></i><b>9.1.2</b> The “UI first” approach</a></li>
-</ul></li>
-<li class="chapter" data-level="9.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#prototyping-shiny"><i class="fa fa-check"></i><b>9.2</b> Prototyping <code>{shiny}</code></a>
-<ul>
-<li class="chapter" data-level="9.2.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#fast-ui-prototyping-with-shinipsum"><i class="fa fa-check"></i><b>9.2.1</b> Fast UI prototyping with <code>{shinipsum}</code></a></li>
-<li class="chapter" data-level="9.2.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#using-fakir-for-fake-data-generation"><i class="fa fa-check"></i><b>9.2.2</b> Using <code>{fakir}</code> for fake data generation</a></li>
-</ul></li>
-<li class="chapter" data-level="9.3" data-path="building-ispum-app.html"><a href="building-ispum-app.html#proto-rmdfirst"><i class="fa fa-check"></i><b>9.3</b> Building with RMarkdown</a>
-<ul>
-<li class="chapter" data-level="9.3.1" data-path="building-ispum-app.html"><a href="building-ispum-app.html#define-the-content-of-the-application"><i class="fa fa-check"></i><b>9.3.1</b> Define the content of the application</a></li>
-<li class="chapter" data-level="9.3.2" data-path="building-ispum-app.html"><a href="building-ispum-app.html#using-the-rmd-files-as-a-laboratory-notebook"><i class="fa fa-check"></i><b>9.3.2</b> Using the Rmd files as a laboratory notebook</a></li>
-<li class="chapter" data-level="9.3.3" data-path="building-ispum-app.html"><a href="building-ispum-app.html#rmd-vignettes-and-documentation-first"><i class="fa fa-check"></i><b>9.3.3</b> Rmd, Vignettes, and documentation first</a></li>
-</ul></li>
-</ul></li>
-<li class="part"><span><b>IV Step 3: Build</b></span></li>
-<li class="chapter" data-level="10" data-path="build-app-golem.html"><a href="build-app-golem.html"><i class="fa fa-check"></i><b>10</b> Building the App with <code>{golem}</code></a>
-<ul>
-<li class="chapter" data-level="10.1" data-path="build-app-golem.html"><a href="build-app-golem.html#add-dependencies"><i class="fa fa-check"></i><b>10.1</b> Add dependencies</a>
-<ul>
-<li class="chapter" data-level="10.1.1" data-path="build-app-golem.html"><a href="build-app-golem.html#package-dependencies"><i class="fa fa-check"></i><b>10.1.1</b> Package dependencies</a></li>
-<li class="chapter" data-level="10.1.2" data-path="build-app-golem.html"><a href="build-app-golem.html#importing-packages-and-functions"><i class="fa fa-check"></i><b>10.1.2</b> Importing packages and functions</a></li>
-</ul></li>
-<li class="chapter" data-level="10.2" data-path="build-app-golem.html"><a href="build-app-golem.html#submodules-and-utility-functions"><i class="fa fa-check"></i><b>10.2</b> Submodules and utility functions</a></li>
-<li class="chapter" data-level="10.3" data-path="build-app-golem.html"><a href="build-app-golem.html#add-tests"><i class="fa fa-check"></i><b>10.3</b> Add tests</a></li>
-<li class="chapter" data-level="10.4" data-path="build-app-golem.html"><a href="build-app-golem.html#documentation-and-code-coverage"><i class="fa fa-check"></i><b>10.4</b> Documentation and code coverage</a>
-<ul>
-<li class="chapter" data-level="10.4.1" data-path="build-app-golem.html"><a href="build-app-golem.html#vignette"><i class="fa fa-check"></i><b>10.4.1</b> Vignette</a></li>
-<li class="chapter" data-level="10.4.2" data-path="build-app-golem.html"><a href="build-app-golem.html#code-coverage-and-continuous-integration"><i class="fa fa-check"></i><b>10.4.2</b> Code coverage and continuous integration</a></li>
-</ul></li>
-<li class="chapter" data-level="10.5" data-path="build-app-golem.html"><a href="build-app-golem.html#using-golem-dev-functions"><i class="fa fa-check"></i><b>10.5</b> Using <code>{golem}</code> dev functions</a></li>
-</ul></li>
-<li class="part"><span><b>V Step 4: Strengthen</b></span></li>
-<li class="chapter" data-level="11" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html"><i class="fa fa-check"></i><b>11</b> Build Yourself a Safety Net</a>
-<ul>
-<li class="chapter" data-level="11.1" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-your-app"><i class="fa fa-check"></i><b>11.1</b> Testing your app</a>
-<ul>
-<li class="chapter" data-level="11.1.1" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-the-business-logic"><i class="fa fa-check"></i><b>11.1.1</b> Testing the business logic</a></li>
-<li class="chapter" data-level="11.1.2" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#shinytestserver"><i class="fa fa-check"></i><b>11.1.2</b> <code>shiny::testServer()</code></a></li>
-<li class="chapter" data-level="11.1.3" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-the-interactive-logic"><i class="fa fa-check"></i><b>11.1.3</b> Testing the interactive logic</a></li>
-<li class="chapter" data-level="11.1.4" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#testing-the-app-load"><i class="fa fa-check"></i><b>11.1.4</b> Testing the app load</a></li>
-</ul></li>
-<li class="chapter" data-level="11.2" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#a-reproducible-environment"><i class="fa fa-check"></i><b>11.2</b> A reproducible environment</a>
-<ul>
-<li class="chapter" data-level="11.2.1" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#renv"><i class="fa fa-check"></i><b>11.2.1</b> <code>{renv}</code></a></li>
-<li class="chapter" data-level="11.2.2" data-path="build-yourself-safety-net.html"><a href="build-yourself-safety-net.html#docker"><i class="fa fa-check"></i><b>11.2.2</b> Docker</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="12" data-path="version-control.html"><a href="version-control.html"><i class="fa fa-check"></i><b>12</b> Version Control</a>
-<ul>
-<li class="chapter" data-level="12.1" data-path="version-control.html"><a href="version-control.html#version-control-git"><i class="fa fa-check"></i><b>12.1</b> Using version control with <code>Git</code></a>
-<ul>
-<li class="chapter" data-level="12.1.1" data-path="version-control.html"><a href="version-control.html#why-version-control"><i class="fa fa-check"></i><b>12.1.1</b> Why version control?</a></li>
-<li class="chapter" data-level="12.1.2" data-path="version-control.html"><a href="version-control.html#git-basics-add---commit---push---pull"><i class="fa fa-check"></i><b>12.1.2</b> <code>Git</code> basics: <code>add</code> - <code>commit</code> - <code>push</code> - <code>pull</code></a></li>
-<li class="chapter" data-level="12.1.3" data-path="version-control.html"><a href="version-control.html#about-branches"><i class="fa fa-check"></i><b>12.1.3</b> About branches</a></li>
-<li class="chapter" data-level="12.1.4" data-path="version-control.html"><a href="version-control.html#issues"><i class="fa fa-check"></i><b>12.1.4</b> Issues</a></li>
-</ul></li>
-<li class="chapter" data-level="12.2" data-path="version-control.html"><a href="version-control.html#git-integration"><i class="fa fa-check"></i><b>12.2</b> <code>Git</code> integration</a>
-<ul>
-<li class="chapter" data-level="12.2.1" data-path="version-control.html"><a href="version-control.html#with-rstudio"><i class="fa fa-check"></i><b>12.2.1</b> With RStudio</a></li>
-<li class="chapter" data-level="12.2.2" data-path="version-control.html"><a href="version-control.html#as-part-of-a-larger-world"><i class="fa fa-check"></i><b>12.2.2</b> As part of a larger world</a></li>
-<li class="chapter" data-level="12.2.3" data-path="version-control.html"><a href="version-control.html#about-git-flow"><i class="fa fa-check"></i><b>12.2.3</b> About <code>git-flow</code></a></li>
-<li class="chapter" data-level="12.2.4" data-path="version-control.html"><a href="version-control.html#further-readings-on-git"><i class="fa fa-check"></i><b>12.2.4</b> Further readings on <code>Git</code></a></li>
-</ul></li>
-<li class="chapter" data-level="12.3" data-path="version-control.html"><a href="version-control.html#automated-testing"><i class="fa fa-check"></i><b>12.3</b> Automated testing</a></li>
-</ul></li>
-<li class="part"><span><b>VI Step 5: Deploy</b></span></li>
-<li class="chapter" data-level="13" data-path="deploy.html"><a href="deploy.html"><i class="fa fa-check"></i><b>13</b> Deploy Your Application</a>
-<ul>
-<li class="chapter" data-level="13.1" data-path="deploy.html"><a href="deploy.html#before-deployment-checklist"><i class="fa fa-check"></i><b>13.1</b> Before deployment checklist</a></li>
-<li class="chapter" data-level="13.2" data-path="deploy.html"><a href="deploy.html#sharing-your-app-as-a-package"><i class="fa fa-check"></i><b>13.2</b> Sharing your app as a package</a>
-<ul>
-<li class="chapter" data-level="13.2.1" data-path="deploy.html"><a href="deploy.html#install-on-your-machine"><i class="fa fa-check"></i><b>13.2.1</b> Install on your machine</a></li>
-<li class="chapter" data-level="13.2.2" data-path="deploy.html"><a href="deploy.html#share-as-a-built-package"><i class="fa fa-check"></i><b>13.2.2</b> Share as a built package</a></li>
-</ul></li>
-<li class="chapter" data-level="13.3" data-path="deploy.html"><a href="deploy.html#deploying-apps-with-golem"><i class="fa fa-check"></i><b>13.3</b> Deploying apps with <code>{golem}</code></a>
-<ul>
-<li class="chapter" data-level="13.3.1" data-path="deploy.html"><a href="deploy.html#rstudio-environments"><i class="fa fa-check"></i><b>13.3.1</b> RStudio environments</a></li>
-<li class="chapter" data-level="13.3.2" data-path="deploy.html"><a href="deploy.html#docker-1"><i class="fa fa-check"></i><b>13.3.2</b> Docker</a></li>
-</ul></li>
-</ul></li>
-<li class="part"><span><b>VII Optimizing</b></span></li>
-<li class="chapter" data-level="14" data-path="need-for-optimization.html"><a href="need-for-optimization.html"><i class="fa fa-check"></i><b>14</b> The Need for Optimization</a>
-<ul>
-<li class="chapter" data-level="14.1" data-path="need-for-optimization.html"><a href="need-for-optimization.html#build-first-then-optimize"><i class="fa fa-check"></i><b>14.1</b> Build first, then optimize</a>
-<ul>
-<li class="chapter" data-level="14.1.1" data-path="need-for-optimization.html"><a href="need-for-optimization.html#identifying-bottlenecks"><i class="fa fa-check"></i><b>14.1.1</b> Identifying bottlenecks</a></li>
-<li class="chapter" data-level="14.1.2" data-path="need-for-optimization.html"><a href="need-for-optimization.html#do-you-need-faster-functions"><i class="fa fa-check"></i><b>14.1.2</b> Do you need faster functions?</a></li>
-<li class="chapter" data-level="14.1.3" data-path="need-for-optimization.html"><a href="need-for-optimization.html#dont-sacrifice-readability"><i class="fa fa-check"></i><b>14.1.3</b> Don’t sacrifice readability</a></li>
-</ul></li>
-<li class="chapter" data-level="14.2" data-path="need-for-optimization.html"><a href="need-for-optimization.html#tools-for-profiling"><i class="fa fa-check"></i><b>14.2</b> Tools for profiling</a>
-<ul>
-<li class="chapter" data-level="14.2.1" data-path="need-for-optimization.html"><a href="need-for-optimization.html#profiling-r-code"><i class="fa fa-check"></i><b>14.2.1</b> Profiling R code</a></li>
-<li class="chapter" data-level="14.2.2" data-path="need-for-optimization.html"><a href="need-for-optimization.html#profiling-shiny"><i class="fa fa-check"></i><b>14.2.2</b> Profiling <code>{shiny}</code></a></li>
-<li class="chapter" data-level="14.2.3" data-path="need-for-optimization.html"><a href="need-for-optimization.html#more-resources-about-web-page-performance"><i class="fa fa-check"></i><b>14.2.3</b> More resources about web-page performance</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="15" data-path="common-app-caveats.html"><a href="common-app-caveats.html"><i class="fa fa-check"></i><b>15</b> Common Application Caveats</a>
-<ul>
-<li class="chapter" data-level="15.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reactivity-anti-patterns"><i class="fa fa-check"></i><b>15.1</b> Reactivity anti-patterns</a>
-<ul>
-<li class="chapter" data-level="15.1.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reactivity-is-awesome-until-it-is-not"><i class="fa fa-check"></i><b>15.1.1</b> Reactivity is awesome… until it is not</a></li>
-<li class="chapter" data-level="15.1.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#observe-vs-observeevent"><i class="fa fa-check"></i><b>15.1.2</b> <code>observe</code> vs <code>observeEvent</code></a></li>
-<li class="chapter" data-level="15.1.3" data-path="common-app-caveats.html"><a href="common-app-caveats.html#building-triggers-and-watchers"><i class="fa fa-check"></i><b>15.1.3</b> Building triggers and watchers</a></li>
-<li class="chapter" data-level="15.1.4" data-path="common-app-caveats.html"><a href="common-app-caveats.html#using-r6-as-data-storage"><i class="fa fa-check"></i><b>15.1.4</b> Using R6 as data storage</a></li>
-<li class="chapter" data-level="15.1.5" data-path="common-app-caveats.html"><a href="common-app-caveats.html#logging-reactivity-with-whereami"><i class="fa fa-check"></i><b>15.1.5</b> Logging reactivity with <code>{whereami}</code></a></li>
-</ul></li>
-<li class="chapter" data-level="15.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#r-does-too-much"><i class="fa fa-check"></i><b>15.2</b> R does too much</a>
-<ul>
-<li class="chapter" data-level="15.2.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#rendering-the-ui-from-the-server-side"><i class="fa fa-check"></i><b>15.2.1</b> Rendering the UI from the server side</a></li>
-<li class="chapter" data-level="15.2.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#too-much-data-in-memory"><i class="fa fa-check"></i><b>15.2.2</b> Too much data in memory</a></li>
-</ul></li>
-<li class="chapter" data-level="15.3" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reading-data"><i class="fa fa-check"></i><b>15.3</b> Reading data</a>
-<ul>
-<li class="chapter" data-level="15.3.1" data-path="common-app-caveats.html"><a href="common-app-caveats.html#including-data-in-your-application"><i class="fa fa-check"></i><b>15.3.1</b> Including data in your application</a></li>
-<li class="chapter" data-level="15.3.2" data-path="common-app-caveats.html"><a href="common-app-caveats.html#reading-external-datasets"><i class="fa fa-check"></i><b>15.3.2</b> Reading external datasets</a></li>
-<li class="chapter" data-level="15.3.3" data-path="common-app-caveats.html"><a href="common-app-caveats.html#using-external-databases"><i class="fa fa-check"></i><b>15.3.3</b> Using external databases</a></li>
-<li class="chapter" data-level="15.3.4" data-path="common-app-caveats.html"><a href="common-app-caveats.html#data-source-checklist"><i class="fa fa-check"></i><b>15.3.4</b> Data-source checklist</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="16" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html"><i class="fa fa-check"></i><b>16</b> Optimizing <code>{shiny}</code> Code</a>
-<ul>
-<li class="chapter" data-level="16.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#optimizing-r-code"><i class="fa fa-check"></i><b>16.1</b> Optimizing R code</a></li>
-<li class="chapter" data-level="16.2" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#caching-elements"><i class="fa fa-check"></i><b>16.2</b> Caching elements</a>
-<ul>
-<li class="chapter" data-level="16.2.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#what-is-caching"><i class="fa fa-check"></i><b>16.2.1</b> What is caching?</a></li>
-<li class="chapter" data-level="16.2.2" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#native-caching-in-r"><i class="fa fa-check"></i><b>16.2.2</b> Native caching in R</a></li>
-<li class="chapter" data-level="16.2.3" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#caching-in-shiny"><i class="fa fa-check"></i><b>16.2.3</b> Caching in <code>{shiny}</code></a></li>
-</ul></li>
-<li class="chapter" data-level="16.3" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#asynchronous-in-shiny"><i class="fa fa-check"></i><b>16.3</b> Asynchronous in <code>{shiny}</code></a>
-<ul>
-<li class="chapter" data-level="16.3.1" data-path="optimizing-shiny-code.html"><a href="optimizing-shiny-code.html#how-to"><i class="fa fa-check"></i><b>16.3.1</b> How to</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="17" data-path="using-javascript.html"><a href="using-javascript.html"><i class="fa fa-check"></i><b>17</b> Using JavaScript</a>
-<ul>
-<li class="chapter" data-level="17.1" data-path="using-javascript.html"><a href="using-javascript.html#introduction-1"><i class="fa fa-check"></i><b>17.1</b> Introduction</a></li>
-<li class="chapter" data-level="17.2" data-path="using-javascript.html"><a href="using-javascript.html#a-quick-introduction-to-javascript"><i class="fa fa-check"></i><b>17.2</b> A quick introduction to JavaScript</a>
-<ul>
-<li class="chapter" data-level="17.2.1" data-path="using-javascript.html"><a href="using-javascript.html#about-javascript"><i class="fa fa-check"></i><b>17.2.1</b> About JavaScript</a></li>
-<li class="chapter" data-level="17.2.2" data-path="using-javascript.html"><a href="using-javascript.html#including-javascript-code-in-your-app"><i class="fa fa-check"></i><b>17.2.2</b> Including JavaScript code in your app</a></li>
-<li class="chapter" data-level="17.2.3" data-path="using-javascript.html"><a href="using-javascript.html#understanding-html-class-and-id"><i class="fa fa-check"></i><b>17.2.3</b> Understanding HTML, class, and id</a></li>
-<li class="chapter" data-level="17.2.4" data-path="using-javascript.html"><a href="using-javascript.html#querying-in-vanilla-javascript"><i class="fa fa-check"></i><b>17.2.4</b> Querying in Vanilla JavaScript</a></li>
-<li class="chapter" data-level="17.2.5" data-path="using-javascript.html"><a href="using-javascript.html#about-dom-events"><i class="fa fa-check"></i><b>17.2.5</b> About DOM events</a></li>
-<li class="chapter" data-level="17.2.6" data-path="using-javascript.html"><a href="using-javascript.html#about-jquery-and-jquery-selectors"><i class="fa fa-check"></i><b>17.2.6</b> About <code>jQuery</code> and <code>jQuery</code> selectors</a></li>
-</ul></li>
-<li class="chapter" data-level="17.3" data-path="using-javascript.html"><a href="using-javascript.html#client-side-javascript"><i class="fa fa-check"></i><b>17.3</b> Client-side JavaScript</a>
-<ul>
-<li class="chapter" data-level="17.3.1" data-path="using-javascript.html"><a href="using-javascript.html#common-patterns"><i class="fa fa-check"></i><b>17.3.1</b> Common patterns</a></li>
-<li class="chapter" data-level="17.3.2" data-path="using-javascript.html"><a href="using-javascript.html#where-to-put-them-back-to-javascript-events"><i class="fa fa-check"></i><b>17.3.2</b> Where to put them: Back to JavaScript Events</a></li>
-</ul></li>
-<li class="chapter" data-level="17.4" data-path="using-javascript.html"><a href="using-javascript.html#javascript---shiny-communication"><i class="fa fa-check"></i><b>17.4</b> JavaScript &lt;-&gt; <code>{shiny}</code> communication</a>
-<ul>
-<li class="chapter" data-level="17.4.1" data-path="using-javascript.html"><a href="using-javascript.html#from-r-to-javascript"><i class="fa fa-check"></i><b>17.4.1</b> From R to JavaScript</a></li>
-<li class="chapter" data-level="17.4.2" data-path="using-javascript.html"><a href="using-javascript.html#from-javascript-to-r"><i class="fa fa-check"></i><b>17.4.2</b> From JavaScript to R</a></li>
-</ul></li>
-<li class="chapter" data-level="17.5" data-path="using-javascript.html"><a href="using-javascript.html#about-shinyjs-js-functions"><i class="fa fa-check"></i><b>17.5</b> About <code>{shinyjs}</code> JS functions</a></li>
-<li class="chapter" data-level="17.6" data-path="using-javascript.html"><a href="using-javascript.html#one-last-thing-api-calls"><i class="fa fa-check"></i><b>17.6</b> One last thing: API calls</a></li>
-<li class="chapter" data-level="17.7" data-path="using-javascript.html"><a href="using-javascript.html#learn-more-about-javascript"><i class="fa fa-check"></i><b>17.7</b> Learn more about JavaScript</a>
-<ul>
-<li class="chapter" data-level="17.7.1" data-path="using-javascript.html"><a href="using-javascript.html#shiny-and-javascript"><i class="fa fa-check"></i><b>17.7.1</b> <code>{shiny}</code> and JavaScript</a></li>
-<li class="chapter" data-level="17.7.2" data-path="using-javascript.html"><a href="using-javascript.html#javascript-basics"><i class="fa fa-check"></i><b>17.7.2</b> JavaScript basics</a></li>
-<li class="chapter" data-level="17.7.3" data-path="using-javascript.html"><a href="using-javascript.html#jquery"><i class="fa fa-check"></i><b>17.7.3</b> jQuery</a></li>
-<li class="chapter" data-level="17.7.4" data-path="using-javascript.html"><a href="using-javascript.html#intermediateadvanced-javascript"><i class="fa fa-check"></i><b>17.7.4</b> Intermediate/advanced JavaScript</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="18" data-path="css.html"><a href="css.html"><i class="fa fa-check"></i><b>18</b> A Gentle Introduction to CSS</a>
-<ul>
-<li class="chapter" data-level="18.1" data-path="css.html"><a href="css.html#what-is-css"><i class="fa fa-check"></i><b>18.1</b> What is CSS?</a>
-<ul>
-<li class="chapter" data-level="18.1.1" data-path="css.html"><a href="css.html#about-css"><i class="fa fa-check"></i><b>18.1.1</b> About CSS</a></li>
-<li class="chapter" data-level="18.1.2" data-path="css.html"><a href="css.html#shinys-default-fluidpage"><i class="fa fa-check"></i><b>18.1.2</b> <code>{shiny}</code>’s default: <code>fluidPage()</code></a></li>
-</ul></li>
-<li class="chapter" data-level="18.2" data-path="css.html"><a href="css.html#getting-started-with-css"><i class="fa fa-check"></i><b>18.2</b> Getting started with CSS</a>
-<ul>
-<li class="chapter" data-level="18.2.1" data-path="css.html"><a href="css.html#about-css-syntax"><i class="fa fa-check"></i><b>18.2.1</b> About CSS syntax</a></li>
-<li class="chapter" data-level="18.2.2" data-path="css.html"><a href="css.html#css-selectors"><i class="fa fa-check"></i><b>18.2.2</b> CSS selectors</a></li>
-<li class="chapter" data-level="18.2.3" data-path="css.html"><a href="css.html#css-properties"><i class="fa fa-check"></i><b>18.2.3</b> CSS properties</a></li>
-</ul></li>
-<li class="chapter" data-level="18.3" data-path="css.html"><a href="css.html#integrate-css-files-in-your-shiny-app"><i class="fa fa-check"></i><b>18.3</b> Integrate CSS files in your <code>{shiny}</code> app</a>
-<ul>
-<li class="chapter" data-level="18.3.1" data-path="css.html"><a href="css.html#inline-css"><i class="fa fa-check"></i><b>18.3.1</b> Inline CSS</a></li>
-<li class="chapter" data-level="18.3.2" data-path="css.html"><a href="css.html#writing-in-a-tagsstyle"><i class="fa fa-check"></i><b>18.3.2</b> Writing in a <code>tags$style()</code></a></li>
-<li class="chapter" data-level="18.3.3" data-path="css.html"><a href="css.html#including-external-files"><i class="fa fa-check"></i><b>18.3.3</b> Including external files</a></li>
-<li class="chapter" data-level="18.3.4" data-path="css.html"><a href="css.html#using-r-packages"><i class="fa fa-check"></i><b>18.3.4</b> Using R packages</a></li>
-</ul></li>
-<li class="chapter" data-level="18.4" data-path="css.html"><a href="css.html#external-resources"><i class="fa fa-check"></i><b>18.4</b> External resources</a></li>
-</ul></li>
-<li class="part"><span><b>VIII Appendix</b></span></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html"><i class="fa fa-check"></i>Appendix A - Use Case: Building an App from Start to Finish</a>
-<ul>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#about-the-application"><i class="fa fa-check"></i>About the application</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-1-design-1"><i class="fa fa-check"></i>Step 1: Design</a>
-<ul>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deciphering-the-specifications"><i class="fa fa-check"></i>Deciphering the specifications</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#building-a-concept-map"><i class="fa fa-check"></i>Building a concept map</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#asking-questions"><i class="fa fa-check"></i>Asking questions</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#building-personas-1"><i class="fa fa-check"></i>Building personas</a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-2-prototyping"><i class="fa fa-check"></i>Step 2: Prototyping</a>
-<ul>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#back-end-in-rmd"><i class="fa fa-check"></i>Back-end in Rmd</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#ui-prototyping"><i class="fa fa-check"></i>UI prototyping</a></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-3-build-1"><i class="fa fa-check"></i>Step 3: Build</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-4-strengthen-1"><i class="fa fa-check"></i>Step 4: Strengthen</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-5-deploy-1"><i class="fa fa-check"></i>Step 5: Deploy</a>
-<ul>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#before-deployment-checklist-1"><i class="fa fa-check"></i>Before deployment checklist</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deploy-as-a-tar.gz"><i class="fa fa-check"></i>Deploy as a tar.gz</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deploy-on-rstudio-connect"><i class="fa fa-check"></i>Deploy on RStudio Connect</a></li>
-<li class="chapter" data-level="" data-path="appendix-a---use-case-building-an-app-from-start-to-finish.html"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deploy-with-docker"><i class="fa fa-check"></i>Deploy with Docker</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="" data-path="appendix-b---session-info.html"><a href="appendix-b---session-info.html"><i class="fa fa-check"></i>Appendix B - Session Info</a></li>
-<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
-<li class="divider"></li>
-<li><a href="https://rtask.thinkr.fr">A book by the ThinkR team</a></li>
-
-</ul>
-
-      </nav>
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Engineering Production-Grade Shiny Apps</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
     </div>
 
-    <div class="book-body">
-      <div class="body-inner">
-        <div class="book-header" role="navigation">
-          <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Engineering Production-Grade Shiny Apps</a>
-          </h1>
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Introduction</a></li>
+<li><a class="" href="foreword.html">Foreword</a></li>
+<li><a class="" href="application-presentation.html">Application presentation</a></li>
+<li class="book-part">Building Successful {shiny} Apps</li>
+<li><a class="" href="successful-shiny-app.html"><span class="header-section-number">1</span> About Successful {shiny} Apps</a></li>
+<li><a class="" href="planning-ahead.html"><span class="header-section-number">2</span> Planning Ahead</a></li>
+<li><a class="" href="structuring-project.html"><span class="header-section-number">3</span> Structuring Your Project</a></li>
+<li><a class="" href="golem.html"><span class="header-section-number">4</span> Introduction to {golem}</a></li>
+<li><a class="" href="workflow.html"><span class="header-section-number">5</span> The Workflow</a></li>
+<li class="book-part">Step 1: Design</li>
+<li><a class="" href="ux-matters.html"><span class="header-section-number">6</span> UX Matters</a></li>
+<li><a class="" href="dont-rush-into-coding.html"><span class="header-section-number">7</span> Don’t Rush into Coding</a></li>
+<li class="book-part">Step 2: Prototype</li>
+<li><a class="" href="setting-up-for-success.html"><span class="header-section-number">8</span> Setting up for Success with {golem}</a></li>
+<li><a class="" href="building-ispum-app.html"><span class="header-section-number">9</span> Building an “ipsum-app”</a></li>
+<li class="book-part">Step 3: Build</li>
+<li><a class="" href="build-app-golem.html"><span class="header-section-number">10</span> Building the App with {golem}</a></li>
+<li class="book-part">Step 4: Strengthen</li>
+<li><a class="" href="build-yourself-safety-net.html"><span class="header-section-number">11</span> Build Yourself a Safety Net</a></li>
+<li><a class="" href="version-control.html"><span class="header-section-number">12</span> Version Control</a></li>
+<li class="book-part">Step 5: Deploy</li>
+<li><a class="" href="deploy.html"><span class="header-section-number">13</span> Deploy Your Application</a></li>
+<li class="book-part">Optimizing</li>
+<li><a class="" href="need-for-optimization.html"><span class="header-section-number">14</span> The Need for Optimization</a></li>
+<li><a class="" href="common-app-caveats.html"><span class="header-section-number">15</span> Common Application Caveats</a></li>
+<li><a class="" href="optimizing-shiny-code.html"><span class="header-section-number">16</span> Optimizing {shiny} Code</a></li>
+<li><a class="" href="using-javascript.html"><span class="header-section-number">17</span> Using JavaScript</a></li>
+<li><a class="" href="css.html"><span class="header-section-number">18</span> A Gentle Introduction to CSS</a></li>
+<li class="book-part">Appendix</li>
+<li><a class="active" href="appendix-a---use-case-building-an-app-from-start-to-finish.html">Appendix A - Use Case: Building an App from Start to Finish</a></li>
+<li><a class="" href="appendix-b---session-info.html">Appendix B - Session Info</a></li>
+<li><a class="" href="references.html">References</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/ThinkR-open/engineering-shiny-book">View book source <i class="fab fa-github"></i></a></p>
         </div>
-
-        <div class="page-wrapper" tabindex="-1" role="main">
-          <div class="page-inner">
-
-            <section class="normal" id="section-">
-<div id="appendix-a---use-case-building-an-app-from-start-to-finish" class="section level1 unnumbered hasAnchor">
-<h1>Appendix A - Use Case: Building an App from Start to Finish<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#appendix-a---use-case-building-an-app-from-start-to-finish" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="appendix-a---use-case-building-an-app-from-start-to-finish" class="section level1 unnumbered">
+<h1>Appendix A - Use Case: Building an App from Start to Finish<a class="anchor" aria-label="anchor" href="#appendix-a---use-case-building-an-app-from-start-to-finish"><i class="fas fa-link"></i></a>
+</h1>
 <p>This chapter aims at exemplifying the workflow developed in this book using a “real-life” example.
-In this appendix, we will be building a <code>{shiny}</code> application from start to finish.
+In this appendix, we will be building a <a href="https://shiny.rstudio.com/">shiny</a> application from start to finish.
 We’ve chosen to build an application that doesn’t rely on heavy computation/data analysis, so that we can focus on the engineering process, not on the internals of the analytic methodology, nor on spending time explaining the dataset.</p>
-<div id="about-the-application" class="section level2 unnumbered hasAnchor">
-<h2>About the application<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#about-the-application" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="about-the-application" class="section level2 unnumbered">
+<h2>About the application<a class="anchor" aria-label="anchor" href="#about-the-application"><i class="fas fa-link"></i></a>
+</h2>
 <p>In this appendix, we will build a “minify” application, an application that takes a CSS, JavaScript, HTML or JSON input, and outputs a minified version of this file.
 We will rely on the <code>{minifyr}</code> package to build this application.</p>
 <p>Here is an example of what the specifications for this app could look like:</p>
-<div class="sourceCode" id="cb355"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb355-1"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-1" tabindex="-1"></a>Hello! </span>
-<span id="cb355-2"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-2" tabindex="-1"></a></span>
-<span id="cb355-3"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-3" tabindex="-1"></a>We want to build a small application that can </span>
-<span id="cb355-4"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-4" tabindex="-1"></a>minify CSS, JavaScript, HTML and JSON. </span>
-<span id="cb355-5"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-5" tabindex="-1"></a></span>
-<span id="cb355-6"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-6" tabindex="-1"></a>In this app, user will be able either to paste </span>
-<span id="cb355-7"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-7" tabindex="-1"></a>the content or to upload a file. </span>
-<span id="cb355-8"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-8" tabindex="-1"></a></span>
-<span id="cb355-9"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-9" tabindex="-1"></a>Once the content is pasted/upladed, they select </span>
-<span id="cb355-10"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-10" tabindex="-1"></a>the type, which is pre-selected based on the </span>
-<span id="cb355-11"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-11" tabindex="-1"></a>file extension. Then they click on a button, </span>
-<span id="cb355-12"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-12" tabindex="-1"></a>and the content is minified. </span>
-<span id="cb355-13"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-13" tabindex="-1"></a></span>
-<span id="cb355-14"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-14" tabindex="-1"></a>They can then copy the output, or download it as a file. </span>
-<span id="cb355-15"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-15" tabindex="-1"></a></span>
-<span id="cb355-16"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb355-16" tabindex="-1"></a>Cheers!</span></code></pre></div>
+<div class="sourceCode" id="cb356"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb356-1"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-1" tabindex="-1"></a>Hello! </span>
+<span id="cb356-2"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-2" tabindex="-1"></a></span>
+<span id="cb356-3"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-3" tabindex="-1"></a>We want to build a small application that can </span>
+<span id="cb356-4"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-4" tabindex="-1"></a>minify CSS, JavaScript, HTML and JSON. </span>
+<span id="cb356-5"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-5" tabindex="-1"></a></span>
+<span id="cb356-6"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-6" tabindex="-1"></a>In this app, user will be able either to paste </span>
+<span id="cb356-7"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-7" tabindex="-1"></a>the content or to upload a file. </span>
+<span id="cb356-8"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-8" tabindex="-1"></a></span>
+<span id="cb356-9"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-9" tabindex="-1"></a>Once the content is pasted/upladed, they select </span>
+<span id="cb356-10"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-10" tabindex="-1"></a>the type, which is pre-selected based on the </span>
+<span id="cb356-11"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-11" tabindex="-1"></a>file extension. Then they click on a button, </span>
+<span id="cb356-12"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-12" tabindex="-1"></a>and the content is minified. </span>
+<span id="cb356-13"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-13" tabindex="-1"></a></span>
+<span id="cb356-14"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-14" tabindex="-1"></a>They can then copy the output, or download it as a file. </span>
+<span id="cb356-15"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-15" tabindex="-1"></a></span>
+<span id="cb356-16"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-16" tabindex="-1"></a>Cheers!</span></code></pre></div>
 </div>
-<div id="step-1-design-1" class="section level2 unnumbered hasAnchor">
-<h2>Step 1: Design<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-1-design-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="deciphering-the-specifications" class="section level3 unnumbered hasAnchor">
-<h3>Deciphering the specifications<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deciphering-the-specifications" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div id="general-observations" class="section level4 unnumbered hasAnchor">
-<h4>General observations<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#general-observations" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="step-1-design-1" class="section level2 unnumbered">
+<h2>Step 1: Design<a class="anchor" aria-label="anchor" href="#step-1-design-1"><i class="fas fa-link"></i></a>
+</h2>
+<div id="deciphering-the-specifications" class="section level3 unnumbered">
+<h3>Deciphering the specifications<a class="anchor" aria-label="anchor" href="#deciphering-the-specifications"><i class="fas fa-link"></i></a>
+</h3>
+<div id="general-observations" class="section level4 unnumbered">
+<h4>General observations<a class="anchor" aria-label="anchor" href="#general-observations"><i class="fas fa-link"></i></a>
+</h4>
 <ul>
 <li><p>As this app is pretty straightforward, it would be better to handle everything in the same page, <em>i.e</em> everything should happen on the same page (no tab).</p></li>
 <li><p>It would be a plus to have the “before minification”/“after minification” gain, so that the users have a better idea of the purpose of the application.</p></li>
 </ul>
 </div>
-<div id="user-experience-considerations" class="section level4 unnumbered hasAnchor">
-<h4>User experience considerations<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#user-experience-considerations" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="user-experience-considerations" class="section level4 unnumbered">
+<h4>User experience considerations<a class="anchor" aria-label="anchor" href="#user-experience-considerations"><i class="fas fa-link"></i></a>
+</h4>
 <ul>
 <li><p>We should provide a link to an explanation of minification.</p></li>
 <li><p>The user might get different results based on the minifying algorithm they use, which can be surprising at first.
@@ -626,23 +173,27 @@ This should be doable with the following CSS: <code>pre{ white-space: pre-wrap; 
 <li><p>We should be careful about using semantic HTML for the inputs and outputs.</p></li>
 </ul>
 </div>
-<div id="technical-points" class="section level4 unnumbered hasAnchor">
-<h4>Technical points<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#technical-points" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="technical-points" class="section level4 unnumbered">
+<h4>Technical points<a class="anchor" aria-label="anchor" href="#technical-points"><i class="fas fa-link"></i></a>
+</h4>
 <ul>
 <li><p>As <code>{minifyr}</code> wraps a NodeJS module, we will need to install NodeJS when deploying.</p></li>
 <li><p>To be sure that the process works, we should check the validity of the file extension from the UI and from the server side.</p></li>
 </ul>
 </div>
 </div>
-<div id="building-a-concept-map" class="section level3 unnumbered hasAnchor">
-<h3>Building a concept map<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#building-a-concept-map" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="building-a-concept-map" class="section level3 unnumbered">
+<h3>Building a concept map<a class="anchor" aria-label="anchor" href="#building-a-concept-map"><i class="fas fa-link"></i></a>
+</h3>
 <p>Figure <a href="#fig:19-appendix-1"><strong>??</strong></a> is the concept map for this application, using Xmind.</p>
 
 </div>
-<div id="asking-questions" class="section level3 unnumbered hasAnchor">
-<h3>Asking questions<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#asking-questions" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div id="about-the-end-users-1" class="section level4 unnumbered hasAnchor">
-<h4>About the end users<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#about-the-end-users-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="asking-questions" class="section level3 unnumbered">
+<h3>Asking questions<a class="anchor" aria-label="anchor" href="#asking-questions"><i class="fas fa-link"></i></a>
+</h3>
+<div id="about-the-end-users-1" class="section level4 unnumbered">
+<h4>About the end users<a class="anchor" aria-label="anchor" href="#about-the-end-users-1"><i class="fas fa-link"></i></a>
+</h4>
 <ul>
 <li><em>Who are the end users of your app?</em></li>
 </ul>
@@ -670,33 +221,38 @@ Small chance of using this on a smartphone.</p>
 <p>Nothing of the like: they should be using this application while developing, so chances are they are using it at a desk.</p>
 </div>
 </div>
-<div id="building-personas-1" class="section level3 unnumbered hasAnchor">
-<h3>Building personas<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#building-personas-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="building-personas-1" class="section level3 unnumbered">
+<h3>Building personas<a class="anchor" aria-label="anchor" href="#building-personas-1"><i class="fas fa-link"></i></a>
+</h3>
 <p>Let’s pick two random names for our personas, and two fake companies where they might be working.</p>
-<div class="sourceCode" id="cb356"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb356-1"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-1" tabindex="-1"></a>nms <span class="ot">&lt;-</span> withr<span class="sc">::</span><span class="fu">with_seed</span>(</span>
-<span id="cb356-2"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-2" tabindex="-1"></a>  <span class="dv">608</span>, {</span>
-<span id="cb356-3"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-3" tabindex="-1"></a>    charlatan<span class="sc">::</span><span class="fu">ch_name</span>(<span class="dv">2</span>)</span>
-<span id="cb356-4"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-4" tabindex="-1"></a>    </span>
-<span id="cb356-5"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-5" tabindex="-1"></a>  }</span>
-<span id="cb356-6"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-6" tabindex="-1"></a>)</span>
-<span id="cb356-7"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb356-7" tabindex="-1"></a>nms</span></code></pre></div>
-<pre><code>[1] &quot;Delina Stanton&quot; &quot;Theo Torphy&quot;   </code></pre>
-<div class="sourceCode" id="cb358"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb358-1"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb358-1" tabindex="-1"></a>company <span class="ot">&lt;-</span> withr<span class="sc">::</span><span class="fu">with_seed</span>(</span>
-<span id="cb358-2"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb358-2" tabindex="-1"></a>  <span class="dv">608</span>, {</span>
-<span id="cb358-3"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb358-3" tabindex="-1"></a>    charlatan<span class="sc">::</span><span class="fu">ch_company</span>(<span class="dv">2</span>)</span>
-<span id="cb358-4"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb358-4" tabindex="-1"></a>  }</span>
-<span id="cb358-5"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb358-5" tabindex="-1"></a>)</span>
-<span id="cb358-6"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb358-6" tabindex="-1"></a>company</span></code></pre></div>
-<pre><code>[1] &quot;Witting-Witting&quot; &quot;Stehr-Stehr&quot;    </code></pre>
-<div id="delina-stanton-shiny-developer-at-witting-witting" class="section level4 unnumbered hasAnchor">
-<h4>Delina Stanton: <code>{shiny}</code> developer at Witting-Witting<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#delina-stanton-shiny-developer-at-witting-witting" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<p>Delina Stanton is a <code>{shiny}</code> developer at Witting-Witting.
+<div class="sourceCode" id="cb357"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nms</span> <span class="op">&lt;-</span> <span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_seed.html">with_seed</a></span><span class="op">(</span></span>
+<span>  <span class="fl">608</span>, <span class="op">{</span></span>
+<span>    <span class="fu">charlatan</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/charlatan/reference/ch_name.html">ch_name</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
+<span>    </span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">nms</span></span></code></pre></div>
+<pre><code>[1] "Delina Stanton" "Theo Torphy"   </code></pre>
+<div class="sourceCode" id="cb359"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">company</span> <span class="op">&lt;-</span> <span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_seed.html">with_seed</a></span><span class="op">(</span></span>
+<span>  <span class="fl">608</span>, <span class="op">{</span></span>
+<span>    <span class="fu">charlatan</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/charlatan/reference/ch_company.html">ch_company</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">company</span></span></code></pre></div>
+<pre><code>[1] "Witting-Witting" "Stehr-Stehr"    </code></pre>
+<div id="delina-stanton-shiny-developer-at-witting-witting" class="section level4 unnumbered">
+<h4>Delina Stanton: <code>{shiny}</code> developer at Witting-Witting<a class="anchor" aria-label="anchor" href="#delina-stanton-shiny-developer-at-witting-witting"><i class="fas fa-link"></i></a>
+</h4>
+<p>Delina Stanton is a <a href="https://shiny.rstudio.com/">shiny</a> developer at Witting-Witting.
 She’s been learning R in graduate school while working on her master’s degree in statistics.
-When she started at Witting-Witting, she was mainly doing data analysis in Rmd, but has gradually switched to building <code>{shiny}</code> applications full-time.
-She discovered minification while reading the “Engineering Production-Grade Shiny App” book, and now wants to add this to her <code>{shiny}</code> application.</p>
+When she started at Witting-Witting, she was mainly doing data analysis in Rmd, but has gradually switched to building <a href="https://shiny.rstudio.com/">shiny</a> applications full-time.
+She discovered minification while reading the “Engineering Production-Grade Shiny App” book, and now wants to add this to her <a href="https://shiny.rstudio.com/">shiny</a> application.</p>
 </div>
-<div id="theo-torphy-web-developer-and-trainer-at-stehr-stehr" class="section level4 unnumbered hasAnchor">
-<h4>Theo Torphy: web developer and trainer at Stehr-Stehr<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#theo-torphy-web-developer-and-trainer-at-stehr-stehr" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="theo-torphy-web-developer-and-trainer-at-stehr-stehr" class="section level4 unnumbered">
+<h4>Theo Torphy: web developer and trainer at Stehr-Stehr<a class="anchor" aria-label="anchor" href="#theo-torphy-web-developer-and-trainer-at-stehr-stehr"><i class="fas fa-link"></i></a>
+</h4>
 <p>Theo Torphy is a web developer at Stehr-Stehr.
 He studied web development at the university, where he learned about minification.
 He is now also in charge of training new recruits for the company where he works, and also gives some lectures at the university he attended.
@@ -705,135 +261,143 @@ Most of the minification he does is automated, but he is looking for a tool he c
 </div>
 </div>
 </div>
-<div id="step-2-prototyping" class="section level2 unnumbered hasAnchor">
-<h2>Step 2: Prototyping<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-2-prototyping" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="step-2-prototyping" class="section level2 unnumbered">
+<h2>Step 2: Prototyping<a class="anchor" aria-label="anchor" href="#step-2-prototyping"><i class="fas fa-link"></i></a>
+</h2>
 <p>In this step, we will be building the back-end of the application on one side, and the UI on the other side.
 Once we have the back-end settled and the UI defined, we will be working on making the two work with each other.</p>
-<div id="back-end-in-rmd" class="section level3 unnumbered hasAnchor">
-<h3>Back-end in Rmd<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#back-end-in-rmd" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="back-end-in-rmd" class="section level3 unnumbered">
+<h3>Back-end in Rmd<a class="anchor" aria-label="anchor" href="#back-end-in-rmd"><i class="fas fa-link"></i></a>
+</h3>
 <p>Our back-end will be composed of two functions:</p>
 <ul>
-<li><code>guess_minifier</code>, which will take a function and return the available algorithms for that file: for example, if you have a JavaScript file, you’ll be able to use the <code>minifyr_js_babel()</code>, <code>minifyr_js_gcc()</code>, <code>minifyr_js_terser()</code>, <code>minifyr_js_uglify()</code>, and <code>minifyr_js_yui()</code> functions. If the type is not guessed based on the extension, the function should fail gracefully, and not make <code>{shiny}</code> crash. We’ll chose to return an empty string if this extension is not guessed.</li>
+<li>
+<code>guess_minifier</code>, which will take a function and return the available algorithms for that file: for example, if you have a JavaScript file, you’ll be able to use the <code><a href="https://rdrr.io/pkg/minifyr/man/js.html">minifyr_js_babel()</a></code>, <code><a href="https://rdrr.io/pkg/minifyr/man/js.html">minifyr_js_gcc()</a></code>, <code><a href="https://rdrr.io/pkg/minifyr/man/js.html">minifyr_js_terser()</a></code>, <code><a href="https://rdrr.io/pkg/minifyr/man/js.html">minifyr_js_uglify()</a></code>, and <code><a href="https://rdrr.io/pkg/minifyr/man/js.html">minifyr_js_yui()</a></code> functions. If the type is not guessed based on the extension, the function should fail gracefully, and not make <a href="https://shiny.rstudio.com/">shiny</a> crash. We’ll chose to return an empty string if this extension is not guessed.</li>
 </ul>
-<div class="sourceCode" id="cb360"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb360-1"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-1" tabindex="-1"></a><span class="fu">library</span>(minifyr)</span>
-<span id="cb360-2"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-2" tabindex="-1"></a>guess_minifier <span class="ot">&lt;-</span> <span class="cf">function</span>(file){</span>
-<span id="cb360-3"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-3" tabindex="-1"></a>  <span class="co"># We&#39;ll start by getting the file extension</span></span>
-<span id="cb360-4"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-4" tabindex="-1"></a>  ext <span class="ot">&lt;-</span> tools<span class="sc">::</span><span class="fu">file_ext</span>(file)</span>
-<span id="cb360-5"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-5" tabindex="-1"></a>  <span class="co"># Check that the extension is correct, if not, return early</span></span>
-<span id="cb360-6"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-6" tabindex="-1"></a>  <span class="co"># It&#39;s important to do this kind of check also </span></span>
-<span id="cb360-7"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-7" tabindex="-1"></a>  <span class="co"># on the server side as HTML manual tempering </span></span>
-<span id="cb360-8"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-8" tabindex="-1"></a>  <span class="co"># would allow to also send other type of files</span></span>
-<span id="cb360-9"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-9" tabindex="-1"></a>  <span class="cf">if</span> (</span>
-<span id="cb360-10"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-10" tabindex="-1"></a>    <span class="sc">!</span> ext <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;js&quot;</span>, <span class="st">&quot;css&quot;</span>, <span class="st">&quot;html&quot;</span>, <span class="st">&quot;json&quot;</span>)</span>
-<span id="cb360-11"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-11" tabindex="-1"></a>  ){</span>
-<span id="cb360-12"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-12" tabindex="-1"></a>    <span class="co"># Return early</span></span>
-<span id="cb360-13"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-13" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">list</span>())</span>
-<span id="cb360-14"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-14" tabindex="-1"></a>  }</span>
-<span id="cb360-15"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-15" tabindex="-1"></a>  <span class="co"># We&#39;ll then retrieve the available </span></span>
-<span id="cb360-16"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-16" tabindex="-1"></a>  <span class="co"># pattern based on the extension</span></span>
-<span id="cb360-17"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-17" tabindex="-1"></a>  patt <span class="ot">&lt;-</span> <span class="cf">switch</span>(</span>
-<span id="cb360-18"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-18" tabindex="-1"></a>    ext, </span>
-<span id="cb360-19"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-19" tabindex="-1"></a>    <span class="at">js =</span> <span class="st">&quot;minifyr_js_.+&quot;</span>,</span>
-<span id="cb360-20"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-20" tabindex="-1"></a>    <span class="at">html =</span> <span class="st">&quot;minifyr_html_.+&quot;</span>,</span>
-<span id="cb360-21"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-21" tabindex="-1"></a>    <span class="at">css =</span> <span class="st">&quot;minifyr_css_.+&quot;</span>,</span>
-<span id="cb360-22"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-22" tabindex="-1"></a>    <span class="at">json =</span> <span class="st">&quot;minifyr_json_.+&quot;</span></span>
-<span id="cb360-23"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-23" tabindex="-1"></a>  )</span>
-<span id="cb360-24"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-24" tabindex="-1"></a>  <span class="co"># List all the available functions to minify the file</span></span>
-<span id="cb360-25"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-25" tabindex="-1"></a>  <span class="fu">list</span>(</span>
-<span id="cb360-26"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-26" tabindex="-1"></a>    <span class="at">file =</span> file,</span>
-<span id="cb360-27"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-27" tabindex="-1"></a>    <span class="at">ext =</span> ext,</span>
-<span id="cb360-28"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-28" tabindex="-1"></a>    <span class="co"># We return this pattern so that </span></span>
-<span id="cb360-29"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-29" tabindex="-1"></a>    <span class="co"># it will be used to update the selectInput that </span></span>
-<span id="cb360-30"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-30" tabindex="-1"></a>    <span class="co"># is used to select an algo</span></span>
-<span id="cb360-31"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-31" tabindex="-1"></a>    <span class="at">pattern =</span> patt, </span>
-<span id="cb360-32"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-32" tabindex="-1"></a>    <span class="at">functions =</span> <span class="fu">grep</span>(</span>
-<span id="cb360-33"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-33" tabindex="-1"></a>      patt, </span>
-<span id="cb360-34"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-34" tabindex="-1"></a>      <span class="fu">names</span>(</span>
-<span id="cb360-35"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-35" tabindex="-1"></a>        <span class="fu">loadNamespace</span>(<span class="st">&quot;minifyr&quot;</span>)</span>
-<span id="cb360-36"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-36" tabindex="-1"></a>      ), </span>
-<span id="cb360-37"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-37" tabindex="-1"></a>      <span class="at">value =</span> <span class="cn">TRUE</span></span>
-<span id="cb360-38"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-38" tabindex="-1"></a>    )</span>
-<span id="cb360-39"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-39" tabindex="-1"></a>  )</span>
-<span id="cb360-40"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-40" tabindex="-1"></a>  </span>
-<span id="cb360-41"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-41" tabindex="-1"></a>}</span>
-<span id="cb360-42"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-42" tabindex="-1"></a></span>
-<span id="cb360-43"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-43" tabindex="-1"></a><span class="co"># minifyr comes with a series of examples, </span></span>
-<span id="cb360-44"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-44" tabindex="-1"></a><span class="co"># so we can use them as tests</span></span>
-<span id="cb360-45"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-45" tabindex="-1"></a><span class="fu">guess_minifier</span>(</span>
-<span id="cb360-46"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-46" tabindex="-1"></a>  <span class="fu">minifyr_example</span>(<span class="st">&quot;css&quot;</span>)</span>
-<span id="cb360-47"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-47" tabindex="-1"></a>)[<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>]</span>
-<span id="cb360-48"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-48" tabindex="-1"></a><span class="fu">guess_minifier</span>(</span>
-<span id="cb360-49"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-49" tabindex="-1"></a>  <span class="fu">minifyr_example</span>(<span class="st">&quot;js&quot;</span>)</span>
-<span id="cb360-50"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-50" tabindex="-1"></a>)[<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>]</span>
-<span id="cb360-51"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-51" tabindex="-1"></a><span class="fu">guess_minifier</span>(</span>
-<span id="cb360-52"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-52" tabindex="-1"></a>  <span class="fu">minifyr_example</span>(<span class="st">&quot;html&quot;</span>)</span>
-<span id="cb360-53"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-53" tabindex="-1"></a>)[<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>]</span>
-<span id="cb360-54"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-54" tabindex="-1"></a><span class="fu">guess_minifier</span>(</span>
-<span id="cb360-55"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-55" tabindex="-1"></a>  <span class="fu">minifyr_example</span>(<span class="st">&quot;json&quot;</span>)</span>
-<span id="cb360-56"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-56" tabindex="-1"></a>)[<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>]</span>
-<span id="cb360-57"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-57" tabindex="-1"></a><span class="co"># Try with a non valid extension</span></span>
-<span id="cb360-58"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-58" tabindex="-1"></a><span class="fu">guess_minifier</span>(</span>
-<span id="cb360-59"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-59" tabindex="-1"></a>  <span class="st">&quot;path/to/text.docx&quot;</span></span>
-<span id="cb360-60"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb360-60" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb361"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">minifyr</span><span class="op">)</span></span>
+<span><span class="va">guess_minifier</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">file</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="co"># We'll start by getting the file extension</span></span>
+<span>  <span class="va">ext</span> <span class="op">&lt;-</span> <span class="fu">tools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/tools/fileutils.html">file_ext</a></span><span class="op">(</span><span class="va">file</span><span class="op">)</span></span>
+<span>  <span class="co"># Check that the extension is correct, if not, return early</span></span>
+<span>  <span class="co"># It's important to do this kind of check also </span></span>
+<span>  <span class="co"># on the server side as HTML manual tempering </span></span>
+<span>  <span class="co"># would allow to also send other type of files</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span></span>
+<span>    <span class="op">!</span> <span class="va">ext</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"js"</span>, <span class="st">"css"</span>, <span class="st">"html"</span>, <span class="st">"json"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">{</span></span>
+<span>    <span class="co"># Return early</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="co"># We'll then retrieve the available </span></span>
+<span>  <span class="co"># pattern based on the extension</span></span>
+<span>  <span class="va">patt</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/switch.html">switch</a></span><span class="op">(</span></span>
+<span>    <span class="va">ext</span>, </span>
+<span>    js <span class="op">=</span> <span class="st">"minifyr_js_.+"</span>,</span>
+<span>    html <span class="op">=</span> <span class="st">"minifyr_html_.+"</span>,</span>
+<span>    css <span class="op">=</span> <span class="st">"minifyr_css_.+"</span>,</span>
+<span>    json <span class="op">=</span> <span class="st">"minifyr_json_.+"</span></span>
+<span>  <span class="op">)</span></span>
+<span>  <span class="co"># List all the available functions to minify the file</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
+<span>    file <span class="op">=</span> <span class="va">file</span>,</span>
+<span>    ext <span class="op">=</span> <span class="va">ext</span>,</span>
+<span>    <span class="co"># We return this pattern so that </span></span>
+<span>    <span class="co"># it will be used to update the selectInput that </span></span>
+<span>    <span class="co"># is used to select an algo</span></span>
+<span>    pattern <span class="op">=</span> <span class="va">patt</span>, </span>
+<span>    functions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span></span>
+<span>      <span class="va">patt</span>, </span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html">loadNamespace</a></span><span class="op">(</span><span class="st">"minifyr"</span><span class="op">)</span></span>
+<span>      <span class="op">)</span>, </span>
+<span>      value <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span>  </span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># minifyr comes with a series of examples, </span></span>
+<span><span class="co"># so we can use them as tests</span></span>
+<span><span class="fu">guess_minifier</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/minifyr/man/minifyr_example.html">minifyr_example</a></span><span class="op">(</span><span class="st">"css"</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span>
+<span><span class="fu">guess_minifier</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/minifyr/man/minifyr_example.html">minifyr_example</a></span><span class="op">(</span><span class="st">"js"</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span>
+<span><span class="fu">guess_minifier</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/minifyr/man/minifyr_example.html">minifyr_example</a></span><span class="op">(</span><span class="st">"html"</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span>
+<span><span class="fu">guess_minifier</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/minifyr/man/minifyr_example.html">minifyr_example</a></span><span class="op">(</span><span class="st">"json"</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span>
+<span><span class="co"># Try with a non valid extension</span></span>
+<span><span class="fu">guess_minifier</span><span class="op">(</span></span>
+<span>  <span class="st">"path/to/text.docx"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <ul>
 <li>A <code>compress()</code> function, which takes three parameters: the file as <code>input</code>, the <code>algo</code> outputted from our last function, and the selection, which is the one selected by the user. The compressed file will be outputted to a tempfile.</li>
 </ul>
-<div class="sourceCode" id="cb361"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb361-1"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-1" tabindex="-1"></a>compress <span class="ot">&lt;-</span> <span class="cf">function</span>(algo, selection){</span>
-<span id="cb361-2"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-2" tabindex="-1"></a>  <span class="co"># Creating a tempfile using our algo object</span></span>
-<span id="cb361-3"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-3" tabindex="-1"></a>  tps <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="fu">sprintf</span>(<span class="st">&quot;.%s&quot;</span>, algo<span class="sc">$</span>ext))</span>
-<span id="cb361-4"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-4" tabindex="-1"></a>  <span class="co"># Getting the function with the selection</span></span>
-<span id="cb361-5"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-5" tabindex="-1"></a>  converter <span class="ot">&lt;-</span> <span class="fu">get</span>(</span>
-<span id="cb361-6"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-6" tabindex="-1"></a>    <span class="fu">grep</span>(selection, algo<span class="sc">$</span>functions, <span class="at">value =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb361-7"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-7" tabindex="-1"></a>  )</span>
-<span id="cb361-8"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-8" tabindex="-1"></a>  <span class="co"># Do the conversion</span></span>
-<span id="cb361-9"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-9" tabindex="-1"></a>  <span class="fu">converter</span>(algo<span class="sc">$</span>file, tps)</span>
-<span id="cb361-10"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-10" tabindex="-1"></a>  <span class="co"># Return the temp file</span></span>
-<span id="cb361-11"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-11" tabindex="-1"></a>  <span class="fu">return</span>(tps)</span>
-<span id="cb361-12"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-12" tabindex="-1"></a>}</span>
-<span id="cb361-13"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-13" tabindex="-1"></a></span>
-<span id="cb361-14"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-14" tabindex="-1"></a>algo <span class="ot">&lt;-</span> <span class="fu">guess_minifier</span>(</span>
-<span id="cb361-15"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-15" tabindex="-1"></a>  <span class="fu">minifyr_example</span>(<span class="st">&quot;js&quot;</span>)</span>
-<span id="cb361-16"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-16" tabindex="-1"></a>)</span>
-<span id="cb361-17"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-17" tabindex="-1"></a></span>
-<span id="cb361-18"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-18" tabindex="-1"></a><span class="fu">compress</span>(</span>
-<span id="cb361-19"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-19" tabindex="-1"></a>  <span class="at">algo =</span> algo, </span>
-<span id="cb361-20"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-20" tabindex="-1"></a>  <span class="at">selection =</span> <span class="st">&quot;babel&quot;</span></span>
-<span id="cb361-21"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb361-21" tabindex="-1"></a>) </span></code></pre></div>
+<div class="sourceCode" id="cb362"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">compress</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">algo</span>, <span class="va">selection</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="co"># Creating a tempfile using our algo object</span></span>
+<span>  <span class="va">tps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">".%s"</span>, <span class="va">algo</span><span class="op">$</span><span class="va">ext</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="co"># Getting the function with the selection</span></span>
+<span>  <span class="va">converter</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/get.html">get</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="va">selection</span>, <span class="va">algo</span><span class="op">$</span><span class="va">functions</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span>  <span class="co"># Do the conversion</span></span>
+<span>  <span class="fu">converter</span><span class="op">(</span><span class="va">algo</span><span class="op">$</span><span class="va">file</span>, <span class="va">tps</span><span class="op">)</span></span>
+<span>  <span class="co"># Return the temp file</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">tps</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">algo</span> <span class="op">&lt;-</span> <span class="fu">guess_minifier</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/minifyr/man/minifyr_example.html">minifyr_example</a></span><span class="op">(</span><span class="st">"js"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">compress</span><span class="op">(</span></span>
+<span>  algo <span class="op">=</span> <span class="va">algo</span>, </span>
+<span>  selection <span class="op">=</span> <span class="st">"babel"</span></span>
+<span><span class="op">)</span> </span></code></pre></div>
 <ul>
-<li>Finally, a <code>compare()</code> function, that can compare the size of two files, so that we can measure the minification gain. This function will take two file paths.</li>
+<li>Finally, a <code><a href="https://testthat.r-lib.org/reference/compare.html">compare()</a></code> function, that can compare the size of two files, so that we can measure the minification gain. This function will take two file paths.</li>
 </ul>
-<div class="sourceCode" id="cb362"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb362-1"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb362-1" tabindex="-1"></a>compare <span class="ot">&lt;-</span> <span class="cf">function</span>(original, minified){</span>
-<span id="cb362-2"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb362-2" tabindex="-1"></a>  <span class="co"># Get the file size of both</span></span>
-<span id="cb362-3"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb362-3" tabindex="-1"></a>  original <span class="ot">&lt;-</span> fs<span class="sc">::</span><span class="fu">file_info</span>(original)<span class="sc">$</span>size</span>
-<span id="cb362-4"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb362-4" tabindex="-1"></a>  minified <span class="ot">&lt;-</span> fs<span class="sc">::</span><span class="fu">file_info</span>(minified)<span class="sc">$</span>size</span>
-<span id="cb362-5"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb362-5" tabindex="-1"></a>  <span class="fu">return</span>(original <span class="sc">-</span> minified)</span>
-<span id="cb362-6"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb362-6" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb363"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">compare</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">original</span>, <span class="va">minified</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="co"># Get the file size of both</span></span>
+<span>  <span class="va">original</span> <span class="op">&lt;-</span> <span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="https://fs.r-lib.org/reference/file_info.html">file_info</a></span><span class="op">(</span><span class="va">original</span><span class="op">)</span><span class="op">$</span><span class="va">size</span></span>
+<span>  <span class="va">minified</span> <span class="op">&lt;-</span> <span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="https://fs.r-lib.org/reference/file_info.html">file_info</a></span><span class="op">(</span><span class="va">minified</span><span class="op">)</span><span class="op">$</span><span class="va">size</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">original</span> <span class="op">-</span> <span class="va">minified</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <p>So, for the complete process:</p>
-<div class="sourceCode" id="cb363"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb363-1"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb363-1" tabindex="-1"></a>algo <span class="ot">&lt;-</span> <span class="fu">guess_minifier</span>(</span>
-<span id="cb363-2"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb363-2" tabindex="-1"></a>  <span class="fu">minifyr_example</span>(<span class="st">&quot;js&quot;</span>)</span>
-<span id="cb363-3"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb363-3" tabindex="-1"></a>)</span>
-<span id="cb363-4"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb363-4" tabindex="-1"></a></span>
-<span id="cb363-5"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb363-5" tabindex="-1"></a>compressed <span class="ot">&lt;-</span> <span class="fu">compress</span>(</span>
-<span id="cb363-6"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb363-6" tabindex="-1"></a>  <span class="at">algo =</span> algo, </span>
-<span id="cb363-7"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb363-7" tabindex="-1"></a>  <span class="at">selection =</span> <span class="st">&quot;babel&quot;</span></span>
-<span id="cb363-8"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb363-8" tabindex="-1"></a>)</span>
-<span id="cb363-9"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb363-9" tabindex="-1"></a><span class="fu">compare</span>(</span>
-<span id="cb363-10"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb363-10" tabindex="-1"></a>  <span class="fu">minifyr_example</span>(<span class="st">&quot;js&quot;</span>), </span>
-<span id="cb363-11"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb363-11" tabindex="-1"></a>  compressed</span>
-<span id="cb363-12"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb363-12" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb364"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">algo</span> <span class="op">&lt;-</span> <span class="fu">guess_minifier</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/minifyr/man/minifyr_example.html">minifyr_example</a></span><span class="op">(</span><span class="st">"js"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">compressed</span> <span class="op">&lt;-</span> <span class="fu">compress</span><span class="op">(</span></span>
+<span>  algo <span class="op">=</span> <span class="va">algo</span>, </span>
+<span>  selection <span class="op">=</span> <span class="st">"babel"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://testthat.r-lib.org/reference/compare.html">compare</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/minifyr/man/minifyr_example.html">minifyr_example</a></span><span class="op">(</span><span class="st">"js"</span><span class="op">)</span>, </span>
+<span>  <span class="va">compressed</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>Now, time to move this into a vignette!</p>
 </div>
-<div id="ui-prototyping" class="section level3 unnumbered hasAnchor">
-<h3>UI prototyping<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#ui-prototyping" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="ui-prototyping" class="section level3 unnumbered">
+<h3>UI prototyping<a class="anchor" aria-label="anchor" href="#ui-prototyping"><i class="fas fa-link"></i></a>
+</h3>
 <p>Let’s start by drawing a small mockup of our front-end using <a href="https://excalidraw.com/">Excalidraw</a>, as seen in Figure <a href="#fig:19-appendix-8"><strong>??</strong></a>.</p>
 
 <p>We would love this application to be “full screen”, and to do that, we’ll take inspiration from the <a href="https://www.w3schools.com/howto/howto_css_split_screen.asp">split-screen layout</a> available at W3Schools.
-To mock up the UI, we will also use the <code>{shinipsum}</code> package.</p>
+To mock up the UI, we will also use the <a href="https://github.com/Thinkr-open/shinipsum">shinipsum</a> package.</p>
 <p>In this first step, we will start generating the module skeleton for the application.
 Here, we will have a <code>left</code> module for the left part of the app, and a <code>right</code> module for the right part.
 Each will receive their corresponding <code>class</code>, based on the CSS from W3.
 Now that these two spots are available, we’ll add the two modules, with some fake output, to simulate our application behavior.
-The left side will be functional in the sense that uploading a file will randomly add algorithms to the <code>selectInput()</code>, and clicking on <code>Launch the minification</code> will regenerate a fake text.</p>
+The left side will be functional in the sense that uploading a file will randomly add algorithms to the <code><a href="https://rdrr.io/pkg/shiny/man/selectInput.html">selectInput()</a></code>, and clicking on <code>Launch the minification</code> will regenerate a fake text.</p>
 <p>Now, let’s pick a soft palette of colors, using <a href="https://coolors.co/palettes/">coolors.co</a>, and a font family from <a href="https://fonts.google.com/">fonts.google.com</a>.
 We went for:</p>
 <ul>
@@ -845,13 +409,14 @@ If you want to know more about this file, it’s located in the <code>inst/app/w
 <p>This step is available at <a href="https://github.com/ColinFay/minifying/tree/master/step-2-prototype">github.com/ColinFay/minifying, folder step-2-prototype</a>.</p>
 </div>
 </div>
-<div id="step-3-build-1" class="section level2 unnumbered hasAnchor">
-<h2>Step 3: Build<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-3-build-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Now we’ve got the back-end in an Rmd, the front end working with <code>{shinipsum}</code>.
+<div id="step-3-build-1" class="section level2 unnumbered">
+<h2>Step 3: Build<a class="anchor" aria-label="anchor" href="#step-3-build-1"><i class="fas fa-link"></i></a>
+</h2>
+<p>Now we’ve got the back-end in an Rmd, the front end working with <a href="https://github.com/Thinkr-open/shinipsum">shinipsum</a>.
 Now is the time to make the two work together!</p>
 <p>Here is the logic we will be adding to the application:</p>
 <ul>
-<li><p>When a file is uploaded, we also check the format from the server-side: the UI restriction with the <code>accept</code> parameter of <code>fileInput()</code> will not be enough to stop users who <strong>really</strong> want to upload something else.</p></li>
+<li><p>When a file is uploaded, we also check the format from the server-side: the UI restriction with the <code>accept</code> parameter of <code><a href="https://rdrr.io/pkg/shiny/man/fileInput.html">fileInput()</a></code> will not be enough to stop users who <strong>really</strong> want to upload something else.</p></li>
 <li><p>If the file comes with the right extension, we update the algorithm selection and read it inside the “Original content” block.</p></li>
 <li><p>Once the user clicks on “Launch the minification”, we create a temp file and minify the original file inside this temp file.</p></li>
 <li><p>When the file is minified, we update the gain output to reflect how many bytes have been gained from the minification, and add the result of this minification to the “Minified content” block.</p></li>
@@ -861,8 +426,9 @@ Now is the time to make the two work together!</p>
 You can refer to the <code>dev/02_dev.R</code> file if you want to read the exact steps taken here.</p>
 <p>This step is available at <a href="https://github.com/ColinFay/minifying/tree/master/step-3-build" class="uri">https://github.com/ColinFay/minifying/tree/master/step-3-build</a>.</p>
 </div>
-<div id="step-4-strengthen-1" class="section level2 unnumbered hasAnchor">
-<h2>Step 4: Strengthen<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-4-strengthen-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="step-4-strengthen-1" class="section level2 unnumbered">
+<h2>Step 4: Strengthen<a class="anchor" aria-label="anchor" href="#step-4-strengthen-1"><i class="fas fa-link"></i></a>
+</h2>
 <p>As of now, we have a working application.
 Time to strengthen it!</p>
 <p>Here are the few steps we will be working on:</p>
@@ -871,119 +437,120 @@ Time to strengthen it!</p>
 This R6 class will generate an object at the very start of our app, and it will be passed into the modules.</p></li>
 <li><p>As the minification process takes a couple of seconds, we will add a small progress bar so that the user knows something is happening.</p></li>
 <li><p>As we will use R6, we will need to manually set the reactive context invalidation.
-To do so, we will use <code>triggers</code> from <code>{gargoyle}</code>.</p></li>
+To do so, we will use <code>triggers</code> from <a href="https://github.com/ColinFay/gargoyle">gargoyle</a>.</p></li>
 <li><p>Chances are, users will be testing several algorithms when using the application, and we don’t want the minification process to happen another time when it is called on the same file and with the same algorithm.
 This is even even more important because the process involves calling an external NodeJS process.
 To prevent that, we will be caching the function that does the computation.</p></li>
-<li><p>Create an unseen input that will upload data, so that we can build an interactivity test using <code>{crrry}</code>.
+<li><p>Create an unseen input that will upload data, so that we can build an interactivity test using <a href="https://github.com/ColinFay/crrry">crrry</a>.
 This input will look like the following on the server:</p></li>
 </ul>
-<div class="sourceCode" id="cb364"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb364-1"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb364-1" tabindex="-1"></a><span class="fu">observeEvent</span>( input<span class="sc">$</span>testingtrigger , {</span>
-<span id="cb364-2"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb364-2" tabindex="-1"></a>  </span>
-<span id="cb364-3"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb364-3" tabindex="-1"></a>  <span class="cf">if</span> (golem<span class="sc">::</span><span class="fu">app_dev</span>()){</span>
-<span id="cb364-4"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb364-4" tabindex="-1"></a>    file<span class="sc">$</span>original_file <span class="ot">&lt;-</span> minifyr<span class="sc">::</span><span class="fu">minifyr_example</span>(</span>
-<span id="cb364-5"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb364-5" tabindex="-1"></a>      <span class="at">ext =</span> input<span class="sc">$</span>testingtext</span>
-<span id="cb364-6"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb364-6" tabindex="-1"></a>    )</span>
-<span id="cb364-7"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb364-7" tabindex="-1"></a>    file<span class="sc">$</span><span class="fu">guess_minifier</span>()</span>
-<span id="cb364-8"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb364-8" tabindex="-1"></a>    file<span class="sc">$</span>type <span class="ot">&lt;-</span> input<span class="sc">$</span>upload<span class="sc">$</span>type</span>
-<span id="cb364-9"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb364-9" tabindex="-1"></a>    file<span class="sc">$</span>minified_file <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb364-10"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb364-10" tabindex="-1"></a>    file<span class="sc">$</span>original_name <span class="ot">&lt;-</span> input<span class="sc">$</span>upload<span class="sc">$</span>name</span>
-<span id="cb364-11"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb364-11" tabindex="-1"></a>    gargoyle<span class="sc">::</span><span class="fu">trigger</span>(<span class="st">&quot;uploaded&quot;</span>)</span>
-<span id="cb364-12"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb364-12" tabindex="-1"></a>  }</span>
-<span id="cb364-13"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb364-13" tabindex="-1"></a>  </span>
-<span id="cb364-14"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb364-14" tabindex="-1"></a>})</span></code></pre></div>
-<p>We use this pattern so that we can combine it with a testing suite with <code>{crrry}</code>, using the following pattern:</p>
-<div class="sourceCode" id="cb365"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb365-1"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-1" tabindex="-1"></a>test <span class="ot">&lt;-</span> crrry<span class="sc">::</span>CrrryProc<span class="sc">$</span><span class="fu">new</span>(</span>
-<span id="cb365-2"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-2" tabindex="-1"></a>  <span class="at">chrome_bin =</span> pagedown<span class="sc">::</span><span class="fu">find_chrome</span>(),</span>
-<span id="cb365-3"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-3" tabindex="-1"></a>  <span class="co"># Process to launch locally</span></span>
-<span id="cb365-4"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-4" tabindex="-1"></a>  <span class="at">fun =</span> <span class="st">&quot;golem::document_and_reload();run_app()&quot;</span>,</span>
-<span id="cb365-5"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-5" tabindex="-1"></a>  <span class="co"># Note that you will need httpuv &gt;= 1.5.2 for randomPort</span></span>
-<span id="cb365-6"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-6" tabindex="-1"></a>  <span class="at">chrome_port =</span> httpuv<span class="sc">::</span><span class="fu">randomPort</span>(), </span>
-<span id="cb365-7"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-7" tabindex="-1"></a>  <span class="at">headless =</span> <span class="cn">FALSE</span></span>
-<span id="cb365-8"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-8" tabindex="-1"></a>)</span>
-<span id="cb365-9"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-9" tabindex="-1"></a></span>
-<span id="cb365-10"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-10" tabindex="-1"></a>test<span class="sc">$</span><span class="fu">wait_for_shiny_ready</span>()</span>
-<span id="cb365-11"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-11" tabindex="-1"></a>ext <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;css&quot;</span>, <span class="st">&quot;js&quot;</span>, <span class="st">&quot;json&quot;</span>, <span class="st">&quot;html&quot;</span>)</span>
-<span id="cb365-12"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-12" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(ext)){</span>
-<span id="cb365-13"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-13" tabindex="-1"></a>  <span class="co"># Set the extension value</span></span>
-<span id="cb365-14"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-14" tabindex="-1"></a>  test<span class="sc">$</span><span class="fu">shiny_set_input</span>(<span class="st">&quot;left_ui_1-testingtext&quot;</span>, ext[i])</span>
-<span id="cb365-15"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-15" tabindex="-1"></a>  <span class="co"># Trigger the file to be read</span></span>
-<span id="cb365-16"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-16" tabindex="-1"></a>  test<span class="sc">$</span><span class="fu">shiny_set_input</span>(<span class="st">&quot;left_ui_1-testingtrigger&quot;</span>, i)</span>
-<span id="cb365-17"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-17" tabindex="-1"></a>  <span class="co"># Launch the minification</span></span>
-<span id="cb365-18"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-18" tabindex="-1"></a>  test<span class="sc">$</span><span class="fu">shiny_set_input</span>(<span class="st">&quot;left_ui_1-launch&quot;</span>, i)</span>
-<span id="cb365-19"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-19" tabindex="-1"></a>}</span>
-<span id="cb365-20"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-20" tabindex="-1"></a></span>
-<span id="cb365-21"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb365-21" tabindex="-1"></a>test<span class="sc">$</span><span class="fu">stop</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb365"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/observeEvent.html">observeEvent</a></span><span class="op">(</span> <span class="va">input</span><span class="op">$</span><span class="va">testingtrigger</span> , <span class="op">{</span></span>
+<span>  </span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu">golem</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/golem/man/prod.html">app_dev</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<span>    <span class="va">file</span><span class="op">$</span><span class="va">original_file</span> <span class="op">&lt;-</span> <span class="fu">minifyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/minifyr/man/minifyr_example.html">minifyr_example</a></span><span class="op">(</span></span>
+<span>      ext <span class="op">=</span> <span class="va">input</span><span class="op">$</span><span class="va">testingtext</span></span>
+<span>    <span class="op">)</span></span>
+<span>    <span class="va">file</span><span class="op">$</span><span class="fu">guess_minifier</span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="va">file</span><span class="op">$</span><span class="va">type</span> <span class="op">&lt;-</span> <span class="va">input</span><span class="op">$</span><span class="va">upload</span><span class="op">$</span><span class="va">type</span></span>
+<span>    <span class="va">file</span><span class="op">$</span><span class="va">minified_file</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span>    <span class="va">file</span><span class="op">$</span><span class="va">original_name</span> <span class="op">&lt;-</span> <span class="va">input</span><span class="op">$</span><span class="va">upload</span><span class="op">$</span><span class="va">name</span></span>
+<span>    <span class="fu">gargoyle</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gargoyle/man/Event.html">trigger</a></span><span class="op">(</span><span class="st">"uploaded"</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+<p>We use this pattern so that we can combine it with a testing suite with <a href="https://github.com/ColinFay/crrry">crrry</a>, using the following pattern:</p>
+<div class="sourceCode" id="cb366"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">test</span> <span class="op">&lt;-</span> <span class="fu">crrry</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/crrry/man/CrrryProc.html">CrrryProc</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  chrome_bin <span class="op">=</span> <span class="fu">pagedown</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pagedown/man/find_chrome.html">find_chrome</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="co"># Process to launch locally</span></span>
+<span>  fun <span class="op">=</span> <span class="st">"golem::document_and_reload();run_app()"</span>,</span>
+<span>  <span class="co"># Note that you will need httpuv &gt;= 1.5.2 for randomPort</span></span>
+<span>  chrome_port <span class="op">=</span> <span class="fu">httpuv</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/httpuv/man/randomPort.html">randomPort</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  headless <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">test</span><span class="op">$</span><span class="fu">wait_for_shiny_ready</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">ext</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"css"</span>, <span class="st">"js"</span>, <span class="st">"json"</span>, <span class="st">"html"</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">ext</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="co"># Set the extension value</span></span>
+<span>  <span class="va">test</span><span class="op">$</span><span class="fu">shiny_set_input</span><span class="op">(</span><span class="st">"left_ui_1-testingtext"</span>, <span class="va">ext</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="co"># Trigger the file to be read</span></span>
+<span>  <span class="va">test</span><span class="op">$</span><span class="fu">shiny_set_input</span><span class="op">(</span><span class="st">"left_ui_1-testingtrigger"</span>, <span class="va">i</span><span class="op">)</span></span>
+<span>  <span class="co"># Launch the minification</span></span>
+<span>  <span class="va">test</span><span class="op">$</span><span class="fu">shiny_set_input</span><span class="op">(</span><span class="st">"left_ui_1-launch"</span>, <span class="va">i</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">test</span><span class="op">$</span><span class="kw">stop</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>It’s safer to wrap these tests between <code>if(interactive())</code>, as running the checks outside of your current session might not launch the app correctly, and launching external processes (the one running the app with Chrome) might fail when run non-interactively.
 And on top of that, running these inside your CI might cause some pain, and of course, it will not work on CRAN checks.</p>
 <p>We’ll also be building “standard” function checks, which you can find in the <code>test/</code> folder.</p>
 <p>This step is available at <a href="https://github.com/ColinFay/minifying/tree/master/step-4-strengthen">github.com/ColinFay/minifying, folder step-4-strengthen</a>.</p>
 </div>
-<div id="step-5-deploy-1" class="section level2 unnumbered hasAnchor">
-<h2>Step 5: Deploy<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#step-5-deploy-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="step-5-deploy-1" class="section level2 unnumbered">
+<h2>Step 5: Deploy<a class="anchor" aria-label="anchor" href="#step-5-deploy-1"><i class="fas fa-link"></i></a>
+</h2>
 <p>As an example, we will deploy this app in three media: as a package, on RStudio Connect, and with Docker.</p>
-<div id="before-deployment-checklist-1" class="section level3 unnumbered hasAnchor">
-<h3>Before deployment checklist<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#before-deployment-checklist-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="before-deployment-checklist-1" class="section level3 unnumbered">
+<h3>Before deployment checklist<a class="anchor" aria-label="anchor" href="#before-deployment-checklist-1"><i class="fas fa-link"></i></a>
+</h3>
 <ul class="task-list">
-<li><p><label><input type="checkbox" checked="" /><em><code>devtools::check()</code>, run from the command line, return 0 errors, 0 warnings, 0 notes</em></label></p></li>
-<li><p><label><input type="checkbox" checked="" /><em>The current version number is valid, i.e</em> if the current app is an update, the version number has been bumped: it makes sense, before the first deployment, to keep a version number of <code>0.0.0.9000</code>, and increment this dev version whenever we implement changes or do test deployments.
+<li><p><label><input type="checkbox" checked><em><code><a href="https://devtools.r-lib.org/reference/check.html">devtools::check()</a></code>, run from the command line, return 0 errors, 0 warnings, 0 notes</em></label></p></li>
+<li><p><label><input type="checkbox" checked><em>The current version number is valid, i.e</em> if the current app is an update, the version number has been bumped: it makes sense, before the first deployment, to keep a version number of <code>0.0.0.9000</code>, and increment this dev version whenever we implement changes or do test deployments.
 Because this is a “true” deployment, we bumped the version to <code>0.1.0</code>.</label></p></li>
-<li><p><label><input type="checkbox" checked="" /><em>Everything is fully documented</em>: we have documented all the functions, even the internal, there is a Vignette that describes the business logic, and the README is filled.</label></p></li>
-<li><p><label><input type="checkbox" checked="" /><em>Test coverage is good, i.e. you cover a sufficient amount of the codebase, and these tests cover the core/strategic algorithms</em>.</label></p></li>
-<li><p><label><input type="checkbox" checked="" /><em>The person to call if something goes wrong is clear to everyone involved in the product.</em>.</label></p></li>
-<li><p><label><input type="checkbox" checked="" /><em>The debugging process is clear to everyone involved in the project, including how to communicate bugs to the developer team, and how long it will take to get changes implemented</em>: this project will be made open source, so the bug will have to be listed on the Github repo.
+<li><p><label><input type="checkbox" checked><em>Everything is fully documented</em>: we have documented all the functions, even the internal, there is a Vignette that describes the business logic, and the README is filled.</label></p></li>
+<li><p><label><input type="checkbox" checked><em>Test coverage is good, i.e. you cover a sufficient amount of the codebase, and these tests cover the core/strategic algorithms</em>.</label></p></li>
+<li><p><label><input type="checkbox" checked><em>The person to call if something goes wrong is clear to everyone involved in the product.</em>.</label></p></li>
+<li><p><label><input type="checkbox" checked><em>The debugging process is clear to everyone involved in the project, including how to communicate bugs to the developer team, and how long it will take to get changes implemented</em>: this project will be made open source, so the bug will have to be listed on the Github repo.
 To help that, we added a link to the GitHub repository on the application.</label></p></li>
-<li><p><label><input type="checkbox" checked="" /><em>(If relevant) The server it is deployed on has all the necessary software installed (Docker, Connect, <code>Shiny Server</code>, etc.) to make the application run</em>.</label></p></li>
-<li><p><label><input type="checkbox" checked="" /><em>The server has all the system requirements needed (the system libraries), and if not, they are installed with the application (if it’s dockerized)</em>: NodeJS will need to be installed on Docker and on the server running RStudio Connect.
+<li><p><label><input type="checkbox" checked><em>(If relevant) The server it is deployed on has all the necessary software installed (Docker, Connect, <code>Shiny Server</code>, etc.) to make the application run</em>.</label></p></li>
+<li><p><label><input type="checkbox" checked><em>The server has all the system requirements needed (the system libraries), and if not, they are installed with the application (if it’s dockerized)</em>: NodeJS will need to be installed on Docker and on the server running RStudio Connect.
 A check is also added on top of <code>run_app()</code> for the availability of NodeJS on the system, especially for people installing it as a package.
 This check will also check if <code>node-minify</code> has been installed, and if not, it will be installed.
 This check might take some time to run, but it will only be performed the first time the app is launched.</label></p></li>
-<li><p><label><input type="checkbox" checked="" /><em>The application, if deployed on a server, will be deployed on a port which will be accessible by the users</em>: when building the Dockerfile using <code>{golem}</code>, the correct port is exposed (<em>i.e</em> the app will run on port 80, which is also made available).
-For the other medium, the port will be automatically chosen, either by <code>{shiny}</code> or by Connect.</label></p></li>
-<li><p><label><input type="checkbox" checked="" /><em>(If relevant) The environment variables from the production server are managed inside the application</em>: not relevant.</label></p></li>
-<li><p><label><input type="checkbox" checked="" /><em>(If relevant) The app is launched on the correct port, or at least this port can be configured via an environment variable</em>: not relevant.</label></p></li>
-<li><p><label><input type="checkbox" checked="" /><em>(If relevant) The server where the app is deployed has access to the data sources (database, API…)</em>: not relevant.</label></p></li>
-<li><p><label><input type="checkbox" checked="" /><em>If the app records data and there are backups for these data</em>: not relevant</label></p></li>
+<li><p><label><input type="checkbox" checked><em>The application, if deployed on a server, will be deployed on a port which will be accessible by the users</em>: when building the Dockerfile using <a href="https://github.com/ThinkR-open/golem">golem</a>, the correct port is exposed (<em>i.e</em> the app will run on port 80, which is also made available).
+For the other medium, the port will be automatically chosen, either by <a href="https://shiny.rstudio.com/">shiny</a> or by Connect.</label></p></li>
+<li><p><label><input type="checkbox" checked><em>(If relevant) The environment variables from the production server are managed inside the application</em>: not relevant.</label></p></li>
+<li><p><label><input type="checkbox" checked><em>(If relevant) The app is launched on the correct port, or at least this port can be configured via an environment variable</em>: not relevant.</label></p></li>
+<li><p><label><input type="checkbox" checked><em>(If relevant) The server where the app is deployed has access to the data sources (database, API…)</em>: not relevant.</label></p></li>
+<li><p><label><input type="checkbox" checked><em>If the app records data and there are backups for these data</em>: not relevant</label></p></li>
 </ul>
 </div>
-<div id="deploy-as-a-tar.gz" class="section level3 unnumbered hasAnchor">
-<h3>Deploy as a tar.gz<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deploy-as-a-tar.gz" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>To share an application as a tar.gz, you can call <code>devtools::build()</code>, which will compile a <code>tar.gz</code> file inside the parent folder of your current application.
+<div id="deploy-as-a-tar.gz" class="section level3 unnumbered">
+<h3>Deploy as a tar.gz<a class="anchor" aria-label="anchor" href="#deploy-as-a-tar.gz"><i class="fas fa-link"></i></a>
+</h3>
+<p>To share an application as a tar.gz, you can call <code><a href="https://devtools.r-lib.org/reference/build.html">devtools::build()</a></code>, which will compile a <code>tar.gz</code> file inside the parent folder of your current application.
 You can then share this archive, and install it with <code>remotes::install_local("path/to/tar.gz")</code>.
-Note that this can also be done with base R, but <code>{remotes}</code> offers a smarter way when it comes to managing the dependencies of your archived package.</p>
+Note that this can also be done with base R, but <a href="https://remotes.r-lib.org">remotes</a> offers a smarter way when it comes to managing the dependencies of your archived package.</p>
 <p>This <code>tar.gz</code> can also be sent to a package repository; be it the CRAN or any other package manager you might have in your company.</p>
 </div>
-<div id="deploy-on-rstudio-connect" class="section level3 unnumbered hasAnchor">
-<h3>Deploy on RStudio Connect<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deploy-on-rstudio-connect" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Once we are sure that the server running Connect has NodeJS installed, and that we have installed the minify module with <code>minifyr::minifyr_npm_install()</code>, we can create the app.R using <code>golem::add_rstudioconnect_file()</code>, and then push to the Connect server.</p>
+<div id="deploy-on-rstudio-connect" class="section level3 unnumbered">
+<h3>Deploy on RStudio Connect<a class="anchor" aria-label="anchor" href="#deploy-on-rstudio-connect"><i class="fas fa-link"></i></a>
+</h3>
+<p>Once we are sure that the server running Connect has NodeJS installed, and that we have installed the minify module with <code><a href="https://rdrr.io/pkg/minifyr/man/minifyr_npm_install.html">minifyr::minifyr_npm_install()</a></code>, we can create the app.R using <code><a href="https://rdrr.io/pkg/golem/man/rstudio_deploy.html">golem::add_rstudioconnect_file()</a></code>, and then push to the Connect server.</p>
 </div>
-<div id="deploy-with-docker" class="section level3 unnumbered hasAnchor">
-<h3>Deploy with Docker<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#deploy-with-docker" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>To create the <code>Dockerfile</code>, we’ll start by launching <code>golem::add_dockerfile()</code>.
-This function will compute the system requirements,<a href="#fn73" class="footnote-ref" id="fnref73"><sup>73</sup></a> and create a generic <code>Dockerfile</code> for your application.
+<div id="deploy-with-docker" class="section level3 unnumbered">
+<h3>Deploy with Docker<a class="anchor" aria-label="anchor" href="#deploy-with-docker"><i class="fas fa-link"></i></a>
+</h3>
+<p>To create the <code>Dockerfile</code>, we’ll start by launching <code><a href="https://rdrr.io/pkg/golem/man/dockerfiles.html">golem::add_dockerfile()</a></code>.
+This function will compute the system requirements,<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;Note that at the time of writing these lines, there is also an issue with the dependencies collected by the &lt;code&gt;sysreq&lt;/code&gt; API, leading to an issue when attempting to compile the Dockerfile.
+Removing the installation of &lt;code&gt;libgit2-dev&lt;/code&gt; solved the issue.&lt;/p&gt;"><sup>73</sup></a> and create a generic <code>Dockerfile</code> for your application.
 Once this is done, we will create/update the <code>.dockerignore</code> file at the root of the package, so that unwanted files are not bundled with our Docker image.</p>
 <p>Inside our <code>Dockerfile</code>, we will also change the default repo to use <a href="https://packagemanager.rstudio.com/all/latest" class="uri">https://packagemanager.rstudio.com/all/latest</a>, which proposes precompiled packages for our system, making the installation faster.
 We will also add an installation of NodeJS, which is needed by our application..</p>
 <p>Then, we can go to our terminal and compile the image!</p>
-<div class="sourceCode" id="cb366"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb366-1"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb366-1" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> minifying . </span></code></pre></div>
+<div class="sourceCode" id="cb367"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb367-1"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb367-1" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> minifying . </span></code></pre></div>
 <p>Now we’ve got a working image!
 We can try it with:</p>
-<div class="sourceCode" id="cb367"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb367-1"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb367-1" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-p</span> 2811:80 minifying</span></code></pre></div>
+<div class="sourceCode" id="cb368"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb368-1"><a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#cb368-1" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-p</span> 2811:80 minifying</span></code></pre></div>
 <p>This step is available at <a href="https://github.com/ColinFay/minifying/tree/master/step-5-deploy">github.com/ColinFay/minifying, folder step-5-deploy</a>.</p>
 
 </div>
 </div>
 </div>
-<div class="footnotes">
-<hr />
-<ol start="73">
-<li id="fn73"><p>Note that at the time of writing these lines, there is also an issue with the dependencies collected by the <code>sysreq</code> API, leading to an issue when attempting to compile the Dockerfile.
-Removing the installation of <code>libgit2-dev</code> solved the issue.<a href="appendix-a---use-case-building-an-app-from-start-to-finish.html#fnref73" class="footnote-back">↩︎</a></p></li>
-</ol>
-</div>
-<hr/>
-<footer>
-<a href="https://rtask.thinkr.fr"><img src="img/logo400_129.png" alt="ThinkR Website"/></a>
+
+<hr>
+<footer><a href="https://rtask.thinkr.fr"><img src="img/logo400_129.png" alt="ThinkR Website"></a>
 <!--https://yihui.org/en/2018/09/target-blank/-->
 <script>
   (function() {
@@ -994,70 +561,64 @@ Removing the installation of <code>libgit2-dev</code> solved the issue.<a href="
     }
   }
 })();
-</script>
-</footer>
-            </section>
+</script></footer><div class="chapter-nav">
+<div class="prev"><a href="css.html"><span class="header-section-number">18</span> A Gentle Introduction to CSS</a></div>
+<div class="next"><a href="appendix-b---session-info.html">Appendix B - Session Info</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#appendix-a---use-case-building-an-app-from-start-to-finish">Appendix A - Use Case: Building an App from Start to Finish</a></li>
+<li><a class="nav-link" href="#about-the-application">About the application</a></li>
+<li>
+<a class="nav-link" href="#step-1-design-1">Step 1: Design</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#deciphering-the-specifications">Deciphering the specifications</a></li>
+<li><a class="nav-link" href="#building-a-concept-map">Building a concept map</a></li>
+<li><a class="nav-link" href="#asking-questions">Asking questions</a></li>
+<li><a class="nav-link" href="#building-personas-1">Building personas</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#step-2-prototyping">Step 2: Prototyping</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#back-end-in-rmd">Back-end in Rmd</a></li>
+<li><a class="nav-link" href="#ui-prototyping">UI prototyping</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#step-3-build-1">Step 3: Build</a></li>
+<li><a class="nav-link" href="#step-4-strengthen-1">Step 4: Strengthen</a></li>
+<li>
+<a class="nav-link" href="#step-5-deploy-1">Step 5: Deploy</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#before-deployment-checklist-1">Before deployment checklist</a></li>
+<li><a class="nav-link" href="#deploy-as-a-tar.gz">Deploy as a tar.gz</a></li>
+<li><a class="nav-link" href="#deploy-on-rstudio-connect">Deploy on RStudio Connect</a></li>
+<li><a class="nav-link" href="#deploy-with-docker">Deploy with Docker</a></li>
+</ul>
+</li>
+</ul>
 
-          </div>
-        </div>
-      </div>
-<a href="css.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="appendix-b---session-info.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
-    </div>
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/ThinkR-open/engineering-shiny-book/blob/master/19-appendix.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/ThinkR-open/engineering-shiny-book/edit/master/19-appendix.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Engineering Production-Grade Shiny Apps</strong>" was written by Colin Fay, Sébastien Rochette, Vincent Guyader, Cervan Girard. It was last built on 2024-03-12.</p>
   </div>
-<script src="libs/gitbook/js/app.min.js"></script>
-<script src="libs/gitbook/js/clipboard.min.js"></script>
-<script src="libs/gitbook/js/plugin-search.js"></script>
-<script src="libs/gitbook/js/plugin-sharing.js"></script>
-<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
-<script src="libs/gitbook/js/plugin-bookdown.js"></script>
-<script src="libs/gitbook/js/jquery.highlight.js"></script>
-<script src="libs/gitbook/js/plugin-clipboard.js"></script>
-<script>
-gitbook.require(["gitbook"], function(gitbook) {
-gitbook.start({
-"sharing": {
-"github": true,
-"facebook": false,
-"twitter": true,
-"linkedin": false,
-"weibo": false,
-"instapaper": false,
-"vk": false,
-"whatsapp": false,
-"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
-},
-"fontsettings": {
-"theme": "white",
-"family": "sans",
-"size": 2
-},
-"edit": {
-"link": "https://github.com/ThinkR-open/building-shiny-apps-workflow/edit/master/19-appendix.Rmd",
-"text": "Edit"
-},
-"history": {
-"link": null,
-"text": null
-},
-"view": {
-"link": null,
-"text": null
-},
-"download": null,
-"search": {
-"engine": "fuse",
-"options": null
-},
-"toc": {
-"collapse": "section"
-}
-});
-});
-</script>
 
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
@@ -1069,7 +630,22 @@ gitbook.start({
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
 </script>
 </body>
-
 </html>
