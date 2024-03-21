@@ -1,5 +1,6 @@
 # To do locally on Colin's computer, thanks
 options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/latest"))
+install.packages("remotes")
 remotes::install_version("shinyloadtest", "1.1.0")
 remotes::install_local(
   Ncpus = 4,
