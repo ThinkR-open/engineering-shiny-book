@@ -1,6 +1,9 @@
-# To do locally on Colin's computer, thanks
-options(repos = c(REPO_NAME = "https://packagemanager.rstudio.com/all/latest"))
+options(repos = c(
+  "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
+  "https://cloud.r-project.org"
+))
 install.packages("remotes")
+remotes::install_cran("pak")
 remotes::install_version("shinyloadtest", "1.1.0")
 remotes::install_local(
   Ncpus = 4,
