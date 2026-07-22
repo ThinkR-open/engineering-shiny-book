@@ -18,13 +18,13 @@ library(shiny)
 library(lubridate)
 ui <- function(){
   tagList(
-    # Adding a first input which allow 
+    # Adding a first input which allows us
     # to select a specific date
     dateInput(
       "date", 
       "choose a date"
     ), 
-    # Adding a second input allowing 
+    # Adding a second input allowing us
     # to specify a year
     selectInput(
       "year", 
@@ -39,7 +39,7 @@ server <- function(
   output, 
   session
 ){
-  # We want the year to be update whenever 
+  # We want the year to be updated whenever
   # the dateInput is updated
   observeEvent( input$date , {
     updateSelectInput(
@@ -49,7 +49,7 @@ server <- function(
     )
   })
   
-  # We want the date to be update whenever 
+  # We want the date to be updated whenever
   # the selectInput is updated
   observeEvent( input$year , {
     updateDateInput(
@@ -108,7 +108,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$year, {
-    # Preventing this update to be sent at application launch
+    # Preventing this update from being sent at application launch
     if (input$year != format(input$date, "%Y")) {
       date <- as.Date(ISOdate(input$year, 1, 1))
       message("Changing date to ", date)
@@ -123,14 +123,14 @@ shinyApp(ui, server)
 ### `observe` vs `observeEvent`
 
 One of the most common features of reactive inferno is the use of `observe()` in cases where you should use `observeEvent`.
-Spoiler: you should try to use `observeEvent()` as much as possible, and avoid `observe()`as much as possible.
+Spoiler: you should try to use `observeEvent()` as much as possible, and avoid `observe()` as much as possible.
 
 At first, `observe()` seems easier to implement, and feels like a shortcut as you do not have to think about what to react to: everything gets updated without you thinking about it.
 But the truth is, this stairway does not lead to heaven.
 
 Let's stop and think about `observe()` for a minute.
 This function updates **every time a reactive object it contains is invalidated**.
-Yes, this works well if you have a small number of reactive objects in the observer, but that gets tricky when you start adding a long list of things inside your `observe()`, as you might be launching a computation 10 times if your reactive scope contains 10 reactive objects that are somehow invalidated in chain.
+Yes, this works well if you have a small number of reactive objects in the observer, but that gets tricky when you start adding a long list of things inside your `observe()`, as you might be launching a computation 10 times if your reactive scope contains 10 reactive objects that are somehow invalidated in a chain.
 And believe us, we have seen pieces of code where the `observe()` contains hundreds of lines of code, with reactive objects all over the place, with one `observe()` context being invalidated dozens of times when one input changes in the application.
 
 For example, let's start with that:
@@ -192,7 +192,7 @@ server <- function(input, output, session){
     i <<- i + 1
     # We print the i value to the console
     cat_rule(as.character(i))
-    # If the user select lower, then the text is 
+    # If the user selects lower, then the text is
     # passed through tolower, otherwise it's passed 
     # through toupper
     if (input$casefolding == "lower") {
@@ -239,10 +239,10 @@ server <- function(input, output, session){
     # Use input_txt as a container for our input
     input_txt <- input$txt
     if (input$rev){
-      # If the input$rev is select, we reverse the text
+      # If the input$rev is selected, we reverse the text
       input_txt <- stri_reverse(input_txt)
     }
-    # If the user select lower, then the text is 
+    # If the user selects lower, then the text is
     # passed through tolower, otherwise it's passed 
     # through toupper
     if (input$casefolding == "lower") {
@@ -290,13 +290,13 @@ server <- function(input, output, session){
     # We print the i value to the console
     cat_rule(as.character(i))
     if (input$rev){
-      # If the input$rev is select, we reverse the text
+      # If the input$rev is selected, we reverse the text
       r$input_txt <- stri_reverse(r$input_txt)
     } else {
       # Otherwise, we leave it as it is
       r$input_txt <- input$txt
     }
-    # If the user select lower, then the text is 
+    # If the user selects lower, then the text is
     # passed through tolower, otherwise it's passed 
     # through toupper
     if (input$casefolding == "lower") {
@@ -328,7 +328,7 @@ That's why (well, in 99% of cases), it is safer to go with `observeEvent`, as it
 Then, if a reactive context is invalidated, **you know why**.
 For example, here is where the reactive invalidation can happen (lines with a `*`)[^common-app-caveats-1]:
 
-[^common-app-caveats-1]: Of course it's an over-simplification: the reactive context will not be invalidated in all of these contexts. The idea is to illustrate how `observe()` can lead to invalidation points that are spread all across the code bloc.
+[^common-app-caveats-1]: Of course it's an over-simplification: the reactive context will not be invalidated in all of these contexts. The idea is to illustrate how `observe()` can lead to invalidation points that are spread all across the code block.
 
 ``` {.r}
 observe({
@@ -399,7 +399,7 @@ The idea here is to allow complete control over when the image is recomputed: on
 That might seem like a lot of extra work, but that is definitely worth considering in the long run, as it will help in optimizing the rendering (fewer computations), and lowering the number of errors that can result from too much reactivity inside an application.
 
 Here is a small example of this implementation, using an environment to store the value.
-When using this pattern, we do not rely on any reactive value invalidating the reactive context: the second result is only displayed when the `"render2"` flag is triggered, giving us a full control on how the reactivity is propagated.
+When using this pattern, we do not rely on any reactive value invalidating the reactive context: the second result is only displayed when the `"render2"` flag is triggered, giving us full control over how the reactivity is propagated.
 
 ```{r 15-common-app-caveats-8, eval = FALSE}
 library(shiny)
@@ -547,7 +547,7 @@ server <- function(
   output, 
   session
 ){
-  # We start by creating a new instance of th
+  # We start by creating a new instance of the class
   r6 <- MyDataProcessing$new()
   # Passing this object to the two server functions
   mod_data_cleaning_server("data_cleaning_ui_1", r6)
@@ -606,7 +606,7 @@ test_that("R6 Class works", {
 })
 ```
 
-Using R6 allows to rely on these battle-tested tools when it comes to testing functions, something which is made more complex when using other patterns like `reactiveValues()`.
+Using R6 allows us to rely on these battle-tested tools when it comes to testing functions, something which is made more complex when using other patterns like `reactiveValues()`.
 
 ### Logging reactivity with `{whereami}`
 
@@ -621,7 +621,7 @@ whereami::cat_where( whereami::whereami() )
 
     ── Running server(...) at app_server.R#9 (2) ───────────────
 
-Combining `cat_where()` will implement a reactive logging to your console while developing: that way, you can instantaneously know what reactive contexts are invalidated while using the application.
+Combining `cat_where()` will implement reactive logging to your console while developing: that way, you can instantaneously know what reactive contexts are invalidated while using the application.
 Of course, you still have to implement it by hand, but that is definitely worth the effort: seeing in real time, in your console, which line is run allows you to detect unexpected behavior.
 For example, you will be able to see that the `observeEvent()` from `mod_main.R#79` has been called 17 times when launching the app, which might be an unexpected behavior.
 
@@ -650,9 +650,9 @@ knitr::include_graphics("img/plot_whereami.png")
 There are many reasons we would want to change things on the UI based on what happens in the server: changing the choices of a `selectInput()` based on the columns of a table which is uploaded by the user, showing and hiding pieces of the app according to an environment variable, allowing the user to create an indeterminate number of inputs, etc.
 
 Chances are that to do that, you have been using the `uiOutput()` and `renderUI()` functions from `{shiny}` [@R-shiny].
-Even if convenient, and the functions of choice in some specific context, this pair of functions makes R do a little bit too much: you are making R regenerate the whole UI component instead of changing only what you need, which can be a suboptimal, be it from the user point of view, or from a developer perspective.
+Even if convenient, and the functions of choice in some specific context, this pair of functions makes R do a little bit too much: you are making R regenerate the whole UI component instead of changing only what you need, which can be suboptimal, be it from the user point of view, or from a developer perspective.
 
-**One of the instance in which this pattern might not be optimal is in the case where your visitors do not have an high-speed internet or when visiting and using a smartphone, contexts where every byte counts**.
+**One of the instances in which this pattern might not be optimal is in the case where your visitors do not have a high-speed internet or when visiting and using a smartphone, contexts where every byte counts**.
 Rendering large elements from the server side in your `{shiny}` app means that these elements will have to transit through the socket, i.e. they need to be sent by the server, and downloaded by the browser.
 In this case, the smaller the message size the better!
 
@@ -678,7 +678,7 @@ ui <- function(){
     actionButton(
       "change", 
       "show/hide graph", 
-      # The toggle() function hide or show the queried element
+      # The toggle() function hides or shows the queried element
       onclick = "$('#plot').toggle()"
     ), 
     plotOutput("plot")
@@ -805,7 +805,7 @@ That is a full second for rendering four of them, while R should be busy doing s
 
 #### B. `update*` inputs {.unnumbered}
 
-Almost every `{shiny}` input, even the custom ones from packages, come with an `update_` function that allows us to change the input values from the server side, instead of re-creating the UI entirely.
+Almost every `{shiny}` input, even the custom ones from packages, comes with an `update_` function that allows us to change the input values from the server side, instead of re-creating the UI entirely.
 For example, here is a way to update the content of a `selectInput` from the server side:
 
 ```{r 15-common-app-caveats-19, eval = FALSE}
@@ -814,7 +814,7 @@ ui <- function(){
   tagList(
     # We start the selectInput empty
     selectInput("species", "Species", choices = NULL), 
-    # The selectInput will be populate 
+    # The selectInput will be populated
     # when the update button is pressed
     actionButton("update", "Update")
   )
@@ -903,8 +903,8 @@ Because these systems have been created to handle and manipulate data on disk: i
 
 For example, if you have a `selectInput()` that is used to perform a filter on a dataset, you can do that filter straight inside SQL, instead of bringing all the data to R and then doing the filter.
 That is even more necessary if you are building the app for a large number of users: for example if one `{shiny}` session takes up to 300MB, multiply that by the number of users that will need one session, and you will have a rough estimate of how much RAM you will need.
-On the contrary, if you reduce the data manipulation so that it is done by the back-end, you will have, let's say, one database with 300MB of data, so the database size will remain (more or less constant), and the only RAM used by `{shiny}` will be the data manipulation, not the data storage.
-That's even more true now that almost any operation you can do today in `{dplyr}` [@R-dplyr] would be doable with an SQL back-end, and that is the purpose of the `{dbplyr}` [@R-dbplyr] package: translates `{dplyr}` code into SQL.
+On the contrary, if you reduce the data manipulation so that it is done by the back-end, you will have, let's say, one database with 300MB of data, so the database size will remain (more or less) constant, and the only RAM used by `{shiny}` will be the data manipulation, not the data storage.
+That's even more true now that almost any operation you can do today in `{dplyr}` [@R-dplyr] would be doable with an SQL back-end, and that is the purpose of the `{dbplyr}` [@R-dbplyr] package: translating `{dplyr}` code into SQL.
 
 If using a database as a back-end seems a little bit far-fetched right now, that is how it is done in most programming languages: if you are building a web app with NodeJS or Python for example, and need to interact with data, nothing will be stored in RAM: you will be relying on an external database to store your data.
 Then your application will be used to make queries to this database back-end.
@@ -963,17 +963,17 @@ Databases come with APIs and drivers that help retrieve and transfer data: be it
 Using a database is one of the solutions for making your app smaller and more efficient in the long run, especially if you need to scale your app to thousands of visitors.
 Indeed, **if you plan on having your app scale to numerous people, that will mean that a lot of R processes will be triggered. And if your data is contained in your app, this will mean that each R process will take a significant amount of RAM if the dataset is large**.
 For example, if your dataset alone takes \~300 MB of RAM, that means that if you want to launch the app 10 times, you will need \~3GB of RAM.
-On the other hand, if you decide to switch these data to an external database, it will lower the global RAM need: the DB will take these 300MB of data, and each shiny application will make a  request to the database.
+On the other hand, if you decide to switch these data to an external database, it will lower the global RAM need: the DB will take these 300MB of data, and each shiny application will make a request to the database.
 For instance, if the database needs 300MB, and one shiny app 50MB, then 10 apps will be 300MB (for the DB) + 50MB \* 10 (for the 10 apps).
 In practice, other things are to be considered: making database requests can be computationally expensive, and might need some network adjustments, but you get the idea.
 
-How does one choose between database back-end?
-Well, first of all you need to see what is available in the environment the application will be deployed: maybe the company you are building the application for already has database servers deployed.
+How does one choose between database back-ends?
+Well, first of all you need to see what is available in the environment the application will be deployed in: maybe the company you are building the application for already has database servers deployed.
 If ever you are free to choose any database as a back-end, your choice should be driven by what kind of operations you want to make on these databases.
 **For example, SQL databases are designed to store tabular data, and they tend to be very fast when it comes to reading data: so if you have one or more large data.frames you want to use inside your application, and with no specific update of these data, an SQL back-end can be the perfect choice**.
 On the other hand, a NoSQL database like MongoDB will be faster when it comes to doing write operations, and can store any kind of object: for example, `{hexmake}` can use a MongoDB back-end to store RDS files.
 But that comes with a price: read calls are a little bit slower, and you might have to work a little bit more on handling the JSON results that come out of MongoDB.
-Another example of an app that uses on an external database is `{databasedemo}`, available at [engineering-shiny.org/databasedemo/](https://engineering-shiny.org/databasedemo/).
+Another example of an app that uses an external database is `{databasedemo}`, available at [engineering-shiny.org/databasedemo/](https://engineering-shiny.org/databasedemo/).
 Feel free to follow this link for more information about this application!
 
 Covering all the available types of databases and the packages associated with each is a very, very large topic: there are dozens of database systems, and as many (if not more) packages to interact with them.
@@ -983,7 +983,7 @@ For more extensive coverage of using databases in R, please follow these resourc
 
 -   [colinfay/r-db](https://colinfay.me/r-db/), a Docker image that bundles the toolchain for a lot of database systems for R.
 
--   [CRAN Task View: Databases with R](https://cran.r-project.org/web/views/Databases.html): the official task view from CRAN with a series of packages for database manipulation
+-   [CRAN Task View: Databases with R](https://cran.r-project.org/web/views/Databases.html): the official task view from CRAN with a series of packages for database manipulation.
 
 ### Data-source checklist
 

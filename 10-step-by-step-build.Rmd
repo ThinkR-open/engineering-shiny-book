@@ -33,7 +33,7 @@ But what about other dependencies like `{ggplot2}`? These ones need to be added 
 
 [^step-by-step-build-1]: The idea with this function is to provide a shortcut for adding commonly used dependencies, so that you don't have to do it by hand.
 
-Here is how to process for a new dependency:
+Here is how to proceed for a new dependency:
 
 -   Open the `dev/02_dev.R` script.
 -   Call the `use_package()` function from `{usethis}`: `usethis::use_package("pkg.you.want.to.add")`.
@@ -53,11 +53,11 @@ There are two places where the dependencies of your application need to be manag
 -   The `NAMESPACE` file describes how your app interacts with the R session at run time, i.e. **when your application is launched**.
     With this `NAMESPACE` file, you can specify only a subset of functions to import from other packages: for example, you can choose to import only `renderDT()` and `DTOutput()` from `{DT}`, instead of importing all the functions.
     This selective import mechanism allows you to avoid namespace conflicts: for example, between `jsonlite::flatten()` and `purrr::flatten()`.[^step-by-step-build-4]
-    To do so, we will need to go to every script that defines one or several function/s, and add a `{roxygen2}` [@R-roxygen2] tag, in the following form : `#' @importFrom jsonlite fromJSON` and `#' @importFrom purrr flatten`: that way, you are only importing `fromJSON()` from `{jsonlite}`.
+    To do so, we will need to go to every script that defines one or several function/s, and add a `{roxygen2}` [@R-roxygen2] tag, in the following form: `#' @importFrom jsonlite fromJSON` and `#' @importFrom purrr flatten`: that way, you are only importing `fromJSON()` from `{jsonlite}`.
 
 [^step-by-step-build-3]: Note that most of the time, you will not be filling this by hand, but by using `usethis::use_package()`.
 
-[^step-by-step-build-4]: This can be pretty common as `{jsonlite}` might import `JSON` files as list, and `{purrr}` has pretty powerful tools for manipulating lists.
+[^step-by-step-build-4]: This can be pretty common as `{jsonlite}` might import `JSON` files as lists, and `{purrr}` has pretty powerful tools for manipulating lists.
 
 Note that you can also use explicit namespacing, i.e. the `pkg::function()` notation inside your code.
 And if you need a little help to identify dependencies, all the explicitly namespaced calls (`pkg::function()`) can be scraped using the `{attachment}` [@R-attachment] package:
@@ -86,7 +86,7 @@ To learn more about the details of how to manage dependencies, and about the `DE
 ## Submodules and utility functions
 
 When building a large application, you **will be splitting your codebase into smaller pieces**.
-In Chapter \@ref(structuring-project), "Structuring Your Project", that these utilitarian functions should be defined in files that are prefixed with a specific term.
+In Chapter \@ref(structuring-project), "Structuring Your Project", we saw that these utilitarian functions should be defined in files that are prefixed with a specific term.
 In the `{golem}` world, these are `utils_*` and `fct_*` files:
 
 -   `utils_*` files contain small functions that might be used several times in the application.
@@ -100,8 +100,8 @@ golem::add_fct( "helpers" )
 golem::add_utils( "helpers" )
 ```
 
--   The first will create a `R/fct_helpers.R` file.
--   The second will create a `R/utils_helpers.R` file.
+-   The first will create an `R/fct_helpers.R` file.
+-   The second will create an `R/utils_helpers.R` file.
 
 The idea, as explained before, is that as soon as you open a `{golem}`-based project, you are able to identify what the files contain, without having to open them.[^step-by-step-build-5]
 
@@ -112,7 +112,7 @@ For example, the `{hexmake}` app has two of these files, [`R/utils_ui.R`](https:
 The `fct_*` files are to be used with larger functions, which are more central to the application, but that might not fit into a specific module.
 For example, in `{hexmake}`, you will find [`R/fct_mongo.R`](https://github.com/ColinFay/hexmake/blob/master/R/fct_mongo.R), which is used to handle all the things related to connecting and interacting with the Mongodb database.
 
-As you can see, the difference is that `fct_*` file are more "topic centered", in the sense that they gather functions that relate to a specific feature of the application (here, the database), while `utils_*` files are more used as a place to put miscellaneous functions.
+As you can see, the difference is that `fct_*` files are more "topic centered", in the sense that they gather functions that relate to a specific feature of the application (here, the database), while `utils_*` files are more used as a place to put miscellaneous functions.
 
 Note that when building a module with `golem::add_module()`, you can add a module-specific `fct_*` or `utils_*` file:
 
@@ -200,7 +200,7 @@ Note that you can also perform code coverage locally, using the `{covr}` [@R-cov
 code_coverage <- covr::package_coverage()
 ```
 
-For example, Figure \@ref(fig:10-step-by-step-build-11) is the output of running the `package_coverage()` function on the `{golem}` package on the 2020-04-29 on the `dev` branch:
+For example, Figure \@ref(fig:10-step-by-step-build-11) is the output of running the `package_coverage()` function on the `{golem}` package on 2020-04-29 on the `dev` branch:
 
 (ref:golemcodecoverageresults) {golem} code coverage results.
 
@@ -240,10 +240,10 @@ Note also that if you want to add the code coverage of your application inside a
 #### B. Continuous Integration {.unnumbered}
 
 Continuous integration, on the other hand, is ensuring the software is still working whenever a change is made by one of the developers.
-The idea is to add to the centralized version control system (for example, Git)[^step-by-step-build-6] a service like Travis CI, GitHub Action (if you are on GitHub), or GitLab CI (for GitLab) that runs a series of commands whenever something is integrated in the repository, i.e. every time a change to the codebase is made.
+The idea is to add to the centralized version control system (for example, Git)[^step-by-step-build-6] a service like Travis CI, GitHub Actions (if you are on GitHub), or GitLab CI (for GitLab) that runs a series of commands whenever something is integrated in the repository, i.e. every time a change to the codebase is made.
 In other words, every time a new piece of code is sent to the central repository, a service runs regression tests that check that the software is still in a valid, working state.
 
-[^step-by-step-build-6]: We will get back to version control in the Chapter \@ref(version-control), "Version Control"..
+[^step-by-step-build-6]: We will get back to version control in Chapter \@ref(version-control), "Version Control".
 
 You can set up various continuous integration services automatically by using functions from the `{usethis}` package:
 
@@ -289,7 +289,7 @@ golem::cat_dev("In dev\n")
 
 Of course, chances are you do not only need to print things, you might want to use other functions.
 Good news!
-You can make any function being "dev-dependent" with the `make_dev()` function:
+You can make any function "dev-dependent" with the `make_dev()` function:
 
 ```{r 10-step-by-step-build-16, eval = TRUE}
 # Same mechanism as cat_dev, but with other functions 

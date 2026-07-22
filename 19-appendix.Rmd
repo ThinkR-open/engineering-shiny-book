@@ -19,10 +19,10 @@ Hello!
 We want to build a small application that can 
 minify CSS, JavaScript, HTML and JSON. 
 
-In this app, user will be able either to paste 
+In this app, users will be able either to paste
 the content or to upload a file. 
 
-Once the content is pasted/upladed, they select 
+Once the content is pasted/uploaded, they select
 the type, which is pre-selected based on the 
 file extension. Then they click on a button, 
 and the content is minified. 
@@ -49,7 +49,7 @@ Cheers!
 -   The user might get different results based on the minifying algorithm they use, which can be surprising at first.
     The application should alert about this.
 
--   For long printed outputs, if we use `verbatimTextOuput`, we should be careful about the page width, as these elements will natively overflow on the x-axis of the page.
+-   For long printed outputs, if we use `verbatimTextOutput`, we should be careful about the page width, as these elements will natively overflow on the x-axis of the page.
     This should be doable with the following CSS: `pre{ white-space: pre-wrap; word-break: keep-all; }`.
 
 -   We should be careful about using semantic HTML for the inputs and outputs.
@@ -125,7 +125,7 @@ company
 `r nms[1]` is a `{shiny}` developer at `r company[1]`.
 She's been learning R in graduate school while working on her master's degree in statistics.
 When she started at `r company[1]`, she was mainly doing data analysis in Rmd, but has gradually switched to building `{shiny}` applications full-time.
-She discovered minification while reading the "Engineering Production-Grade Shiny App" book, and now wants to add this to her `{shiny}` application.
+She discovered minification while reading the "Engineering Production-Grade Shiny Apps" book, and now wants to add this to her `{shiny}` application.
 
 #### `r nms[2]`: web developer and trainer at `r company[2]` {.unnumbered}
 
@@ -152,7 +152,7 @@ minif <- paste0("`", minif, "()`")
 minif <- knitr::combine_words(minif)
 ```
 
--   `guess_minifier`, which will take a function and return the available algorithms for that file: for example, if you have a JavaScript file, you'll be able to use the `r minif` functions. If the type is not guessed based on the extension, the function should fail gracefully, and not make `{shiny}` crash. We'll chose to return an empty string if this extension is not guessed.
+-   `guess_minifier`, which will take a function and return the available algorithms for that file: for example, if you have a JavaScript file, you'll be able to use the `r minif` functions. If the type is not guessed based on the extension, the function should fail gracefully, and not make `{shiny}` crash. We'll choose to return an empty string if this extension is not guessed.
 
 ```{r 19-appendix-4}
 library(minifyr)
@@ -161,8 +161,8 @@ guess_minifier <- function(file){
   ext <- tools::file_ext(file)
   # Check that the extension is correct, if not, return early
   # It's important to do this kind of check also 
-  # on the server side as HTML manual tempering 
-  # would allow to also send other type of files
+  # on the server side as HTML manual tampering
+  # would allow one to also send other types of files
   if (
     ! ext %in% c("js", "css", "html", "json")
   ){
@@ -211,7 +211,7 @@ guess_minifier(
 guess_minifier(
   minifyr_example("json")
 )[2:4]
-# Try with a non valid extension
+# Try with an invalid extension
 guess_minifier(
   "path/to/text.docx"
 )
@@ -361,7 +361,7 @@ Here are the few steps we will be working on:
     To do so, we will use `triggers` from `{gargoyle}`.
 
 -   Chances are, users will be testing several algorithms when using the application, and we don't want the minification process to happen another time when it is called on the same file and with the same algorithm.
-    This is even even more important because the process involves calling an external NodeJS process.
+    This is even more important because the process involves calling an external NodeJS process.
     To prevent that, we will be caching the function that does the computation.
 
 -   Create an unseen input that will upload data, so that we can build an interactivity test using `{crrry}`.
@@ -423,7 +423,7 @@ As an example, we will deploy this app in three media: as a package, on RStudio 
 
 ### Before deployment checklist {.unnumbered}
 
--   [x] *`devtools::check()`, run from the command line, return 0 errors, 0 warnings, 0 notes*
+-   [x] *`devtools::check()`, run from the command line, returns 0 errors, 0 warnings, 0 notes*
 
 -   [x] *The current version number is valid, i.e* if the current app is an update, the version number has been bumped: it makes sense, before the first deployment, to keep a version number of `0.0.0.9000`, and increment this dev version whenever we implement changes or do test deployments.
     Because this is a "true" deployment, we bumped the version to `0.1.0`.
@@ -432,9 +432,9 @@ As an example, we will deploy this app in three media: as a package, on RStudio 
 
 -   [x] *Test coverage is good, i.e. you cover a sufficient amount of the codebase, and these tests cover the core/strategic algorithms*.
 
--   [x] *The person to call if something goes wrong is clear to everyone involved in the product.*.
+-   [x] *The person to call if something goes wrong is clear to everyone involved in the product.*
 
--   [x] *The debugging process is clear to everyone involved in the project, including how to communicate bugs to the developer team, and how long it will take to get changes implemented*: this project will be made open source, so the bug will have to be listed on the Github repo.
+-   [x] *The debugging process is clear to everyone involved in the project, including how to communicate bugs to the developer team, and how long it will take to get changes implemented*: this project will be made open source, so the bug will have to be listed on the GitHub repo.
     To help that, we added a link to the GitHub repository on the application.
 
 -   [x] *(If relevant) The server it is deployed on has all the necessary software installed (Docker, Connect, `Shiny Server`, etc.) to make the application run*.
@@ -453,7 +453,7 @@ As an example, we will deploy this app in three media: as a package, on RStudio 
 
 -   [x] *(If relevant) The server where the app is deployed has access to the data sources (database, API...)*: not relevant.
 
--   [x] *If the app records data and there are backups for these data*: not relevant
+-   [x] *If the app records data and there are backups for these data*: not relevant.
 
 ### Deploy as a tar.gz {.unnumbered}
 
@@ -461,7 +461,7 @@ To share an application as a tar.gz, you can call `devtools::build()`, which wil
 You can then share this archive, and install it with `remotes::install_local("path/to/tar.gz")`.
 Note that this can also be done with base R, but `{remotes}` offers a smarter way when it comes to managing the dependencies of your archived package.
 
-This `tar.gz` can also be sent to a package repository; be it the CRAN or any other package manager you might have in your company.
+This `tar.gz` can also be sent to a package repository; be it CRAN or any other package manager you might have in your company.
 
 ### Deploy on RStudio Connect {.unnumbered}
 
@@ -477,7 +477,7 @@ Once this is done, we will create/update the `.dockerignore` file at the root of
     Removing the installation of `libgit2-dev` solved the issue.
 
 Inside our `Dockerfile`, we will also change the default repo to use <https://packagemanager.rstudio.com/all/latest>, which proposes precompiled packages for our system, making the installation faster.
-We will also add an installation of NodeJS, which is needed by our application..
+We will also add an installation of NodeJS, which is needed by our application.
 
 Then, we can go to our terminal and compile the image!
 
