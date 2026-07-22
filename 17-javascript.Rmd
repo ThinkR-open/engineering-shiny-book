@@ -9,7 +9,7 @@ knitr::opts_chunk$set( comment = "", eval = FALSE)
 Note you can build a successful, production-grade `{shiny}`[@R-shiny] application without ever writing a single line of JavaScript code.
 Even more when you can use a lot of tools that already bundle JavaScript functionalities: a great example of that being `{shinyjs}` [@R-shinyjs], which allows you to interact with your application using JavaScript, without writing a single line of JavaScript.
 
-We chose to include this chapter in this book as it will help you get a better understanding on how `{shiny}` works at its core, and show you that getting at ease with JavaScript can help you get better at building web applications using R in the long run.
+We chose to include this chapter in this book as it will help you get a better understanding of how `{shiny}` works at its core, and show you that getting at ease with JavaScript can help you get better at building web applications using R in the long run.
 It can also help you extend `{shiny}` with other JavaScript libraries, for example, using `{htmlwidgets}` [@R-htmlwidgets], when you get better at writing JavaScript.
 
 That being said, note also that every inclusion of external JavaScript code or library can present a security risk for your application, so don't include code you don't know/understand in your application unless you are sure of what you are doing. 
@@ -54,7 +54,7 @@ It's important to note here that the **communication happens in both directions*
 In fact, when we write a piece of code like `sliderInput("first_input", "Select a number", 1, 10, 5)`, what we are doing is creating a binding between JavaScript and R, where the JavaScript runtime (in the browser) listens to any event happening on the slider with the id `"plop"`, and whenever it detects that something happens to this element, something (most of the time its value) is sent back to R, and R does computation based on that value.
 With `output$bla <- renderPlot({})`, what we are doing is making the two communicate the other way around: we are telling JavaScript to listen to any incoming data from R for the `id` `"bla"`, and whenever JavaScript sees incoming data from R, it puts it into the proper HTML tag (here, JavaScript inserts the image received from R in the `<img>` tags with the id `bla`).
 
-Even if everything is written in R, we **are** writing a web application, i.e..
+Even if everything is written in R, we **are** writing a web application, i.e.
 HTML, CSS and JavaScript elements.
 Once you have realized that, the possibilities are endless: in fact almost anything doable in a "classic" web app can be done in `{shiny}` with a little bit of tweaking.
 What this also implies is that getting (even a little bit) better at writing HTML, CSS, and especially JavaScript will make your app better, smaller, and more user-friendly, as JavaScript is a language that has been designed to interact with a web page: change element appearances, hide and show things, click somewhere, show alerts and prompts, etc.
@@ -63,8 +63,8 @@ All these things are good examples of where you should be using JavaScript inste
 
 Moreover, the number of JavaScript libraries available on the web is tremendous; and the good news is that `{shiny}` has everything it needs to bundle external JavaScript libraries inside your application.[^javascript-2]
 
-[^javascript-2]: This can also be done by wrapping a JS libraries inside a package, which will later be used inside an application.
-    See for example `{glouton}` [@R-glouton], which is a wrapper around the [`js-cookie` >https://github.com/js-cookie/js-cookie> JavaScript library.
+[^javascript-2]: This can also be done by wrapping a JS library inside a package, which will later be used inside an application.
+    See for example `{glouton}` [@R-glouton], which is a wrapper around the [`js-cookie`](https://github.com/js-cookie/js-cookie) JavaScript library.
 
 This is what this section of the book aims at: giving you just enough JavaScript knowledge to lighten your `{shiny}` app, in order to improve the global user and developer experience.
 In this chapter, we will first review some JavaScript basics which can be used "client-side" only, i.e. only in your browser.
@@ -86,7 +86,7 @@ This will open a new interface where you can have access to a JavaScript console
 Here, you can try your first JavaScript code!
 For example, you can try running `var message = "Hello world"; alert(message);`.
 
-[^javascript-3]: You can now work with JavaScript in a server with Node.JS, but this won't be a useful software when working with `{shiny}`.
+[^javascript-3]: You can now work with JavaScript in a server with Node.JS, but this won't be useful software when working with `{shiny}`.
     See linked resources to learn more.
 
 As you might have guessed, we will not be focusing on playing with JavaScript in your browser console: what we want to know is how to insert JavaScript code inside a `{shiny}` application.
@@ -172,7 +172,7 @@ document.getElementsByTagName("div")
 Note that some of these methods have been introduced with ES6, which is a version of JavaScript that came out in 2015.
 This version of JavaScript is supported by most browsers since mid-2016 (and June 2017 for Firefox) (see [JavaScript Versions](https://www.w3schools.com/js/js_versions.asp) from W3Schools).
 Most of your users should now be using a browser version that is compatible with ES6, but that is something that you might want to keep in mind: browser version matters when it comes to using JavaScript.
-Indeed, some companies (for internal reason) are still using old versions of Internet Explorer: a constraint you want to be aware of before starting to build the app, hence a question that you want to ask during the Design step.
+Indeed, some companies (for internal reasons) are still using old versions of Internet Explorer: a constraint you want to be aware of before starting to build the app, hence a question that you want to ask during the Design step.
 
 ### About DOM events
 
@@ -321,7 +321,7 @@ observeEvent(input$ok, {
 
 ```{r 17-javascript-4, eval = FALSE}
 output$ui <- renderUI({
-  # Conditionnal rendering of the UI
+  # Conditional rendering of the UI
   if (this){
     tags$p("First")
   } else {
@@ -347,7 +347,7 @@ The `onclick` attribute can be added straight inside the HTML tag when possible:
 ```{r 17-javascript-5, eval = FALSE}
 # Building a button using the native HTML tag 
 # (i.e. not using the actionButton() function)
-# This button only goal is to launch this JS code
+# This button's only goal is to launch this JS code
 # when it is clicked 
 tags$button(
   "Show",
@@ -358,8 +358,8 @@ tags$button(
 Or with `shiny::tagAppendAttributes()`:
 
 ```{r 17-javascript-6, eval = FALSE}
-# Using tagAppendAttributes() allows to add attributes to the 
-# outputed UI element
+# Using tagAppendAttributes() allows you to add attributes to the
+# outputted UI element
 plotOutput(
   "plot"
 ) %>% tagAppendAttributes(
@@ -547,7 +547,7 @@ For example, with:
 
 ```{js 17-javascript-16, eval = FALSE, echo = TRUE}
 // This function from the Shiny JavaScript object
-// Allows to register an input name, and a value
+// Allows you to register an input name, and a value
 Shiny.setInputValue("rand", Math.random())
 ```
 
@@ -589,7 +589,7 @@ $(function(){
 });
 ```
 
-These events (getting the user name and the last plot clicked), can then be caught from the server side with:
+These events (getting the user name and the last plot clicked) can then be caught from the server side with:
 
 ```{r 17-javascript-19, eval = FALSE}
 # We wait for the output of alertme(), which will set the
@@ -674,7 +674,7 @@ mod_my_first_module_server <- function(input, output, session){
 As said in the introduction to this chapter, running JavaScript code that you don't fully control/understand can be tricky and might open doors for external attacks.
 In many cases, for the most common JavaScript manipulations, it's safer to go for a package that has already been proved efficient: `{shinyjs}`.
 
-This package, licensed in MIT since version 2.0.0, can be used to perform common JavaScript tasks: show, hide, alert, click, etc.
+This package, licensed under MIT since version 2.0.0, can be used to perform common JavaScript tasks: show, hide, alert, click, etc.
 
 See [deanattali.com/shinyjs/](https://deanattali.com/shinyjs/) for more information about how to use this package.
 
@@ -701,7 +701,7 @@ const get_rand_beer = () => {
   fetch("https://api.punkapi.com/v2/beers/random")
   // What do we do when we receive the data
   .then((data) =>{
-  // TTurn the data to JSON
+  // Turn the data to JSON
     data.json().then((res) => {
     // Send the json to R
       Shiny.setInputValue("beer", res, {priority: 'event'})
@@ -732,7 +732,7 @@ Learn more about `fetch()` at [Using Fetch](https://developer.mozilla.org/en-US/
 If you want to interact straight from R with NodeJS (JavaScript in the terminal), you can try the `{bubble}` [@R-bubble] package.
 Be aware that you will need to have a working NodeJS installation on your machine.
 
-It can be installed from GitHub
+It can be installed from GitHub:
 
 ```{r 17-javascript-23, eval = FALSE}
 remotes::install_github("ColinFay/bubble")

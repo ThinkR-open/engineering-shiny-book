@@ -20,7 +20,7 @@ That **focusing on optimizing small portions of your app before making it work f
 Why?
 Here is the general idea: let's say the schema in Figure \@ref(fig:14-when-optimize-1) represents your software, and its goal is to make things travel from *X1* to *X2*, but you have a bottleneck at *U*.
 You are building elements piece by piece: first, the portion `X1.1` of the "road", then `X1.2`, etc.
-Only when you have your application ready can you really appreciate where your bottleneck is, and you can focus on making things go fast from `X1.1` to `X.1.2`, these performance gains won't make your application go faster: you will only make the elements move faster to the bottleneck.
+Only when you have your application ready can you really appreciate where your bottleneck is, and you can focus on making things go fast from `X1.1` to `X1.2`, these performance gains won't make your application go faster: you will only make the elements move faster to the bottleneck.
 
 When?
 Once the application is ready: here in our example, we can only detect the bottleneck once the full road is actually built, not while we are building the circle.
@@ -75,7 +75,7 @@ Yet you will only realize that once the application is up and running!
 ### Don't sacrifice readability
 
 As said in the last section, every piece of code can be rewritten to be faster, either from R to R or using a lower-level language: for example C or C++.
-You can also rebuild data manipulation code switching from one package to another, or use a complex data structures to optimize memory usage, etc.
+You can also rebuild data manipulation code switching from one package to another, or use complex data structures to optimize memory usage, etc.
 
 But that comes with a price: **not keeping things simple for the sake of local optimization makes maintenance harder, even more if you are using a lesser-known language/package**.
 Refactoring a piece of code is better done when you keep in mind that "the primary goal should be to produce human-friendly code, even at the cost of your original design. If the laser focus is on the solution rather than the process, there's a greater chance your application will end up more contrived and complicated than it was in the first place" [@lemaire2020].
@@ -140,7 +140,7 @@ The best way to profile R code is by using the `{profvis}` [@R-profvis] package,
 With `{profvis}`, you can spot the bottleneck in your function.
 Without an automated tool to do the profiling, the developers would have to profile by guessing, which will, most of the time, come with bad results:
 
-[^when_optimize-1]: `{utils}` also comes with a function call `Rprof()`, but we will not be examining this one here, as `{profvis}` provides a more user-friendly and enhanced interface to this profiling function.
+[^when_optimize-1]: `{utils}` also comes with a function called `Rprof()`, but we will not be examining this one here, as `{profvis}` provides a more user-friendly and enhanced interface to this profiling function.
 
 > One of the lessons that the original Unix programmers learned early is that intuition is a poor guide to where the bottlenecks are, even for one who knows the code in question intimately. 
 > 
@@ -193,7 +193,7 @@ profvis({
 
 What you see now is called a `flame graph`: it is a detailed timing of how your function has run, with a clear decomposition of the call stack.
 What you see in the top window is the expression evaluated, and on the bottom the details of the call stack, with what looks a little bit like a Gantt diagram.
-This result reads as follow: the wider the function call, the more time it has taken R to compute this piece of code.
+This result reads as follows: the wider the function call, the more time it has taken R to compute this piece of code.
 On the very bottom, the "top" function (i.e. the function which is directly called in the console), and the higher you go, the more you enter the nested function calls.
 
 Here is how to read the graph in \@ref(fig:14-when-optimize-4):
@@ -224,7 +224,7 @@ If you are working on profiling the memory usage, you can also use the `{profmem
 
 ```{r 14-when-optimize-6 }
 library(profmem)
-# Computing the memory used by each c
+# Computing the memory used by each call
 p <- profmem({
   x <- raw(1000)
   A <- matrix(rnorm(100), ncol = 10)
@@ -262,13 +262,13 @@ And of course, without a clear documentation of what we are doing, we will be mi
 In other words, if you want to be sure that you are actually optimizing, be sure that you have a basis for comparison.
 
 How to do that?
-One thing that can be done is to keep an RMarkdown file with your starting point: use this notebook to keep track of what you are doing, by noting where you are starting from (i.e, what's the original function you want to optimize), and compare it with the new one.
-By using an Rmd, you can document the strategies you have been using to optimize the code, e.ga: "switched from for loop to vectorize function", "changed from x to y", etc.
+One thing that can be done is to keep an RMarkdown file with your starting point: use this notebook to keep track of what you are doing, by noting where you are starting from (i.e., what's the original function you want to optimize), and compare it with the new one.
+By using an Rmd, you can document the strategies you have been using to optimize the code, e.g.: "switched from for loop to vectorized function", "changed from x to y", etc.
 This will also be helpful for the future: either for you in other projects (you can get back to this document), or for other developers, as it will explain why specific decisions have been made.
 
 To do the timing computation, you can use the `{bench}` [@R-bench] package, which compares the execution time (and other metrics) of two functions.
 This function takes a series of named elements, each containing an R expression that will be timed.
-Note that by default, the `mark()` function compares the output of each function,
+Note that by default, the `mark()` function compares the output of each function.
 
 Once the timing is done, you will get a data.frame with various metrics about the benchmark.
 
@@ -294,7 +294,7 @@ res <- bench::mark(
 res
 ```
 
-Here, we have an empirical evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest.
+Here, we have empirical evidence that one code is faster than the other: by benchmarking the speed of our code, we are able to determine which function is the fastest.
 
 If you want a graphical analysis, `{bench}` comes with an `autoplot` method for `{ggplot2}` [@R-ggplot2], as shown in Figure \@ref(fig:14-when-optimize-10):
 
@@ -333,7 +333,7 @@ Yet many, if not all, studies of how the web is browsed report the same results:
 
 [^when_optimize-3]: broadbandsearch <https://www.broadbandsearch.net/blog/mobile-desktop-internet-usage-statistics> for example, reports a 53.3% share for mobile browsing.
 
-And, the advantages of running it in your browser is that it can perform the analysis on locally deployed applications: in other words, you can launch your `{shiny}` application in your R console, open the app in Google Chrome, and run the audit.
+And, the advantage of running it in your browser is that it can perform the analysis on locally deployed applications: in other words, you can launch your `{shiny}` application in your R console, open the app in Google Chrome, and run the audit.
 A lot of online services need a URL to do the audit!
 
 Each result from the audit comes with advice and changes you can make to your application to make it better, with links to know more about the specific issue.
@@ -343,7 +343,7 @@ It is always a good mood booster to see our app passing some audited points!
 
 Here is a quick introduction to this tool:
 
--   Open Chrome in incognito mode (File \> New Icognito Window),[^when_optimize-4] so that the page performance is not influenced by any of the installed extensions in your Google Chrome.
+-   Open Chrome in incognito mode (File \> New Incognito Window),[^when_optimize-4] so that the page performance is not influenced by any of the installed extensions in your Google Chrome.
 -   Open your developer console, either by going to View \> Developer \> Developer tools, by right-clicking \> Inspect, or with the keyboard shortcut ctrl/cmd + alt + I, as shown in Figure \@ref(fig:14-when-optimize-11).
 -   Go to the "Audit" tab.
 -   Configure your report (or leave the default).
@@ -384,11 +384,11 @@ Once the audit is finished, you have some basic but useful indications about you
 -   SEO, search engine optimization, or how your app will perform when it comes to search engine indexation.[^when_optimize-6]
 
 -   Progressive Web App (PWA): A PWA is an app that can run on any device, *"reaching anyone, anywhere, on any device with a single codebase"*.
-    Google audit your application to see if your application fits with this idea.
+    Google audits your application to see if your application fits with this idea.
 
 [^when_optimize-6]: Search engine indexation refers to how Google ranks your website in the search results for a given query.
 
-Profiling web page is a wide topic and a lot of things can be done to enhance the global page performance.
+Profiling web pages is a wide topic and a lot of things can be done to enhance the global page performance.
 That being said, if you have a limited time to invest in optimizing the front-end performance of the application, Google Lighthouse is a perfect tool, and can be your go-to audit tool for your application.
 
 And if you want to do it from R, the npm lighthouse module allows you to output the audit in JSON, which can then be brought back to R!
@@ -399,7 +399,7 @@ lighthouse --output json \
   http://localhost:2811
 ```
 
-Then, being a JSON file, you can call if from R:
+Then, being a JSON file, you can call it from R:
 
 ```{r 14-when-optimize-13 }
 # Reading the JSON output of your lighthouse audit, 
@@ -408,7 +408,7 @@ lighthouse_report <- jsonlite::read_json("data-raw/output.json")
 lighthouse_report$audits$`speed-index`$displayValue
 ```
 
-The results are contained in the `audits` sections of this object, and each of these sub-elements contains a `description` field, detailing what the metric means.
+The results are contained in the `audits` section of this object, and each of these sub-elements contains a `description` field, detailing what the metric means.
 
 Here are, for example, some of the results, focused on performance, with their respective descriptions:
 
@@ -550,7 +550,7 @@ To minify JavaScript, HTML and CSS files from R, you can use the `{minifyr}` [@R
 For example, compare the size of this file from `{shiny}`:
 
 ```{r 14-when-optimize-24, eval = FALSE}
-# Displaying the file size of a CSS file from {shiny}
+# Displaying the file size of a JS file from {shiny}
 fs::file_size(
   system.file("www/shared/shiny.js", package = "shiny")
 ) 
@@ -563,7 +563,7 @@ cat("239K")
 To its minified version:
 
 ```{r 14-when-optimize-26, eval = FALSE}
-# Using the {minifyr} package to minify the CSS file
+# Using the {minifyr} package to minify the JS file
 minified <- minifyr::minifyr_js_gcc(
   system.file("www/shared/shiny.js", package = "shiny"), 
   "shinymini.js"
@@ -585,12 +585,12 @@ Of course, minification will not suddenly make your application blazing fast, bu
 Minification can be important notably if you expect your audience to be connecting to your app with a low bandwidth: whenever your application starts, the browser has to download the source files from the server, meaning that the larger these files, the longer it will take to render.
 
 Note that `{shiny}` files are minified by default, so you will not have to re-minify them.
-But most packages that extend `{shiny}` are not, so minifying the CSS and JavaScript files from these packages might help you win some points on you Google Lighthouse report!
+But most packages that extend `{shiny}` are not, so minifying the CSS and JavaScript files from these packages might help you win some points on your Google Lighthouse report!
 
 To do this automatically, you can add the `{minifyr}` commands to your deployment, be it on your CD/CI platform, or as a Dockerfile step.
 `{minifyr}` comes with a series of functions to do that:
 
--   `minify_folder_css()`, `minify_folder_js()`, `minify_folder_html()` and `minify_folder_json()` do a bulk minification of the files found in a folder that matches the extension.
+-   `minify_folder_css()`, `minify_folder_js()`, `minify_folder_html()` and `minify_folder_json()` do a bulk minification of the files found in a folder that match the extension.
 -   `minify_package_js()`, `minify_package_css()`, `minify_package_html()` and `minify_package_json()` will minify the CSS and JavaScript files contained inside a package installed on the machine.
 
 Here is what it can look like inside a `Dockerfile` (Note that you will need to install NodeJS inside the container):
